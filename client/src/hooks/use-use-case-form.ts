@@ -102,24 +102,26 @@ export function useUseCaseForm() {
   const validateStep = useCallback((step: number): boolean => {
     switch (step) {
       case 1:
-        return !!formData.useCaseType;
+        return !!formData.aiModel; // AI Model selection
       case 2:
-        return !!(formData.clientName && formData.projectName && formData.useCaseCode);
+        return !!formData.useCaseType; // Use Case Type selection
       case 3:
+        return !!(formData.clientName && formData.projectName && formData.useCaseCode); // Basic Info
+      case 4:
         const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir'];
         const startsWithInfinitive = infinitiveVerbs.some(verb => 
           formData.useCaseName.toLowerCase().startsWith(verb)
         );
-        return !!(formData.useCaseName && formData.fileName && formData.description && startsWithInfinitive);
-      case 4:
-        return formData.useCaseType !== 'entity' || formData.searchFilters.some(f => f.trim());
+        return !!(formData.useCaseName && formData.fileName && formData.description && startsWithInfinitive); // Use Case Details
       case 5:
-        return formData.useCaseType !== 'entity' || formData.resultColumns.some(c => c.trim());
+        return formData.useCaseType !== 'entity' || formData.searchFilters.some(f => f.trim()); // Search Filters (Entity only)
       case 6:
-        return formData.useCaseType !== 'entity' || formData.entityFields.some(f => f.name.trim());
+        return formData.useCaseType !== 'entity' || formData.resultColumns.some(c => c.trim()); // Result Columns (Entity only)
       case 7:
-        return true; // Optional fields
+        return formData.useCaseType !== 'entity' || formData.entityFields.some(f => f.name.trim()); // Entity Fields (Entity only)
       case 8:
+        return true; // Optional fields (Business Rules)
+      case 9:
         return true; // Review step
       default:
         return true;
