@@ -75,72 +75,43 @@ export class DocumentService {
       }
     } catch (error) {
       console.error('Error loading header image:', error);
-      // Fallback to text
+      // Use text fallback
       headerParagraphChildren = [new TextRun({
-        text: "INGEMATICA - Documentación de casos de uso", 
+        text: "INGEMATICA - Documentación de casos de uso",
         font: "Segoe UI Semilight",
         size: 24,
         color: "0070C0",
         bold: true
       })];
     }
-    
+
+    // Create document
     const doc = new Document({
-      sections: [{
-        properties: {
-          page: {
-            margin: {
-              top: 1440, // 1 inch = 1440 twips
-              right: 1440,
-              bottom: 1440,
-              left: 1440,
+      sections: [
+        {
+          headers: {
+            default: new Header({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: headerParagraphChildren
+                })
+              ]
+            })
+          },
+          children: paragraphs,
+          properties: {
+            page: {
+              margin: {
+                top: 1440, // 1 inch = 1440 twips
+                right: 1440,
+                bottom: 1440,
+                left: 1440,
+              }
             }
           }
-        },
-        headers: {
-          default: new Header({
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: headerParagraphChildren
-              })
-            ]
-          })
-        },
-        footers: {
-          default: new Footer({
-            children: [
-              new Paragraph({
-                alignment: AlignmentType.JUSTIFIED,
-                children: [
-                  new TextRun({
-                    text: "Página ",
-                    font: "Segoe UI Semilight",
-                    size: 20
-                  }),
-                  new TextRun({
-                    children: [PageNumber.CURRENT]
-                  }),
-                  new TextRun({
-                    text: " de ",
-                    font: "Segoe UI Semilight",
-                    size: 20
-                  }),
-                  new TextRun({
-                    children: [PageNumber.TOTAL_PAGES]
-                  }),
-                  new TextRun({
-                    text: `${' '.repeat(50)}${useCaseName}`,
-                    font: "Segoe UI Semilight",
-                    size: 20
-                  })
-                ]
-              })
-            ]
-          })
-        },
-        children: paragraphs
-      }]
+        }
+      ]
     });
 
     return await Packer.toBuffer(doc);
@@ -156,24 +127,11 @@ export class DocumentService {
         .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '')
         .trim();
         
-      // Remove only standalone duplicate "HISTORIA DE REVISIONES Y APROBACIONES" titles (not the one with table)
-      const historyTitlePattern = /<h[1-6][^>]*>.*?HISTORIA DE REVISIONES Y APROBACIONES.*?<\/h[1-6]>/gi;
-      const historyMatches = cleanContent.match(historyTitlePattern);
-      if (historyMatches && historyMatches.length > 1) {
-        // Find which one is followed by a table and keep that one
-        for (const match of historyMatches) {
-          const matchIndex = cleanContent.indexOf(match);
-          const afterMatch = cleanContent.substring(matchIndex + match.length, matchIndex + match.length + 500);
-          // If this title is NOT followed by a table, remove it (it's the duplicate)
-          if (!afterMatch.includes('<table')) {
-            cleanContent = cleanContent.replace(match, '');
-          }
-        }
-      }
+      // Remove all existing "HISTORIA DE REVISIONES Y APROBACIONES" content to avoid duplicates
+      cleanContent = cleanContent.replace(/<h[1-6][^>]*>.*?HISTORIA DE REVISIONES Y APROBACIONES.*?<\/h[1-6]>/gi, '');
+      cleanContent = cleanContent.replace(/<table[^>]*>[\s\S]*?HISTORIA DE REVISIONES[\s\S]*?<\/table>/gi, '');
 
       const result: (Paragraph | Table)[] = [];
-      
-      // Process content more carefully to preserve structure
       
       // Extract and process tables first
       const tableMatches = cleanContent.match(/<table[^>]*>.*?<\/table>/gi);
@@ -190,9 +148,112 @@ export class DocumentService {
         }
       }
       
-      // Process remaining content by splitting into logical sections
-      const elements = this.parseContentElements(cleanContent);
-      result.push(...elements);
+      // Process remaining content by lines to preserve indentation
+      const lines = cleanContent.split(/\n+/);
+      
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        
+        const text = this.extractTextContent(trimmed);
+        if (!text) continue;
+        
+        // Handle headings
+        if (trimmed.match(/<h1[^>]*>/i)) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 200 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 32,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        } else if (trimmed.match(/<h2[^>]*>/i)) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 240, after: 120 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 28,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        } else if (trimmed.match(/<h3[^>]*>/i)) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_3,
+            spacing: { before: 200, after: 100 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 24,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        } else if (trimmed.match(/<h4[^>]*>/i)) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_4,
+            spacing: { before: 120, after: 80 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 22,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        } else {
+          // Create hierarchical list items based on text patterns
+          let indentLevel = 0;
+          let isListItem = false;
+          
+          // Detect numbered patterns (1., 2., etc) 
+          if (text.match(/^\d+\./)) {
+            indentLevel = 720; // 0.5 inch for first level
+            isListItem = true;
+          }
+          // Check for letter patterns (a., b., etc) - second level
+          else if (text.match(/^[a-z]\./)) {
+            indentLevel = 1080; // 0.75 inch for second level
+            isListItem = true;
+          }
+          // Check for roman numeral patterns (i., ii., etc) - third level
+          else if (text.match(/^[ivx]+\./)) {
+            indentLevel = 1440; // 1 inch for third level
+            isListItem = true;
+          }
+          
+          if (isListItem) {
+            result.push(new Paragraph({
+              indent: {
+                left: indentLevel,
+                hanging: 360 // Hanging indent for numbered lists
+              },
+              spacing: { after: 120 },
+              children: [new TextRun({
+                text,
+                size: 22,
+                font: "Segoe UI Semilight"
+              })]
+            }));
+          } else {
+            // Regular paragraph
+            result.push(new Paragraph({
+              spacing: { after: 120 },
+              children: [new TextRun({
+                text,
+                size: 22,
+                font: "Segoe UI Semilight"
+              })]
+            }));
+          }
+        }
+      }
       
       return result;
     } catch (error) {
@@ -208,253 +269,16 @@ export class DocumentService {
     }
   }
 
-  private static parseContentElements(content: string): Paragraph[] {
-    const result: Paragraph[] = [];
-    
-    // First, split by lines to preserve the exact structure from HTML
-    const lines = content.split(/\n/);
-    
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      
-      const text = this.extractTextContent(trimmed);
-      if (!text) continue;
-      
-      // Check for headings first
-      if (trimmed.match(/<h1[^>]*>/i)) {
-        result.push(new Paragraph({
-          heading: HeadingLevel.HEADING_1,
-          spacing: { after: 200 },
-          children: [new TextRun({
-            text,
-            bold: true,
-            size: 32,
-            color: "0070C0",
-            font: "Segoe UI Semilight"
-          })]
-        }));
-      } else if (trimmed.match(/<h2[^>]*>/i)) {
-        result.push(new Paragraph({
-          heading: HeadingLevel.HEADING_2,
-          spacing: { before: 240, after: 120 },
-          children: [new TextRun({
-            text,
-            bold: true,
-            size: 28,
-            color: "0070C0",
-            font: "Segoe UI Semilight"
-          })]
-        }));
-      } else if (trimmed.match(/<h3[^>]*>/i)) {
-        result.push(new Paragraph({
-          heading: HeadingLevel.HEADING_3,
-          spacing: { before: 200, after: 100 },
-          children: [new TextRun({
-            text,
-            bold: true,
-            size: 24,
-            color: "0070C0",
-            font: "Segoe UI Semilight"
-          })]
-        }));
-      } else if (trimmed.match(/<h4[^>]*>/i)) {
-        result.push(new Paragraph({
-          heading: HeadingLevel.HEADING_4,
-          spacing: { before: 120, after: 80 },
-          children: [new TextRun({
-            text,
-            bold: true,
-            size: 22,
-            color: "0070C0",
-            font: "Segoe UI Semilight"
-          })]
-        }));
-      } else {
-        // Check if this is a list item with numbered pattern
-        if (text.match(/^\d+\./)) {
-          result.push(this.createListItem(text));
-        } else if (text.match(/^[a-z]\./)) {
-          result.push(this.createListItem(text));
-        } else if (text.match(/^[ivx]+\./)) {
-          result.push(this.createListItem(text));
-        } else {
-          // Regular paragraph
-          result.push(new Paragraph({
-            spacing: { after: 120 },
-            alignment: AlignmentType.JUSTIFIED,
-            children: [new TextRun({
-              text,
-              size: 22,
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
-      }
-    }
-    
-    return result;
-  }
-
-  private static createListItem(text: string): Paragraph {
-    // Word-compatible hierarchical list formatting to match HTML indentation
-    let indentLevel = 0;
-    let tabStops: any[] = [];
-    
-    // Detect hierarchical numbering patterns exactly like HTML shows
-    if (text.match(/^\d+\.\d+\.\d+/)) {
-      // Third level (like "1.2.3") - deepest indent
-      indentLevel = 1440; // 1 inch
-      tabStops = [{ position: 1440, leader: "none" }];
-    } else if (text.match(/^\d+\.\d+/)) {
-      // Second level (like "1.2") - medium indent  
-      indentLevel = 1080; // 0.75 inch
-      tabStops = [{ position: 1080, leader: "none" }];
-    } else if (text.match(/^\d+\./)) {
-      // First level (like "1.") - base indent
-      indentLevel = 720; // 0.5 inch
-      tabStops = [{ position: 720, leader: "none" }];
-    } else if (text.match(/^[a-z]\./)) {
-      // Letter sublevel (like "a.") - same as second level
-      indentLevel = 1080; // 0.75 inch
-      tabStops = [{ position: 1080, leader: "none" }];
-    } else if (text.match(/^[ivx]+\./)) {
-      // Roman numeral sublevel (like "i.") - deepest
-      indentLevel = 1440; // 1 inch
-      tabStops = [{ position: 1440, leader: "none" }];
-    }
-    
-    return new Paragraph({
-      indent: {
-        left: indentLevel,
-        hanging: 360 // Proper hanging indent for numbered lists
-      },
-      tabStops: tabStops,
-      spacing: { after: 120 },
-      alignment: AlignmentType.JUSTIFIED,
-      children: [new TextRun({
-        text: text,
-        size: 22,
-        font: "Segoe UI Semilight"
-      })]
-    });
-  }
-
-  private static parseRegularContent(content: string): Paragraph[] {
-    const elements: Paragraph[] = [];
-    
-    // Clean content 
-    const cleanContent = content
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    // Split by major HTML tags while preserving structure
-    const sections = cleanContent.split(/(<h[1-6][^>]*>.*?<\/h[1-6]>|<p[^>]*>.*?<\/p>|<li[^>]*>.*?<\/li>|<div[^>]*>.*?<\/div>)/gi)
-      .filter(section => section.trim().length > 0);
-    
-    for (const section of sections) {
-      const trimmed = section.trim();
-      
-      if (trimmed.match(/<h1[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          elements.push(new Paragraph({
-            heading: HeadingLevel.HEADING_1,
-            children: [
-              new TextRun({
-                text,
-                bold: true,
-                size: 32,
-                color: "0070C0",
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else if (trimmed.match(/<h2[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          elements.push(new Paragraph({
-            heading: HeadingLevel.HEADING_2,
-            children: [
-              new TextRun({
-                text,
-                bold: true,
-                size: 28,
-                color: "0070C0",
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else if (trimmed.match(/<h3[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          elements.push(new Paragraph({
-            heading: HeadingLevel.HEADING_3,
-            children: [
-              new TextRun({
-                text,
-                bold: true,
-                size: 24,
-                color: "0070C0",
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else if (trimmed.match(/<h4[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          elements.push(new Paragraph({
-            heading: HeadingLevel.HEADING_4,
-            children: [
-              new TextRun({
-                text,
-                bold: true,
-                size: 22,
-                color: "0070C0",
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else {
-        // Handle all other content as simple paragraphs
-        const text = this.extractTextContent(trimmed);
-        if (text && text.length > 0) {
-          // Check for list items based on text patterns
-          let indentLevel = 0;
-          if (text.match(/^\d+\.\d+\.\d+/)) indentLevel = 720;
-          else if (text.match(/^\d+\.\d+/)) indentLevel = 360;
-          else if (text.match(/^[a-z]\./)) indentLevel = 360;
-          else if (text.match(/^[ivx]+\./)) indentLevel = 720;
-          
-          elements.push(new Paragraph({
-            indent: indentLevel > 0 ? { left: indentLevel } : undefined,
-            children: [new TextRun({
-              text,
-              size: 22,
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
-      }
-    }
-
-    return elements;
-  }
-
   private static extractTextContent(html: string): string {
     return html
-      .replace(/<[^>]*>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/&nbsp;/g, ' ') // Replace non-breaking spaces
+      .replace(/&amp;/g, '&') // Replace HTML entities
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\s+/g, ' ') // Normalize whitespace
       .trim();
   }
 
@@ -480,7 +304,6 @@ export class DocumentService {
           cells.push(new TableCell({
             children: [
               new Paragraph({
-                alignment: AlignmentType.LEFT,
                 children: [
                   new TextRun({
                     text: cellText,
@@ -491,241 +314,114 @@ export class DocumentService {
                 ]
               })
             ],
-            borders: {
-              top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-            },
             shading: isHeader ? {
-              type: ShadingType.SOLID,
-              color: "F5F5F5",
-            } : undefined
+              fill: "D9E2F3" // Light blue background for headers
+            } : undefined,
+            width: {
+              size: 20,
+              type: WidthType.PERCENTAGE
+            }
           }));
         }
 
         if (cells.length > 0) {
-          rows.push(new TableRow({ children: cells }));
+          rows.push(new TableRow({
+            children: cells
+          }));
         }
       }
 
-      if (rows.length > 0) {
-        return new Table({
-          width: {
-            size: 100,
-            type: WidthType.PERCENTAGE,
-          },
-          rows: rows
-        });
-      }
+      if (rows.length === 0) return null;
 
-      return null;
+      return new Table({
+        rows: rows,
+        width: {
+          size: 100,
+          type: WidthType.PERCENTAGE
+        },
+        borders: {
+          top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+          bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+          left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+          right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+          insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+          insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "666666" }
+        }
+      });
     } catch (error) {
       console.error('Error parsing HTML table:', error);
       return null;
     }
   }
-  
+
   private static createHistoryTable(): Table {
-    const today = new Date().toLocaleDateString('es-ES');
-    
     return new Table({
-      width: {
-        size: 2.17 * 1440, // Convert inches to twips (2.17 inches as specified)
-        type: WidthType.DXA,
-      },
       rows: [
-        // Header row
         new TableRow({
           children: [
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [
-                    new TextRun({
-                      text: "Fecha",
-                      bold: true,
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              }
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Fecha", bold: true, font: "Segoe UI Semilight", size: 20 })]
+              })],
+              shading: { fill: "D9E2F3" }
             }),
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [
-                    new TextRun({
-                      text: "Acción",
-                      bold: true,
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              }
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Acción", bold: true, font: "Segoe UI Semilight", size: 20 })]
+              })],
+              shading: { fill: "D9E2F3" }
             }),
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [
-                    new TextRun({
-                      text: "Responsable",
-                      bold: true,
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              }
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Responsable", bold: true, font: "Segoe UI Semilight", size: 20 })]
+              })],
+              shading: { fill: "D9E2F3" }
             }),
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [
-                    new TextRun({
-                      text: "Comentario",
-                      bold: true,
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              },
-              width: {
-                size: 40, // Larger width for comments column as specified
-                type: WidthType.PERCENTAGE,
-              }
-            }),
-          ],
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Comentario", bold: true, font: "Segoe UI Semilight", size: 20 })]
+              })],
+              shading: { fill: "D9E2F3" }
+            })
+          ]
         }),
-        // Data row
         new TableRow({
           children: [
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.LEFT,
-                  children: [
-                    new TextRun({
-                      text: today,
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              }
+              children: [new Paragraph({
+                children: [new TextRun({ text: "27/7/2025", font: "Segoe UI Semilight", size: 20 })]
+              })]
             }),
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.LEFT,
-                  children: [
-                    new TextRun({
-                      text: "Versión original",
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              }
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Versión original", font: "Segoe UI Semilight", size: 20 })]
+              })]
             }),
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.LEFT,
-                  children: [
-                    new TextRun({
-                      text: "Sistema",
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              }
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Sistema", font: "Segoe UI Semilight", size: 20 })]
+              })]
             }),
             new TableCell({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.LEFT,
-                  children: [
-                    new TextRun({
-                      text: "Documento generado automáticamente",
-                      font: "Segoe UI Semilight",
-                      size: 20
-                    })
-                  ]
-                })
-              ],
-              verticalAlign: VerticalAlign.CENTER,
-              borders: {
-                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
-              },
-              width: {
-                size: 40, // Larger width for comments column as specified
-                type: WidthType.PERCENTAGE,
-              }
-            }),
-          ],
-        }),
+              children: [new Paragraph({
+                children: [new TextRun({ text: "Documento generado automáticamente", font: "Segoe UI Semilight", size: 20 })]
+              })]
+            })
+          ]
+        })
       ],
+      width: {
+        size: 100,
+        type: WidthType.PERCENTAGE
+      },
+      borders: {
+        top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "666666" }
+      }
     });
   }
 }
