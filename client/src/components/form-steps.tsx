@@ -924,6 +924,15 @@ export default function FormSteps({
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
                         placeholder={`Wireframe ${index + 1}: Descripción de la pantalla...`}
                       />
+                      <AIAssistButton
+                        fieldName={`wireframeDescription_${index}`}
+                        fieldValue={description}
+                        fieldType="wireframeDescription"
+                        context={{ step: 8, useCaseType: formData.useCaseType }}
+                        onImprovement={(value) => onUpdateWireframeDescription(index, value)}
+                        size="sm"
+                        aiModel={formData.aiModel}
+                      />
                       {(formData.wireframeDescriptions || []).length > 1 && (
                         <Button
                           type="button"
@@ -964,6 +973,15 @@ export default function FormSteps({
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
                       placeholder={`Flujo alternativo ${index + 1}: Escenario de excepción...`}
                     />
+                    <AIAssistButton
+                      fieldName={`alternativeFlow_${index}`}
+                      fieldValue={flow}
+                      fieldType="alternativeFlow"
+                      context={{ step: 8, useCaseType: formData.useCaseType }}
+                      onImprovement={(value) => onUpdateAlternativeFlow(index, value)}
+                      size="sm"
+                      aiModel={formData.aiModel}
+                    />
                     {(formData.alternativeFlows || []).length > 1 && (
                       <Button
                         type="button"
@@ -993,26 +1011,52 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Reglas de negocio adicionales
               </label>
-              <textarea 
-                value={formData.businessRules}
-                onChange={(e) => handleInputChange('businessRules', e.target.value)}
-                rows={3} 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                placeholder="Especifique reglas de negocio específicas si las hay..."
-              />
+              <div className="relative">
+                <textarea 
+                  value={formData.businessRules}
+                  onChange={(e) => handleInputChange('businessRules', e.target.value)}
+                  rows={3} 
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                  placeholder="Especifique reglas de negocio específicas si las hay..."
+                />
+                <div className="absolute top-2 right-2">
+                  <AIAssistButton
+                    fieldName="businessRules"
+                    fieldValue={formData.businessRules}
+                    fieldType="businessRules"
+                    context={{ step: 8, useCaseType: formData.useCaseType }}
+                    onImprovement={(value) => handleInputChange('businessRules', value)}
+                    size="sm"
+                    aiModel={formData.aiModel}
+                  />
+                </div>
+              </div>
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Requerimientos especiales
               </label>
-              <textarea 
-                value={formData.specialRequirements}
-                onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
-                rows={3} 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                placeholder="Indique cualquier requerimiento especial..."
-              />
+              <div className="relative">
+                <textarea 
+                  value={formData.specialRequirements}
+                  onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
+                  rows={3} 
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                  placeholder="Indique cualquier requerimiento especial..."
+                />
+                <div className="absolute top-2 right-2">
+                  <AIAssistButton
+                    fieldName="specialRequirements"
+                    fieldValue={formData.specialRequirements}
+                    fieldType="specialRequirements"
+                    context={{ step: 8, useCaseType: formData.useCaseType }}
+                    onImprovement={(value) => handleInputChange('specialRequirements', value)}
+                    size="sm"
+                    aiModel={formData.aiModel}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

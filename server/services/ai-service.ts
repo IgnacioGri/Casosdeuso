@@ -627,6 +627,22 @@ VALOR MEJORADO:`;
       return '- Extraer campos de entidad del texto descriptivo\n- Inferir tipos de datos, obligatoriedad y longitudes\n- Generar estructura JSON con campos\n- Incluir validaciones apropiadas\n- Solo devolver el JSON estructurado, sin explicaciones';
     }
     
+    if (fieldType === 'wireframeDescription') {
+      return '- Descripción detallada de la pantalla/interfaz\n- Incluir elementos UI específicos (botones, campos, tablas)\n- Mencionar funcionalidades visibles\n- Formato profesional y técnico\n- Ejemplo: "Panel de búsqueda con filtros por nombre, estado y fecha"';
+    }
+    
+    if (fieldType === 'alternativeFlow') {
+      return '- Escenario de excepción o error específico\n- Incluir condición que dispara el flujo\n- Describir pasos para manejar la situación\n- Resultado esperado del flujo alternativo\n- Ejemplo: "Cliente inexistente: Mostrar mensaje de error y opciones"';
+    }
+    
+    if (fieldType === 'businessRules') {
+      return '- Lista numerada de reglas específicas\n- Cada regla debe ser verificable\n- Incluir validaciones de datos\n- Mencionar restricciones de seguridad\n- Formato: "1. Regla específica\n2. Segunda regla"';
+    }
+    
+    if (fieldType === 'specialRequirements') {
+      return '- Requerimientos técnicos específicos\n- Tiempos de respuesta, performance\n- Integraciones con sistemas externos\n- Seguridad y auditoria\n- Formato de lista con especificaciones medibles';
+    }
+    
     return '- Seguir convenciones profesionales\n- Lenguaje claro y preciso\n- Sin errores ortográficos';
   }
 
@@ -679,6 +695,18 @@ VALOR MEJORADO:`;
       }
       if (fieldType === 'fieldsFromText') {
         return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+      }
+      if (fieldType === 'wireframeDescription') {
+        return 'Panel de búsqueda con filtros (Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta) y botón "Buscar". Tabla de resultados mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado con botones "Editar" y "Ver Detalle" por fila.';
+      }
+      if (fieldType === 'alternativeFlow') {
+        return 'Cliente inexistente: Al buscar un cliente que no existe en la base de datos, mostrar mensaje "Cliente no encontrado" con opciones para "Crear nuevo cliente" o "Refinar búsqueda".';
+      }
+      if (fieldType === 'businessRules') {
+        return '1. El DNI debe ser único en el sistema\n2. No se puede eliminar un cliente con productos activos\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
+      }
+      if (fieldType === 'specialRequirements') {
+        return '1. Integración con servicio externo de scoring crediticio al momento del alta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
       }
       return fieldValue;
     }
