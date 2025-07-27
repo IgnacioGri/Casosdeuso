@@ -19,6 +19,12 @@ interface FormStepsProps {
   onAddEntityField: () => void;
   onRemoveEntityField: (index: number) => void;
   onUpdateEntityField: (index: number, field: Partial<EntityField>) => void;
+  onAddWireframeDescription: () => void;
+  onRemoveWireframeDescription: (index: number) => void;
+  onUpdateWireframeDescription: (index: number, value: string) => void;
+  onAddAlternativeFlow: () => void;
+  onRemoveAlternativeFlow: (index: number) => void;
+  onUpdateAlternativeFlow: (index: number, value: string) => void;
   onLoadDemoData: () => void;
 }
 
@@ -35,6 +41,12 @@ export default function FormSteps({
   onAddEntityField,
   onRemoveEntityField,
   onUpdateEntityField,
+  onAddWireframeDescription,
+  onRemoveWireframeDescription,
+  onUpdateWireframeDescription,
+  onAddAlternativeFlow,
+  onRemoveAlternativeFlow,
+  onUpdateAlternativeFlow,
   onLoadDemoData
 }: FormStepsProps) {
 
@@ -582,6 +594,86 @@ export default function FormSteps({
               </label>
               <div className="text-xs text-gray-500 mt-1 ml-6">
                 Incluye descripciones detalladas de las interfaces de usuario
+              </div>
+            </div>
+
+            {formData.generateWireframes && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Descripciones de Wireframes
+                </label>
+                <div className="space-y-2">
+                  {(formData.wireframeDescriptions || ['']).map((description, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={description}
+                        onChange={(e) => onUpdateWireframeDescription(index, e.target.value)}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
+                        placeholder={`Wireframe ${index + 1}: Descripción de la pantalla...`}
+                      />
+                      {(formData.wireframeDescriptions || []).length > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onRemoveWireframeDescription(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          ✕
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onAddWireframeDescription}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    + Agregar Wireframe
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Flujos Alternativos
+              </label>
+              <div className="space-y-2">
+                {(formData.alternativeFlows || ['']).map((flow, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={flow}
+                      onChange={(e) => onUpdateAlternativeFlow(index, e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
+                      placeholder={`Flujo alternativo ${index + 1}: Escenario de excepción...`}
+                    />
+                    {(formData.alternativeFlows || []).length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => onRemoveAlternativeFlow(index)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={onAddAlternativeFlow}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  + Agregar Flujo Alternativo
+                </Button>
               </div>
             </div>
             

@@ -23,7 +23,17 @@ export interface UseCaseFormData {
   businessRules?: string;
   specialRequirements?: string;
   generateWireframes: boolean;
+  wireframeDescriptions?: string[];
+  alternativeFlows?: string[];
   aiModel: AIModel;
+  // Campos específicos para tipos de casos de uso
+  apiEndpoint?: string;
+  requestFormat?: string;
+  responseFormat?: string;
+  serviceFrequency?: string;
+  executionTime?: string;
+  configurationPaths?: string;
+  webServiceCredentials?: string;
 }
 
 export interface UseCase {

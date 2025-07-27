@@ -32,6 +32,12 @@ export default function UseCaseGenerator() {
     addEntityField,
     removeEntityField,
     updateEntityField,
+    addWireframeDescription,
+    removeWireframeDescription,
+    updateWireframeDescription,
+    addAlternativeFlow,
+    removeAlternativeFlow,
+    updateAlternativeFlow,
     validateStep,
     loadDemoData,
     resetForm
@@ -201,6 +207,12 @@ export default function UseCaseGenerator() {
               onAddEntityField={addEntityField}
               onRemoveEntityField={removeEntityField}
               onUpdateEntityField={updateEntityField}
+              onAddWireframeDescription={addWireframeDescription}
+              onRemoveWireframeDescription={removeWireframeDescription}
+              onUpdateWireframeDescription={updateWireframeDescription}
+              onAddAlternativeFlow={addAlternativeFlow}
+              onRemoveAlternativeFlow={removeAlternativeFlow}
+              onUpdateAlternativeFlow={updateAlternativeFlow}
               onLoadDemoData={handleLoadDemo}
             />
 
@@ -250,6 +262,11 @@ export default function UseCaseGenerator() {
               onRefresh={() => {
                 if (generatedUseCase) {
                   editUseCaseMutation.mutateAsync({ instructions: "Actualizar el documento con los cambios más recientes" });
+                }
+              }}
+              onDownload={() => {
+                if (generatedUseCase) {
+                  exportUseCaseMutation.mutate();
                 }
               }}
             />

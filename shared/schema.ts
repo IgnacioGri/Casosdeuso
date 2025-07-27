@@ -18,6 +18,8 @@ export const useCases = pgTable("use_cases", {
   businessRules: text("business_rules"),
   specialRequirements: text("special_requirements"),
   generateWireframes: boolean("generate_wireframes").default(false),
+  wireframeDescriptions: jsonb("wireframe_descriptions").default('[]'),
+  alternativeFlows: jsonb("alternative_flows").default('[]'),
   generatedContent: text("generated_content"),
   aiModel: text("ai_model").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -68,6 +70,8 @@ export const useCaseFormSchema = z.object({
   businessRules: z.string().optional(),
   specialRequirements: z.string().optional(),
   generateWireframes: z.boolean().default(false),
+  wireframeDescriptions: z.array(z.string()).default([]),
+  alternativeFlows: z.array(z.string()).default([]),
   // Campos específicos para diferentes tipos de casos de uso
   apiEndpoint: z.string().optional(),
   requestFormat: z.string().optional(),

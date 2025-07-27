@@ -10,13 +10,15 @@ interface EnhancedDocumentPreviewProps {
   currentStep: number;
   generatedContent?: string;
   onRefresh?: () => void;
+  onDownload?: () => void;
 }
 
 export default function EnhancedDocumentPreview({ 
   formData, 
   currentStep, 
   generatedContent,
-  onRefresh 
+  onRefresh,
+  onDownload 
 }: EnhancedDocumentPreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [previewSections, setPreviewSections] = useState<string[]>([]);
@@ -202,7 +204,7 @@ export default function EnhancedDocumentPreview({
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Actualizar
                 </Button>
-                <Button size="sm">
+                <Button size="sm" onClick={onDownload} disabled={!generatedContent}>
                   <Download className="w-4 h-4 mr-2" />
                   Descargar
                 </Button>

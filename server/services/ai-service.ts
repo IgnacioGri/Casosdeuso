@@ -104,7 +104,7 @@ export class AIService {
   }
 
   private static buildPrompt(formData: any, rules: string): string {
-    return `IMPORTANTE: Responde ÚNICAMENTE con el HTML del documento de caso de uso. NO incluyas explicaciones, comentarios, código CSS separado, ni texto adicional antes o después del HTML.
+    return `INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML. NO incluyas explicaciones como "Claro, aquí tienes...", "Se han incorporado mejoras...", etc. NO incluyas bloques de código con \`\`\`html. Responde SOLO con HTML puro.
 
 Genera un documento de caso de uso siguiendo estrictamente estas reglas:
 
@@ -176,6 +176,16 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
       /^.*?documento.*?actualizado.*?mejoras.*?\./gi,
       /^.*?manteniendo.*?formato.*?HTML.*?\./gi,
       /^.*?como.*?lo.*?haría.*?experto.*?\./gi,
+      /^.*?Se.*?han.*?incorporado.*?mejoras.*?\./gi,
+      /^.*?estructura.*?profesional.*?\./gi,
+      /^.*?historial.*?de.*?revisiones.*?\./gi,
+      /^.*?claridad.*?y.*?consistencia.*?\./gi,
+      /^.*?flujos.*?alternativos.*?\./gi,
+      /^.*?corrección.*?de.*?HTML.*?\./gi,
+      /^.*?prototipos.*?mejorados.*?\./gi,
+      /^\*\*.*?\*\*.*?\./gm,
+      /^-+$/gm,
+      /###.*?$/gm,
       /```html/gi,
       /```css/gi,
       /```/gi,

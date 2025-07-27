@@ -22,6 +22,8 @@ export function useUseCaseForm() {
     businessRules: '',
     specialRequirements: '',
     generateWireframes: false,
+    wireframeDescriptions: [''],
+    alternativeFlows: [''],
     // Campos específicos para tipos de casos de uso
     apiEndpoint: '',
     requestFormat: '',
@@ -107,6 +109,54 @@ export function useUseCaseForm() {
     }));
   }, []);
 
+  // Wireframe descriptions management
+  const addWireframeDescription = useCallback(() => {
+    setFormData(prev => ({
+      ...prev,
+      wireframeDescriptions: [...(prev.wireframeDescriptions || []), '']
+    }));
+  }, []);
+
+  const removeWireframeDescription = useCallback((index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      wireframeDescriptions: (prev.wireframeDescriptions || []).filter((_, i) => i !== index)
+    }));
+  }, []);
+
+  const updateWireframeDescription = useCallback((index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      wireframeDescriptions: (prev.wireframeDescriptions || []).map((desc, i) => 
+        i === index ? value : desc
+      )
+    }));
+  }, []);
+
+  // Alternative flows management
+  const addAlternativeFlow = useCallback(() => {
+    setFormData(prev => ({
+      ...prev,
+      alternativeFlows: [...(prev.alternativeFlows || []), '']
+    }));
+  }, []);
+
+  const removeAlternativeFlow = useCallback((index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      alternativeFlows: (prev.alternativeFlows || []).filter((_, i) => i !== index)
+    }));
+  }, []);
+
+  const updateAlternativeFlow = useCallback((index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      alternativeFlows: (prev.alternativeFlows || []).map((flow, i) => 
+        i === index ? value : flow
+      )
+    }));
+  }, []);
+
   const validateStep = useCallback((step: number): boolean => {
     switch (step) {
       case 1:
@@ -158,6 +208,16 @@ export function useUseCaseForm() {
       businessRules: 'Los usuarios deben tener un email único en el sistema. Las contraseñas deben cumplir con políticas de seguridad mínimas.',
       specialRequirements: 'El sistema debe soportar autenticación de dos factores y debe integrarse con Active Directory corporativo.',
       generateWireframes: true,
+      wireframeDescriptions: [
+        'Pantalla principal de gestión con tabla de usuarios y botones de acción',
+        'Formulario de alta/edición de usuario con validaciones en tiempo real',
+        'Modal de confirmación para eliminación de usuarios'
+      ],
+      alternativeFlows: [
+        'Usuario intenta registrarse con email ya existente',
+        'Error de conexión con Active Directory durante autenticación',
+        'Sesión expira durante la edición de un usuario'
+      ],
       // Campos específicos para tipos de casos de uso
       apiEndpoint: '',
       requestFormat: '',
@@ -190,6 +250,8 @@ export function useUseCaseForm() {
       businessRules: '',
       specialRequirements: '',
       generateWireframes: false,
+      wireframeDescriptions: [''],
+      alternativeFlows: [''],
       // Campos específicos para tipos de casos de uso
       apiEndpoint: '',
       requestFormat: '',
@@ -217,6 +279,12 @@ export function useUseCaseForm() {
     addEntityField,
     removeEntityField,
     updateEntityField,
+    addWireframeDescription,
+    removeWireframeDescription,
+    updateWireframeDescription,
+    addAlternativeFlow,
+    removeAlternativeFlow,
+    updateAlternativeFlow,
     validateStep,
     loadDemoData,
     resetForm

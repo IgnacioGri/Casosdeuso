@@ -28,6 +28,11 @@ Preferred communication style: Simple, everyday language.
 ✓ Integrated professional Word export with Ingematica header branding
 ✓ Added mandatory "Historia de Revisiones y Aprobaciones" table
 ✓ Configured Segoe UI Semilight font and specific blue colors for documents
+✓ Enhanced AI prompts with stronger rejection of explanatory text (January 27, 2025)
+✓ Added dynamic wireframe descriptions fields with add/remove functionality
+✓ Implemented multiple alternative flows support for error scenarios
+✓ Fixed document download button functionality with proper export API calls
+✓ Updated form structure to support expandable wireframe and flow arrays
 
 ## System Architecture
 
