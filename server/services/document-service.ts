@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun, Media } from 'docx';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -25,36 +25,51 @@ export class DocumentService {
     paragraphs.push(historyTitle);
     paragraphs.push(historyTable);
     
-    // Create header with Ingematica branding
-    let headerContent: TextRun;
+    // Create header with Ingematica image
+    let headerImage: ImageRun | null = null;
+    let headerParagraphChildren: (TextRun | ImageRun)[] = [];
+    
     try {
-      const imagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_caso_de_uso.png');
+      // Try to use the new uploaded header image first
+      const newImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+      const fallbackImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_caso_de_uso.png');
+      
+      let imagePath = newImagePath;
+      if (!fs.existsSync(newImagePath) && fs.existsSync(fallbackImagePath)) {
+        imagePath = fallbackImagePath;
+      }
+      
       if (fs.existsSync(imagePath)) {
-        // For now, use text until we resolve the image import issue
-        headerContent = new TextRun({
-          text: "INGEMATICA - Documentación de casos de uso",
-          font: "Segoe UI Semilight",
-          size: 24,
-          color: "0070C0",
-          bold: true
+        console.log('Loading header image from:', imagePath);
+        const imageBuffer = fs.readFileSync(imagePath);
+        headerImage = new ImageRun({
+          data: imageBuffer,
+          transformation: {
+            width: 600,  // Adjusted width for header  
+            height: 80   // Adjusted height for header
+          }
         });
+        headerParagraphChildren = [headerImage];
       } else {
-        headerContent = new TextRun({
+        // Fallback to text if no image found
+        headerParagraphChildren = [new TextRun({
           text: "INGEMATICA - Documentación de casos de uso",
           font: "Segoe UI Semilight",
           size: 24,
           color: "0070C0",
           bold: true
-        });
+        })];
       }
     } catch (error) {
-      headerContent = new TextRun({
+      console.error('Error loading header image:', error);
+      // Fallback to text
+      headerParagraphChildren = [new TextRun({
         text: "INGEMATICA - Documentación de casos de uso", 
         font: "Segoe UI Semilight",
         size: 24,
         color: "0070C0",
         bold: true
-      });
+      })];
     }
     
     const doc = new Document({
@@ -74,7 +89,7 @@ export class DocumentService {
             children: [
               new Paragraph({
                 alignment: AlignmentType.CENTER,
-                children: [headerContent]
+                children: headerParagraphChildren
               })
             ]
           })
@@ -122,7 +137,7 @@ export class DocumentService {
     const result: (Paragraph | Table)[] = [];
     
     // Process content sequentially to maintain order
-    const contentParts = htmlContent.split(/(<table[^>]*>.*?<\/table>)/gis);
+    const contentParts = htmlContent.split(/(<table[^>]*>.*?<\/table>)/gi);
     
     for (const part of contentParts) {
       const trimmed = part.trim();
