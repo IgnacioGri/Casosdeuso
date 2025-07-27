@@ -104,9 +104,11 @@ export class AIService {
   }
 
   private static buildPrompt(formData: any, rules: string): string {
-    return `INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML. NO incluyas explicaciones como "Claro, aquí tienes...", "Se han incorporado mejoras...", etc. NO incluyas bloques de código con \`\`\`html. Responde SOLO con HTML puro.
+    return `INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML. NO incluyas explicaciones como "Claro, aquí tienes...", "Se han incorporado mejoras...", "actualizado con los cambios más recientes", etc. NO incluyas bloques de código con \`\`\`html. Responde SOLO con HTML puro.
 
-Genera un documento de caso de uso siguiendo estrictamente estas reglas:
+IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO, no un resultado de ejecución. Debe contener secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
+
+Genera un documento de caso de uso formal siguiendo estrictamente estas reglas:
 
 ${rules}
 
@@ -158,6 +160,8 @@ Datos del formulario:
 - Reglas de negocio: ${formData.businessRules || 'Ninguna específica'}
 - Requerimientos especiales: ${formData.specialRequirements || 'Ninguno'}
 - Generar wireframes: ${formData.generateWireframes ? 'Sí' : 'No'}
+${formData.wireframeDescriptions?.length ? `- Descripciones de wireframes: ${formData.wireframeDescriptions.filter((w: string) => w.trim()).join('; ')}` : ''}
+${formData.alternativeFlows?.length ? `- Flujos alternativos: ${formData.alternativeFlows.filter((f: string) => f.trim()).join('; ')}` : ''}
 
 Responde SOLO con el HTML del documento completo. Usa estilos inline para el formato Microsoft especificado. NO agregues explicaciones antes o después.`;
   }
@@ -183,7 +187,13 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
       /^.*?flujos.*?alternativos.*?\./gi,
       /^.*?corrección.*?de.*?HTML.*?\./gi,
       /^.*?prototipos.*?mejorados.*?\./gi,
+      /^.*?actualizado.*?cambios.*?recientes.*?\./gi,
+      /^.*?estructurado.*?profesionalmente.*?\./gi,
+      /^.*?añadido.*?nuevos.*?campos.*?\./gi,
+      /^.*?tabla.*?control.*?versiones.*?\./gi,
+      /^.*?reflejar.*?modificaciones.*?\./gi,
       /^\*\*.*?\*\*.*?\./gm,
+      /\*\*\*.*?\*\*\*/gm,
       /^-+$/gm,
       /###.*?$/gm,
       /```html/gi,
@@ -459,12 +469,14 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
     }
 
     try {
-      const prompt = `Modifica el siguiente documento de caso de uso aplicando estos cambios: "${instructions}"
+      const prompt = `INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML. NO incluyas explicaciones como "Claro, aquí tienes...", "Se han incorporado mejoras...", "actualizado con los cambios más recientes", "estructurado profesionalmente", etc. NO incluyas bloques de código con \`\`\`html. Responde SOLO con HTML puro.
+
+Modifica el siguiente documento de caso de uso aplicando estos cambios: "${instructions}"
 
 Documento actual:
 ${content}
 
-Devuelve el documento completo modificado manteniendo el formato HTML y el estilo Microsoft.`;
+Devuelve el documento completo modificado manteniendo exactamente el formato HTML y el estilo Microsoft. NO agregues texto explicativo.`;
 
       let modifiedContent: string;
       
@@ -485,8 +497,11 @@ Devuelve el documento completo modificado manteniendo el formato HTML y el estil
           throw new Error(`Modelo de IA no soportado: ${aiModel}`);
       }
 
+      // Clean content to remove any explanatory text before HTML
+      const cleanedContent = this.cleanAIResponse(modifiedContent);
+      
       return {
-        content: modifiedContent,
+        content: cleanedContent,
         success: true
       };
     } catch (error) {
