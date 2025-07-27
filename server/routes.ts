@@ -83,7 +83,7 @@ function getSpecificRules(useCaseType: string, formData: any): string {
   
   if (useCaseType === 'entity') {
     return `
-INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE ENTIDAD:
+INSTRUCCIONES CRÍTICAS PARA CASOS DE USO DE ENTIDAD - SIGUE EXACTAMENTE LA MINUTA ING:
 
 DATOS DEL FORMULARIO:
 - Cliente: ${formData.clientName}
@@ -99,50 +99,84 @@ DATOS DEL FORMULARIO:
 - Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
 - Generar wireframes: ${formData.generateWireframes ? 'Sí' : 'No'}
 
-ESTRUCTURA OBLIGATORIA CON LISTAS MULTINIVEL:
+ESTRUCTURA OBLIGATORIA SEGÚN MINUTA ING:
 
-1. FLUJO PRINCIPAL DE EVENTOS
+1. TÍTULO: "${formData.useCaseName}" en MAYÚSCULAS, color azul oscuro RGB(0,112,192), font Segoe UI Semilight
+
+2. INFORMACIÓN BÁSICA (presentar como tabla HTML):
+   - Nombre del cliente: ${formData.clientName}
+   - Nombre del proyecto: ${formData.projectName}
+   - Código del caso de uso: ${formData.useCaseCode}
+   - Nombre del caso de uso: ${formData.useCaseName}
+   - Nombre del archivo: ${formData.fileName}
+
+3. DESCRIPCIÓN: Explicación detallada del alcance y objetivo del caso de uso
+
+4. FLUJO PRINCIPAL DE EVENTOS (lista numerada con múltiples niveles - formato 1, a, i):
+   DEBE incluir OBLIGATORIAMENTE estas funcionalidades:
    1. Buscar datos de la entidad
-      a. Filtros disponibles: ${formData.searchFilters?.join(', ') || 'Definir filtros apropiados'}
-      b. Columnas del resultado: ${formData.resultColumns?.join(', ') || 'Definir columnas apropiadas'}
-      c. Implementar paginación de resultados
+      a. Detallar los filtros de búsqueda: ${formData.searchFilters?.join(', ') || 'No especificado'}
+      b. Detallar las columnas del resultado: ${formData.resultColumns?.join(', ') || 'No especificado'}
    2. Agregar una nueva entidad
-      a. Campos de entrada: ${formData.entityFields?.map((f: any) => f.name).join(', ') || 'Definir campos apropiados'}
-      b. Validación de campos obligatorios
-      c. Registro automático de fecha y usuario de alta
+      a. Detallar cada uno de los datos de la entidad: ${formData.entityFields?.map((f: any) => `${f.name} (${f.type}${f.length ? `, ${f.length}` : ''}${f.mandatory ? ', obligatorio' : ', opcional'})`).join(', ') || 'No especificado'}
+      b. Cuando se agrega una entidad se debe registrar la fecha y el usuario de alta
 
-2. FLUJOS ALTERNATIVOS
+5. FLUJOS ALTERNATIVOS (lista numerada con múltiples niveles):
+   DEBE incluir OBLIGATORIAMENTE:
    1. Modificar o actualizar una entidad
-      a. Mostrar todos los campos editables
-      b. Mostrar identificador único de la entidad
-      c. Mostrar fecha y usuario de alta (solo lectura)
-      d. Registro automático de fecha y usuario de modificación
+      a. Detallar cada uno de los datos de la entidad
+      b. Mostrar el identificador
+      c. Mostrar la fecha y el usuario de alta
+      d. Cuando se modifica una entidad se debe registrar la fecha y el usuario de modificación
    2. Eliminar una entidad
-      a. Verificar integridad referencial
-      b. Confirmar eliminación con el usuario
-      c. Eliminación lógica o física según reglas del negocio
+      a. Para eliminar una entidad se debe verificar que no tenga relaciones con otras entidades
+
+6. REGLAS DE NEGOCIO: ${formData.businessRules || 'Detallar cada una de las reglas de negocio'}
+
+7. REQUERIMIENTOS ESPECIALES: ${formData.specialRequirements || 'Detallar los requerimientos especiales'}
+
+8. PRECONDICIONES: Usuario autenticado con permisos correspondientes
+
+9. POSTCONDICIONES: Datos actualizados en base de datos con registro de auditoría
 
 ${formData.generateWireframes ? `
-3. BOCETOS GRÁFICOS DE INTERFACES
+10. BOCETOS GRÁFICOS SIMPLIFICADOS DE INTERFAZ DE USUARIO:
 
 WIREFRAME 1: Buscador de Entidades
-- Sección de filtros: ${formData.searchFilters?.join(', ') || 'campos de filtrado'}
-- Botones: Buscar, Limpiar, Agregar
-- Tabla de resultados con columnas: ${formData.resultColumns?.join(', ') || 'columnas apropiadas'}
-- Paginación inferior
-- Botones por fila: Editar, Eliminar
+- Debe incluir: Paginado, Botón de Buscar, Limpiar y Agregar
+- Botón de editar y Eliminar en cada fila del resultado
+- Funcionalidades:
+  - Listar cada uno de los filtros de búsqueda: ${formData.searchFilters?.join(', ') || 'filtros apropiados'}
+  - Listar cada una de las columnas del resultado: ${formData.resultColumns?.join(', ') || 'columnas apropiadas'}
+  - Indicar que debe paginar
 
-WIREFRAME 2: Formulario de Entidad
-- Campos de entrada: ${formData.entityFields?.map((f: any) => `${f.name} (${f.mandatory ? 'obligatorio' : 'opcional'})`).join(', ') || 'campos apropiados'}
-- Campos automáticos: Fecha y usuario de alta, Fecha y usuario de modificación
-- Botones: Aceptar, Cancelar
+WIREFRAME 2: Formulario para Agregar/Editar Entidad
+- Debe incluir: Botón para Aceptar y Cancelar
+- Campos de fecha y usuario de alta, fecha y usuario de modificación
+- Funcionalidades:
+  - Listar cada uno de los datos de la entidad indicando tipo de dato, si es obligatorio, longitud
 
 FUNCIONALIDADES DETALLADAS:
 - Validación en tiempo real de campos obligatorios
 - Formato específico para cada tipo de dato
 - Mensajes de error contextuales
 - Navegación entre campos con Tab
-` : ''}`;
+` : ''}
+
+11. HISTORIA DE REVISIONES Y APROBACIONES (OBLIGATORIA):
+- Título "HISTORIA DE REVISIONES Y APROBACIONES" como Heading 1, color azul RGB(0,112,192)
+- Tabla con 2 filas y 4 columnas: Fecha, Acción, Responsable, Comentario
+- Títulos en negrita y centrados, datos alineados a la izquierda
+- Bordes grises uniformes
+- Una fila de datos: fecha actual (${today}), "Versión original", "Sistema", "Documento generado automáticamente"
+
+FORMATO HTML CRÍTICO:
+- Font Segoe UI Semilight para todo el documento
+- Interlineado simple
+- Títulos principales en azul oscuro RGB(0,112,192)
+- Listas numeradas multinivel: 1º nivel números (1,2,3), 2º nivel letras (a,b,c), 3º nivel romanos (i,ii,iii)
+- Usar estilos inline para mantener formato Microsoft
+- El nombre del caso de uso debe comenzar con verbo en infinitivo`;
   }
   
   if (useCaseType === 'api') {
