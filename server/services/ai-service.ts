@@ -615,6 +615,18 @@ VALOR MEJORADO:`;
       return '- Formato JSON estructurado\n- Incluir campos requeridos y opcionales\n- Especificar tipos de datos\n- Códigos de estado para responses\n- Ejemplos concretos';
     }
     
+    if (fieldType === 'filtersFromText') {
+      return '- Extraer filtros lógicos del texto descriptivo\n- Generar lista de filtros de búsqueda\n- Cada filtro debe ser un campo de la entidad\n- Formato: nombres simples y descriptivos\n- Solo devolver la lista de filtros, sin explicaciones';
+    }
+    
+    if (fieldType === 'columnsFromText') {
+      return '- Extraer columnas de resultado del texto descriptivo\n- Generar lista de columnas para tabla de resultados\n- Columnas relevantes para identificar registros\n- Formato: nombres claros y profesionales\n- Solo devolver la lista de columnas, sin explicaciones';
+    }
+    
+    if (fieldType === 'fieldsFromText') {
+      return '- Extraer campos de entidad del texto descriptivo\n- Inferir tipos de datos, obligatoriedad y longitudes\n- Generar estructura JSON con campos\n- Incluir validaciones apropiadas\n- Solo devolver el JSON estructurado, sin explicaciones';
+    }
+    
     return '- Seguir convenciones profesionales\n- Lenguaje claro y preciso\n- Sin errores ortográficos';
   }
 
@@ -658,6 +670,15 @@ VALOR MEJORADO:`;
       }
       if (fieldName_lower.includes('response')) {
         return '{\n  "success": "boolean",\n  "data": {\n    "id": "number",\n    "cliente": "object"\n  },\n  "status": 200\n}';
+      }
+      if (fieldType === 'filtersFromText') {
+        return 'Número de cliente\nNombre completo\nEstado del cliente\nFecha de registro';
+      }
+      if (fieldType === 'columnsFromText') {
+        return 'ID Cliente\nNombre Completo\nEmail\nTeléfono\nEstado';
+      }
+      if (fieldType === 'fieldsFromText') {
+        return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
       }
       return fieldValue;
     }

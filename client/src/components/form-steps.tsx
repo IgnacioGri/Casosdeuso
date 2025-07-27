@@ -358,12 +358,55 @@ export default function FormSteps({
             Filtros de Búsqueda
           </h3>
           
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Filtros disponibles para la búsqueda
-            </label>
-            
-            <div className="space-y-2">
+          <div className="space-y-6">
+            {/* Campo superior para texto libre */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Describe los filtros de búsqueda (opcional)
+              </label>
+              <div className="relative">
+                <textarea
+                  placeholder="Ej: Los usuarios podrán filtrar por nombre del cliente, estado del cliente (activo/inactivo), fecha de registro, y tipo de segmento..."
+                  rows={4}
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+                />
+                <div className="absolute top-2 right-2">
+                  <AIAssistButton
+                    fieldName="searchFiltersDescription"
+                    fieldValue=""
+                    fieldType="filtersFromText"
+                    context={{ step: 5, useCaseType: formData.useCaseType }}
+                    onImprovement={(value) => {
+                      // Procesar el texto y crear filtros automáticamente
+                      const filters = value.split('\n').filter(f => f.trim()).map(f => f.trim());
+                      filters.forEach(filter => {
+                        onAddSearchFilter();
+                        setTimeout(() => {
+                          const currentFilters = formData.searchFilters;
+                          const lastIndex = currentFilters.length - 1;
+                          if (lastIndex >= 0) {
+                            onUpdateSearchFilter(lastIndex, filter);
+                          }
+                        }, 10);
+                      });
+                    }}
+                    aiModel={formData.aiModel}
+                    size="sm"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Usa el botón AI para convertir automáticamente tu descripción en filtros estructurados
+              </p>
+            </div>
+
+            {/* Lista manual de filtros */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Filtros disponibles para la búsqueda
+              </label>
+              
+              <div className="space-y-2">
               {formData.searchFilters.map((filter, index) => (
                 <div key={index} className="flex items-center space-x-2">
                   <input 
@@ -393,16 +436,17 @@ export default function FormSteps({
                   </Button>
                 </div>
               ))}
+              </div>
+              
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={onAddSearchFilter}
+                className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
+              >
+                Agregar filtro
+              </Button>
             </div>
-            
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={onAddSearchFilter}
-              className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
-            >
-              Agregar filtro
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -419,51 +463,95 @@ export default function FormSteps({
             Columnas de Resultado
           </h3>
           
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Columnas que se mostrarán en los resultados de búsqueda
-            </label>
-            
-            <div className="space-y-2">
-              {formData.resultColumns.map((column, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <input 
-                    type="text" 
-                    value={column}
-                    onChange={(e) => onUpdateResultColumn(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                    placeholder="Nombre de la columna (ej: ID)"
-                  />
+          <div className="space-y-6">
+            {/* Campo superior para texto libre */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Describe las columnas de resultado (opcional)
+              </label>
+              <div className="relative">
+                <textarea
+                  placeholder="Ej: La tabla de resultados debe mostrar el ID del cliente, nombre completo, email, teléfono, fecha de registro, estado actual y tipo de segmento..."
+                  rows={4}
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+                />
+                <div className="absolute top-2 right-2">
                   <AIAssistButton
-                    fieldName={`resultColumn_${index}`}
-                    fieldValue={column}
-                    fieldType="resultColumn"
+                    fieldName="resultColumnsDescription"
+                    fieldValue=""
+                    fieldType="columnsFromText"
                     context={{ step: 6, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => onUpdateResultColumn(index, value)}
-                    size="sm"
+                    onImprovement={(value) => {
+                      // Procesar el texto y crear columnas automáticamente
+                      const columns = value.split('\n').filter(c => c.trim()).map(c => c.trim());
+                      columns.forEach(column => {
+                        onAddResultColumn();
+                        setTimeout(() => {
+                          const currentColumns = formData.resultColumns;
+                          const lastIndex = currentColumns.length - 1;
+                          if (lastIndex >= 0) {
+                            onUpdateResultColumn(lastIndex, column);
+                          }
+                        }, 10);
+                      });
+                    }}
                     aiModel={formData.aiModel}
-                  />
-                  <Button 
-                    type="button" 
-                    variant="ghost"
                     size="sm"
-                    onClick={() => onRemoveResultColumn(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Eliminar
-                  </Button>
+                  />
                 </div>
-              ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Usa el botón AI para convertir automáticamente tu descripción en columnas estructuradas
+              </p>
             </div>
-            
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={onAddResultColumn}
-              className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
-            >
-              Agregar columna
-            </Button>
+
+            {/* Lista manual de columnas */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Columnas que se mostrarán en los resultados de búsqueda
+              </label>
+              
+              <div className="space-y-2">
+                {formData.resultColumns.map((column, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <input 
+                      type="text" 
+                      value={column}
+                      onChange={(e) => onUpdateResultColumn(index, e.target.value)}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                      placeholder="Nombre de la columna (ej: ID)"
+                    />
+                    <AIAssistButton
+                      fieldName={`resultColumn_${index}`}
+                      fieldValue={column}
+                      fieldType="resultColumn"
+                      context={{ step: 6, useCaseType: formData.useCaseType }}
+                      onImprovement={(value) => onUpdateResultColumn(index, value)}
+                      size="sm"
+                      aiModel={formData.aiModel}
+                    />
+                    <Button 
+                      type="button" 
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onRemoveResultColumn(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              
+              <Button 
+                type="button" 
+                variant="outline"
+                onClick={onAddResultColumn}
+                className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
+              >
+                Agregar columna
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -480,12 +568,78 @@ export default function FormSteps({
             Datos de la Entidad
           </h3>
           
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Campos de la entidad
-            </label>
-            
-            <div className="space-y-3">
+          <div className="space-y-6">
+            {/* Campo superior para texto libre */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Describe los campos de la entidad (opcional)
+              </label>
+              <div className="relative">
+                <textarea
+                  placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
+                  rows={6}
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+                />
+                <div className="absolute top-2 right-2">
+                  <AIAssistButton
+                    fieldName="entityFieldsDescription"
+                    fieldValue=""
+                    fieldType="fieldsFromText"
+                    context={{ step: 7, useCaseType: formData.useCaseType }}
+                    onImprovement={(value) => {
+                      // Procesar JSON y crear campos de entidad automáticamente
+                      try {
+                        const fields = JSON.parse(value);
+                        if (Array.isArray(fields)) {
+                          fields.forEach(field => {
+                            onAddEntityField();
+                            setTimeout(() => {
+                              const currentFields = formData.entityFields;
+                              const lastIndex = currentFields.length - 1;
+                              if (lastIndex >= 0) {
+                                onUpdateEntityField(lastIndex, {
+                                  name: field.name || '',
+                                  type: field.type || 'text',
+                                  mandatory: field.mandatory ?? false,
+                                  length: field.length
+                                });
+                              }
+                            }, 10);
+                          });
+                        }
+                      } catch (error) {
+                        console.error('Error parsing entity fields JSON:', error);
+                        // Fallback: treat as text lines
+                        const fieldNames = value.split('\n').filter(f => f.trim()).map(f => f.trim());
+                        fieldNames.forEach(fieldName => {
+                          onAddEntityField();
+                          setTimeout(() => {
+                            const currentFields = formData.entityFields;
+                            const lastIndex = currentFields.length - 1;
+                            if (lastIndex >= 0) {
+                              onUpdateEntityField(lastIndex, { name: fieldName });
+                            }
+                          }, 10);
+                        });
+                      }
+                    }}
+                    aiModel={formData.aiModel}
+                    size="sm"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Usa el botón AI para convertir automáticamente tu descripción en campos estructurados con tipos y validaciones
+              </p>
+            </div>
+
+            {/* Lista manual de campos */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Campos de la entidad
+              </label>
+              
+              <div className="space-y-3">
               {formData.entityFields.map((field, index) => (
                 <div key={index} className="p-4 border border-gray-200 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -562,6 +716,7 @@ export default function FormSteps({
             >
               Agregar campo
             </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

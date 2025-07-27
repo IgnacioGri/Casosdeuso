@@ -1,0 +1,50 @@
+Thought for 10s
+Ideas para Implementar un Sistema con AI en la App de Generador de Casos de Uso
+
+¡Hola! Dado que el documento ING es inalterable y define reglas estrictas para la estructura, formato y contenido de los casos de uso (CU), podemos usarlo como base rígida para el sistema. Tu feedback anterior (expandir AI Assist a más campos, permitir entradas libres que IA refine en estructuras/listas, usar modelo IA solo en assists por campo, y aplicar formato sin IA en la generación final) es el complemento perfecto para hacer la app más inteligente y usable. El objetivo es potenciar la IA como asistente contextual, asegurando que cada output cumpla al 100% con las reglas ING, mientras das control al usuario.
+
+A continuación, te doy ideas accionables para que tu programador implemente esto en la app (basada en React/Node.js/TypeScript). Me enfoco en un enfoque híbrido: AI Assist para refinamiento granular (siguiendo tu feedback), y motor de generación que aplica reglas fijas del documento. Incluyo sugerencias técnicas, prompts de ejemplo y cómo integrar con multi-proveedores (OpenAI, Claude, Gemini, Grok).
+
+1. Mejora el Flujo Multi-Paso con Secuencialidad Obligatoria
+
+Idea Principal: Siguiendo el documento (pedir datos secuencialmente al inicio: cliente, proyecto, código CU, nombre CU, nombre archivo), haz el Paso 3 (Información Básica) progresivo: Muestra campos uno por uno en modales o steps bloqueados (usando React Hook Form con watch/submit parcial). Esto fuerza el orden, reduce errores y prepara datos para AI Assists posteriores.
+Integración con Feedback Anterior: No AI Assist aquí (como dijiste, solo validar completitud). Usa validaciones Zod en vivo: ej. código CU como "XX000" (letras + números), nombre CU empezando con verbo infinitivo (validación regex inicial, pero refinable en Paso 4 con AI).
+Sugerencia Técnica: En frontend, usa un wizard con useSteps de Shadcn/ui. Backend: Endpoint /api/validate-basic para double-check server-side.
+Beneficio con AI: Prepara contexto para prompts posteriores (ej. "Usa nombre cliente: [input] para contextualizar descripciones").
+2. Expansión Revolucionaria de AI Assist (Campo por Campo y Listas)
+
+Idea Principal: Basado en tu feedback, agrega botones AI Assist a todos los campos relevantes (Pasos 4-8), permitiendo texto libre que IA refine según reglas ING. La IA seleccionada al inicio se usa solo aquí (por llamada individual), corrigiendo formatos, profesionalizando texto y estructurando listas. Para listas (filtros, columnas, datos entidad), agrega un "campo superior" de texto libre donde el usuario describe narrativamente (ej. "Filtros: por nombre y edad mayor a 18"), y AI Assist lo convierte en lista estructurada con numeración multi-nivel (1-a-i, como en documento).
+Detalles por Paso (Alineado con Documento ING):
+Paso 4: Detalles CU: AI Assist para nombre CU (corrige a verbo infinitivo), nombre archivo ("[letras][números]_[NombreCU sin espacios]"), descripción (reescribe en 50-200 palabras detalladas sobre alcance/objetivo, técnica pero clara).
+Prompt Ejemplo (para Grok/Claude): "Reescribe esta descripción profesionalmente: [input]. Asegura explicación detallada de alcance y objetivo, 50-200 palabras, tono técnico ING."
+Paso 5: Filtros Búsqueda: Campo superior libre; AI genera lista indentada (detallar filtros como en documento para entidades).
+Prompt: "Extrae filtros lógicos de: [input]. Output como array JSON: [{campo: 'nombre', logica: 'igual'}]. Cumple reglas ING para búsqueda entidades."
+Paso 6: Columnas Resultado: Similar, AI estructura con paginado implícito (como en bocetos gráficos del documento).
+Paso 7: Campos Entidad: Texto libre (ej. "Nombre: string, obligatorio, 50 chars; Edad: int, opcional"); AI crea lista con tipos, obligatoriedad, longitud, requerimientos especiales. Agrega auto-registro de fecha/usuario alta/modificación (regla obligatoria en documento).
+Prompt: "Estructura datos entidad de: [input]. Incluye tipo, obligatorio, longitud, especiales. Agrega fecha/usuario alta/modificación si aplica."
+Paso 8: Opciones Adicionales: AI Assist por sub-campo (wireframes, flujos alternos, reglas negocio, requerimientos especiales). Para flujos: Reescribe texto libre en listas indentadas (principal: buscar/agregar; alternos: modificar/eliminar con verificaciones relaciones). Para wireframes: Genera descripción textual simplificada primero (con botones Buscar/Limpiar/Agregar, paginado, etc.); luego, pregunta confirmación para imagen real en estilo Microsoft (usando herramienta externa si integra, pero siempre confirma como en guidelines).
+Prompt para Reglas: "Reescribe reglas negocio: [input]. Detalla cada una lógicamente, incluye requerimientos especiales como configurables (path/URL para procesos)."
+Para Tipos Específicos: Adapta prompts por tipo CU (ej. APIs: enfoca request/response; Procesos: frecuencia/ejecución y configurables).
+Integración con Feedback: Campos más grandes (textareas con auto-resize). Opción manual siempre disponible. Toast para éxito ("Refinado con cumplimiento ING").
+Sugerencia Técnica: Abstracción en backend: Endpoint /api/assist/{fieldType} con prompts parametrizados. Usa React Query para cache de assists (evita llamadas repetidas). Para multi-proveedor: Switch basado en selección inicial, con fallback a Demo (simulación regex/rules-based sin API).
+Beneficio: Asegura flujos numerados correctamente (1-a-i con indent 0.2), pre/postcondiciones, y bocetos gráficos sin violar documento.
+3. Motor de Generación de Contenido (Sin IA en Este Paso)
+
+Idea Principal: Como en tu feedback, la generación final (Paso 9) no usa IA; solo aplica plantillas fijas basadas en datos refinados por assists previos. Compila secciones del documento: Título en mayúsculas RGB(0,112,192), descripción, flujos indentados, reglas, bocetos (textual + opción imagen), pre/postcondiciones.
+Adaptación por Tipo CU: Usa condicionales en código para ramificar (ej. if tipo='entidad': incluye bocetos buscador/agregar; if 'API': request/response; if 'proceso': frecuencia/configurables).
+Inclusión de Casos de Prueba: Agrega opción para generar tabla de pruebas desde CU (código/nombre iguales a CU, objetivo/precondiciones mapeadas, tabla pasos con #/Acción/Datos/Resultado/Observaciones/Estado P/F). Historia de revisiones pre-poblada con versión inicial (fecha actual, usuario placeholder).
+Sugerencia Técnica: En Node.js, usa templates HTML con marked.js para indentación/numeración. Previsualiza en HTML antes de exportar.
+Beneficio: Garantiza estilo Microsoft (Segoe UI Semilight, interlineado simple) y secciones exactas sin variabilidad IA.
+4. Sistema de Exportación DOCX Mejorado
+
+Idea Principal: Exporta solo cuando solicitado (como documento). Aplica reglas precisas: Font Segoe UI Semilight, interlineado/espaciado simple, header con "Encabezado caso de uso.png" (carga desde assets), footer (página 1 de N izquierda, nombre CU derecha). Al final: Título "HISTORIA DE REVISIONES Y APROBACIONES" en azul RGB(0,112,192), tabla 2x4 (Fecha/Acción/Responsable/Comentario) con anchos proporcionales (ej. Fecha: 0.8in, Observaciones: 1.5in), bordes grises, alineaciones centro/izquierda, negrita en headers, sin sangrías.
+Integración con Feedback: Solicita letras/números para nombre archivo antes de exportar (modal final).
+Sugerencia Técnica: En docx.js, parsea HTML línea por línea para preservar indentaciones (0.2 por nivel). Elimina duplicados/sangrías extras. Para tablas: Set widths dinámicos, borders uniformes (gris medio RGB(128,128,128)).
+Beneficio: Documentos perfectos para Word, con wireframes como imágenes embebidas si generadas.
+5. Características Avanzadas y Escalabilidad
+
+Manejo de Errores y Validación Global: Antes de generar, valida cumplimiento ING (ej. verbo infinitivo, listas indentadas) con chequeos client-side. Si falla, sugiere AI Assist en campo específico.
+Analytics y Mejora Continua: Registra uso de AI Assist (por campo/proveedor) para optimizar prompts. Agrega "Regenerar con otro proveedor" si output no satisface.
+Modo Avanzado: Para usuarios expertos, permite prompts custom en AI Assist (pero default a reglas ING).
+Performance: Lazy-load assists, optimistic updates en UI. Preparado para DB (Drizzle) para guardar CU parciales.
+Ideas Creativas con AI: Usa Grok para razonamiento en reglas complejas (ej. "Inferir precondiciones lógicas de flujos"). Integra voice mode (si app móvil) para dictar textos libres.
