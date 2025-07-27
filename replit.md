@@ -62,6 +62,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Implemented crucial separation: AI only for field improvements, document generation always uses formatting-only mode (January 27, 2025)
 ✓ Modified final "Generate Document" button to always apply styles/formatting without AI, regardless of selected model
 ✓ Clarified system architecture: AI Assist for individual fields, pure formatting for final document output
+✓ Redesigned AI model selector with professional Radix UI components, unique icons and themed colors (January 27, 2025)
+✓ Enhanced Step 1 layout with centered design and clear explanation of AI configuration purpose
+✓ Removed unnecessary AI Assist buttons from Step 3 basic information fields (client name, project name, use case code)
+✓ Streamlined form UX by limiting AI assistance to complex descriptive fields where it adds genuine value
 
 ## System Architecture
 
