@@ -63,10 +63,15 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Brain className="mr-2 text-ms-blue" size={20} />
-            Selección de Modelo de IA
-          </h3>
+          <div className="text-center mb-6">
+            <Brain className="mx-auto text-ms-blue mb-3" size={32} />
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Configuración del Motor de IA
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Selecciona el modelo de inteligencia artificial que utilizarás para asistir en la generación de contenido
+            </p>
+          </div>
           
           <div className="space-y-4">
             <div>
@@ -176,12 +181,19 @@ export default function FormSteps({
               </Select>
             </div>
             
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
               <div className="flex items-start">
-                <Info className="text-blue-500 mt-0.5 mr-2" size={16} />
-                <div className="text-sm text-blue-700">
-                  <strong>Modo Demo:</strong> Genera contenido de ejemplo sin necesidad de claves API. 
-                  Perfecto para probar la funcionalidad antes de configurar las APIs reales.
+                <Info className="text-blue-500 mt-0.5 mr-3 flex-shrink-0" size={18} />
+                <div className="text-sm">
+                  <div className="font-medium text-gray-900 dark:text-white mb-1">
+                    ¿Qué hace esta configuración?
+                  </div>
+                  <div className="text-gray-700 dark:text-gray-300">
+                    El modelo seleccionado se usará únicamente para los <strong>botones AI Assist</strong> que aparecen junto a los campos del formulario. El documento final siempre mantiene formato profesional sin procesamiento de IA.
+                  </div>
+                  <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                    💡 Recomendación: Usa <strong>Modo Demo</strong> para probar sin APIs o <strong>OpenAI</strong> para mejores resultados.
+                  </div>
                 </div>
               </div>
             </div>
