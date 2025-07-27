@@ -57,6 +57,11 @@ Preferred communication style: Simple, everyday language.
 ✓ Implemented AI assistance for wireframe descriptions, alternative flows, business rules, and special requirements
 ✓ Added comprehensive field-specific improvement rules for all Step 8 field types
 ✓ Enhanced demo mode with realistic examples for all new AI-assisted fields
+✓ Expanded Step 8 fields to large textareas for better free-text input and AI transformation visibility
+✓ Added top and bottom navigation buttons for improved user experience across all form steps
+✓ Implemented crucial separation: AI only for field improvements, document generation always uses formatting-only mode (January 27, 2025)
+✓ Modified final "Generate Document" button to always apply styles/formatting without AI, regardless of selected model
+✓ Clarified system architecture: AI Assist for individual fields, pure formatting for final document output
 
 ## System Architecture
 

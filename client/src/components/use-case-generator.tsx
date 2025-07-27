@@ -126,7 +126,10 @@ export default function UseCaseGenerator() {
 
   const handleGenerateUseCase = () => {
     if (validateStep(currentStep)) {
-      generateUseCaseMutation.mutate(formData);
+      // IMPORTANTE: El último paso NUNCA usa IA, solo aplica estilos y formato
+      // La IA se usa únicamente en los botones AI Assist de campos individuales
+      const formDataWithDemoMode = { ...formData, aiModel: 'demo' };
+      generateUseCaseMutation.mutate(formDataWithDemoMode);
     } else {
       toast({
         title: "Formulario incompleto",
@@ -175,7 +178,7 @@ export default function UseCaseGenerator() {
             className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
           >
             <Cog className="mr-2" size={16} />
-            {generateUseCaseMutation.isPending ? 'Generando...' : 'Generar Caso de Uso'}
+{generateUseCaseMutation.isPending ? 'Aplicando formato...' : 'Generar Documento'}
           </Button>
         )}
         
