@@ -513,4 +513,152 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       };
     }
   }
+
+  async improveField(fieldName: string, fieldValue: string, fieldType: string, context?: any): Promise<string> {
+    try {
+      // Define field-specific rules based on ING specifications
+      const fieldRules = this.getFieldRules(fieldName, fieldType, context);
+      
+      const prompt = `
+MEJORA ESTE CAMPO SEGÚN LAS REGLAS DE ING:
+
+CAMPO: ${fieldName}
+TIPO: ${fieldType}
+VALOR ACTUAL: "${fieldValue}"
+CONTEXTO: ${JSON.stringify(context || {})}
+
+REGLAS ESPECÍFICAS:
+${fieldRules}
+
+INSTRUCCIONES:
+- Corrige cualquier error de formato
+- Aplica las reglas específicas del campo
+- Mantén el significado original si es correcto
+- Si está vacío, proporciona un ejemplo apropiado
+- Solo devuelve el valor mejorado, sin explicaciones
+- No agregues comillas ni formato markdown
+
+VALOR MEJORADO:`;
+
+      if (this.selectedModel === 'demo') {
+        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+
+      const response = await this.callAI(prompt);
+      
+      if (!response.success || !response.content) {
+        throw new Error('No se pudo mejorar el campo');
+      }
+
+      // Clean the response
+      return response.content.trim().replace(/^["']|["']$/g, '');
+      
+    } catch (error) {
+      console.error('Error improving field:', error);
+      // Return original value if AI fails
+      return fieldValue || '';
+    }
+  }
+
+  private getFieldRules(fieldName: string, fieldType: string, context?: any): string {
+    const fieldName_lower = fieldName.toLowerCase();
+    
+    if (fieldName_lower.includes('nombre') && fieldName_lower.includes('cliente')) {
+      return '- Debe ser un nombre de empresa real o banco\n- Primera letra mayúscula\n- Sin abreviaciones innecesarias';
+    }
+    
+    if (fieldName_lower.includes('proyecto')) {
+      return '- Debe describir un sistema o proyecto tecnológico\n- Formato profesional\n- Relacionado con el cliente';
+    }
+    
+    if (fieldName_lower.includes('codigo')) {
+      return '- Formato: 2 letras mayúsculas + 3 números (ej: CL005, AB123)\n- Las letras deben relacionarse con el módulo o área';
+    }
+    
+    if (fieldName_lower.includes('nombre') && fieldName_lower.includes('caso')) {
+      return '- OBLIGATORIO: Debe comenzar con verbo en infinitivo (Gestionar, Crear, Consultar, etc.)\n- Describe claramente la funcionalidad\n- Sin artículos innecesarios';
+    }
+    
+    if (fieldName_lower.includes('archivo')) {
+      return '- Formato: 2 letras + 3 números + nombre descriptivo sin espacios\n- Ejemplo: BP005GestionarClientesPremium\n- Sin caracteres especiales';
+    }
+    
+    if (fieldName_lower.includes('descripcion')) {
+      return '- Explicación clara del alcance del caso de uso\n- Menciona las funcionalidades principales\n- Entre 50-200 palabras\n- Lenguaje técnico pero comprensible';
+    }
+    
+    if (fieldName_lower.includes('reglas') && fieldName_lower.includes('negocio')) {
+      return '- Lista de reglas numeradas con viñetas\n- Cada regla debe ser específica y verificable\n- Incluir validaciones de datos\n- Mencionar restricciones de seguridad';
+    }
+    
+    if (fieldName_lower.includes('requerimientos')) {
+      return '- Requerimientos técnicos específicos\n- Tiempos de respuesta, integraciones\n- Formato de lista con viñetas\n- Mencionar tecnologías si aplica';
+    }
+    
+    if (fieldType === 'searchFilter') {
+      return '- Nombre del campo de búsqueda\n- Debe ser un campo lógico de la entidad\n- Formato: "Nombre del campo" sin tipo de dato';
+    }
+    
+    if (fieldType === 'resultColumn') {
+      return '- Nombre de columna para mostrar en resultados\n- Debe ser información relevante para identificar registros\n- Formato claro y profesional';
+    }
+    
+    if (fieldType === 'entityField') {
+      return '- Nombre del campo de la entidad\n- Debe ser claro y sin abreviaciones\n- Relacionado con el dominio del negocio';
+    }
+    
+    return '- Seguir convenciones profesionales\n- Lenguaje claro y preciso\n- Sin errores ortográficos';
+  }
+
+  private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {
+    const fieldName_lower = fieldName.toLowerCase();
+    
+    if (!fieldValue || fieldValue.trim() === '') {
+      // Provide examples for empty fields
+      if (fieldName_lower.includes('nombre') && fieldName_lower.includes('cliente')) {
+        return 'Banco Provincia';
+      }
+      if (fieldName_lower.includes('proyecto')) {
+        return 'Gestión Integral de Clientes';
+      }
+      if (fieldName_lower.includes('codigo')) {
+        return 'CL005';
+      }
+      if (fieldName_lower.includes('nombre') && fieldName_lower.includes('caso')) {
+        return 'Gestionar Clientes Premium';
+      }
+      if (fieldName_lower.includes('archivo')) {
+        return 'BP005GestionarClientesPremium';
+      }
+      if (fieldName_lower.includes('descripcion')) {
+        return 'Este caso de uso permite al operador del área de atención gestionar los datos de clientes del segmento Premium. Incluye funcionalidades de búsqueda, alta, modificación y eliminación de clientes, validando condiciones específicas según políticas del banco.';
+      }
+      return fieldValue;
+    }
+    
+    // Improve existing values
+    if (fieldName_lower.includes('nombre') && fieldName_lower.includes('caso')) {
+      const verbs = ['gestionar', 'crear', 'consultar', 'administrar', 'configurar', 'procesar'];
+      const startsWithVerb = verbs.some(verb => fieldValue.toLowerCase().startsWith(verb));
+      if (!startsWithVerb) {
+        return `Gestionar ${fieldValue}`;
+      }
+      // Capitalize first letter
+      return fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
+    }
+    
+    if (fieldName_lower.includes('codigo')) {
+      // Ensure format XX000
+      if (!/^[A-Z]{2}\d{3}$/.test(fieldValue)) {
+        return 'CL005';
+      }
+    }
+    
+    if (fieldName_lower.includes('archivo')) {
+      // Ensure no spaces and proper format
+      return fieldValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+    }
+    
+    return fieldValue;
+  }
 }

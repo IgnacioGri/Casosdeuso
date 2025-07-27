@@ -372,6 +372,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Assist for individual fields
+  app.post('/api/use-cases/ai-assist', async (req: Request, res: Response) => {
+    try {
+      const { fieldName, fieldValue, fieldType, context } = req.body;
+      
+      if (!fieldName || !fieldType) {
+        return res.status(400).json({ error: 'Field name and type are required' });
+      }
+
+      const aiService = new AIService();
+      const improvedValue = await aiService.improveField(fieldName, fieldValue, fieldType, context);
+      
+      res.json({ improvedValue });
+    } catch (error) {
+      console.error('Error with AI assist:', error);
+      res.status(500).json({ error: 'Error processing field with AI' });
+    }
+  });
+
   // Export use case to docx
   app.get("/api/use-cases/:id/export", async (req, res) => {
     try {
