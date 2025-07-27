@@ -61,7 +61,7 @@ export class DocumentService {
             bold: true
           })];
         }
-        headerParagraphChildren = [headerImage];
+        if (headerImage) headerParagraphChildren = [headerImage];
       } else {
         // Fallback to text if no image found
         headerParagraphChildren = [new TextRun({
@@ -147,89 +147,40 @@ export class DocumentService {
 
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
     try {
-      // First, let's clean the HTML content more aggressively
+      // Clean the HTML content properly
       let cleanContent = htmlContent
-        .replace(/<style[^>]*>.*?<\/style>/gi, '') // Remove style blocks
-        .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove script blocks
-        .replace(/<!--.*?-->/gi, '') // Remove comments
-        .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '') // Remove document structure tags
+        .replace(/<style[^>]*>.*?<\/style>/gi, '')
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/<!--.*?-->/gi, '')
+        .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '')
         .trim();
 
       const result: (Paragraph | Table)[] = [];
       
-      // Split by major sections first - tables and content blocks
-      const sections = cleanContent.split(/(?=<(?:h[1-6]|p|ul|ol|table)[^>]*>)/gi);
+      // Process content more carefully to preserve structure
       
-      for (const section of sections) {
-        const trimmed = section.trim();
-        if (!trimmed) continue;
-        
-        if (trimmed.includes('<table')) {
-          const table = this.parseHtmlTable(trimmed);
-          if (table) result.push(table);
-        } else {
-          // Process as regular content - split into sections and parse
-          const textSections = trimmed.split(/(?=<h[1-6][^>]*>)/gi);
-          for (const textSection of textSections) {
-            const cleanText = textSection.trim();
-            if (!cleanText) continue;
-            
-            if (cleanText.includes('<h1')) {
-              const text = this.extractTextContent(cleanText);
-              if (text) result.push(new Paragraph({
-                heading: HeadingLevel.HEADING_1,
-                children: [new TextRun({ text, bold: true, size: 32, color: "0070C0", font: "Segoe UI Semilight" })]
-              }));
-            } else if (cleanText.includes('<h2')) {
-              const text = this.extractTextContent(cleanText);
-              if (text) result.push(new Paragraph({
-                heading: HeadingLevel.HEADING_2,
-                children: [new TextRun({ text, bold: true, size: 28, color: "0070C0", font: "Segoe UI Semilight" })]
-              }));
-            } else if (cleanText.includes('<h3')) {
-              const text = this.extractTextContent(cleanText);
-              if (text) result.push(new Paragraph({
-                heading: HeadingLevel.HEADING_3,
-                children: [new TextRun({ text, bold: true, size: 24, color: "0070C0", font: "Segoe UI Semilight" })]
-              }));
-            } else if (cleanText.includes('<h4')) {
-              const text = this.extractTextContent(cleanText);
-              if (text) result.push(new Paragraph({
-                heading: HeadingLevel.HEADING_4,
-                children: [new TextRun({ text, bold: true, size: 22, color: "0070C0", font: "Segoe UI Semilight" })]
-              }));
-            } else {
-              // Split by line breaks and process each line
-              const lines = cleanText.split(/\n|<br\s*\/?>/gi);
-              for (const line of lines) {
-                const text = this.extractTextContent(line);
-                if (text && text.length > 0) {
-                  // Determine indentation for numbered lists
-                  let indentLevel = 0;
-                  if (text.match(/^\d+\.\d+\.\d+/)) indentLevel = 720;
-                  else if (text.match(/^\d+\.\d+/)) indentLevel = 360;
-                  else if (text.match(/^[a-z]\./)) indentLevel = 360;
-                  else if (text.match(/^[ivx]+\./)) indentLevel = 720;
-                  
-                  result.push(new Paragraph({
-                    indent: indentLevel > 0 ? { left: indentLevel } : undefined,
-                    children: [new TextRun({
-                      text,
-                      size: 22,
-                      font: "Segoe UI Semilight"
-                    })]
-                  }));
-                }
-              }
-            }
+      // Extract and process tables first
+      const tableMatches = cleanContent.match(/<table[^>]*>.*?<\/table>/gi);
+      if (tableMatches) {
+        for (const tableHtml of tableMatches) {
+          const table = this.parseHtmlTable(tableHtml);
+          if (table) {
+            result.push(table);
           }
         }
+        // Remove processed tables from content
+        for (const tableHtml of tableMatches) {
+          cleanContent = cleanContent.replace(tableHtml, '');
+        }
       }
+      
+      // Process remaining content by splitting into logical sections
+      const elements = this.parseContentElements(cleanContent);
+      result.push(...elements);
       
       return result;
     } catch (error) {
       console.error('Error parsing HTML content:', error);
-      // Fallback: create a simple paragraph with the text content
       const textContent = htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       return [new Paragraph({
         children: [new TextRun({
@@ -239,6 +190,148 @@ export class DocumentService {
         })]
       })];
     }
+  }
+
+  private static parseContentElements(content: string): Paragraph[] {
+    const result: Paragraph[] = [];
+    
+    // Split content into logical blocks, preserving structure
+    const blocks = content.split(/(<h[1-6][^>]*>.*?<\/h[1-6]>|<p[^>]*>.*?<\/p>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<div[^>]*>.*?<\/div>)/gi)
+      .filter(block => block.trim().length > 0);
+    
+    for (const block of blocks) {
+      const trimmed = block.trim();
+      if (!trimmed) continue;
+      
+      if (trimmed.match(/<h1[^>]*>/i)) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_1,
+            spacing: { after: 200 }, // Add spacing after headings
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 32,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        }
+      } else if (trimmed.match(/<h2[^>]*>/i)) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 240, after: 120 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 28,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        }
+      } else if (trimmed.match(/<h3[^>]*>/i)) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_3,
+            spacing: { before: 200, after: 100 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 24,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        }
+      } else if (trimmed.match(/<h4[^>]*>/i)) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          result.push(new Paragraph({
+            heading: HeadingLevel.HEADING_4,
+            spacing: { before: 120, after: 80 },
+            children: [new TextRun({
+              text,
+              bold: true,
+              size: 22,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        }
+      } else if (trimmed.match(/<(ul|ol)[^>]*>/i)) {
+        // Process lists
+        const listItems = trimmed.match(/<li[^>]*>.*?<\/li>/gi);
+        if (listItems) {
+          for (const item of listItems) {
+            const text = this.extractTextContent(item);
+            if (text) {
+              result.push(this.createListItem(text));
+            }
+          }
+        }
+      } else if (trimmed.match(/<li[^>]*>/i)) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          result.push(this.createListItem(text));
+        }
+      } else if (trimmed.match(/<p[^>]*>/i) || (!trimmed.match(/<[^>]+>/) && trimmed.length > 0)) {
+        const text = this.extractTextContent(trimmed);
+        if (text && text.length > 0) {
+          result.push(new Paragraph({
+            spacing: { after: 120 }, // Add spacing between paragraphs
+            children: [new TextRun({
+              text,
+              size: 22,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        }
+      }
+    }
+    
+    return result;
+  }
+
+  private static createListItem(text: string): Paragraph {
+    // Enhanced list item formatting with proper indentation
+    let indentLevel = 0;
+    let bulletPoint = '• ';
+    
+    // Detect hierarchical numbering patterns
+    if (text.match(/^\d+\.\d+\.\d+/)) {
+      indentLevel = 1440; // 1 inch for third level
+      bulletPoint = '';
+    } else if (text.match(/^\d+\.\d+/)) {
+      indentLevel = 720; // 0.5 inch for second level
+      bulletPoint = '';
+    } else if (text.match(/^\d+\./)) {
+      indentLevel = 360; // 0.25 inch for first level
+      bulletPoint = '';
+    } else if (text.match(/^[a-z]\./)) {
+      indentLevel = 720;
+      bulletPoint = '';
+    } else if (text.match(/^[ivx]+\./)) {
+      indentLevel = 1080;
+      bulletPoint = '';
+    }
+    
+    return new Paragraph({
+      indent: {
+        left: indentLevel,
+        hanging: indentLevel > 0 ? 360 : 0 // Hanging indent for proper list formatting
+      },
+      spacing: { after: 80 },
+      children: [new TextRun({
+        text: bulletPoint + text,
+        size: 22,
+        font: "Segoe UI Semilight"
+      })]
+    });
   }
 
   private static parseRegularContent(content: string): Paragraph[] {
