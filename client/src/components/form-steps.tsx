@@ -916,33 +916,39 @@ export default function FormSteps({
                 </label>
                 <div className="space-y-2">
                   {(formData.wireframeDescriptions || ['']).map((description, index) => (
-                    <div key={index} className="flex gap-2">
-                      <input
-                        type="text"
-                        value={description}
-                        onChange={(e) => onUpdateWireframeDescription(index, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
-                        placeholder={`Wireframe ${index + 1}: Descripción de la pantalla...`}
-                      />
-                      <AIAssistButton
-                        fieldName={`wireframeDescription_${index}`}
-                        fieldValue={description}
-                        fieldType="wireframeDescription"
-                        context={{ step: 8, useCaseType: formData.useCaseType }}
-                        onImprovement={(value) => onUpdateWireframeDescription(index, value)}
-                        size="sm"
-                        aiModel={formData.aiModel}
-                      />
+                    <div key={index} className="space-y-2">
+                      <div className="relative">
+                        <textarea
+                          value={description}
+                          onChange={(e) => onUpdateWireframeDescription(index, e.target.value)}
+                          rows={4}
+                          className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
+                          placeholder={`Wireframe ${index + 1}: Describe la pantalla en lenguaje natural. Ej: Una pantalla de búsqueda donde el usuario puede filtrar por nombre, ver resultados en tabla y editar registros...`}
+                        />
+                        <div className="absolute top-2 right-2">
+                          <AIAssistButton
+                            fieldName={`wireframeDescription_${index}`}
+                            fieldValue={description}
+                            fieldType="wireframeDescription"
+                            context={{ step: 8, useCaseType: formData.useCaseType }}
+                            onImprovement={(value) => onUpdateWireframeDescription(index, value)}
+                            size="sm"
+                            aiModel={formData.aiModel}
+                          />
+                        </div>
+                      </div>
                       {(formData.wireframeDescriptions || []).length > 1 && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onRemoveWireframeDescription(index)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          ✕
-                        </Button>
+                        <div className="flex justify-end">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onRemoveWireframeDescription(index)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            ✕ Eliminar Wireframe
+                          </Button>
+                        </div>
                       )}
                     </div>
                   ))}
@@ -965,33 +971,39 @@ export default function FormSteps({
               </label>
               <div className="space-y-2">
                 {(formData.alternativeFlows || ['']).map((flow, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      type="text"
-                      value={flow}
-                      onChange={(e) => onUpdateAlternativeFlow(index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
-                      placeholder={`Flujo alternativo ${index + 1}: Escenario de excepción...`}
-                    />
-                    <AIAssistButton
-                      fieldName={`alternativeFlow_${index}`}
-                      fieldValue={flow}
-                      fieldType="alternativeFlow"
-                      context={{ step: 8, useCaseType: formData.useCaseType }}
-                      onImprovement={(value) => onUpdateAlternativeFlow(index, value)}
-                      size="sm"
-                      aiModel={formData.aiModel}
-                    />
+                  <div key={index} className="space-y-2">
+                    <div className="relative">
+                      <textarea
+                        value={flow}
+                        onChange={(e) => onUpdateAlternativeFlow(index, e.target.value)}
+                        rows={4}
+                        className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
+                        placeholder={`Flujo alternativo ${index + 1}: Describe el escenario de error en lenguaje natural. Ej: Cuando el usuario busca un cliente que no existe, que pasa y como se maneja...`}
+                      />
+                      <div className="absolute top-2 right-2">
+                        <AIAssistButton
+                          fieldName={`alternativeFlow_${index}`}
+                          fieldValue={flow}
+                          fieldType="alternativeFlow"
+                          context={{ step: 8, useCaseType: formData.useCaseType }}
+                          onImprovement={(value) => onUpdateAlternativeFlow(index, value)}
+                          size="sm"
+                          aiModel={formData.aiModel}
+                        />
+                      </div>
+                    </div>
                     {(formData.alternativeFlows || []).length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onRemoveAlternativeFlow(index)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        ✕
-                      </Button>
+                      <div className="flex justify-end">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onRemoveAlternativeFlow(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          ✕ Eliminar Flujo Alternativo
+                        </Button>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -1015,9 +1027,9 @@ export default function FormSteps({
                 <textarea 
                   value={formData.businessRules}
                   onChange={(e) => handleInputChange('businessRules', e.target.value)}
-                  rows={3} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                  placeholder="Especifique reglas de negocio específicas si las hay..."
+                  rows={5} 
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
+                  placeholder="Describe las reglas de negocio en lenguaje natural. Ej: Los clientes no se pueden eliminar si tienen productos activos, el DNI debe ser único, solo supervisores pueden hacer ciertas operaciones..."
                 />
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
@@ -1041,9 +1053,9 @@ export default function FormSteps({
                 <textarea 
                   value={formData.specialRequirements}
                   onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
-                  rows={3} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                  placeholder="Indique cualquier requerimiento especial..."
+                  rows={5} 
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
+                  placeholder="Describe los requerimientos especiales en lenguaje natural. Ej: Debe integrarse con servicio externo, tiempos de respuesta específicos, validaciones HTTPS, auditoria completa..."
                 />
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
