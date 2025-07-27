@@ -1,7 +1,8 @@
-import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock } from "lucide-react";
+import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot } from "lucide-react";
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LiveValidation } from "@/components/live-validation";
 import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 import ContextualHelp from "@/components/contextual-help";
@@ -69,20 +70,110 @@ export default function FormSteps({
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Modelo de IA a utilizar
               </label>
-              <select 
-                value={formData.aiModel}
-                onChange={(e) => handleInputChange('aiModel', e.target.value as AIModel)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
+              <Select 
+                value={formData.aiModel} 
+                onValueChange={(value) => handleInputChange('aiModel', value as AIModel)}
               >
-                <option value="demo">Modo Demo (Sin API)</option>
-                <option value="openai">OpenAI GPT-4</option>
-                <option value="claude">Anthropic Claude</option>
-                <option value="grok">Grok API</option>
-                <option value="gemini">Google Gemini</option>
-              </select>
+                <SelectTrigger className="w-full h-14 px-4 border-2 border-gray-200 hover:border-ms-blue focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/20 rounded-lg bg-white dark:bg-gray-800 transition-colors">
+                  <SelectValue className="flex items-center">
+                    {formData.aiModel === 'demo' && (
+                      <div className="flex items-center">
+                        <Sparkles className="mr-3 text-purple-500" size={20} />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900 dark:text-white">Modo Demo</div>
+                          <div className="text-xs text-gray-500">Sin API necesaria</div>
+                        </div>
+                      </div>
+                    )}
+                    {formData.aiModel === 'openai' && (
+                      <div className="flex items-center">
+                        <Bot className="mr-3 text-green-500" size={20} />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900 dark:text-white">OpenAI GPT-4</div>
+                          <div className="text-xs text-gray-500">Avanzado y preciso</div>
+                        </div>
+                      </div>
+                    )}
+                    {formData.aiModel === 'claude' && (
+                      <div className="flex items-center">
+                        <Cpu className="mr-3 text-orange-500" size={20} />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900 dark:text-white">Anthropic Claude</div>
+                          <div className="text-xs text-gray-500">Análisis profundo</div>
+                        </div>
+                      </div>
+                    )}
+                    {formData.aiModel === 'grok' && (
+                      <div className="flex items-center">
+                        <Zap className="mr-3 text-blue-500" size={20} />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900 dark:text-white">Grok API</div>
+                          <div className="text-xs text-gray-500">Velocidad y eficiencia</div>
+                        </div>
+                      </div>
+                    )}
+                    {formData.aiModel === 'gemini' && (
+                      <div className="flex items-center">
+                        <Brain className="mr-3 text-red-500" size={20} />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900 dark:text-white">Google Gemini</div>
+                          <div className="text-xs text-gray-500">Multimodal avanzado</div>
+                        </div>
+                      </div>
+                    )}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent className="w-full border-2 border-gray-200 rounded-lg bg-white dark:bg-gray-800 shadow-lg">
+                  <SelectItem value="demo" className="h-14 px-4 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer">
+                    <div className="flex items-center w-full">
+                      <Sparkles className="mr-3 text-purple-500" size={20} />
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900 dark:text-white">Modo Demo</div>
+                        <div className="text-xs text-gray-500">Sin API necesaria • Ideal para pruebas</div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="openai" className="h-14 px-4 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer">
+                    <div className="flex items-center w-full">
+                      <Bot className="mr-3 text-green-500" size={20} />
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900 dark:text-white">OpenAI GPT-4</div>
+                        <div className="text-xs text-gray-500">Avanzado y preciso • Requiere API key</div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="claude" className="h-14 px-4 hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer">
+                    <div className="flex items-center w-full">
+                      <Cpu className="mr-3 text-orange-500" size={20} />
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900 dark:text-white">Anthropic Claude</div>
+                        <div className="text-xs text-gray-500">Análisis profundo • Requiere API key</div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="grok" className="h-14 px-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
+                    <div className="flex items-center w-full">
+                      <Zap className="mr-3 text-blue-500" size={20} />
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900 dark:text-white">Grok API</div>
+                        <div className="text-xs text-gray-500">Velocidad y eficiencia • Requiere API key</div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="gemini" className="h-14 px-4 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
+                    <div className="flex items-center w-full">
+                      <Brain className="mr-3 text-red-500" size={20} />
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900 dark:text-white">Google Gemini</div>
+                        <div className="text-xs text-gray-500">Multimodal avanzado • Requiere API key</div>
+                      </div>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
