@@ -381,14 +381,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Field name and type are required' });
       }
 
-      const aiService = new AIService();
-      
-      // Set the selected model for AI Assist
-      if (aiModel) {
-        aiService.setModel(aiModel);
-      }
-      
-      const improvedValue = await aiService.improveField(fieldName, fieldValue, fieldType, context);
+      // Use AIService.improveField directly (it's a static method)
+      const improvedValue = await AIService.improveField(fieldName, fieldValue, fieldType, context, aiModel);
       
       res.json({ improvedValue });
     } catch (error) {

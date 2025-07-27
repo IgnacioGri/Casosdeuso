@@ -128,7 +128,7 @@ export default function UseCaseGenerator() {
     if (validateStep(currentStep)) {
       // IMPORTANTE: El último paso NUNCA usa IA, solo aplica estilos y formato
       // La IA se usa únicamente en los botones AI Assist de campos individuales
-      const formDataWithDemoMode = { ...formData, aiModel: 'demo' };
+      const formDataWithDemoMode = { ...formData, aiModel: 'demo' as const };
       generateUseCaseMutation.mutate(formDataWithDemoMode);
     } else {
       toast({

@@ -514,7 +514,15 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     }
   }
 
-  async improveField(fieldName: string, fieldValue: string, fieldType: string, context?: any): Promise<string> {
+  static async improveField(fieldName: string, fieldValue: string, fieldType: string, context?: any, aiModel?: string): Promise<string> {
+    const service = new AIService();
+    if (aiModel) {
+      service.selectedModel = aiModel as AIModel;
+    }
+    return service.improveFieldInstance(fieldName, fieldValue, fieldType, context);
+  }
+
+  private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any): Promise<string> {
     try {
       // Define field-specific rules based on ING specifications
       const fieldRules = this.getFieldRules(fieldName, fieldType, context);
