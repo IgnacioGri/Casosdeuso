@@ -108,7 +108,7 @@ export function useUseCaseForm() {
       case 3:
         return !!(formData.clientName && formData.projectName && formData.useCaseCode); // Basic Info
       case 4:
-        const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir'];
+        const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar'];
         const startsWithInfinitive = infinitiveVerbs.some(verb => 
           formData.useCaseName.toLowerCase().startsWith(verb)
         );
