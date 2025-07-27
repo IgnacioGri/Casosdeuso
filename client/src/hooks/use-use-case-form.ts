@@ -129,7 +129,7 @@ export function useUseCaseForm() {
   }, [formData]);
 
   const loadDemoData = useCallback(() => {
-    setFormData({
+    setFormData(prev => ({
       useCaseType: 'entity',
       clientName: 'Banco Nacional de Argentina',
       projectName: 'Sistema de Gestión de Usuarios',
@@ -150,8 +150,8 @@ export function useUseCaseForm() {
       businessRules: 'Los usuarios deben tener un email único en el sistema. Las contraseñas deben cumplir con políticas de seguridad mínimas.',
       specialRequirements: 'El sistema debe soportar autenticación de dos factores y debe integrarse con Active Directory corporativo.',
       generateWireframes: true,
-      aiModel: 'demo'
-    });
+      aiModel: prev.aiModel // Mantiene el modelo seleccionado previamente
+    }));
   }, []);
 
   const resetForm = useCallback(() => {
