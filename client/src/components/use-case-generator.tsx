@@ -154,6 +154,44 @@ export default function UseCaseGenerator() {
 
   const isReviewStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 6;
 
+  // Navigation buttons component for reuse
+  const NavigationButtons = () => (
+    <div className="flex justify-between">
+      <Button 
+        variant="outline"
+        onClick={handlePreviousStep}
+        disabled={currentStep === 1}
+        className="flex items-center"
+      >
+        <ArrowLeft className="mr-2" size={16} />
+        Anterior
+      </Button>
+      
+      <div className="flex space-x-4">
+        {isReviewStep && (
+          <Button 
+            onClick={handleGenerateUseCase}
+            disabled={generateUseCaseMutation.isPending}
+            className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
+          >
+            <Cog className="mr-2" size={16} />
+            {generateUseCaseMutation.isPending ? 'Generando...' : 'Generar Caso de Uso'}
+          </Button>
+        )}
+        
+        {!isReviewStep && (
+          <Button 
+            onClick={handleNextStep}
+            className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
+          >
+            Siguiente
+            <ArrowRight className="ml-2" size={16} />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-ms-gray">
       {/* Header */}
@@ -195,6 +233,11 @@ export default function UseCaseGenerator() {
               useCaseType={formData.useCaseType}
             />
             
+            {/* Navigation Buttons - Top */}
+            <div className="mb-6 pt-4 border-t border-gray-200">
+              <NavigationButtons />
+            </div>
+            
             <FormSteps
               currentStep={currentStep}
               formData={formData}
@@ -218,40 +261,9 @@ export default function UseCaseGenerator() {
               onLoadPremiumExample={loadPremiumClientExample}
             />
 
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
-              <Button 
-                variant="outline"
-                onClick={handlePreviousStep}
-                disabled={currentStep === 1}
-                className="flex items-center"
-              >
-                <ArrowLeft className="mr-2" size={16} />
-                Anterior
-              </Button>
-              
-              <div className="flex space-x-4">
-                {isReviewStep && (
-                  <Button 
-                    onClick={handleGenerateUseCase}
-                    disabled={generateUseCaseMutation.isPending}
-                    className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
-                  >
-                    <Cog className="mr-2" size={16} />
-                    {generateUseCaseMutation.isPending ? 'Generando...' : 'Generar Caso de Uso'}
-                  </Button>
-                )}
-                
-                {!isReviewStep && (
-                  <Button 
-                    onClick={handleNextStep}
-                    className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
-                  >
-                    Siguiente
-                    <ArrowRight className="ml-2" size={16} />
-                  </Button>
-                )}
-              </div>
+            {/* Navigation Buttons - Bottom */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <NavigationButtons />
             </div>
           </div>
 
