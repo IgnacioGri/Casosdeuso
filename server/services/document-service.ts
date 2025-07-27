@@ -162,13 +162,18 @@ export class DocumentService {
         .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '')
         .trim();
         
-      // Remove duplicate "HISTORIA DE REVISIONES Y APROBACIONES" titles from HTML
-      const historyPattern = /<h[1-6][^>]*>.*?HISTORIA DE REVISIONES Y APROBACIONES.*?<\/h[1-6]>/gi;
-      const historyMatches = cleanContent.match(historyPattern);
+      // Remove only standalone duplicate "HISTORIA DE REVISIONES Y APROBACIONES" titles (not the one with table)
+      const historyTitlePattern = /<h[1-6][^>]*>.*?HISTORIA DE REVISIONES Y APROBACIONES.*?<\/h[1-6]>/gi;
+      const historyMatches = cleanContent.match(historyTitlePattern);
       if (historyMatches && historyMatches.length > 1) {
-        // Keep only the first occurrence, remove the rest
-        for (let i = 1; i < historyMatches.length; i++) {
-          cleanContent = cleanContent.replace(historyMatches[i], '');
+        // Find which one is followed by a table and keep that one
+        for (const match of historyMatches) {
+          const matchIndex = cleanContent.indexOf(match);
+          const afterMatch = cleanContent.substring(matchIndex + match.length, matchIndex + match.length + 500);
+          // If this title is NOT followed by a table, remove it (it's the duplicate)
+          if (!afterMatch.includes('<table')) {
+            cleanContent = cleanContent.replace(match, '');
+          }
         }
       }
 
@@ -299,14 +304,20 @@ export class DocumentService {
       } else if (trimmed.match(/<p[^>]*>/i) || (!trimmed.match(/<[^>]+>/) && trimmed.length > 0)) {
         const text = this.extractTextContent(trimmed);
         if (text && text.length > 0) {
-          result.push(new Paragraph({
-            spacing: { after: 120 }, // Add spacing between paragraphs
-            children: [new TextRun({
-              text,
-              size: 22,
-              font: "Segoe UI Semilight"
-            })]
-          }));
+          // Check if this is actually a list item that should be indented
+          if (text.match(/^[\d]+\./) || text.match(/^[a-z]\./) || text.match(/^[ivx]+\./)) {
+            result.push(this.createListItem(text));
+          } else {
+            result.push(new Paragraph({
+              spacing: { after: 120 },
+              alignment: AlignmentType.JUSTIFIED,
+              children: [new TextRun({
+                text,
+                size: 22,
+                font: "Segoe UI Semilight"
+              })]
+            }));
+          }
         }
       }
     }
@@ -315,37 +326,43 @@ export class DocumentService {
   }
 
   private static createListItem(text: string): Paragraph {
-    // Enhanced list item formatting with better indentation for Word compatibility
+    // Word-compatible hierarchical list formatting to match HTML indentation
     let indentLevel = 0;
-    let bulletPoint = '• ';
+    let tabStops: any[] = [];
     
-    // Detect hierarchical numbering patterns and apply proper Word-style indentation
+    // Detect hierarchical numbering patterns exactly like HTML shows
     if (text.match(/^\d+\.\d+\.\d+/)) {
-      indentLevel = 1080; // 0.75 inch for third level
-      bulletPoint = '';
+      // Third level (like "1.2.3") - deepest indent
+      indentLevel = 1440; // 1 inch
+      tabStops = [{ position: 1440, leader: "none" }];
     } else if (text.match(/^\d+\.\d+/)) {
-      indentLevel = 720; // 0.5 inch for second level  
-      bulletPoint = '';
+      // Second level (like "1.2") - medium indent  
+      indentLevel = 1080; // 0.75 inch
+      tabStops = [{ position: 1080, leader: "none" }];
     } else if (text.match(/^\d+\./)) {
-      indentLevel = 360; // 0.25 inch for first level
-      bulletPoint = '';
+      // First level (like "1.") - base indent
+      indentLevel = 720; // 0.5 inch
+      tabStops = [{ position: 720, leader: "none" }];
     } else if (text.match(/^[a-z]\./)) {
-      indentLevel = 720; // 0.5 inch for letter items
-      bulletPoint = '';
+      // Letter sublevel (like "a.") - same as second level
+      indentLevel = 1080; // 0.75 inch
+      tabStops = [{ position: 1080, leader: "none" }];
     } else if (text.match(/^[ivx]+\./)) {
-      indentLevel = 1080; // 0.75 inch for roman numerals
-      bulletPoint = '';
+      // Roman numeral sublevel (like "i.") - deepest
+      indentLevel = 1440; // 1 inch
+      tabStops = [{ position: 1440, leader: "none" }];
     }
     
     return new Paragraph({
       indent: {
         left: indentLevel,
-        firstLine: indentLevel > 0 ? -200 : 0 // Better hanging indent for Word
+        hanging: 360 // Proper hanging indent for numbered lists
       },
-      spacing: { after: 100 },
-      alignment: AlignmentType.LEFT,
+      tabStops: tabStops,
+      spacing: { after: 120 },
+      alignment: AlignmentType.JUSTIFIED,
       children: [new TextRun({
-        text: bulletPoint + text,
+        text: text,
         size: 22,
         font: "Segoe UI Semilight"
       })]
