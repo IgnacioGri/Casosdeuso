@@ -86,8 +86,11 @@ export class AIService {
           throw new Error(`Modelo de IA no soportado: ${aiModel}`);
       }
 
+      // Clean content to remove any explanatory text before HTML
+      const cleanedContent = this.cleanAIResponse(content);
+      
       return {
-        content,
+        content: cleanedContent,
         success: true
       };
     } catch (error) {
@@ -101,7 +104,9 @@ export class AIService {
   }
 
   private static buildPrompt(formData: any, rules: string): string {
-    return `Genera un documento de caso de uso siguiendo estrictamente estas reglas:
+    return `IMPORTANTE: Responde ÚNICAMENTE con el HTML del documento de caso de uso. NO incluyas explicaciones, comentarios, código CSS separado, ni texto adicional antes o después del HTML.
+
+Genera un documento de caso de uso siguiendo estrictamente estas reglas:
 
 ${rules}
 
@@ -120,7 +125,54 @@ Datos del formulario:
 - Requerimientos especiales: ${formData.specialRequirements || 'Ninguno'}
 - Generar wireframes: ${formData.generateWireframes ? 'Sí' : 'No'}
 
-Genera el documento completo en formato HTML con el estilo Microsoft especificado en las reglas. Incluye todas las secciones requeridas según el tipo de caso de uso.`;
+Responde SOLO con el HTML del documento completo. Usa estilos inline para el formato Microsoft especificado. NO agregues explicaciones antes o después.`;
+  }
+
+  private static cleanAIResponse(content: string): string {
+    // Remove any explanatory text before HTML
+    let cleaned = content;
+    
+    // Remove common AI explanatory phrases
+    const unwantedPhrases = [
+      /Claro,.*?aquí.*?tienes.*?\./gi,
+      /Por.*?supuesto.*?\./gi,
+      /Aquí.*?está.*?\./gi,
+      /```html/gi,
+      /```css/gi,
+      /```/gi,
+      /^.*?font-family.*?$/gm,
+      /^.*?line-height.*?$/gm,
+      /^.*?color.*?rgb.*?$/gm,
+      /^.*?margin.*?$/gm,
+      /^.*?padding.*?$/gm,
+      /^body.*?\{[\s\S]*?\}/gi,
+      /^p.*?\{[\s\S]*?\}/gi,
+      /^h\d.*?\{[\s\S]*?\}/gi,
+      /^\..*?\{[\s\S]*?\}/gi,
+      /^ol.*?\{[\s\S]*?\}/gi
+    ];
+    
+    // Remove unwanted phrases
+    unwantedPhrases.forEach(phrase => {
+      cleaned = cleaned.replace(phrase, '');
+    });
+    
+    // Find first HTML tag and start from there
+    const htmlStart = cleaned.search(/<(?:div|h1|h2|h3|p|ol|ul|table)/i);
+    if (htmlStart !== -1) {
+      cleaned = cleaned.substring(htmlStart);
+    }
+    
+    // Remove any trailing explanatory text after the last closing tag
+    const lastCloseTag = cleaned.lastIndexOf('</');
+    if (lastCloseTag !== -1) {
+      const endOfLastTag = cleaned.indexOf('>', lastCloseTag) + 1;
+      if (endOfLastTag > 0) {
+        cleaned = cleaned.substring(0, endOfLastTag);
+      }
+    }
+    
+    return cleaned.trim();
   }
 
   private static async generateWithOpenAI(prompt: string): Promise<string> {
