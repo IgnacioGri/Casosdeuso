@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType } from 'docx';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -25,7 +25,7 @@ export class DocumentService {
     paragraphs.push(historyTitle);
     paragraphs.push(historyTable);
     
-    // Create header with image
+    // Create header with Ingematica branding
     let headerContent: TextRun;
     try {
       const imagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_caso_de_uso.png');
@@ -121,13 +121,21 @@ export class DocumentService {
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
     const elements: (Paragraph | Table)[] = [];
     
-    // Improved HTML parsing to handle more content
-    const lines = htmlContent.split('\n').filter(line => line.trim());
+    // Clean and parse HTML content more efficiently
+    const cleanContent = htmlContent
+      .replace(/<\/?(table|thead|tbody|tr|td|th)[^>]*>/gi, '') // Remove table tags
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/\s+/g, ' ')
+      .trim();
     
-    for (const line of lines) {
-      const trimmed = line.trim();
+    // Split by major HTML tags while preserving structure
+    const sections = cleanContent.split(/(<h[1-6][^>]*>.*?<\/h[1-6]>|<p[^>]*>.*?<\/p>|<li[^>]*>.*?<\/li>|<div[^>]*>.*?<\/div>)/gi)
+      .filter(section => section.trim().length > 0);
+    
+    for (const section of sections) {
+      const trimmed = section.trim();
       
-      if (trimmed.startsWith('<h1')) {
+      if (trimmed.match(/<h1[^>]*>/i)) {
         const text = this.extractTextContent(trimmed);
         if (text) {
           elements.push(new Paragraph({
@@ -143,7 +151,7 @@ export class DocumentService {
             ]
           }));
         }
-      } else if (trimmed.startsWith('<h2')) {
+      } else if (trimmed.match(/<h2[^>]*>/i)) {
         const text = this.extractTextContent(trimmed);
         if (text) {
           elements.push(new Paragraph({
@@ -159,7 +167,7 @@ export class DocumentService {
             ]
           }));
         }
-      } else if (trimmed.startsWith('<h3')) {
+      } else if (trimmed.match(/<h3[^>]*>/i)) {
         const text = this.extractTextContent(trimmed);
         if (text) {
           elements.push(new Paragraph({
@@ -175,7 +183,7 @@ export class DocumentService {
             ]
           }));
         }
-      } else if (trimmed.startsWith('<h4')) {
+      } else if (trimmed.match(/<h4[^>]*>/i)) {
         const text = this.extractTextContent(trimmed);
         if (text) {
           elements.push(new Paragraph({
@@ -191,9 +199,32 @@ export class DocumentService {
             ]
           }));
         }
-      } else if (trimmed.startsWith('<p') || trimmed.startsWith('<div')) {
+      } else if (trimmed.match(/<li[^>]*>/i)) {
         const text = this.extractTextContent(trimmed);
         if (text) {
+          // Handle different list styles based on content
+          let bulletStyle = '• ';
+          if (text.match(/^\d+\./)) {
+            bulletStyle = '';
+          } else if (text.match(/^[a-z]\./)) {
+            bulletStyle = '    ';
+          } else if (text.match(/^[ivx]+\./)) {
+            bulletStyle = '        ';
+          }
+          
+          elements.push(new Paragraph({
+            children: [
+              new TextRun({
+                text: bulletStyle + text,
+                size: 22,
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+      } else if (trimmed.match(/<(p|div)[^>]*>/i)) {
+        const text = this.extractTextContent(trimmed);
+        if (text && text.length > 0) {
           elements.push(new Paragraph({
             children: [
               new TextRun({
@@ -204,115 +235,8 @@ export class DocumentService {
             ]
           }));
         }
-      } else if (trimmed.startsWith('<li')) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          elements.push(new Paragraph({
-            children: [
-              new TextRun({
-                text: `• ${text}`,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else if (trimmed.startsWith('<ol') || trimmed.startsWith('<ul')) {
-        // Skip list containers
-        continue;
-      } else if (trimmed.startsWith('<table')) {
-        // Create the revision table
-        const table = new Table({
-          width: {
-            size: 2.17 * 1440, // Convert inches to twips
-            type: WidthType.DXA,
-          },
-          rows: [
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [new Paragraph({ text: "Fecha", alignment: AlignmentType.CENTER })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph({ text: "Acción", alignment: AlignmentType.CENTER })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph({ text: "Responsable", alignment: AlignmentType.CENTER })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph({ text: "Comentario", alignment: AlignmentType.CENTER })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-              ],
-            }),
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [new Paragraph({ text: "26/7/2025" })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph({ text: "Versión original" })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph({ text: "Sistema" })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-                new TableCell({
-                  children: [new Paragraph({ text: "Documento generado automáticamente" })],
-                  borders: {
-                    top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                    right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
-                  }
-                }),
-              ],
-            }),
-          ],
-        });
-        elements.push(table);
-      } else if (trimmed && !trimmed.startsWith('<') && !trimmed.startsWith('</')) {
-        // Plain text content that might have been missed
+      } else if (!trimmed.match(/<[^>]+>/) && trimmed.length > 0) {
+        // Plain text content (not HTML)
         elements.push(new Paragraph({
           children: [
             new TextRun({
