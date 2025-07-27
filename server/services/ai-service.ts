@@ -110,6 +110,40 @@ Genera un documento de caso de uso siguiendo estrictamente estas reglas:
 
 ${rules}
 
+FORMATO ESPECÍFICO REQUERIDO:
+1. Presenta los metadatos como tabla HTML con estilo inline:
+   <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+     <tr><td style="border:1px solid #ccc; padding:8px; font-weight:bold;">Campo</td><td style="border:1px solid #ccc; padding:8px; font-weight:bold;">Valor</td></tr>
+     <tr><td style="border:1px solid #ccc; padding:8px;">Nombre del Cliente</td><td style="border:1px solid #ccc; padding:8px;">${formData.clientName}</td></tr>
+     <!-- etc... -->
+   </table>
+
+2. Para flujos, usa numeración jerárquica mejorada:
+   4. Flujo Básico
+     4.1 Menú principal
+     4.2 Subflujo: Búsqueda
+       4.2.1 Ingreso de filtros
+       4.2.2 Ejecución de búsqueda
+     4.3 Subflujo: Alta
+       4.3.1 Validación de datos
+       4.3.2 Confirmación
+
+3. Historia de revisiones como tabla con estilo profesional:
+   <table style="width:100%; border-collapse:collapse; font-size:11px; line-height:1.2;">
+     <tr style="background-color:#f5f5f5;">
+       <th style="border:1px solid #999; padding:6px;">Versión</th>
+       <th style="border:1px solid #999; padding:6px;">Fecha</th>
+       <th style="border:1px solid #999; padding:6px;">Autor</th>
+       <th style="border:1px solid #999; padding:6px;">Descripción del Cambio</th>
+     </tr>
+     <tr>
+       <td style="border:1px solid #999; padding:6px;">1.0</td>
+       <td style="border:1px solid #999; padding:6px;">15/04/2024</td>
+       <td style="border:1px solid #999; padding:6px;">Analista de Sistemas</td>
+       <td style="border:1px solid #999; padding:6px;">Creación inicial del documento de caso de uso.</td>
+     </tr>
+   </table>
+
 Datos del formulario:
 - Tipo de caso de uso: ${formData.useCaseType}
 - Cliente: ${formData.clientName}
@@ -132,14 +166,20 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
     // Remove any explanatory text before HTML
     let cleaned = content;
     
-    // Remove common AI explanatory phrases
+    // Remove common AI explanatory phrases and unwanted patterns
     const unwantedPhrases = [
       /Claro,.*?aquí.*?tienes.*?\./gi,
       /Por.*?supuesto.*?\./gi,
       /Aquí.*?está.*?\./gi,
+      /Aquí.*?tienes.*?\./gi,
+      /Te.*?presento.*?\./gi,
+      /^.*?documento.*?actualizado.*?mejoras.*?\./gi,
+      /^.*?manteniendo.*?formato.*?HTML.*?\./gi,
+      /^.*?como.*?lo.*?haría.*?experto.*?\./gi,
       /```html/gi,
       /```css/gi,
       /```/gi,
+      /---\s*/gi,
       /^.*?font-family.*?$/gm,
       /^.*?line-height.*?$/gm,
       /^.*?color.*?rgb.*?$/gm,
@@ -171,6 +211,9 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
         cleaned = cleaned.substring(0, endOfLastTag);
       }
     }
+    
+    // Final cleanup - remove any remaining unwanted content at the beginning
+    cleaned = cleaned.replace(/^[^<]*(?=<)/, '');
     
     return cleaned.trim();
   }

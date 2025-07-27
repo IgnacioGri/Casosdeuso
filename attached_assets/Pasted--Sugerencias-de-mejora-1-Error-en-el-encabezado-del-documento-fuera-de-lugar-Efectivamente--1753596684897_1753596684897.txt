@@ -1,0 +1,59 @@
+🔧 Sugerencias de mejora
+
+1. ⚠️ Error en el encabezado del documento (fuera de lugar)
+Efectivamente, esto no debería aparecer en el documento final:
+
+Claro, aquí tienes el documento de caso de uso actualizado con mejoras profesionales, manteniendo el formato HTML y una estructura clara y detallada, tal como lo haría un experto en documentación. --- ```html
+Qué hacer:
+
+Ajustar tu app para que no incluya introducciones “narrativas” o explicativas del sistema generador.
+Y por supuesto, no debe aparecer ```html ni ningún tag de código markdown/HTML salvo que estés generando código literal.
+2. ✍️ Encabezado y metadatos: mejor presentados como tabla
+Podés presentar esta información con más claridad visual, tipo:
+
+Campo	Valor
+Nombre del Cliente	Banco Provincia
+Nombre del Proyecto	Gestión Integral de Clientes
+Código del Caso de Uso	CU005
+Nombre del Caso de Uso	Gestionar Clientes Premium
+Nombre del Archivo	BP_CU005_GestionarClientesPremium_v1.1
+Versión	1.1
+Fecha de Versión	24/05/2024
+Autor	Analista de Sistemas
+Actores	Operador de Atención al Cliente, Supervisor
+3. 🧱 Podrías enriquecer la numeración del flujo
+Por ejemplo:
+
+En lugar de:
+4. Flujo Básico (Flujo de Éxito)
+4.1 Búsqueda de Clientes
+4.2 Alta de Cliente
+Podrías usar:
+
+4. Flujo Básico
+  4.1 Menú principal
+  4.2 Subflujo: Búsqueda
+    4.2.1 Ingreso de filtros
+    4.2.2 Ejecución de búsqueda
+  4.3 Subflujo: Alta
+etc.
+Esto ayuda al equipo técnico a trazar fácilmente los pasos al implementar/testear.
+
+4. 🧾 Sugerencia mínima para el historial de cambios
+Podrías usar esta tabla con bordes finos, fuente más chica, interlineado simple (como exige la minuta):
+
+Versión	Fecha	Autor	Descripción del Cambio
+1.0	15/04/2024	Analista de Sistemas	Creación inicial del documento de caso de uso.
+1.1	24/05/2024	Analista de Sistemas	Actualización general del documento. Se clarifica el flujo básico en subflujos. Se añade sección de Flujos Alternativos. Se completan reglas y postcondiciones.
+5. 🖥️ Bonus: si vas a exportar a Word
+Asegurate de que:
+El título esté en azul oscuro (RGB: 0,112,192)
+La fuente sea Segoe UI Semilight
+El encabezado contenga una imagen ("Encabezado caso de uso.png")
+El footer tenga:
+A la izquierda: “Página X de N”
+A la derecha: el nombre del caso de uso
+Tu app podría incluso previsualizar esto antes de exportar.
+
+✅ Conclusión
+Sí, tu app hizo un muy buen trabajo. Lo único que debe eliminarse es esa línea de markdown/código HTML al principio, y todo lo demás es sólido, usable, profesional y escalable. Si lográs integrar estos pequeños ajustes, podrías posicionarla como una herramienta real de generación de documentación en entornos exigentes como bancos, telcos o entes públicos.

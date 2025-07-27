@@ -119,11 +119,36 @@ export class DocumentService {
   }
 
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
-    const elements: (Paragraph | Table)[] = [];
+    const result: (Paragraph | Table)[] = [];
     
-    // Clean and parse HTML content more efficiently
-    const cleanContent = htmlContent
-      .replace(/<\/?(table|thead|tbody|tr|td|th)[^>]*>/gi, '') // Remove table tags
+    // Process content sequentially to maintain order
+    const contentParts = htmlContent.split(/(<table[^>]*>.*?<\/table>)/gis);
+    
+    for (const part of contentParts) {
+      const trimmed = part.trim();
+      if (!trimmed) continue;
+      
+      if (trimmed.match(/<table[^>]*>/i)) {
+        // This is a table
+        const table = this.parseHtmlTable(trimmed);
+        if (table) {
+          result.push(table);
+        }
+      } else {
+        // This is regular content, process as before
+        const elements = this.parseRegularContent(trimmed);
+        result.push(...elements);
+      }
+    }
+    
+    return result;
+  }
+
+  private static parseRegularContent(content: string): Paragraph[] {
+    const elements: Paragraph[] = [];
+    
+    // Clean content 
+    const cleanContent = content
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/\s+/g, ' ')
       .trim();
@@ -202,17 +227,34 @@ export class DocumentService {
       } else if (trimmed.match(/<li[^>]*>/i)) {
         const text = this.extractTextContent(trimmed);
         if (text) {
-          // Handle different list styles based on content
+          // Handle hierarchical numbering - improved based on feedback
           let bulletStyle = '• ';
-          if (text.match(/^\d+\./)) {
+          let indentLevel = 0;
+          
+          if (text.match(/^\d+\.\d+\.\d+/)) {
+            // Third level (4.2.1)
             bulletStyle = '';
+            indentLevel = 720; // 0.5 inch
+          } else if (text.match(/^\d+\.\d+/)) {
+            // Second level (4.2 Subflujo:)
+            bulletStyle = '';
+            indentLevel = 360; // 0.25 inch
+          } else if (text.match(/^\d+\./)) {
+            // First level (4.)
+            bulletStyle = '';
+            indentLevel = 0;
           } else if (text.match(/^[a-z]\./)) {
-            bulletStyle = '    ';
+            bulletStyle = '';
+            indentLevel = 360;
           } else if (text.match(/^[ivx]+\./)) {
-            bulletStyle = '        ';
+            bulletStyle = '';
+            indentLevel = 720;
           }
           
           elements.push(new Paragraph({
+            indent: {
+              left: indentLevel,
+            },
             children: [
               new TextRun({
                 text: bulletStyle + text,
@@ -254,6 +296,74 @@ export class DocumentService {
 
   private static extractTextContent(html: string): string {
     return html.replace(/<[^>]*>/g, '').trim();
+  }
+
+  private static parseHtmlTable(htmlTable: string): Table | null {
+    try {
+      // Extract table rows
+      const rowMatches = htmlTable.match(/<tr[^>]*>.*?<\/tr>/gi);
+      if (!rowMatches) return null;
+
+      const rows: TableRow[] = [];
+
+      for (const rowHtml of rowMatches) {
+        // Extract cells (both td and th)
+        const cellMatches = rowHtml.match(/<t[hd][^>]*>.*?<\/t[hd]>/gi);
+        if (!cellMatches) continue;
+
+        const cells: TableCell[] = [];
+        
+        for (const cellHtml of cellMatches) {
+          const cellText = this.extractTextContent(cellHtml);
+          const isHeader = cellHtml.match(/<th[^>]*>/i);
+          
+          cells.push(new TableCell({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.LEFT,
+                children: [
+                  new TextRun({
+                    text: cellText,
+                    bold: isHeader ? true : false,
+                    font: "Segoe UI Semilight",
+                    size: 20
+                  })
+                ]
+              })
+            ],
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+            },
+            shading: isHeader ? {
+              type: ShadingType.SOLID,
+              color: "F5F5F5",
+            } : undefined
+          }));
+        }
+
+        if (cells.length > 0) {
+          rows.push(new TableRow({ children: cells }));
+        }
+      }
+
+      if (rows.length > 0) {
+        return new Table({
+          width: {
+            size: 100,
+            type: WidthType.PERCENTAGE,
+          },
+          rows: rows
+        });
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error parsing HTML table:', error);
+      return null;
+    }
   }
   
   private static createHistoryTable(): Table {
