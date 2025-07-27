@@ -134,29 +134,46 @@ export class DocumentService {
   }
 
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
-    const result: (Paragraph | Table)[] = [];
-    
-    // Process content sequentially to maintain order
-    const contentParts = htmlContent.split(/(<table[^>]*>.*?<\/table>)/gi);
-    
-    for (const part of contentParts) {
-      const trimmed = part.trim();
-      if (!trimmed) continue;
+    try {
+      // First, let's clean the HTML content more aggressively
+      let cleanContent = htmlContent
+        .replace(/<style[^>]*>.*?<\/style>/gi, '') // Remove style blocks
+        .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove script blocks
+        .replace(/<!--.*?-->/gi, '') // Remove comments
+        .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '') // Remove document structure tags
+        .trim();
+
+      const result: (Paragraph | Table)[] = [];
       
-      if (trimmed.match(/<table[^>]*>/i)) {
-        // This is a table
-        const table = this.parseHtmlTable(trimmed);
-        if (table) {
-          result.push(table);
+      // Split by major sections first - tables and content blocks
+      const sections = cleanContent.split(/(?=<(?:h[1-6]|p|ul|ol|table)[^>]*>)/gi);
+      
+      for (const section of sections) {
+        const trimmed = section.trim();
+        if (!trimmed) continue;
+        
+        if (trimmed.includes('<table')) {
+          const table = this.parseHtmlTable(trimmed);
+          if (table) result.push(table);
+        } else {
+          const paragraphs = this.parseTextContent(trimmed);
+          result.push(...paragraphs);
         }
-      } else {
-        // This is regular content, process as before
-        const elements = this.parseRegularContent(trimmed);
-        result.push(...elements);
       }
+      
+      return result;
+    } catch (error) {
+      console.error('Error parsing HTML content:', error);
+      // Fallback: create a simple paragraph with the text content
+      const textContent = htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      return [new Paragraph({
+        children: [new TextRun({
+          text: textContent,
+          font: "Segoe UI Semilight",
+          size: 22
+        })]
+      })];
     }
-    
-    return result;
   }
 
   private static parseRegularContent(content: string): Paragraph[] {
@@ -239,70 +256,26 @@ export class DocumentService {
             ]
           }));
         }
-      } else if (trimmed.match(/<li[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          // Handle hierarchical numbering - improved based on feedback
-          let bulletStyle = '• ';
-          let indentLevel = 0;
-          
-          if (text.match(/^\d+\.\d+\.\d+/)) {
-            // Third level (4.2.1)
-            bulletStyle = '';
-            indentLevel = 720; // 0.5 inch
-          } else if (text.match(/^\d+\.\d+/)) {
-            // Second level (4.2 Subflujo:)
-            bulletStyle = '';
-            indentLevel = 360; // 0.25 inch
-          } else if (text.match(/^\d+\./)) {
-            // First level (4.)
-            bulletStyle = '';
-            indentLevel = 0;
-          } else if (text.match(/^[a-z]\./)) {
-            bulletStyle = '';
-            indentLevel = 360;
-          } else if (text.match(/^[ivx]+\./)) {
-            bulletStyle = '';
-            indentLevel = 720;
-          }
-          
-          elements.push(new Paragraph({
-            indent: {
-              left: indentLevel,
-            },
-            children: [
-              new TextRun({
-                text: bulletStyle + text,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else if (trimmed.match(/<(p|div)[^>]*>/i)) {
+      } else {
+        // Handle all other content as simple paragraphs
         const text = this.extractTextContent(trimmed);
         if (text && text.length > 0) {
+          // Check for list items based on text patterns
+          let indentLevel = 0;
+          if (text.match(/^\d+\.\d+\.\d+/)) indentLevel = 720;
+          else if (text.match(/^\d+\.\d+/)) indentLevel = 360;
+          else if (text.match(/^[a-z]\./)) indentLevel = 360;
+          else if (text.match(/^[ivx]+\./)) indentLevel = 720;
+          
           elements.push(new Paragraph({
-            children: [
-              new TextRun({
-                text,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
-      } else if (!trimmed.match(/<[^>]+>/) && trimmed.length > 0) {
-        // Plain text content (not HTML)
-        elements.push(new Paragraph({
-          children: [
-            new TextRun({
-              text: trimmed,
+            indent: indentLevel > 0 ? { left: indentLevel } : undefined,
+            children: [new TextRun({
+              text,
               size: 22,
               font: "Segoe UI Semilight"
-            })
-          ]
-        }));
+            })]
+          }));
+        }
       }
     }
 
@@ -310,7 +283,15 @@ export class DocumentService {
   }
 
   private static extractTextContent(html: string): string {
-    return html.replace(/<[^>]*>/g, '').trim();
+    return html
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .trim();
   }
 
   private static parseHtmlTable(htmlTable: string): Table | null {
