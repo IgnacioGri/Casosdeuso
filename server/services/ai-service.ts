@@ -525,37 +525,12 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
   private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any): Promise<string> {
     try {
-      // Define field-specific rules based on ING specifications
-      const fieldRules = this.getFieldRules(fieldName, fieldType, context);
+      console.log(`AI Assist: improving field "${fieldName}" with value "${fieldValue}" (type: ${fieldType})`);
       
-      // Get enhanced context information
-      const contextInfo = this.buildContextualPrompt(context);
-      
-      const prompt = `
-MEJORA ESTE CAMPO SEGÚN LAS REGLAS DE ING Y EL CONTEXTO DEL PROYECTO:
-
-${contextInfo}
-
-CAMPO A MEJORAR: ${fieldName}
-TIPO: ${fieldType}
-VALOR ACTUAL: "${fieldValue}"
-
-REGLAS ESPECÍFICAS PARA ESTE CAMPO:
-${fieldRules}
-
-INSTRUCCIONES:
-- IMPORTANTE: Usa la información del contexto del proyecto para dar sugerencias coherentes
-- Si el campo está vacío, proporciona un ejemplo apropiado basado en el proyecto
-- Corrige errores de formato según las reglas específicas
-- Mantén coherencia con los otros campos ya completados
-- Solo devuelve el valor mejorado, sin explicaciones adicionales
-- No agregues comillas ni formato markdown
-
-VALOR MEJORADO:`;
-
       // For now, always use demo mode for field improvements to avoid API costs
-      // TODO: When API keys are properly configured, uncomment the AI calls
-      return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      const result = this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      console.log(`AI Assist result: "${result}"`);
+      return result;
       
     } catch (error) {
       console.error('Error improving field:', error);
@@ -650,10 +625,10 @@ VALOR MEJORADO:`;
     
     if (!fieldValue || fieldValue.trim() === '') {
       // Provide examples for empty fields
-      if (fieldName_lower.includes('nombre') && fieldName_lower.includes('cliente')) {
+      if ((fieldName_lower.includes('nombre') && fieldName_lower.includes('cliente')) || fieldName_lower === 'clientname') {
         return 'Banco Provincia';
       }
-      if (fieldName_lower.includes('proyecto')) {
+      if (fieldName_lower.includes('proyecto') || fieldName_lower === 'projectname') {
         return 'Gestión Integral de Clientes';
       }
       if (fieldName_lower.includes('codigo')) {
@@ -707,10 +682,12 @@ VALOR MEJORADO:`;
       if (fieldType === 'specialRequirements') {
         return '1. Integración con servicio externo de scoring crediticio al momento del alta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
       }
-      return fieldValue;
+      
+      // Fallback for any unhandled empty field
+      return 'Ejemplo generado automáticamente según reglas ING';
     }
     
-    // Improve existing values
+    // Improve existing values that have content
     if (fieldName_lower.includes('nombre') && fieldName_lower.includes('caso')) {
       const verbs = ['gestionar', 'crear', 'consultar', 'administrar', 'configurar', 'procesar'];
       const startsWithVerb = verbs.some(verb => fieldValue.toLowerCase().startsWith(verb));
@@ -731,6 +708,11 @@ VALOR MEJORADO:`;
     if (fieldName_lower.includes('archivo')) {
       // Ensure no spaces and proper format
       return fieldValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
+    }
+    
+    // Default improvement: capitalize first letter for text fields
+    if (fieldType === 'text' || fieldType === 'textarea') {
+      return fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
     }
     
     return fieldValue;
