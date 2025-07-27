@@ -46,9 +46,6 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
   return (
     <div className="mb-8 bg-white dark:bg-gray-900 p-6 rounded-lg border shadow-sm">
       <div className="flex items-center justify-between mb-6 relative">
-        {/* Progress line background */}
-        <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-300 dark:bg-gray-600 z-0" />
-        
         {Array.from({ length: totalSteps }, (_, index) => {
           const stepNumber = index + 1;
           const isCompleted = stepNumber < currentStep;
@@ -57,10 +54,22 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
           const StepIcon = stepInfo.icon;
           
           return (
-            <div key={stepNumber} className="flex flex-col items-center relative z-10">
+            <div key={stepNumber} className="flex flex-col items-center relative">
+              {/* Connection line to next step */}
+              {stepNumber < totalSteps && (
+                <div className="absolute left-1/2 top-6 w-full h-0.5 z-0">
+                  <div 
+                    className={`h-full transition-all duration-300 ${
+                      stepNumber < currentStep ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'
+                    }`}
+                    style={{ marginLeft: '24px', width: 'calc(100% - 24px)' }}
+                  />
+                </div>
+              )}
+              
               <div
                 className={`
-                  flex items-center justify-center w-12 h-12 rounded-full border-2 text-sm font-medium transition-all duration-200 mb-2 bg-white dark:bg-gray-800
+                  flex items-center justify-center w-12 h-12 rounded-full border-2 text-sm font-medium transition-all duration-200 mb-2 relative z-10
                   ${isCompleted 
                     ? 'bg-green-600 border-green-600 text-white shadow-lg scale-105' 
                     : isCurrent 
@@ -78,19 +87,6 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
               }`}>
                 {stepInfo.name}
               </div>
-              
-              {/* Progress line segment */}
-              {stepNumber < totalSteps && (
-                <div 
-                  className={`
-                    absolute top-6 left-6 h-0.5 transition-all duration-300 z-20
-                    ${stepNumber < currentStep ? 'bg-green-600' : 'bg-gray-300 dark:bg-gray-600'}
-                  `}
-                  style={{ 
-                    width: `calc(100% + 48px)`, // Connect to next circle
-                  }}
-                />
-              )}
             </div>
           );
         })}
