@@ -7,23 +7,30 @@ export class DocumentService {
     // Convert HTML to docx structure
     const paragraphs = this.parseHtmlToParagraphs(htmlContent);
     
-    // Add the mandatory history table at the end
-    const historyTitle = new Paragraph({
-      heading: HeadingLevel.HEADING_1,
-      children: [
-        new TextRun({
-          text: "HISTORIA DE REVISIONES Y APROBACIONES",
-          bold: true,
-          size: 32,
-          color: "0070C0", // Blue color as specified
-          font: "Segoe UI Semilight"
-        })
-      ]
-    });
+    // Add the mandatory history table at the end (only if not already present)
+    const htmlContentLower = htmlContent.toLowerCase();
+    const hasHistoryTitle = htmlContentLower.includes("historia de revisiones") || 
+                           htmlContentLower.includes("historia de revisiones y aprobaciones");
     
-    const historyTable = this.createHistoryTable();
-    paragraphs.push(historyTitle);
-    paragraphs.push(historyTable);
+    if (!hasHistoryTitle) {
+      const historyTitle = new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 400, after: 200 },
+        children: [
+          new TextRun({
+            text: "HISTORIA DE REVISIONES Y APROBACIONES",
+            bold: true,
+            size: 32,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })
+        ]
+      });
+      
+      const historyTable = this.createHistoryTable();
+      paragraphs.push(historyTitle);
+      paragraphs.push(historyTable);
+    }
     
     // Create header with Ingematica image
     let headerImage: ImageRun | null = null;
@@ -147,13 +154,23 @@ export class DocumentService {
 
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
     try {
-      // Clean the HTML content properly
+      // Clean the HTML content properly and remove duplicated history sections
       let cleanContent = htmlContent
         .replace(/<style[^>]*>.*?<\/style>/gi, '')
         .replace(/<script[^>]*>.*?<\/script>/gi, '')
         .replace(/<!--.*?-->/gi, '')
         .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '')
         .trim();
+        
+      // Remove duplicate "HISTORIA DE REVISIONES Y APROBACIONES" titles from HTML
+      const historyPattern = /<h[1-6][^>]*>.*?HISTORIA DE REVISIONES Y APROBACIONES.*?<\/h[1-6]>/gi;
+      const historyMatches = cleanContent.match(historyPattern);
+      if (historyMatches && historyMatches.length > 1) {
+        // Keep only the first occurrence, remove the rest
+        for (let i = 1; i < historyMatches.length; i++) {
+          cleanContent = cleanContent.replace(historyMatches[i], '');
+        }
+      }
 
       const result: (Paragraph | Table)[] = [];
       
@@ -298,34 +315,35 @@ export class DocumentService {
   }
 
   private static createListItem(text: string): Paragraph {
-    // Enhanced list item formatting with proper indentation
+    // Enhanced list item formatting with better indentation for Word compatibility
     let indentLevel = 0;
     let bulletPoint = '• ';
     
-    // Detect hierarchical numbering patterns
+    // Detect hierarchical numbering patterns and apply proper Word-style indentation
     if (text.match(/^\d+\.\d+\.\d+/)) {
-      indentLevel = 1440; // 1 inch for third level
+      indentLevel = 1080; // 0.75 inch for third level
       bulletPoint = '';
     } else if (text.match(/^\d+\.\d+/)) {
-      indentLevel = 720; // 0.5 inch for second level
+      indentLevel = 720; // 0.5 inch for second level  
       bulletPoint = '';
     } else if (text.match(/^\d+\./)) {
       indentLevel = 360; // 0.25 inch for first level
       bulletPoint = '';
     } else if (text.match(/^[a-z]\./)) {
-      indentLevel = 720;
+      indentLevel = 720; // 0.5 inch for letter items
       bulletPoint = '';
     } else if (text.match(/^[ivx]+\./)) {
-      indentLevel = 1080;
+      indentLevel = 1080; // 0.75 inch for roman numerals
       bulletPoint = '';
     }
     
     return new Paragraph({
       indent: {
         left: indentLevel,
-        hanging: indentLevel > 0 ? 360 : 0 // Hanging indent for proper list formatting
+        firstLine: indentLevel > 0 ? -200 : 0 // Better hanging indent for Word
       },
-      spacing: { after: 80 },
+      spacing: { after: 100 },
+      alignment: AlignmentType.LEFT,
       children: [new TextRun({
         text: bulletPoint + text,
         size: 22,
