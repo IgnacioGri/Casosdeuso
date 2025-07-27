@@ -375,13 +375,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Assist for individual fields
   app.post('/api/use-cases/ai-assist', async (req: Request, res: Response) => {
     try {
-      const { fieldName, fieldValue, fieldType, context } = req.body;
+      const { fieldName, fieldValue, fieldType, context, aiModel } = req.body;
       
       if (!fieldName || !fieldType) {
         return res.status(400).json({ error: 'Field name and type are required' });
       }
 
       const aiService = new AIService();
+      
+      // Set the selected model for AI Assist
+      if (aiModel) {
+        aiService.setModel(aiModel);
+      }
+      
       const improvedValue = await aiService.improveField(fieldName, fieldValue, fieldType, context);
       
       res.json({ improvedValue });

@@ -13,6 +13,7 @@ interface AIAssistButtonProps {
   disabled?: boolean;
   size?: "sm" | "default" | "lg";
   variant?: "default" | "outline" | "secondary" | "ghost";
+  aiModel?: string;
 }
 
 export function AIAssistButton({
@@ -23,7 +24,8 @@ export function AIAssistButton({
   onImprovement,
   disabled = false,
   size = "sm",
-  variant = "outline"
+  variant = "outline",
+  aiModel
 }: AIAssistButtonProps) {
   const { toast } = useToast();
 
@@ -65,7 +67,8 @@ export function AIAssistButton({
       fieldName,
       fieldValue,
       fieldType,
-      context
+      context,
+      aiModel
     });
   };
 

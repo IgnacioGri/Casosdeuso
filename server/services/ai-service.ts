@@ -544,7 +544,7 @@ VALOR MEJORADO:`;
         return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
       }
 
-      const response = await this.callAI(prompt);
+      const response = await this.callAIProvider(prompt, this.selectedModel);
       
       if (!response.success || !response.content) {
         throw new Error('No se pudo mejorar el campo');
@@ -607,6 +607,14 @@ VALOR MEJORADO:`;
       return '- Nombre del campo de la entidad\n- Debe ser claro y sin abreviaciones\n- Relacionado con el dominio del negocio';
     }
     
+    if (fieldType === 'apiEndpoint') {
+      return '- URL completa del endpoint\n- Protocolo HTTPS preferido\n- Versionado en la URL (v1, v2)\n- RESTful naming convention\n- Ejemplo: https://api.banco.com/v1/clientes';
+    }
+    
+    if (fieldName_lower.includes('request') || fieldName_lower.includes('response')) {
+      return '- Formato JSON estructurado\n- Incluir campos requeridos y opcionales\n- Especificar tipos de datos\n- Códigos de estado para responses\n- Ejemplos concretos';
+    }
+    
     return '- Seguir convenciones profesionales\n- Lenguaje claro y preciso\n- Sin errores ortográficos';
   }
 
@@ -632,6 +640,24 @@ VALOR MEJORADO:`;
       }
       if (fieldName_lower.includes('descripcion')) {
         return 'Este caso de uso permite al operador del área de atención gestionar los datos de clientes del segmento Premium. Incluye funcionalidades de búsqueda, alta, modificación y eliminación de clientes, validando condiciones específicas según políticas del banco.';
+      }
+      if (fieldType === 'searchFilter') {
+        return 'Número de cliente';
+      }
+      if (fieldType === 'resultColumn') {
+        return 'ID Cliente';
+      }
+      if (fieldType === 'entityField') {
+        return 'numeroCliente';
+      }
+      if (fieldType === 'apiEndpoint') {
+        return 'https://api.banco.com/v1/clientes';
+      }
+      if (fieldName_lower.includes('request')) {
+        return '{\n  "numeroCliente": "string",\n  "nombre": "string",\n  "email": "string"\n}';
+      }
+      if (fieldName_lower.includes('response')) {
+        return '{\n  "success": "boolean",\n  "data": {\n    "id": "number",\n    "cliente": "object"\n  },\n  "status": 200\n}';
       }
       return fieldValue;
     }
