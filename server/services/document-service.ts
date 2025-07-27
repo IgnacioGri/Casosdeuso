@@ -7,30 +7,24 @@ export class DocumentService {
     // Convert HTML to docx structure
     const paragraphs = this.parseHtmlToParagraphs(htmlContent);
     
-    // Add the mandatory history table at the end (only if not already present)
-    const htmlContentLower = htmlContent.toLowerCase();
-    const hasHistoryTitle = htmlContentLower.includes("historia de revisiones") || 
-                           htmlContentLower.includes("historia de revisiones y aprobaciones");
+    // Always add the mandatory history table at the end
+    const historyTitle = new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400, after: 200 },
+      children: [
+        new TextRun({
+          text: "HISTORIA DE REVISIONES Y APROBACIONES",
+          bold: true,
+          size: 32,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })
+      ]
+    });
     
-    if (!hasHistoryTitle) {
-      const historyTitle = new Paragraph({
-        heading: HeadingLevel.HEADING_1,
-        spacing: { before: 400, after: 200 },
-        children: [
-          new TextRun({
-            text: "HISTORIA DE REVISIONES Y APROBACIONES",
-            bold: true,
-            size: 32,
-            color: "0070C0",
-            font: "Segoe UI Semilight"
-          })
-        ]
-      });
-      
-      const historyTable = this.createHistoryTable();
-      paragraphs.push(historyTitle);
-      paragraphs.push(historyTable);
-    }
+    const historyTable = this.createHistoryTable();
+    paragraphs.push(historyTitle);
+    paragraphs.push(historyTable);
     
     // Create header with Ingematica image
     let headerImage: ImageRun | null = null;
@@ -217,107 +211,84 @@ export class DocumentService {
   private static parseContentElements(content: string): Paragraph[] {
     const result: Paragraph[] = [];
     
-    // Split content into logical blocks, preserving structure
-    const blocks = content.split(/(<h[1-6][^>]*>.*?<\/h[1-6]>|<p[^>]*>.*?<\/p>|<ul[^>]*>.*?<\/ul>|<ol[^>]*>.*?<\/ol>|<li[^>]*>.*?<\/li>|<div[^>]*>.*?<\/div>)/gi)
-      .filter(block => block.trim().length > 0);
+    // First, split by lines to preserve the exact structure from HTML
+    const lines = content.split(/\n/);
     
-    for (const block of blocks) {
-      const trimmed = block.trim();
+    for (const line of lines) {
+      const trimmed = line.trim();
       if (!trimmed) continue;
       
+      const text = this.extractTextContent(trimmed);
+      if (!text) continue;
+      
+      // Check for headings first
       if (trimmed.match(/<h1[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_1,
-            spacing: { after: 200 }, // Add spacing after headings
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 32,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
+        result.push(new Paragraph({
+          heading: HeadingLevel.HEADING_1,
+          spacing: { after: 200 },
+          children: [new TextRun({
+            text,
+            bold: true,
+            size: 32,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
       } else if (trimmed.match(/<h2[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 240, after: 120 },
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 28,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
+        result.push(new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 240, after: 120 },
+          children: [new TextRun({
+            text,
+            bold: true,
+            size: 28,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
       } else if (trimmed.match(/<h3[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_3,
-            spacing: { before: 200, after: 100 },
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 24,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
+        result.push(new Paragraph({
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 200, after: 100 },
+          children: [new TextRun({
+            text,
+            bold: true,
+            size: 24,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
       } else if (trimmed.match(/<h4[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
+        result.push(new Paragraph({
+          heading: HeadingLevel.HEADING_4,
+          spacing: { before: 120, after: 80 },
+          children: [new TextRun({
+            text,
+            bold: true,
+            size: 22,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      } else {
+        // Check if this is a list item with numbered pattern
+        if (text.match(/^\d+\./)) {
+          result.push(this.createListItem(text));
+        } else if (text.match(/^[a-z]\./)) {
+          result.push(this.createListItem(text));
+        } else if (text.match(/^[ivx]+\./)) {
+          result.push(this.createListItem(text));
+        } else {
+          // Regular paragraph
           result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_4,
-            spacing: { before: 120, after: 80 },
+            spacing: { after: 120 },
+            alignment: AlignmentType.JUSTIFIED,
             children: [new TextRun({
               text,
-              bold: true,
               size: 22,
-              color: "0070C0",
               font: "Segoe UI Semilight"
             })]
           }));
-        }
-      } else if (trimmed.match(/<(ul|ol)[^>]*>/i)) {
-        // Process lists
-        const listItems = trimmed.match(/<li[^>]*>.*?<\/li>/gi);
-        if (listItems) {
-          for (const item of listItems) {
-            const text = this.extractTextContent(item);
-            if (text) {
-              result.push(this.createListItem(text));
-            }
-          }
-        }
-      } else if (trimmed.match(/<li[^>]*>/i)) {
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          result.push(this.createListItem(text));
-        }
-      } else if (trimmed.match(/<p[^>]*>/i) || (!trimmed.match(/<[^>]+>/) && trimmed.length > 0)) {
-        const text = this.extractTextContent(trimmed);
-        if (text && text.length > 0) {
-          // Check if this is actually a list item that should be indented
-          if (text.match(/^[\d]+\./) || text.match(/^[a-z]\./) || text.match(/^[ivx]+\./)) {
-            result.push(this.createListItem(text));
-          } else {
-            result.push(new Paragraph({
-              spacing: { after: 120 },
-              alignment: AlignmentType.JUSTIFIED,
-              children: [new TextRun({
-                text,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })]
-            }));
-          }
         }
       }
     }
