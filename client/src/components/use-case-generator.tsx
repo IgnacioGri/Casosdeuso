@@ -40,6 +40,7 @@ export default function UseCaseGenerator() {
     updateAlternativeFlow,
     validateStep,
     loadDemoData,
+    loadPremiumClientExample,
     resetForm
   } = useUseCaseForm();
 
@@ -214,6 +215,7 @@ export default function UseCaseGenerator() {
               onRemoveAlternativeFlow={removeAlternativeFlow}
               onUpdateAlternativeFlow={updateAlternativeFlow}
               onLoadDemoData={handleLoadDemo}
+              onLoadPremiumExample={loadPremiumClientExample}
             />
 
             {/* Navigation Buttons */}

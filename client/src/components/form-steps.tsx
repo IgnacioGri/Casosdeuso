@@ -26,6 +26,7 @@ interface FormStepsProps {
   onRemoveAlternativeFlow: (index: number) => void;
   onUpdateAlternativeFlow: (index: number, value: string) => void;
   onLoadDemoData: () => void;
+  onLoadPremiumExample?: () => void;
 }
 
 export default function FormSteps({
@@ -47,7 +48,8 @@ export default function FormSteps({
   onAddAlternativeFlow,
   onRemoveAlternativeFlow,
   onUpdateAlternativeFlow,
-  onLoadDemoData
+  onLoadDemoData,
+  onLoadPremiumExample
 }: FormStepsProps) {
 
   const handleInputChange = (field: keyof UseCaseFormData, value: any) => {
@@ -113,6 +115,30 @@ export default function FormSteps({
           selectedType={formData.useCaseType}
           onTypeSelect={(type) => handleInputChange('useCaseType', type)}
         />
+
+        {/* Botón de autocompletado para ejemplo Premium solo cuando está seleccionado "Gestión de Entidades" */}
+        {formData.useCaseType === 'entity' && (
+          <Card className="border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-blue-900">Ejemplo Complejo: Gestionar Clientes Premium</h4>
+                  <p className="text-sm text-blue-700">
+                    Autocompletar con un caso de uso bancario completo y detallado
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={onLoadPremiumExample}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Autocompletar Ejemplo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }

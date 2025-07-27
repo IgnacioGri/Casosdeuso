@@ -1,0 +1,172 @@
+Perfecto. Acá tenés **todo el caso de uso completo y complejo** del ejemplo “Gestionar Clientes Premium”, ya integrado en un único bloque continuo, listo para transformar en HTML y luego exportar a Word.
+
+---
+
+## 📘 CASO DE USO: GESTIONAR CLIENTES PREMIUM
+
+**Cliente:** Banco Provincia
+**Proyecto:** Gestión Integral de Clientes
+**Código del caso de uso:** CL005
+**Nombre del archivo:** BP005GestionarClientesPremium
+
+---
+
+### 📌 DESCRIPCIÓN
+
+Este caso de uso permite al operador del área de atención gestionar los datos de clientes del segmento Premium. Incluye funcionalidades de búsqueda, alta, modificación y eliminación de clientes, validando condiciones específicas según políticas del banco. También se contemplan reglas para relaciones con cuentas activas, restricciones por morosidad y auditoría de cambios.
+
+---
+
+### 📋 FLUJO PRINCIPAL DE EVENTOS
+
+1. Buscar datos de la entidad “Cliente Premium”
+    a. Ingresar los filtros:
+     i. Número de cliente
+     ii. Apellido
+     iii. DNI
+     iv. Segmento
+     v. Estado
+     vi. Fecha de alta desde / hasta
+     vii. Usuario de alta
+    b. Hacer clic en “Buscar”
+    c. Visualizar las columnas del resultado:
+     i. Número de cliente
+     ii. Nombre completo
+     iii. DNI
+     iv. Segmento
+     v. Estado
+     vi. Fecha de alta
+     vii. Usuario de alta
+
+2. Agregar una nueva entidad
+    a. Ingresar los siguientes datos:
+     i. Nombre
+     ii. Apellido
+     iii. DNI
+     iv. Fecha de nacimiento
+     v. Email
+     vi. Teléfono
+     vii. Segmento
+     viii. Es cliente activo
+    b. Al guardar, registrar automáticamente:
+     i. Fecha de alta
+     ii. Usuario de alta
+
+---
+
+### 🔁 FLUJOS ALTERNATIVOS
+
+1. Modificar o actualizar una entidad
+    a. Buscar un cliente existente
+    b. Seleccionar el registro y hacer clic en “Editar”
+    c. Modificar campos permitidos:
+     i. Email
+     ii. Segmento
+     iii. Estado
+    d. Registrar fecha y usuario de modificación
+
+2. Eliminar una entidad
+    a. Validar que el cliente no tenga productos activos
+    b. Confirmar eliminación
+    c. Registrar fecha y usuario de eliminación
+
+---
+
+### 🔍 FILTROS DE BÚSQUEDA
+
+* Número de cliente
+* Apellido
+* DNI
+* Segmento
+* Estado
+* Fecha de alta desde
+* Fecha de alta hasta
+* Usuario de alta
+
+---
+
+### 📊 COLUMNAS DE RESULTADO
+
+* Número de cliente
+* Nombre completo
+* DNI
+* Segmento
+* Estado
+* Fecha de alta
+* Usuario de alta
+
+---
+
+### 🧱 DATOS DE LA ENTIDAD
+
+| Campo                   | Tipo     | Longitud máxima | Obligatorio       |
+| ----------------------- | -------- | --------------- | ----------------- |
+| Nombre                  | Texto    | 50              | Sí                |
+| Apellido                | Texto    | 50              | Sí                |
+| DNI                     | Número   | 8               | Sí                |
+| Fecha de nacimiento     | Fecha    | —               | Sí                |
+| Email                   | Email    | 100             | Sí                |
+| Teléfono                | Número   | 15              | No                |
+| Segmento                | Texto    | 20              | Sí                |
+| Ingresos anuales        | Número   | 12              | No                |
+| Es cliente activo       | Booleano | —               | Sí                |
+| Tiene productos activos | Booleano | —               | No                |
+| Fecha de alta           | Fecha    | —               | Sí *(sistema)*    |
+| Usuario de alta         | Texto    | 50              | Sí *(sistema)*    |
+| Fecha de modificación   | Fecha    | —               | No *(automático)* |
+| Usuario de modificación | Texto    | 50              | No *(automático)* |
+
+---
+
+### 🖼️ DESCRIPCIÓN DE INTERFACES DE USUARIO
+
+**Buscador de Clientes**
+
+* Filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta (desde/hasta), Usuario de alta
+* Botones: `Buscar`, `Limpiar`, `Agregar nuevo`
+* Tabla paginada con columnas:
+
+  * Nro Cliente, Nombre completo, DNI, Segmento, Estado, Fecha Alta, Usuario Alta
+* Acciones por fila: `Editar`, `Eliminar`
+
+**Formulario de Alta / Edición**
+
+* Campos: Nombre, Apellido, DNI, Fecha de nacimiento, Email, Teléfono, Segmento, Es cliente activo
+* Campos de solo lectura: Fecha de alta, Usuario de alta, Fecha y usuario de modificación
+* Validaciones: formato de email, DNI único
+* Botones: `Aceptar`, `Cancelar`
+
+---
+
+### 📏 REGLAS DE NEGOCIO
+
+* El DNI debe ser único
+* No se puede eliminar un cliente con productos activos
+* El email debe tener formato válido
+* Solo usuarios con rol Supervisor pueden modificar el campo “Segmento”
+* Segmento “Black” requiere ingresos anuales > \$5.000.000
+* Al alta, el cliente queda automáticamente con estado “Activo”
+
+---
+
+### 🧩 REQUERIMIENTOS ESPECIALES
+
+* Integración con servicio externo de scoring crediticio al momento del alta
+* Combo “Segmento” cargado dinámicamente desde tabla paramétrica
+* Registro automático en bitácora de alta/modificación/eliminación
+* Usuario de alta/modificación se toma de la sesión activa
+* Validación de DNI duplicado al guardar
+
+---
+
+### 📜 HISTORIA DE REVISIONES Y APROBACIONES
+
+| Fecha      | Acción           | Responsable      | Comentario                          |
+| ---------- | ---------------- | ---------------- | ----------------------------------- |
+| 26/07/2025 | Creación inicial | Juan Pérez       | Documento generado automáticamente  |
+| 27/07/2025 | Ajustes revisión | Claudia Muther   | Se corrige condición de eliminación |
+| 28/07/2025 | Aprobado         | Valeria González | Validado por área funcional         |
+
+---
+
+¿Querés que ahora te lo convierta en HTML estructurado según la minuta? ¿O directamente un `.docx` con estilos listos para exportar?

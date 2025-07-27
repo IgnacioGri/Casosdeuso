@@ -230,6 +230,82 @@ export function useUseCaseForm() {
     }));
   }, []);
 
+  const loadPremiumClientExample = useCallback(() => {
+    setFormData(prev => ({
+      useCaseType: 'entity',
+      clientName: 'Banco Provincia',
+      projectName: 'Gestión Integral de Clientes',
+      useCaseCode: 'CL005',
+      useCaseName: 'Gestionar Clientes Premium',
+      fileName: 'BP005GestionarClientesPremium',
+      description: 'Este caso de uso permite al operador del área de atención gestionar los datos de clientes del segmento Premium. Incluye funcionalidades de búsqueda, alta, modificación y eliminación de clientes, validando condiciones específicas según políticas del banco. También se contemplan reglas para relaciones con cuentas activas, restricciones por morosidad y auditoría de cambios.',
+      searchFilters: [
+        'Número de cliente',
+        'Apellido', 
+        'DNI',
+        'Segmento',
+        'Estado',
+        'Fecha de alta desde',
+        'Fecha de alta hasta',
+        'Usuario de alta'
+      ],
+      resultColumns: [
+        'Número de cliente',
+        'Nombre completo',
+        'DNI',
+        'Segmento',
+        'Estado',
+        'Fecha de alta',
+        'Usuario de alta'
+      ],
+      entityFields: [
+        { name: 'Nombre', type: 'text', length: 50, mandatory: true },
+        { name: 'Apellido', type: 'text', length: 50, mandatory: true },
+        { name: 'DNI', type: 'number', length: 8, mandatory: true },
+        { name: 'Fecha de nacimiento', type: 'date', mandatory: true },
+        { name: 'Email', type: 'email', length: 100, mandatory: true },
+        { name: 'Teléfono', type: 'number', length: 15, mandatory: false },
+        { name: 'Segmento', type: 'text', length: 20, mandatory: true },
+        { name: 'Ingresos anuales', type: 'number', length: 12, mandatory: false },
+        { name: 'Es cliente activo', type: 'boolean', mandatory: true },
+        { name: 'Tiene productos activos', type: 'boolean', mandatory: false },
+        { name: 'Fecha de alta', type: 'date', mandatory: true },
+        { name: 'Usuario de alta', type: 'text', length: 50, mandatory: true },
+        { name: 'Fecha de modificación', type: 'date', mandatory: false },
+        { name: 'Usuario de modificación', type: 'text', length: 50, mandatory: false }
+      ],
+      businessRules: `• El DNI debe ser único
+• No se puede eliminar un cliente con productos activos
+• El email debe tener formato válido
+• Solo usuarios con rol Supervisor pueden modificar el campo "Segmento"
+• Segmento "Black" requiere ingresos anuales > $5.000.000
+• Al alta, el cliente queda automáticamente con estado "Activo"`,
+      specialRequirements: `• Integración con servicio externo de scoring crediticio al momento del alta
+• Combo "Segmento" cargado dinámicamente desde tabla paramétrica
+• Registro automático en bitácora de alta/modificación/eliminación
+• Usuario de alta/modificación se toma de la sesión activa
+• Validación de DNI duplicado al guardar`,
+      generateWireframes: true,
+      wireframeDescriptions: [
+        'Buscador de Clientes: Filtros (Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta desde/hasta, Usuario de alta), Botones (Buscar, Limpiar, Agregar nuevo), Tabla paginada con columnas (Nro Cliente, Nombre completo, DNI, Segmento, Estado, Fecha Alta, Usuario Alta), Acciones por fila (Editar, Eliminar)',
+        'Formulario de Alta/Edición: Campos (Nombre, Apellido, DNI, Fecha de nacimiento, Email, Teléfono, Segmento, Es cliente activo), Campos de solo lectura (Fecha de alta, Usuario de alta, Fecha y usuario de modificación), Validaciones (formato de email, DNI único), Botones (Aceptar, Cancelar)'
+      ],
+      alternativeFlows: [
+        'Modificar o actualizar una entidad: Buscar un cliente existente, Seleccionar el registro y hacer clic en "Editar", Modificar campos permitidos (Email, Segmento, Estado), Registrar fecha y usuario de modificación',
+        'Eliminar una entidad: Validar que el cliente no tenga productos activos, Confirmar eliminación, Registrar fecha y usuario de eliminación'
+      ],
+      // Campos específicos para tipos de casos de uso
+      apiEndpoint: '',
+      requestFormat: '',
+      responseFormat: '',
+      serviceFrequency: '',
+      executionTime: '',
+      configurationPaths: '',
+      webServiceCredentials: '',
+      aiModel: prev.aiModel // Mantiene el modelo seleccionado previamente
+    }));
+  }, []);
+
   const resetForm = useCallback(() => {
     setFormData({
       useCaseType: 'entity',
@@ -287,6 +363,7 @@ export function useUseCaseForm() {
     updateAlternativeFlow,
     validateStep,
     loadDemoData,
+    loadPremiumClientExample,
     resetForm
   };
 }
