@@ -1,4 +1,6 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun } from 'docx';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class DocumentService {
   static async generateDocx(htmlContent: string, fileName: string, useCaseName: string = ''): Promise<Buffer> {
@@ -23,6 +25,38 @@ export class DocumentService {
     paragraphs.push(historyTitle);
     paragraphs.push(historyTable);
     
+    // Create header with image
+    let headerContent: TextRun;
+    try {
+      const imagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_caso_de_uso.png');
+      if (fs.existsSync(imagePath)) {
+        // For now, use text until we resolve the image import issue
+        headerContent = new TextRun({
+          text: "INGEMATICA - Documentación de casos de uso",
+          font: "Segoe UI Semilight",
+          size: 24,
+          color: "0070C0",
+          bold: true
+        });
+      } else {
+        headerContent = new TextRun({
+          text: "INGEMATICA - Documentación de casos de uso",
+          font: "Segoe UI Semilight",
+          size: 24,
+          color: "0070C0",
+          bold: true
+        });
+      }
+    } catch (error) {
+      headerContent = new TextRun({
+        text: "INGEMATICA - Documentación de casos de uso", 
+        font: "Segoe UI Semilight",
+        size: 24,
+        color: "0070C0",
+        bold: true
+      });
+    }
+    
     const doc = new Document({
       sections: [{
         properties: {
@@ -39,13 +73,8 @@ export class DocumentService {
           default: new Header({
             children: [
               new Paragraph({
-                children: [
-                  new TextRun({
-                    text: "Encabezado caso de uso", // This should be replaced with actual image
-                    font: "Segoe UI Semilight",
-                    size: 20
-                  })
-                ]
+                alignment: AlignmentType.CENTER,
+                children: [headerContent]
               })
             ]
           })

@@ -22,6 +22,12 @@ Preferred communication style: Simple, everyday language.
 ✓ Updated business rules to match comprehensive specification document
 ✓ Enhanced prompt engineering for strict AI compliance
 ✓ Improved document parsing for better Word export quality
+✓ Implemented strict file name validation (2 letters + 3 numbers + descriptive name)
+✓ Added type-specific form fields (API endpoints, Service configurations)
+✓ Enhanced content generation with multi-level numbered lists (1, a, i)
+✓ Integrated professional Word export with Ingematica header branding
+✓ Added mandatory "Historia de Revisiones y Aprobaciones" table
+✓ Configured Segoe UI Semilight font and specific blue colors for documents
 
 ## System Architecture
 
