@@ -10,13 +10,18 @@ The application now features robust error handling and can operate without API k
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (Updated: 26/7/2025)
+## Recent Changes (Updated: 27/7/2025)
 
 ✓ Fixed application startup issues when API keys are missing
 ✓ Implemented lazy loading of AI service clients to prevent errors
 ✓ Added proper error handling for missing API configurations
 ✓ Ensured demo mode works independently of external services
-✓ Application now starts successfully without any API keys configured
+✓ Fixed form validation issues in steps 2 and 4 with verb infinitives
+✓ Added AI response cleaning to remove explanatory text and CSS blocks
+✓ Configured OpenAI and Gemini APIs for professional content generation
+✓ Updated business rules to match comprehensive specification document
+✓ Enhanced prompt engineering for strict AI compliance
+✓ Improved document parsing for better Word export quality
 
 ## System Architecture
 

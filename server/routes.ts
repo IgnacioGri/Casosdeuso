@@ -6,47 +6,75 @@ import { AIService } from "./services/ai-service";
 import { DocumentService } from "./services/document-service";
 
 const USE_CASE_RULES = `
-Al elaborar un caso de uso de una entidad considerar:
+REGLAS PARA CASOS DE USO CON IA - SEGUIR ESTRICTAMENTE:
 
-Deben tener el estilo y formato Microsoft e interlineado simple
+ESTRUCTURA COMÚN PARA TODOS LOS TIPOS:
+- Título: igual al nombre del caso de uso EN MAYÚSCULAS, color azul oscuro (red=0, green=112, blue=192)
+- Nombre del Cliente
+- Nombre del Proyecto  
+- Código del Caso de Uso
+- Nombre del Caso de Uso
+- Nombre del Archivo
+- Descripción: explicación detallada del alcance y objetivo
+- Flujo Principal de Eventos
+- Flujos Alternativos
+- Reglas de Negocio: detallar cada una
+- Requerimientos Especiales: detallar cada uno
+- Precondiciones
+- Postcondiciones
+- Historia de Revisiones y Aprobaciones (tabla final)
 
-Los casos de uso deben contener las siguientes secciones:
-- Titulo: debe ser igual al nombre del caso de uso en mayúscula
-- Nombre del cliente
-- Nombre del proyecto
-- Nombre del caso de uso
-- Descripción: explicación detallada del alcance del objetivo del caso de uso
+CASOS DE USO DE ENTIDAD:
+Flujo Principal (lista numerada multinivel):
+1. Buscar datos de la entidad
+   a. Detallar los filtros de búsqueda de la entidad
+   b. Detallar las columnas del resultado de búsqueda
+2. Agregar una nueva entidad
+   a. Detallar cada uno de los datos de la entidad
+   b. Cuando se agrega se registra fecha y usuario de alta
 
-Flujo principal de eventos que debe mostrarse como una lista indentada con sangrías e incluir solo las siguientes funcionalidades:
-- Buscar datos de la entidad
-- Detallar los filtros de la búsqueda de la entidad
-- Detallar las columnas del resultado de la búsqueda de la entidad
-- Agregar una nueva entidad
-- Detallar cada uno de los datos de la entidad
-- Cuando se agrega una entidad se debe registrar la fecha y el usuario de alta
+Flujos Alternativos (lista numerada multinivel):
+1. Modificar o actualizar una entidad
+   a. Detallar cada uno de los datos de la entidad
+   b. Mostrar el identificador
+   c. Mostrar fecha y usuario de alta
+   d. Al modificar se registra fecha y usuario de modificación
+2. Eliminar una entidad
+   a. Verificar que no tenga relaciones con otras entidades
 
-Flujos alternativos que mostrarse como una lista indentada con sangrías e debe incluir las siguientes funcionalidades:
-- Modificar o actualizar una entidad
-- Detallar cada uno de los datos de la entidad
-- Mostrar el identificador
-- Mostrar la fecha y el usuario de alta
-- Cuando se modifica una entidad se debe registrar la fecha y el usuario de modificación
-- Eliminar una entidad
-- Para eliminar una entidad se debe verificar que no tenga relaciones con otras entidades
+AGREGAR SECCIONES DE WIREFRAMES (solo para entidades):
+- Boceto gráfico del buscador de entidades: incluir paginado, botones Buscar/Limpiar/Agregar, botones Editar/Eliminar por fila
+- Boceto gráfico para agregar entidad: botones Aceptar/Cancelar, fechas de alta/modificación
+- Detallar funcionalidades de cada interfaz con listas específicas
 
-Reglas de negocio: Detallar cada una de las reglas de negocio
-Requerimientos especiales: Detallar los requerimientos especiales
-Precondiciones
-Postcondiciones
+CASOS DE USO DE API/WEB SERVICE:
+Flujo Principal: incluir identificación, request y response
+Flujos Alternativos: incluir respuestas de error
+Incluir detalle completo del request y response
 
-El flujo principal y los alternativos deben estar numerados con una lista de múltiples niveles de formato, el primer nivel ordena con número empezando de 1, el segundo nivel ordena con letras empezando con a indentando 0.2 a la derecha y el tercer nivel ordena con números romanos empezando con i indentando 0.2 a la derecha
+CASOS DE USO DE SERVICIO/PROCESO AUTOMÁTICO:
+Flujo Principal: incluir frecuencia y/o hora de ejecución
+Flujos Alternativos: incluir respuestas de error
+Si captura archivo: indicar que el path debe ser configurable
+Si llama web service: indicar que usuario, clave y URL deben ser configurables
 
-El nombre del caso de uso debe comenzar con un verbo en infinitivo
+FORMATO Y ESTILO OBLIGATORIO:
+- Font: Segoe UI Semilight para todo el documento
+- Interlineado: simple
+- Espaciado: simple
+- Títulos: color azul oscuro (red=0, green=112, blue=192)
+- Listas multinivel: 1º nivel números (1,2,3), 2º nivel letras (a,b,c) con sangría 0.2", 3º nivel romanos (i,ii,iii) con sangría 0.2"
+- Nombre del caso de uso: debe comenzar con verbo en infinitivo
 
-Para todo el documento considerar Font Segoe UI Semilight
-El interlineado es simple
-El espaciado es simple
-El título debe ser azul oscuros con código red=0, green=112 y blue=192
+TABLA FINAL OBLIGATORIA - HISTORIA DE REVISIONES:
+- Título: "HISTORIA DE REVISIONES Y APROBACIONES" (Heading 1, azul)
+- Tabla: 2 filas, 4 columnas
+- Columnas: Fecha, Acción, Responsable, Comentario
+- Ancho: 2.17 pulgadas
+- Títulos en negrita y centrados
+- Datos alineados a la izquierda
+- Bordes grises uniformes
+- Una fila de datos con fecha actual, "Versión original", "Sistema", "Documento generado automáticamente"
 `;
 
 export async function registerRoutes(app: Express): Promise<Server> {
