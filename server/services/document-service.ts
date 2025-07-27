@@ -235,21 +235,13 @@ export class DocumentService {
                 hanging: 360 // Hanging indent for numbered lists
               },
               spacing: { after: 120 },
-              children: [new TextRun({
-                text,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })]
+              children: this.parseFormattedText(trimmed)
             }));
           } else {
             // Regular paragraph
             result.push(new Paragraph({
               spacing: { after: 120 },
-              children: [new TextRun({
-                text,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })]
+              children: this.parseFormattedText(trimmed)
             }));
           }
         }
@@ -282,6 +274,51 @@ export class DocumentService {
       .trim();
   }
 
+  private static parseFormattedText(html: string): TextRun[] {
+    const textRuns: TextRun[] = [];
+    
+    // Handle bold formatting by parsing <strong> and <b> tags
+    if (html.includes('<strong>') || html.includes('<b>')) {
+      // Split by bold tags to create separate text runs
+      const parts = html.split(/(<\/?(?:strong|b)[^>]*>)/gi);
+      let isBold = false;
+      
+      for (const part of parts) {
+        if (part.match(/<(?:strong|b)[^>]*>/i)) {
+          isBold = true;
+        } else if (part.match(/<\/(?:strong|b)>/i)) {
+          isBold = false;
+        } else if (part.trim()) {
+          const text = this.extractTextContent(part);
+          if (text) {
+            textRuns.push(new TextRun({
+              text,
+              bold: isBold,
+              size: 22,
+              font: "Segoe UI Semilight"
+            }));
+          }
+        }
+      }
+    } else {
+      // No formatting, single text run
+      const text = this.extractTextContent(html);
+      if (text) {
+        textRuns.push(new TextRun({
+          text,
+          size: 22,
+          font: "Segoe UI Semilight"
+        }));
+      }
+    }
+    
+    return textRuns.length > 0 ? textRuns : [new TextRun({
+      text: this.extractTextContent(html),
+      size: 22,
+      font: "Segoe UI Semilight"
+    })];
+  }
+
   private static parseHtmlTable(htmlTable: string): Table | null {
     try {
       // Extract table rows
@@ -304,14 +341,17 @@ export class DocumentService {
           cells.push(new TableCell({
             children: [
               new Paragraph({
-                children: [
-                  new TextRun({
-                    text: cellText,
-                    bold: isHeader ? true : false,
-                    font: "Segoe UI Semilight",
-                    size: 20
-                  })
-                ]
+                children: isHeader ? [new TextRun({
+                  text: cellText,
+                  bold: true,
+                  font: "Segoe UI Semilight",
+                  size: 20
+                })] : this.parseFormattedText(cellHtml).map(run => new TextRun({
+                  text: run.text,
+                  bold: run.bold,
+                  font: "Segoe UI Semilight",
+                  size: 20
+                }))
               })
             ],
             shading: isHeader ? {
