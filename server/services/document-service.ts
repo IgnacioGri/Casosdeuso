@@ -18,7 +18,7 @@ export class DocumentService {
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
     const elements: (Paragraph | Table)[] = [];
     
-    // Simple HTML parsing for demo - in production, use a proper HTML parser
+    // Improved HTML parsing to handle more content
     const lines = htmlContent.split('\n').filter(line => line.trim());
     
     for (const line of lines) {
@@ -26,34 +26,97 @@ export class DocumentService {
       
       if (trimmed.startsWith('<h1')) {
         const text = this.extractTextContent(trimmed);
-        elements.push(new Paragraph({
-          text,
-          heading: HeadingLevel.HEADING_1,
-          children: [
-            new TextRun({
-              text,
-              bold: true,
-              size: 32,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })
-          ]
-        }));
+        if (text) {
+          elements.push(new Paragraph({
+            heading: HeadingLevel.HEADING_1,
+            children: [
+              new TextRun({
+                text,
+                bold: true,
+                size: 32,
+                color: "0070C0",
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
       } else if (trimmed.startsWith('<h2')) {
         const text = this.extractTextContent(trimmed);
-        elements.push(new Paragraph({
-          text,
-          heading: HeadingLevel.HEADING_2,
-          children: [
-            new TextRun({
-              text,
-              bold: true,
-              size: 28,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })
-          ]
-        }));
+        if (text) {
+          elements.push(new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            children: [
+              new TextRun({
+                text,
+                bold: true,
+                size: 28,
+                color: "0070C0",
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+      } else if (trimmed.startsWith('<h3')) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          elements.push(new Paragraph({
+            heading: HeadingLevel.HEADING_3,
+            children: [
+              new TextRun({
+                text,
+                bold: true,
+                size: 24,
+                color: "0070C0",
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+      } else if (trimmed.startsWith('<h4')) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          elements.push(new Paragraph({
+            heading: HeadingLevel.HEADING_4,
+            children: [
+              new TextRun({
+                text,
+                bold: true,
+                size: 22,
+                color: "0070C0",
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+      } else if (trimmed.startsWith('<p') || trimmed.startsWith('<div')) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          elements.push(new Paragraph({
+            children: [
+              new TextRun({
+                text,
+                size: 22,
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+      } else if (trimmed.startsWith('<li')) {
+        const text = this.extractTextContent(trimmed);
+        if (text) {
+          elements.push(new Paragraph({
+            children: [
+              new TextRun({
+                text: `• ${text}`,
+                size: 22,
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+      } else if (trimmed.startsWith('<ol') || trimmed.startsWith('<ul')) {
+        // Skip list containers
+        continue;
       } else if (trimmed.startsWith('<table')) {
         // Create the revision table
         const table = new Table({
@@ -145,20 +208,17 @@ export class DocumentService {
           ],
         });
         elements.push(table);
-      } else if (trimmed.startsWith('<div') && !trimmed.includes('style=')) {
-        // Regular paragraph
-        const text = this.extractTextContent(trimmed);
-        if (text) {
-          elements.push(new Paragraph({
-            children: [
-              new TextRun({
-                text,
-                size: 22,
-                font: "Segoe UI Semilight"
-              })
-            ]
-          }));
-        }
+      } else if (trimmed && !trimmed.startsWith('<') && !trimmed.startsWith('</')) {
+        // Plain text content that might have been missed
+        elements.push(new Paragraph({
+          children: [
+            new TextRun({
+              text: trimmed,
+              size: 22,
+              font: "Segoe UI Semilight"
+            })
+          ]
+        }));
       }
     }
 
