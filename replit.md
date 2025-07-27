@@ -33,6 +33,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Implemented multiple alternative flows support for error scenarios
 ✓ Fixed document download button functionality with proper export API calls
 ✓ Updated form structure to support expandable wireframe and flow arrays
+✓ Unified AI prompts between initial generation and editing functions (January 27, 2025)
+✓ Enhanced content cleaning patterns to remove all explanatory text from AI responses
+✓ Added HTML download functionality alongside existing DOCX export option
+✓ Fixed document generation consistency across all AI operations
 
 ## System Architecture
 

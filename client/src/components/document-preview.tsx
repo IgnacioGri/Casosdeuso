@@ -14,6 +14,7 @@ interface DocumentPreviewProps {
   isGenerating?: boolean;
   onEdit?: (instructions: string) => void;
   onExport?: () => void;
+  onExportHtml?: () => void;
 }
 
 export default function DocumentPreview({
@@ -22,7 +23,8 @@ export default function DocumentPreview({
   formData,
   isGenerating = false,
   onEdit,
-  onExport
+  onExport,
+  onExportHtml
 }: DocumentPreviewProps) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editInstructions, setEditInstructions] = useState('');
@@ -75,6 +77,50 @@ export default function DocumentPreview({
     }
   };
 
+  const handleExportHtml = () => {
+    if (!generatedContent || !useCase) return;
+    
+    try {
+      // Create HTML file content with proper structure
+      const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${useCase.useCaseName || 'Caso de Uso'}</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; margin: 40px; }
+    </style>
+</head>
+<body>
+    ${generatedContent}
+</body>
+</html>`;
+
+      // Create blob and download
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${useCase.fileName || 'caso-de-uso'}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Éxito",
+        description: "Archivo HTML descargado correctamente"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Error al descargar el archivo HTML",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <Card className="shadow-sm border border-ms-border sticky top-8">
       <CardContent className="p-6">
@@ -97,7 +143,7 @@ export default function DocumentPreview({
           </div>
         ) : (
           <>
-            <div className="flex space-x-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-4">
               <Button 
                 size="sm"
                 variant="outline"
@@ -114,7 +160,16 @@ export default function DocumentPreview({
                 className="text-green-600 border-green-300 hover:bg-green-50"
               >
                 <Download className="mr-1" size={14} />
-                Exportar .docx
+                .docx
+              </Button>
+              <Button 
+                size="sm"
+                variant="outline"
+                onClick={handleExportHtml}
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                <Download className="mr-1" size={14} />
+                .html
               </Button>
             </div>
             

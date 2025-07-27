@@ -102,7 +102,7 @@ export default function EnhancedDocumentPreview({
       }
     }
 
-    if (formData.useCaseType === 'automated') {
+    if (formData.useCaseType === 'service') {
       if (formData.serviceFrequency || formData.executionTime) {
         sections.push(`
           <h2>Configuración del Servicio</h2>
@@ -143,6 +143,41 @@ export default function EnhancedDocumentPreview({
 
     const filledFields = requiredFields.filter(field => field && field.trim()).length;
     return Math.round((filledFields / requiredFields.length) * 100);
+  };
+
+  const handleDownloadHtml = () => {
+    if (!generatedContent) return;
+    
+    try {
+      // Create HTML file content with proper structure
+      const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${formData.useCaseName || 'Caso de Uso'}</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; margin: 40px; }
+    </style>
+</head>
+<body>
+    ${generatedContent}
+</body>
+</html>`;
+
+      // Create blob and download
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${formData.fileName || 'caso-de-uso'}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading HTML:', error);
+    }
   };
 
   if (!isVisible) {
@@ -206,7 +241,11 @@ export default function EnhancedDocumentPreview({
                 </Button>
                 <Button size="sm" onClick={onDownload} disabled={!generatedContent}>
                   <Download className="w-4 h-4 mr-2" />
-                  Descargar
+                  .docx
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleDownloadHtml} disabled={!generatedContent}>
+                  <Download className="w-4 h-4 mr-2" />
+                  .html
                 </Button>
               </div>
             </div>
