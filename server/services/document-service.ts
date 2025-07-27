@@ -158,8 +158,8 @@ export class DocumentService {
         const text = this.extractTextContent(trimmed);
         if (!text) continue;
         
-        // Handle headings
-        if (trimmed.match(/<h1[^>]*>/i)) {
+        // Handle headings - check if this line might be a title even without h tags
+        if (trimmed.match(/<h1[^>]*>/i) || (text && text.match(/^(Gestionar|Crear|Administrar|Configurar).*/i) && !trimmed.match(/<[^>]+>/))) {
           result.push(new Paragraph({
             heading: HeadingLevel.HEADING_1,
             spacing: { after: 200 },
@@ -171,7 +171,7 @@ export class DocumentService {
               font: "Segoe UI Semilight"
             })]
           }));
-        } else if (trimmed.match(/<h2[^>]*>/i)) {
+        } else if (trimmed.match(/<h2[^>]*>/i) || (text && text.match(/^(Descripción|Flujo Principal|Reglas de Negocio|Requerimientos|Precondiciones|Postcondiciones|Boceto)/i))) {
           result.push(new Paragraph({
             heading: HeadingLevel.HEADING_2,
             spacing: { before: 240, after: 120 },
@@ -347,9 +347,9 @@ export class DocumentService {
                   font: "Segoe UI Semilight",
                   size: 20
                 })] : this.parseFormattedText(cellHtml).map(run => new TextRun({
-                  text: run.text,
+                  text: run.text || "",
                   bold: run.bold,
-                  font: "Segoe UI Semilight",
+                  font: "Segoe UI Semilight", 
                   size: 20
                 }))
               })
