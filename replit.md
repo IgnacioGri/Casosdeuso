@@ -65,7 +65,9 @@ Preferred communication style: Simple, everyday language.
 ✓ Redesigned AI model selector with professional Radix UI components, unique icons and themed colors (January 27, 2025)
 ✓ Enhanced Step 1 layout with centered design and clear explanation of AI configuration purpose
 ✓ Removed unnecessary AI Assist buttons from Step 3 basic information fields (client name, project name, use case code)
+✓ Removed AI Assist buttons from Step 4 structured fields (use case name, file name) keeping only description field
 ✓ Streamlined form UX by limiting AI assistance to complex descriptive fields where it adds genuine value
+✓ Preserved validation rules for structured fields while simplifying interface design
 
 ## System Architecture
 

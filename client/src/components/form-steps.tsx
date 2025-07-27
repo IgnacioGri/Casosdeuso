@@ -326,23 +326,13 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre del Caso de Uso *
               </label>
-              <div className="flex items-center">
-                <input 
-                  type="text" 
-                  value={formData.useCaseName}
-                  onChange={(e) => handleInputChange('useCaseName', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
-                  placeholder="Ej: Gestionar Usuarios del Sistema"
-                />
-                <AIAssistButton
-                  fieldName="useCaseName"
-                  fieldValue={formData.useCaseName}
-                  fieldType="text"
-                  context={{ step: 4, useCaseType: formData.useCaseType }}
-                  onImprovement={(value) => handleInputChange('useCaseName', value)}
-                  aiModel={formData.aiModel}
-                />
-              </div>
+              <input 
+                type="text" 
+                value={formData.useCaseName}
+                onChange={(e) => handleInputChange('useCaseName', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                placeholder="Ej: Gestionar Usuarios del Sistema"
+              />
               <LiveValidation value={formData.useCaseName} type="useCaseName" />
             </div>
             
@@ -350,23 +340,13 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre del Archivo *
               </label>
-              <div className="flex items-center">
-                <input 
-                  type="text" 
-                  value={formData.fileName}
-                  onChange={(e) => handleInputChange('fileName', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
-                  placeholder="Ej: AB123GestionarUsuarios"
-                />
-                <AIAssistButton
-                  fieldName="fileName"
-                  fieldValue={formData.fileName}
-                  fieldType="fileName"
-                  context={{ step: 4, useCaseName: formData.useCaseName }}
-                  onImprovement={(value) => handleInputChange('fileName', value)}
-                  aiModel={formData.aiModel}
-                />
-              </div>
+              <input 
+                type="text" 
+                value={formData.fileName}
+                onChange={(e) => handleInputChange('fileName', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                placeholder="Ej: AB123GestionarUsuarios"
+              />
               <LiveValidation value={formData.fileName} type="fileName" />
             </div>
             
