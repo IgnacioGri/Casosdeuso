@@ -42,13 +42,25 @@ export class DocumentService {
       if (fs.existsSync(imagePath)) {
         console.log('Loading header image from:', imagePath);
         const imageBuffer = fs.readFileSync(imagePath);
-        headerImage = new ImageRun({
-          data: imageBuffer,
-          transformation: {
-            width: 600,  // Adjusted width for header  
-            height: 80   // Adjusted height for header
-          }
-        });
+        try {
+          headerImage = new ImageRun({
+            data: imageBuffer,
+            transformation: {
+              width: 600,  // Adjusted width for header  
+              height: 80   // Adjusted height for header
+            }
+          });
+        } catch (imageError) {
+          console.error('Error creating ImageRun:', imageError);
+          // Use text fallback if image creation fails
+          headerParagraphChildren = [new TextRun({
+            text: "INGEMATICA - Documentación de casos de uso",
+            font: "Segoe UI Semilight",
+            size: 24,
+            color: "0070C0",
+            bold: true
+          })];
+        }
         headerParagraphChildren = [headerImage];
       } else {
         // Fallback to text if no image found
@@ -156,8 +168,61 @@ export class DocumentService {
           const table = this.parseHtmlTable(trimmed);
           if (table) result.push(table);
         } else {
-          const paragraphs = this.parseTextContent(trimmed);
-          result.push(...paragraphs);
+          // Process as regular content - split into sections and parse
+          const textSections = trimmed.split(/(?=<h[1-6][^>]*>)/gi);
+          for (const textSection of textSections) {
+            const cleanText = textSection.trim();
+            if (!cleanText) continue;
+            
+            if (cleanText.includes('<h1')) {
+              const text = this.extractTextContent(cleanText);
+              if (text) result.push(new Paragraph({
+                heading: HeadingLevel.HEADING_1,
+                children: [new TextRun({ text, bold: true, size: 32, color: "0070C0", font: "Segoe UI Semilight" })]
+              }));
+            } else if (cleanText.includes('<h2')) {
+              const text = this.extractTextContent(cleanText);
+              if (text) result.push(new Paragraph({
+                heading: HeadingLevel.HEADING_2,
+                children: [new TextRun({ text, bold: true, size: 28, color: "0070C0", font: "Segoe UI Semilight" })]
+              }));
+            } else if (cleanText.includes('<h3')) {
+              const text = this.extractTextContent(cleanText);
+              if (text) result.push(new Paragraph({
+                heading: HeadingLevel.HEADING_3,
+                children: [new TextRun({ text, bold: true, size: 24, color: "0070C0", font: "Segoe UI Semilight" })]
+              }));
+            } else if (cleanText.includes('<h4')) {
+              const text = this.extractTextContent(cleanText);
+              if (text) result.push(new Paragraph({
+                heading: HeadingLevel.HEADING_4,
+                children: [new TextRun({ text, bold: true, size: 22, color: "0070C0", font: "Segoe UI Semilight" })]
+              }));
+            } else {
+              // Split by line breaks and process each line
+              const lines = cleanText.split(/\n|<br\s*\/?>/gi);
+              for (const line of lines) {
+                const text = this.extractTextContent(line);
+                if (text && text.length > 0) {
+                  // Determine indentation for numbered lists
+                  let indentLevel = 0;
+                  if (text.match(/^\d+\.\d+\.\d+/)) indentLevel = 720;
+                  else if (text.match(/^\d+\.\d+/)) indentLevel = 360;
+                  else if (text.match(/^[a-z]\./)) indentLevel = 360;
+                  else if (text.match(/^[ivx]+\./)) indentLevel = 720;
+                  
+                  result.push(new Paragraph({
+                    indent: indentLevel > 0 ? { left: indentLevel } : undefined,
+                    children: [new TextRun({
+                      text,
+                      size: 22,
+                      font: "Segoe UI Semilight"
+                    })]
+                  }));
+                }
+              }
+            }
+          }
         }
       }
       
