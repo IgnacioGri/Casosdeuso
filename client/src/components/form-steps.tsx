@@ -215,7 +215,7 @@ export default function FormSteps({
                 placeholder="Ej: Gestionar Usuarios del Sistema"
               />
               <div className="text-xs text-gray-500 mt-1">
-                Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Actualizar, etc.)
+                Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, Consultar, etc.)
               </div>
             </div>
             
