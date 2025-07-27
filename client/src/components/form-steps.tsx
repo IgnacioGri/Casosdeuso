@@ -89,67 +89,18 @@ export default function FormSteps({
   if (currentStep === 2) {
     return (
       <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <List className="mr-2 text-ms-blue" size={20} />
+            Selecciona el Tipo de Caso de Uso
+          </h3>
+          <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+        </div>
+        
         <UseCaseTemplatePreview 
           selectedType={formData.useCaseType}
           onTypeSelect={(type) => handleInputChange('useCaseType', type)}
         />
-        
-        <Card className="shadow-sm border border-ms-border">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                <List className="mr-2 text-ms-blue" size={20} />
-                Tipo de Caso de Uso
-              </h3>
-              <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
-            </div>
-            
-            <div className="space-y-4">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Selecciona el tipo de caso de uso a generar:
-              </label>
-              
-              <div className="grid grid-cols-1 gap-3">
-                {[
-                  {
-                    value: 'entity' as UseCaseType,
-                    title: 'Entidad',
-                    description: 'Gestión completa de una entidad (CRUD, búsquedas, filtros)'
-                  },
-                  {
-                    value: 'api' as UseCaseType,
-                    title: 'API / Web Service',
-                    description: 'Documentación de endpoints, request/response'
-                  },
-                  {
-                    value: 'automated' as UseCaseType,
-                    title: 'Servicio / Proceso Automático',
-                    description: 'Procesos automatizados, servicios programados'
-                  }
-                ].map((option) => (
-                  <label key={option.value} className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                    formData.useCaseType === option.value 
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                      : 'border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
-                  }`}>
-                    <input 
-                      type="radio" 
-                      name="useCaseType" 
-                      value={option.value}
-                      checked={formData.useCaseType === option.value}
-                      onChange={(e) => handleInputChange('useCaseType', e.target.value as UseCaseType)}
-                      className="mr-3" 
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900 dark:text-white">{option.title}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     );
   }
