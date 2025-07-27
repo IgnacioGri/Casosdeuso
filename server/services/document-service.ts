@@ -8,41 +8,6 @@ export class DocumentService {
     const doc = new Document({
       sections: [{
         properties: {},
-        headers: {
-          default: {
-            options: {},
-            children: [new Paragraph({
-              children: [
-                new TextRun({
-                  text: "Encabezado caso de uso",
-                  size: 20,
-                  font: "Segoe UI Semilight"
-                })
-              ]
-            })]
-          }
-        },
-        footers: {
-          default: {
-            options: {},
-            children: [new Paragraph({
-              children: [
-                new TextRun({
-                  text: `Página 1 de N`,
-                  size: 20,
-                  font: "Segoe UI Semilight"
-                }),
-                new TextRun({
-                  text: `${fileName}`,
-                  size: 20,
-                  font: "Segoe UI Semilight",
-                  break: 1
-                })
-              ],
-              alignment: AlignmentType.JUSTIFIED
-            })]
-          }
-        },
         children: paragraphs
       }]
     });
