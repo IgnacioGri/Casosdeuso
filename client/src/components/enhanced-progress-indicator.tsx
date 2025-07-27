@@ -46,18 +46,7 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
   return (
     <div className="mb-8 bg-white dark:bg-gray-900 p-6 rounded-lg border shadow-sm">
       <div className="relative mb-6">
-        {/* Background progress line */}
-        <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-300 dark:bg-gray-600" />
-        
-        {/* Completed progress line */}
-        <div 
-          className="absolute top-6 left-6 h-0.5 bg-green-600 transition-all duration-500 ease-out"
-          style={{ 
-            width: `${Math.max(0, ((currentStep - 1) / (totalSteps - 1)) * 100)}%`
-          }}
-        />
-        
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           {Array.from({ length: totalSteps }, (_, index) => {
             const stepNumber = index + 1;
             const isCompleted = stepNumber < currentStep;
@@ -69,7 +58,7 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
               <div key={stepNumber} className="flex flex-col items-center relative z-10">
                 <div
                   className={`
-                    flex items-center justify-center w-12 h-12 rounded-full border-2 text-sm font-medium transition-all duration-200 mb-2
+                    flex items-center justify-center w-12 h-12 rounded-full border-2 text-sm font-medium transition-all duration-200 mb-2 relative
                     ${isCompleted 
                       ? 'bg-green-600 border-green-600 text-white shadow-lg scale-105' 
                       : isCurrent 
@@ -91,6 +80,17 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
             );
           })}
         </div>
+        
+        {/* Background progress line - positioned to cross through center of icons */}
+        <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-300 dark:bg-gray-600 -z-10" />
+        
+        {/* Completed progress line */}
+        <div 
+          className="absolute top-6 left-6 h-0.5 bg-green-600 transition-all duration-500 ease-out -z-10"
+          style={{ 
+            width: `${Math.max(0, ((currentStep - 1) / (totalSteps - 1)) * 100)}%`
+          }}
+        />
       </div>
       <div className="text-center">
         <div className="text-lg font-semibold text-gray-900 dark:text-white">
