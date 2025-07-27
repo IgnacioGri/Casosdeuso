@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useUseCaseForm } from "@/hooks/use-use-case-form";
-import ProgressIndicator from "@/components/progress-indicator";
+import EnhancedProgressIndicator from "@/components/enhanced-progress-indicator";
 import FormSteps from "@/components/form-steps";
-import DocumentPreview from "@/components/document-preview";
+import EnhancedDocumentPreview from "@/components/enhanced-document-preview";
+import UseCaseTemplatePreview from "@/components/use-case-template-preview";
+import WireframePreview from "@/components/wireframe-preview";
+import ContextualHelp from "@/components/contextual-help";
 import { UseCase } from "@/types/use-case";
 
 export default function UseCaseGenerator() {
@@ -179,7 +182,11 @@ export default function UseCaseGenerator() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Form Section */}
           <div className="lg:col-span-2">
-            <ProgressIndicator currentStep={currentStep} totalSteps={getTotalSteps()} />
+            <EnhancedProgressIndicator 
+              currentStep={currentStep} 
+              totalSteps={getTotalSteps()} 
+              useCaseType={formData.useCaseType}
+            />
             
             <FormSteps
               currentStep={currentStep}
@@ -236,13 +243,15 @@ export default function UseCaseGenerator() {
 
           {/* Preview Section */}
           <div className="lg:col-span-1">
-            <DocumentPreview
-              generatedContent={generatedContent}
-              useCase={generatedUseCase || undefined}
+            <EnhancedDocumentPreview
               formData={formData}
-              isGenerating={generateUseCaseMutation.isPending}
-              onEdit={(instructions) => editUseCaseMutation.mutateAsync({ instructions })}
-              onExport={() => exportUseCaseMutation.mutateAsync()}
+              currentStep={currentStep}
+              generatedContent={generatedContent}
+              onRefresh={() => {
+                if (generatedUseCase) {
+                  editUseCaseMutation.mutateAsync({ instructions: "Actualizar el documento con los cambios más recientes" });
+                }
+              }}
             />
           </div>
         </div>

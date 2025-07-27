@@ -2,6 +2,9 @@ import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Cl
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { LiveValidation } from "@/components/live-validation";
+import UseCaseTemplatePreview from "@/components/use-case-template-preview";
+import ContextualHelp from "@/components/contextual-help";
 
 interface FormStepsProps {
   currentStep: number;
@@ -82,58 +85,72 @@ export default function FormSteps({
     );
   }
 
-  // Step 2: Use Case Type
+  // Step 2: Use Case Type with Template Preview
   if (currentStep === 2) {
     return (
-      <Card className="shadow-sm border border-ms-border">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <List className="mr-2 text-ms-blue" size={20} />
-            Tipo de Caso de Uso
-          </h3>
-          
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              Selecciona el tipo de caso de uso a generar:
-            </label>
-            
-            <div className="grid grid-cols-1 gap-3">
-              {[
-                {
-                  value: 'entity' as UseCaseType,
-                  title: 'Entidad',
-                  description: 'Gestión completa de una entidad (CRUD, búsquedas, filtros)'
-                },
-                {
-                  value: 'api' as UseCaseType,
-                  title: 'API / Web Service',
-                  description: 'Documentación de endpoints, request/response'
-                },
-                {
-                  value: 'service' as UseCaseType,
-                  title: 'Servicio / Proceso Automático',
-                  description: 'Procesos automatizados, servicios programados'
-                }
-              ].map((option) => (
-                <label key={option.value} className="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input 
-                    type="radio" 
-                    name="useCaseType" 
-                    value={option.value}
-                    checked={formData.useCaseType === option.value}
-                    onChange={(e) => handleInputChange('useCaseType', e.target.value as UseCaseType)}
-                    className="mr-3" 
-                  />
-                  <div>
-                    <div className="font-medium text-gray-900">{option.title}</div>
-                    <div className="text-sm text-gray-600">{option.description}</div>
-                  </div>
-                </label>
-              ))}
+      <div className="space-y-6">
+        <UseCaseTemplatePreview 
+          selectedType={formData.useCaseType}
+          onTypeSelect={(type) => handleInputChange('useCaseType', type)}
+        />
+        
+        <Card className="shadow-sm border border-ms-border">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <List className="mr-2 text-ms-blue" size={20} />
+                Tipo de Caso de Uso
+              </h3>
+              <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Selecciona el tipo de caso de uso a generar:
+              </label>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  {
+                    value: 'entity' as UseCaseType,
+                    title: 'Entidad',
+                    description: 'Gestión completa de una entidad (CRUD, búsquedas, filtros)'
+                  },
+                  {
+                    value: 'api' as UseCaseType,
+                    title: 'API / Web Service',
+                    description: 'Documentación de endpoints, request/response'
+                  },
+                  {
+                    value: 'automated' as UseCaseType,
+                    title: 'Servicio / Proceso Automático',
+                    description: 'Procesos automatizados, servicios programados'
+                  }
+                ].map((option) => (
+                  <label key={option.value} className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    formData.useCaseType === option.value 
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
+                      : 'border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
+                  }`}>
+                    <input 
+                      type="radio" 
+                      name="useCaseType" 
+                      value={option.value}
+                      checked={formData.useCaseType === option.value}
+                      onChange={(e) => handleInputChange('useCaseType', e.target.value as UseCaseType)}
+                      className="mr-3" 
+                    />
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-white">{option.title}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{option.description}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -142,49 +159,55 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Info className="mr-2 text-ms-blue" size={20} />
-            Información Básica
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <Info className="mr-2 text-ms-blue" size={20} />
+              Información Básica
+            </h3>
+            <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre del Cliente *
               </label>
               <input 
                 type="text" 
                 value={formData.clientName}
                 onChange={(e) => handleInputChange('clientName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: Banco Nacional de Argentina"
               />
+              <LiveValidation value={formData.clientName} type="required" label="Nombre del Cliente" />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre del Proyecto *
               </label>
               <input 
                 type="text" 
                 value={formData.projectName}
                 onChange={(e) => handleInputChange('projectName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: Sistema de Gestión de Usuarios"
               />
+              <LiveValidation value={formData.projectName} type="required" label="Nombre del Proyecto" />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Código del Caso de Uso *
               </label>
               <input 
                 type="text" 
                 value={formData.useCaseCode}
                 onChange={(e) => handleInputChange('useCaseCode', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: UC001"
               />
+              <LiveValidation value={formData.useCaseCode} type="required" label="Código del Caso de Uso" />
             </div>
           </div>
         </CardContent>
@@ -197,46 +220,45 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Edit className="mr-2 text-ms-blue" size={20} />
-            Detalles del Caso de Uso
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <Edit className="mr-2 text-ms-blue" size={20} />
+              Detalles del Caso de Uso
+            </h3>
+            <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre del Caso de Uso *
               </label>
               <input 
                 type="text" 
                 value={formData.useCaseName}
                 onChange={(e) => handleInputChange('useCaseName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: Gestionar Usuarios del Sistema"
               />
-              <div className="text-xs text-gray-500 mt-1">
-                Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, Consultar, etc.)
-              </div>
+              <LiveValidation value={formData.useCaseName} type="useCaseName" />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Nombre del Archivo *
               </label>
               <input 
                 type="text" 
                 value={formData.fileName}
                 onChange={(e) => handleInputChange('fileName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: AB123GestionarUsuarios"
               />
-              <div className="text-xs text-gray-500 mt-1">
-                Formato obligatorio: 2 letras mayúsculas + 3 números + nombre del caso de uso
-              </div>
+              <LiveValidation value={formData.fileName} type="fileName" />
             </div>
             
             {formData.useCaseType === 'entity' && (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                 <input 
                   type="checkbox"
                   id="generateWireframes"
@@ -244,23 +266,24 @@ export default function FormSteps({
                   onChange={(e) => handleInputChange('generateWireframes', e.target.checked)}
                   className="rounded border-gray-300 text-ms-blue focus:ring-ms-blue focus:ring-offset-0"
                 />
-                <label htmlFor="generateWireframes" className="text-sm text-gray-700">
-                  Generar bocetos gráficos de wireframes para interfaces de usuario
+                <label htmlFor="generateWireframes" className="text-sm text-gray-700 dark:text-gray-300">
+                  ✨ Generar bocetos gráficos de wireframes para interfaces de usuario
                 </label>
               </div>
             )}
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Descripción *
               </label>
               <textarea 
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows={4} 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Describa el alcance y objetivo del caso de uso..."
               />
+              <LiveValidation value={formData.description} type="required" label="Descripción" />
             </div>
           </div>
         </CardContent>
