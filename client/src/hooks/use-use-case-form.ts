@@ -22,6 +22,14 @@ export function useUseCaseForm() {
     businessRules: '',
     specialRequirements: '',
     generateWireframes: false,
+    // Campos específicos para tipos de casos de uso
+    apiEndpoint: '',
+    requestFormat: '',
+    responseFormat: '',
+    serviceFrequency: '',
+    executionTime: '',
+    configurationPaths: '',
+    webServiceCredentials: '',
     aiModel: 'demo'
   });
 
@@ -150,6 +158,14 @@ export function useUseCaseForm() {
       businessRules: 'Los usuarios deben tener un email único en el sistema. Las contraseñas deben cumplir con políticas de seguridad mínimas.',
       specialRequirements: 'El sistema debe soportar autenticación de dos factores y debe integrarse con Active Directory corporativo.',
       generateWireframes: true,
+      // Campos específicos para tipos de casos de uso
+      apiEndpoint: '',
+      requestFormat: '',
+      responseFormat: '',
+      serviceFrequency: '',
+      executionTime: '',
+      configurationPaths: '',
+      webServiceCredentials: '',
       aiModel: prev.aiModel // Mantiene el modelo seleccionado previamente
     }));
   }, []);
@@ -174,6 +190,14 @@ export function useUseCaseForm() {
       businessRules: '',
       specialRequirements: '',
       generateWireframes: false,
+      // Campos específicos para tipos de casos de uso
+      apiEndpoint: '',
+      requestFormat: '',
+      responseFormat: '',
+      serviceFrequency: '',
+      executionTime: '',
+      configurationPaths: '',
+      webServiceCredentials: '',
       aiModel: 'demo'
     });
     setCurrentStep(1);

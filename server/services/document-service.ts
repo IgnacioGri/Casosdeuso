@@ -1,13 +1,87 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType } from 'docx';
 
 export class DocumentService {
-  static async generateDocx(htmlContent: string, fileName: string): Promise<Buffer> {
+  static async generateDocx(htmlContent: string, fileName: string, useCaseName: string = ''): Promise<Buffer> {
     // Convert HTML to docx structure
     const paragraphs = this.parseHtmlToParagraphs(htmlContent);
     
+    // Add the mandatory history table at the end
+    const historyTitle = new Paragraph({
+      heading: HeadingLevel.HEADING_1,
+      children: [
+        new TextRun({
+          text: "HISTORIA DE REVISIONES Y APROBACIONES",
+          bold: true,
+          size: 32,
+          color: "0070C0", // Blue color as specified
+          font: "Segoe UI Semilight"
+        })
+      ]
+    });
+    
+    const historyTable = this.createHistoryTable();
+    paragraphs.push(historyTitle);
+    paragraphs.push(historyTable);
+    
     const doc = new Document({
       sections: [{
-        properties: {},
+        properties: {
+          page: {
+            margin: {
+              top: 1440, // 1 inch = 1440 twips
+              right: 1440,
+              bottom: 1440,
+              left: 1440,
+            }
+          }
+        },
+        headers: {
+          default: new Header({
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Encabezado caso de uso", // This should be replaced with actual image
+                    font: "Segoe UI Semilight",
+                    size: 20
+                  })
+                ]
+              })
+            ]
+          })
+        },
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.JUSTIFIED,
+                children: [
+                  new TextRun({
+                    text: "Página ",
+                    font: "Segoe UI Semilight",
+                    size: 20
+                  }),
+                  new TextRun({
+                    children: [PageNumber.CURRENT]
+                  }),
+                  new TextRun({
+                    text: " de ",
+                    font: "Segoe UI Semilight",
+                    size: 20
+                  }),
+                  new TextRun({
+                    children: [PageNumber.TOTAL_PAGES]
+                  }),
+                  new TextRun({
+                    text: `${' '.repeat(50)}${useCaseName}`,
+                    font: "Segoe UI Semilight",
+                    size: 20
+                  })
+                ]
+              })
+            ]
+          })
+        },
         children: paragraphs
       }]
     });
@@ -227,5 +301,208 @@ export class DocumentService {
 
   private static extractTextContent(html: string): string {
     return html.replace(/<[^>]*>/g, '').trim();
+  }
+  
+  private static createHistoryTable(): Table {
+    const today = new Date().toLocaleDateString('es-ES');
+    
+    return new Table({
+      width: {
+        size: 2.17 * 1440, // Convert inches to twips (2.17 inches as specified)
+        type: WidthType.DXA,
+      },
+      rows: [
+        // Header row
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: "Fecha",
+                      bold: true,
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              }
+            }),
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: "Acción",
+                      bold: true,
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              }
+            }),
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: "Responsable",
+                      bold: true,
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              }
+            }),
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: "Comentario",
+                      bold: true,
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              },
+              width: {
+                size: 40, // Larger width for comments column as specified
+                type: WidthType.PERCENTAGE,
+              }
+            }),
+          ],
+        }),
+        // Data row
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  children: [
+                    new TextRun({
+                      text: today,
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              }
+            }),
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  children: [
+                    new TextRun({
+                      text: "Versión original",
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              }
+            }),
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  children: [
+                    new TextRun({
+                      text: "Sistema",
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              }
+            }),
+            new TableCell({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.LEFT,
+                  children: [
+                    new TextRun({
+                      text: "Documento generado automáticamente",
+                      font: "Segoe UI Semilight",
+                      size: 20
+                    })
+                  ]
+                })
+              ],
+              verticalAlign: VerticalAlign.CENTER,
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                left: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+                right: { style: BorderStyle.SINGLE, size: 1, color: "808080" },
+              },
+              width: {
+                size: 40, // Larger width for comments column as specified
+                type: WidthType.PERCENTAGE,
+              }
+            }),
+          ],
+        }),
+      ],
+    });
   }
 }

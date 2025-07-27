@@ -53,7 +53,14 @@ export const useCaseFormSchema = z.object({
     },
     "Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, etc.)"
   ),
-  fileName: z.string().min(1, "El nombre del archivo es requerido"),
+  fileName: z.string().min(1, "El nombre del archivo es requerido").refine(
+    (val) => {
+      // Formato: 2 letras + 3 números + nombre del caso de uso
+      const pattern = /^[A-Z]{2}\d{3}.+$/;
+      return pattern.test(val);
+    },
+    "Formato requerido: 2 letras + 3 números + nombre del caso de uso (ej: AB123GestionarUsuarios)"
+  ),
   description: z.string().min(1, "La descripción es requerida"),
   searchFilters: z.array(z.string()).default([]),
   resultColumns: z.array(z.string()).default([]),
@@ -61,6 +68,14 @@ export const useCaseFormSchema = z.object({
   businessRules: z.string().optional(),
   specialRequirements: z.string().optional(),
   generateWireframes: z.boolean().default(false),
+  // Campos específicos para diferentes tipos de casos de uso
+  apiEndpoint: z.string().optional(),
+  requestFormat: z.string().optional(),
+  responseFormat: z.string().optional(),
+  serviceFrequency: z.string().optional(),
+  executionTime: z.string().optional(),
+  configurationPaths: z.string().optional(),
+  webServiceCredentials: z.string().optional(),
   aiModel: z.enum(['demo', 'openai', 'claude', 'grok', 'gemini']),
 });
 

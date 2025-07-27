@@ -36,7 +36,7 @@ export default function UseCaseGenerator() {
 
   // Calculate total steps based on use case type
   const getTotalSteps = () => {
-    return formData.useCaseType === 'entity' ? 9 : 6;
+    return formData.useCaseType === 'entity' ? 9 : 7;
   };
 
   const generateUseCaseMutation = useMutation({

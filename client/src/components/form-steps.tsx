@@ -1,4 +1,4 @@
-import { Brain, List, Info, Edit, Filter, Columns, Database, Settings } from "lucide-react";
+import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock } from "lucide-react";
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -231,9 +231,24 @@ export default function FormSteps({
                 placeholder="Ej: AB123GestionarUsuarios"
               />
               <div className="text-xs text-gray-500 mt-1">
-                Formato: dos letras + 3 números + nombre del caso de uso
+                Formato obligatorio: 2 letras mayúsculas + 3 números + nombre del caso de uso
               </div>
             </div>
+            
+            {formData.useCaseType === 'entity' && (
+              <div className="flex items-center space-x-2">
+                <input 
+                  type="checkbox"
+                  id="generateWireframes"
+                  checked={formData.generateWireframes}
+                  onChange={(e) => handleInputChange('generateWireframes', e.target.checked)}
+                  className="rounded border-gray-300 text-ms-blue focus:ring-ms-blue focus:ring-offset-0"
+                />
+                <label htmlFor="generateWireframes" className="text-sm text-gray-700">
+                  Generar bocetos gráficos de wireframes para interfaces de usuario
+                </label>
+              </div>
+            )}
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -444,8 +459,131 @@ export default function FormSteps({
     );
   }
 
+  // Step 5: API/Service specific fields (non-entity types)
+  if (currentStep === 5 && formData.useCaseType === 'api') {
+    return (
+      <Card className="shadow-sm border border-ms-border">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Globe className="mr-2 text-ms-blue" size={20} />
+            Detalles de API/Web Service
+          </h3>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Endpoint de la API
+              </label>
+              <input 
+                type="text" 
+                value={formData.apiEndpoint || ''}
+                onChange={(e) => handleInputChange('apiEndpoint', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Ej: https://api.ejemplo.com/v1/usuarios"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Formato del Request
+              </label>
+              <textarea 
+                value={formData.requestFormat || ''}
+                onChange={(e) => handleInputChange('requestFormat', e.target.value)}
+                rows={4} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Describir el formato del request JSON, parámetros requeridos, headers, etc."
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Formato del Response
+              </label>
+              <textarea 
+                value={formData.responseFormat || ''}
+                onChange={(e) => handleInputChange('responseFormat', e.target.value)}
+                rows={4} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Describir el formato del response JSON, códigos de estado, estructura de datos, etc."
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Step 5: Service specific fields (service type)
+  if (currentStep === 5 && formData.useCaseType === 'service') {
+    return (
+      <Card className="shadow-sm border border-ms-border">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Clock className="mr-2 text-ms-blue" size={20} />
+            Detalles de Servicio/Proceso Automático
+          </h3>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Frecuencia de Ejecución
+              </label>
+              <input 
+                type="text" 
+                value={formData.serviceFrequency || ''}
+                onChange={(e) => handleInputChange('serviceFrequency', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Ej: Diariamente, Cada hora, Semanal, etc."
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Hora de Ejecución
+              </label>
+              <input 
+                type="text" 
+                value={formData.executionTime || ''}
+                onChange={(e) => handleInputChange('executionTime', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Ej: 02:00 AM, 18:30, etc."
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Rutas de Configuración
+              </label>
+              <textarea 
+                value={formData.configurationPaths || ''}
+                onChange={(e) => handleInputChange('configurationPaths', e.target.value)}
+                rows={3} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Si el proceso captura archivos, indicar que las rutas deben ser configurables"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Credenciales de Web Services
+              </label>
+              <textarea 
+                value={formData.webServiceCredentials || ''}
+                onChange={(e) => handleInputChange('webServiceCredentials', e.target.value)}
+                rows={3} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Si llama web services, indicar que usuario, clave y URL deben ser configurables"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Step 8: Additional Options (adjusted step number for non-entity types)
-  const isAdditionalOptionsStep = formData.useCaseType === 'entity' ? currentStep === 8 : currentStep === 5;
+  const isAdditionalOptionsStep = formData.useCaseType === 'entity' ? currentStep === 8 : currentStep === 6;
   if (isAdditionalOptionsStep) {
     return (
       <Card className="shadow-sm border border-ms-border">
@@ -505,7 +643,7 @@ export default function FormSteps({
   }
 
   // Step 9: Review and Generation (adjusted step number for non-entity types)
-  const isReviewStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 6;
+  const isReviewStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 7;
   if (isReviewStep) {
     const getSummaryData = () => {
       const summary = [];

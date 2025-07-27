@@ -77,6 +77,183 @@ TABLA FINAL OBLIGATORIA - HISTORIA DE REVISIONES:
 - Una fila de datos con fecha actual, "Versión original", "Sistema", "Documento generado automáticamente"
 `;
 
+// Function to generate specific rules based on use case type
+function getSpecificRules(useCaseType: string, formData: any): string {
+  const today = new Date().toLocaleDateString('es-ES');
+  
+  if (useCaseType === 'entity') {
+    return `
+INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE ENTIDAD:
+
+DATOS DEL FORMULARIO:
+- Cliente: ${formData.clientName}
+- Proyecto: ${formData.projectName}
+- Código: ${formData.useCaseCode}
+- Nombre: ${formData.useCaseName}
+- Archivo: ${formData.fileName}
+- Descripción: ${formData.description}
+- Filtros de búsqueda: ${formData.searchFilters?.join(', ') || 'No especificado'}
+- Columnas de resultado: ${formData.resultColumns?.join(', ') || 'No especificado'}
+- Campos de entidad: ${formData.entityFields?.map((f: any) => `${f.name} (${f.type}${f.length ? `, ${f.length}` : ''}${f.mandatory ? ', obligatorio' : ', opcional'})`).join(', ') || 'No especificado'}
+- Reglas de negocio: ${formData.businessRules || 'No especificado'}
+- Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
+- Generar wireframes: ${formData.generateWireframes ? 'Sí' : 'No'}
+
+ESTRUCTURA OBLIGATORIA CON LISTAS MULTINIVEL:
+
+1. FLUJO PRINCIPAL DE EVENTOS
+   1. Buscar datos de la entidad
+      a. Filtros disponibles: ${formData.searchFilters?.join(', ') || 'Definir filtros apropiados'}
+      b. Columnas del resultado: ${formData.resultColumns?.join(', ') || 'Definir columnas apropiadas'}
+      c. Implementar paginación de resultados
+   2. Agregar una nueva entidad
+      a. Campos de entrada: ${formData.entityFields?.map((f: any) => f.name).join(', ') || 'Definir campos apropiados'}
+      b. Validación de campos obligatorios
+      c. Registro automático de fecha y usuario de alta
+
+2. FLUJOS ALTERNATIVOS
+   1. Modificar o actualizar una entidad
+      a. Mostrar todos los campos editables
+      b. Mostrar identificador único de la entidad
+      c. Mostrar fecha y usuario de alta (solo lectura)
+      d. Registro automático de fecha y usuario de modificación
+   2. Eliminar una entidad
+      a. Verificar integridad referencial
+      b. Confirmar eliminación con el usuario
+      c. Eliminación lógica o física según reglas del negocio
+
+${formData.generateWireframes ? `
+3. BOCETOS GRÁFICOS DE INTERFACES
+
+WIREFRAME 1: Buscador de Entidades
+- Sección de filtros: ${formData.searchFilters?.join(', ') || 'campos de filtrado'}
+- Botones: Buscar, Limpiar, Agregar
+- Tabla de resultados con columnas: ${formData.resultColumns?.join(', ') || 'columnas apropiadas'}
+- Paginación inferior
+- Botones por fila: Editar, Eliminar
+
+WIREFRAME 2: Formulario de Entidad
+- Campos de entrada: ${formData.entityFields?.map((f: any) => `${f.name} (${f.mandatory ? 'obligatorio' : 'opcional'})`).join(', ') || 'campos apropiados'}
+- Campos automáticos: Fecha y usuario de alta, Fecha y usuario de modificación
+- Botones: Aceptar, Cancelar
+
+FUNCIONALIDADES DETALLADAS:
+- Validación en tiempo real de campos obligatorios
+- Formato específico para cada tipo de dato
+- Mensajes de error contextuales
+- Navegación entre campos con Tab
+` : ''}`;
+  }
+  
+  if (useCaseType === 'api') {
+    return `
+INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
+
+DATOS DEL FORMULARIO:
+- Cliente: ${formData.clientName}
+- Proyecto: ${formData.projectName}
+- Código: ${formData.useCaseCode}
+- Nombre: ${formData.useCaseName}
+- Archivo: ${formData.fileName}
+- Descripción: ${formData.description}
+- Endpoint: ${formData.apiEndpoint || 'No especificado'}
+- Formato Request: ${formData.requestFormat || 'No especificado'}
+- Formato Response: ${formData.responseFormat || 'No especificado'}
+- Reglas de negocio: ${formData.businessRules || 'No especificado'}
+- Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
+
+ESTRUCTURA OBLIGATORIA:
+
+1. FLUJO PRINCIPAL DE EVENTOS
+   1. Identificación del servicio
+      a. Endpoint: ${formData.apiEndpoint || 'Definir endpoint apropiado'}
+      b. Método HTTP: GET/POST/PUT/DELETE
+      c. Headers requeridos
+   2. Request
+      a. Formato: ${formData.requestFormat || 'Definir formato JSON apropiado'}
+      b. Parámetros obligatorios
+      c. Parámetros opcionales
+   3. Response
+      a. Formato: ${formData.responseFormat || 'Definir formato JSON apropiado'}
+      b. Códigos de estado exitosos
+      c. Estructura de datos de respuesta
+
+2. FLUJOS ALTERNATIVOS
+   1. Errores de validación (400)
+      a. Request malformado
+      b. Parámetros faltantes
+      c. Tipos de datos incorrectos
+   2. Errores de autorización (401/403)
+      a. Token inválido
+      b. Permisos insuficientes
+   3. Errores del servidor (500)
+      a. Error interno del sistema
+      b. Timeout de conexión
+      c. Servicio no disponible`;
+  }
+  
+  if (useCaseType === 'service') {
+    return `
+INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE SERVICIO/PROCESO AUTOMÁTICO:
+
+DATOS DEL FORMULARIO:
+- Cliente: ${formData.clientName}
+- Proyecto: ${formData.projectName}
+- Código: ${formData.useCaseCode}
+- Nombre: ${formData.useCaseName}
+- Archivo: ${formData.fileName}
+- Descripción: ${formData.description}
+- Frecuencia: ${formData.serviceFrequency || 'No especificado'}
+- Hora de ejecución: ${formData.executionTime || 'No especificado'}
+- Rutas configurables: ${formData.configurationPaths || 'No especificado'}
+- Credenciales de servicios: ${formData.webServiceCredentials || 'No especificado'}
+- Reglas de negocio: ${formData.businessRules || 'No especificado'}
+- Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
+
+ESTRUCTURA OBLIGATORIA:
+
+1. FLUJO PRINCIPAL DE EVENTOS
+   1. Programación de ejecución
+      a. Frecuencia: ${formData.serviceFrequency || 'Definir frecuencia apropiada'}
+      b. Hora específica: ${formData.executionTime || 'Definir horario apropiado'}
+      c. Configuración de horarios múltiples si aplica
+   2. Proceso de ejecución
+      a. Inicialización del servicio
+      b. Validación de configuraciones
+      c. Ejecución de la lógica principal
+   3. Finalización y logging
+      a. Registro de resultados
+      b. Notificación de completitud
+      c. Limpieza de recursos temporales
+
+2. FLUJOS ALTERNATIVOS
+   1. Errores de configuración
+      a. Archivos no encontrados
+      b. Permisos insuficientes
+      c. Configuraciones inválidas
+   2. Errores de conectividad
+      a. Servicios externos no disponibles
+      b. Timeout de conexiones
+      c. Fallos de autenticación
+
+${formData.configurationPaths ? `
+3. CONFIGURACIONES REQUERIDAS
+- Rutas de archivos: ${formData.configurationPaths}
+- Las rutas deben ser configurables vía archivo de configuración
+- Validación de existencia y permisos al inicio
+` : ''}
+
+${formData.webServiceCredentials ? `
+3. CREDENCIALES DE SERVICIOS
+- Configuración: ${formData.webServiceCredentials}
+- Usuario, clave y URL deben ser configurables
+- Almacenamiento seguro de credenciales
+` : ''}`;
+  }
+  
+  return '';
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
   // Generate use case
@@ -84,10 +261,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = useCaseFormSchema.parse(req.body);
       
+      // Create specific rules based on use case type
+      const specificRules = getSpecificRules(validatedData.useCaseType, validatedData);
+      
       const response = await AIService.generateUseCase({
         aiModel: validatedData.aiModel,
         formData: validatedData,
-        rules: USE_CASE_RULES
+        rules: USE_CASE_RULES + "\n\n" + specificRules
       });
 
       if (!response.success) {
@@ -170,7 +350,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const docxBuffer = await DocumentService.generateDocx(
         useCase.generatedContent || '',
-        useCase.fileName
+        useCase.fileName || 'caso-de-uso',
+        useCase.useCaseName || ''
       );
 
       res.set({
