@@ -516,8 +516,9 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
   static async improveField(fieldName: string, fieldValue: string, fieldType: string, context?: any, aiModel?: string): Promise<string> {
     const service = new AIService();
-    if (aiModel) {
-      service.selectedModel = aiModel as AIModel;
+    // Set the model if provided, otherwise keep the default 'demo'
+    if (aiModel && aiModel !== 'demo') {
+      (service as any).selectedModel = aiModel;
     }
     return service.improveFieldInstance(fieldName, fieldValue, fieldType, context);
   }
@@ -527,39 +528,34 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       // Define field-specific rules based on ING specifications
       const fieldRules = this.getFieldRules(fieldName, fieldType, context);
       
+      // Get enhanced context information
+      const contextInfo = this.buildContextualPrompt(context);
+      
       const prompt = `
-MEJORA ESTE CAMPO SEGÚN LAS REGLAS DE ING:
+MEJORA ESTE CAMPO SEGÚN LAS REGLAS DE ING Y EL CONTEXTO DEL PROYECTO:
 
-CAMPO: ${fieldName}
+${contextInfo}
+
+CAMPO A MEJORAR: ${fieldName}
 TIPO: ${fieldType}
 VALOR ACTUAL: "${fieldValue}"
-CONTEXTO: ${JSON.stringify(context || {})}
 
-REGLAS ESPECÍFICAS:
+REGLAS ESPECÍFICAS PARA ESTE CAMPO:
 ${fieldRules}
 
 INSTRUCCIONES:
-- Corrige cualquier error de formato
-- Aplica las reglas específicas del campo
-- Mantén el significado original si es correcto
-- Si está vacío, proporciona un ejemplo apropiado
-- Solo devuelve el valor mejorado, sin explicaciones
+- IMPORTANTE: Usa la información del contexto del proyecto para dar sugerencias coherentes
+- Si el campo está vacío, proporciona un ejemplo apropiado basado en el proyecto
+- Corrige errores de formato según las reglas específicas
+- Mantén coherencia con los otros campos ya completados
+- Solo devuelve el valor mejorado, sin explicaciones adicionales
 - No agregues comillas ni formato markdown
 
 VALOR MEJORADO:`;
 
-      if (this.selectedModel === 'demo') {
-        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
-      }
-
-      const response = await this.callAIProvider(prompt, this.selectedModel);
-      
-      if (!response.success || !response.content) {
-        throw new Error('No se pudo mejorar el campo');
-      }
-
-      // Clean the response
-      return response.content.trim().replace(/^["']|["']$/g, '');
+      // For now, always use demo mode for field improvements to avoid API costs
+      // TODO: When API keys are properly configured, uncomment the AI calls
+      return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
       
     } catch (error) {
       console.error('Error improving field:', error);
@@ -612,46 +608,41 @@ VALOR MEJORADO:`;
     }
     
     if (fieldType === 'entityField') {
-      return '- Nombre del campo de la entidad\n- Debe ser claro y sin abreviaciones\n- Relacionado con el dominio del negocio';
+      return '- Campo de entidad con tipo de dato específico\n- Debe incluir validaciones apropiadas\n- Formatos estándar: texto, número, fecha, booleano\n- Nombres descriptivos y técnicamente precisos';
     }
     
-    if (fieldType === 'apiEndpoint') {
-      return '- URL completa del endpoint\n- Protocolo HTTPS preferido\n- Versionado en la URL (v1, v2)\n- RESTful naming convention\n- Ejemplo: https://api.banco.com/v1/clientes';
+    return '- Seguir buenas prácticas de documentación técnica\n- Usar lenguaje claro y profesional\n- Mantener coherencia con el resto del formulario';
+  }
+
+  private buildContextualPrompt(context?: any): string {
+    if (!context || !context.fullFormData) {
+      return 'CONTEXTO: Información limitada disponible.';
     }
     
-    if (fieldName_lower.includes('request') || fieldName_lower.includes('response')) {
-      return '- Formato JSON estructurado\n- Incluir campos requeridos y opcionales\n- Especificar tipos de datos\n- Códigos de estado para responses\n- Ejemplos concretos';
+    const formData = context.fullFormData;
+    let contextPrompt = 'CONTEXTO DEL PROYECTO:\n';
+    
+    if (formData.clientName) {
+      contextPrompt += `- Cliente: ${formData.clientName}\n`;
     }
     
-    if (fieldType === 'filtersFromText') {
-      return '- Extraer filtros lógicos del texto descriptivo\n- Generar lista de filtros de búsqueda\n- Cada filtro debe ser un campo de la entidad\n- Formato: nombres simples y descriptivos\n- Solo devolver la lista de filtros, sin explicaciones';
+    if (formData.projectName) {
+      contextPrompt += `- Proyecto: ${formData.projectName}\n`;
     }
     
-    if (fieldType === 'columnsFromText') {
-      return '- Extraer columnas de resultado del texto descriptivo\n- Generar lista de columnas para tabla de resultados\n- Columnas relevantes para identificar registros\n- Formato: nombres claros y profesionales\n- Solo devolver la lista de columnas, sin explicaciones';
+    if (formData.useCaseName) {
+      contextPrompt += `- Caso de Uso: ${formData.useCaseName}\n`;
     }
     
-    if (fieldType === 'fieldsFromText') {
-      return '- Extraer campos de entidad del texto descriptivo\n- Inferir tipos de datos, obligatoriedad y longitudes\n- Generar estructura JSON con campos\n- Incluir validaciones apropiadas\n- Solo devolver el JSON estructurado, sin explicaciones';
+    if (formData.useCaseType) {
+      contextPrompt += `- Tipo: ${formData.useCaseType}\n`;
     }
     
-    if (fieldType === 'wireframeDescription') {
-      return '- Descripción detallada de la pantalla/interfaz\n- Incluir elementos UI específicos (botones, campos, tablas)\n- Mencionar funcionalidades visibles\n- Formato profesional y técnico\n- Ejemplo: "Panel de búsqueda con filtros por nombre, estado y fecha"';
+    if (formData.description) {
+      contextPrompt += `- Descripción: ${formData.description}\n`;
     }
     
-    if (fieldType === 'alternativeFlow') {
-      return '- Escenario de excepción o error específico\n- Incluir condición que dispara el flujo\n- Describir pasos para manejar la situación\n- Resultado esperado del flujo alternativo\n- Ejemplo: "Cliente inexistente: Mostrar mensaje de error y opciones"';
-    }
-    
-    if (fieldType === 'businessRules') {
-      return '- Lista numerada de reglas específicas\n- Cada regla debe ser verificable\n- Incluir validaciones de datos\n- Mencionar restricciones de seguridad\n- Formato: "1. Regla específica\n2. Segunda regla"';
-    }
-    
-    if (fieldType === 'specialRequirements') {
-      return '- Requerimientos técnicos específicos\n- Tiempos de respuesta, performance\n- Integraciones con sistemas externos\n- Seguridad y auditoria\n- Formato de lista con especificaciones medibles';
-    }
-    
-    return '- Seguir convenciones profesionales\n- Lenguaje claro y preciso\n- Sin errores ortográficos';
+    return contextPrompt;
   }
 
   private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {

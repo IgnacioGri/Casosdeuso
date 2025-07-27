@@ -174,7 +174,16 @@ export default function FormSteps({
                   fieldName="clientName"
                   fieldValue={formData.clientName}
                   fieldType="text"
-                  context={{ step: 3 }}
+                  context={{ 
+                    step: 3,
+                    fullFormData: {
+                      useCaseType: formData.useCaseType,
+                      clientName: formData.clientName,
+                      projectName: formData.projectName,
+                      useCaseCode: formData.useCaseCode,
+                      useCaseName: formData.useCaseName
+                    }
+                  }}
                   onImprovement={(value) => handleInputChange('clientName', value)}
                   aiModel={formData.aiModel}
                 />
@@ -198,7 +207,16 @@ export default function FormSteps({
                   fieldName="projectName"
                   fieldValue={formData.projectName}
                   fieldType="text"
-                  context={{ step: 3, clientName: formData.clientName }}
+                  context={{ 
+                    step: 3,
+                    fullFormData: {
+                      useCaseType: formData.useCaseType,
+                      clientName: formData.clientName,
+                      projectName: formData.projectName,
+                      useCaseCode: formData.useCaseCode,
+                      useCaseName: formData.useCaseName
+                    }
+                  }}
                   onImprovement={(value) => handleInputChange('projectName', value)}
                   aiModel={formData.aiModel}
                 />
