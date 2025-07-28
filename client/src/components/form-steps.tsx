@@ -637,6 +637,8 @@ export default function FormSteps({
               </label>
               <div className="relative">
                 <textarea
+                  value={formData.fieldsDescription || ''}
+                  onChange={(e) => handleInputChange('fieldsDescription', e.target.value)}
                   placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
                   rows={6}
                   className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
@@ -644,7 +646,7 @@ export default function FormSteps({
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
                     fieldName="entityFieldsDescription"
-                    fieldValue=""
+                    fieldValue={formData.fieldsDescription || ''}
                     fieldType="fieldsFromText"
                     context={{ step: 7, useCaseType: formData.useCaseType }}
                     onImprovement={(value) => {
@@ -652,35 +654,46 @@ export default function FormSteps({
                       try {
                         const fields = JSON.parse(value);
                         if (Array.isArray(fields)) {
+                          // Limpiar campos existentes vacíos
+                          const cleanedFields = formData.entityFields.filter(f => f.name.trim() !== '');
+                          
+                          // Crear la nueva lista de campos
+                          const allFields = [...cleanedFields];
+                          
                           fields.forEach(field => {
-                            onAddEntityField();
-                            setTimeout(() => {
-                              const currentFields = formData.entityFields;
-                              const lastIndex = currentFields.length - 1;
-                              if (lastIndex >= 0) {
-                                onUpdateEntityField(lastIndex, {
-                                  name: field.name || '',
-                                  type: field.type || 'text',
-                                  mandatory: field.mandatory ?? false,
-                                  length: field.length
-                                });
-                              }
-                            }, 10);
+                            allFields.push({
+                              name: field.name || '',
+                              type: field.type || 'text',
+                              mandatory: field.mandatory ?? false,
+                              length: field.length
+                            });
+                          });
+                          
+                          // Actualizar el estado con todos los campos de una vez
+                          onUpdateFormData({ 
+                            entityFields: allFields,
+                            fieldsDescription: formData.fieldsDescription || '' 
                           });
                         }
                       } catch (error) {
                         console.error('Error parsing entity fields JSON:', error);
                         // Fallback: treat as text lines
                         const fieldNames = value.split('\n').filter(f => f.trim()).map(f => f.trim());
+                        const cleanedFields = formData.entityFields.filter(f => f.name.trim() !== '');
+                        const allFields = [...cleanedFields];
+                        
                         fieldNames.forEach(fieldName => {
-                          onAddEntityField();
-                          setTimeout(() => {
-                            const currentFields = formData.entityFields;
-                            const lastIndex = currentFields.length - 1;
-                            if (lastIndex >= 0) {
-                              onUpdateEntityField(lastIndex, { name: fieldName });
-                            }
-                          }, 10);
+                          allFields.push({
+                            name: fieldName,
+                            type: 'text',
+                            mandatory: false,
+                            length: undefined
+                          });
+                        });
+                        
+                        onUpdateFormData({ 
+                          entityFields: allFields,
+                          fieldsDescription: formData.fieldsDescription || '' 
                         });
                       }
                     }}
@@ -1095,7 +1108,7 @@ export default function FormSteps({
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
                     fieldName="businessRules"
-                    fieldValue={formData.businessRules}
+                    fieldValue={formData.businessRules || ''}
                     fieldType="businessRules"
                     context={{ step: 8, useCaseType: formData.useCaseType }}
                     onImprovement={(value) => handleInputChange('businessRules', value)}
@@ -1121,7 +1134,7 @@ export default function FormSteps({
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
                     fieldName="specialRequirements"
-                    fieldValue={formData.specialRequirements}
+                    fieldValue={formData.specialRequirements || ''}
                     fieldType="specialRequirements"
                     context={{ step: 8, useCaseType: formData.useCaseType }}
                     onImprovement={(value) => handleInputChange('specialRequirements', value)}

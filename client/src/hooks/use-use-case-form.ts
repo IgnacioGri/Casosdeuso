@@ -13,6 +13,7 @@ export function useUseCaseForm() {
     description: '',
     filtersDescription: '',
     columnsDescription: '',
+    fieldsDescription: '',
     searchFilters: [''],
     resultColumns: [''],
     entityFields: [{

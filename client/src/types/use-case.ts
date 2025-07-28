@@ -19,6 +19,7 @@ export interface UseCaseFormData {
   description: string;
   filtersDescription?: string;
   columnsDescription?: string;
+  fieldsDescription?: string;
   searchFilters: string[];
   resultColumns: string[];
   entityFields: EntityField[];
