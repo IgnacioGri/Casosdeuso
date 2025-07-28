@@ -126,6 +126,8 @@ Preferred communication style: Simple, everyday language.
 ✓ Maintained only the main AI Assist functionality for text-to-list conversion in each step's description field
 ✓ Simplified UX by focusing AI assistance on the primary conversion functions rather than individual item improvements
 ✓ Updated form styling to remove unnecessary padding that was reserved for removed AI buttons
+✓ Updated help button design to show only "?" icon without text for cleaner interface
+✓ Revised help content to reflect streamlined AI Assist system without individual element buttons
 
 ## System Architecture
 

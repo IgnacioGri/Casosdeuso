@@ -103,7 +103,7 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
             explanation: "AI Assist está disponible solo para el campo de descripción.",
             usage: [
               "Escribe una descripción básica de tu caso de uso",
-              "Presiona el botón robot (🤖) junto al campo descripción",
+              "Presiona el botón AI Assist junto al campo descripción",
               "El AI mejorará tu texto haciéndolo más profesional y completo",
               "Seguirá las normas ING de redacción técnica",
               "Agregará contexto bancario y estructura profesional"
@@ -127,10 +127,10 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
             explanation: "AI Assist convierte texto libre en filtros estructurados automáticamente.",
             usage: [
               "Describe en el área superior: 'Los usuarios buscarán por nombre, DNI y estado'",
-              "Presiona AI Assist para convertir automáticamente en filtros individuales",
-              "También puedes mejorar filtros individuales con el botón robot de cada fila",
+              "Presiona el botón AI Assist para convertir automáticamente en filtros individuales",
               "El AI seguirá estándares bancarios para nombres de filtros",
-              "Generará filtros profesionales y técnicamente correctos"
+              "Generará una lista completa de filtros profesionales y técnicamente correctos",
+              "Luego puedes editar manualmente cada filtro si necesitas ajustes"
             ]
           }
         };
@@ -151,7 +151,7 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
             explanation: "AI Assist transforma descripciones en columnas estructuradas con formato profesional.",
             usage: [
               "Describe en texto: 'Mostrar nombre completo, DNI, email y estado del cliente'",
-              "Usa AI Assist para convertir en columnas automáticamente",
+              "Presiona AI Assist para convertir en columnas automáticamente",
               "El AI creará nombres técnicos apropiados para cada columna",
               "Seguirá convenciones ING para etiquetas de interfaz",
               "Agregará columnas estándar si faltan (estado, fechas)"
@@ -175,7 +175,7 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
             explanation: "AI Assist convierte descripciones en campos JSON estructurados y agrega campos ING automáticamente.",
             usage: [
               "Describe campos en lenguaje natural: 'nombre completo texto obligatorio, edad número opcional'",
-              "Presiona AI Assist para generar JSON estructurado automáticamente",
+              "Presiona AI Assist para generar campos estructurados automáticamente",
               "El AI agregará automáticamente los 4 campos obligatorios ING de auditoría",
               "Interpretará tipos de datos y obligatoriedad de tu descripción",
               "Generará nombres técnicos apropiados para base de datos"
@@ -196,9 +196,9 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
           ],
           aiAssistInfo: {
             available: true,
-            explanation: "AI Assist está disponible en todos los campos para mejorar contenido y crear listas numeradas profesionales.",
+            explanation: "AI Assist está disponible para cada campo principal para mejorar contenido y crear listas numeradas profesionales.",
             usage: [
-              "Describe en texto simple tu requerimiento o regla",
+              "Describe en texto simple tu requerimiento o regla en cada campo",
               "Presiona AI Assist para obtener formato profesional ING",
               "El AI creará numeración multi-nivel (1, a, i) automáticamente",
               "Agregará sub-elementos técnicos relevantes",
@@ -248,10 +248,9 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
         <Button
           variant="outline"
           size="sm"
-          className="border-blue-200 text-blue-600 hover:bg-blue-50"
+          className="border-blue-200 text-blue-600 hover:bg-blue-50 px-2"
         >
-          <HelpCircle size={16} className="mr-1" />
-          Ayuda
+          <HelpCircle size={16} />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
