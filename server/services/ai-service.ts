@@ -884,13 +884,49 @@ Reglas:
     return JSON.stringify(fields, null, 2);
   }
 
+  private cleanInputText(text: string): string {
+    // Remove quotes at the beginning and end (including smart quotes)
+    text = text.replace(/^["'"'"„«»]+|["'"'"„«»]+$/g, '');
+    
+    // Remove quotes around individual phrases within commas
+    text = text.replace(/"([^"]+)"/g, '$1');
+    text = text.replace(/'([^']+)'/g, '$1');
+    text = text.replace(/'([^']+)'/g, '$1');
+    text = text.replace(/"([^"]+)"/g, '$1');
+    
+    // Remove extra whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    // Convert to lowercase for better processing, except first letter
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    }
+    
+    return text;
+  }
+
+  private formatProfessionalText(text: string): string {
+    // Clean the text first
+    text = this.cleanInputText(text);
+    
+    // Ensure first letter is uppercase
+    text = text.charAt(0).toUpperCase() + text.slice(1);
+    
+    // Add period if missing
+    if (!text.endsWith('.') && !text.endsWith(';') && !text.endsWith(':')) {
+      text += '.';
+    }
+    
+    return text;
+  }
+
   private generateIntelligentWireframeDescription(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
       return 'Panel de búsqueda con filtros (Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta) y botón "Buscar". Tabla de resultados mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado con botones "Editar" y "Ver Detalle" por fila.';
     }
 
-    const text = fieldValue.toLowerCase();
-    let description = fieldValue.trim();
+    let description = this.cleanInputText(fieldValue);
+    const text = description.toLowerCase();
 
     // Enhance basic descriptions with professional formatting and additional details
     if (text.length < 50) {
@@ -904,13 +940,7 @@ Reglas:
       }
     }
 
-    // Ensure professional formatting
-    description = description.charAt(0).toUpperCase() + description.slice(1);
-    if (!description.endsWith('.')) {
-      description += '.';
-    }
-
-    return description;
+    return this.formatProfessionalText(description);
   }
 
   private generateIntelligentAlternativeFlow(fieldValue: string): string {
@@ -918,8 +948,8 @@ Reglas:
       return 'Cliente inexistente: Al buscar un cliente que no existe en la base de datos, mostrar mensaje "Cliente no encontrado" con opciones para "Crear nuevo cliente" o "Refinar búsqueda".';
     }
 
-    const text = fieldValue.toLowerCase();
-    let flow = fieldValue.trim();
+    let flow = this.cleanInputText(fieldValue);
+    const text = flow.toLowerCase();
 
     // Add structure if missing
     if (!flow.includes(':')) {
@@ -937,15 +967,10 @@ Reglas:
 
     // Ensure professional formatting and add resolution if missing
     if (!text.includes('mostrar') && !text.includes('mensaje') && !text.includes('opcion')) {
-      flow += '. Mostrar mensaje informativo con opciones para el usuario.';
+      flow += '. Mostrar mensaje informativo con opciones para el usuario';
     }
 
-    flow = flow.charAt(0).toUpperCase() + flow.slice(1);
-    if (!flow.endsWith('.')) {
-      flow += '.';
-    }
-
-    return flow;
+    return this.formatProfessionalText(flow);
   }
 
   private generateIntelligentBusinessRules(fieldValue: string): string {
@@ -953,41 +978,34 @@ Reglas:
       return '1. El DNI debe ser único en el sistema\n2. No se puede eliminar un cliente con productos activos\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
     }
 
-    const text = fieldValue;
-    const lines = text.split('\n').filter(line => line.trim() !== '');
+    // Clean and normalize input
+    let text = this.cleanInputText(fieldValue);
+    
+    // Split by sentences, commas, or line breaks
+    const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
     let rules: string[] = [];
 
-    lines.forEach((line, index) => {
-      let rule = line.trim();
+    parts.forEach((part) => {
+      let rule = part.trim();
+      if (rule.length === 0) return;
       
-      // Add numbering if not present
-      if (!rule.match(/^\d+\./)) {
-        rule = `${index + 1}. ${rule}`;
-      }
+      // Remove existing numbering to avoid duplication
+      rule = rule.replace(/^\d+\.\s*/, '');
       
-      // Ensure professional formatting
-      rule = rule.charAt(0).toUpperCase() + rule.slice(1);
-      if (!rule.endsWith('.') && !rule.endsWith(';')) {
-        rule += '.';
-      }
+      // Skip if it's just a number or empty after cleaning
+      if (rule.match(/^\d+\.?\s*$/) || rule.length === 0) return;
+      
+      // Clean the rule text
+      rule = this.cleanInputText(rule);
+      
+      // Add new numbering
+      rule = `${rules.length + 1}. ${rule}`;
+      
+      // Professional formatting
+      rule = this.formatProfessionalText(rule);
       
       rules.push(rule);
     });
-
-    // If input was a paragraph, try to split into rules
-    if (rules.length === 1 && rules[0].length > 100) {
-      const sentences = rules[0].split(/[.;]/).filter(s => s.trim() !== '');
-      rules = sentences.map((sentence, index) => {
-        let rule = sentence.trim();
-        if (!rule.match(/^\d+\./)) {
-          rule = `${index + 1}. ${rule}`;
-        }
-        if (!rule.endsWith('.')) {
-          rule += '.';
-        }
-        return rule;
-      });
-    }
 
     return rules.join('\n');
   }
@@ -997,21 +1015,32 @@ Reglas:
       return '1. Integración con servicio externo de scoring crediticio al momento del alta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
     }
 
-    const text = fieldValue;
-    const lines = text.split('\n').filter(line => line.trim() !== '');
+    // Clean and normalize input
+    let text = this.cleanInputText(fieldValue);
+    
+    // Split by sentences, commas, or line breaks
+    const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
     let requirements: string[] = [];
 
-    lines.forEach((line, index) => {
-      let req = line.trim();
+    parts.forEach((part) => {
+      let req = part.trim();
+      if (req.length === 0) return;
       
-      // Add numbering if not present
-      if (!req.match(/^\d+\./)) {
-        req = `${index + 1}. ${req}`;
-      }
+      // Remove existing numbering to avoid duplication
+      req = req.replace(/^\d+\.\s*/, '');
+      
+      // Skip if it's just a number or empty after cleaning
+      if (req.match(/^\d+\.?\s*$/) || req.length === 0) return;
+      
+      // Clean the requirement text
+      req = this.cleanInputText(req);
+      
+      // Add new numbering
+      req = `${requirements.length + 1}. ${req}`;
       
       // Enhance technical requirements
       const lowerReq = req.toLowerCase();
-      if (lowerReq.includes('tiempo') && !lowerReq.includes('máximo')) {
+      if (lowerReq.includes('tiempo') && !lowerReq.includes('máximo') && !lowerReq.includes('segundos')) {
         req += ' (especificar límite máximo aceptable)';
       }
       if (lowerReq.includes('integra') && !lowerReq.includes('formato')) {
@@ -1021,29 +1050,11 @@ Reglas:
         req += ' con validación obligatoria';
       }
       
-      // Ensure professional formatting
-      req = req.charAt(0).toUpperCase() + req.slice(1);
-      if (!req.endsWith('.') && !req.endsWith(';')) {
-        req += '.';
-      }
+      // Professional formatting
+      req = this.formatProfessionalText(req);
       
       requirements.push(req);
     });
-
-    // If input was a paragraph, try to split into requirements
-    if (requirements.length === 1 && requirements[0].length > 100) {
-      const sentences = requirements[0].split(/[.;]/).filter(s => s.trim() !== '');
-      requirements = sentences.map((sentence, index) => {
-        let req = sentence.trim();
-        if (!req.match(/^\d+\./)) {
-          req = `${index + 1}. ${req}`;
-        }
-        if (!req.endsWith('.')) {
-          req += '.';
-        }
-        return req;
-      });
-    }
 
     return requirements.join('\n');
   }
