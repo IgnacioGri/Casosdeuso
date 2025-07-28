@@ -1118,54 +1118,40 @@ Reglas ING:
       return '1. Integración con servicio externo de scoring crediticio al momento del alta\n   a. Definir formato de intercambio de datos\n   b. Configurar timeout de respuesta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n   a. Cache local para mejorar performance\n   b. Actualización automática cada 24 horas\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
     }
 
-    // Enhanced multi-level processing for special requirements
+    // Clean and split input into meaningful bullet points
     let text = this.cleanInputText(fieldValue);
-    const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
+    
+    // Split by bullet points (• or -) or line breaks, preserving existing structure
+    let lines = text.split(/(?:•\s*|^\s*-\s*|\n)/m).filter(line => line.trim() !== '');
+    
+    if (lines.length === 0) {
+      lines = [text]; // Fallback to treat as single requirement
+    }
+    
     let items: string[] = [];
 
-    parts.forEach((part) => {
-      let item = part.trim();
+    lines.forEach((line) => {
+      let item = line.trim();
       if (item.length === 0) return;
       
-      // Remove existing numbering
-      item = item.replace(/^\d+\.\s*/, '');
+      // Remove existing numbering and clean bullet points
+      item = item.replace(/^\d+\.\s*/, '').replace(/^[•\-]\s*/, '');
       if (item.match(/^\d+\.?\s*$/) || item.length === 0) return;
       
       // Clean the requirement text
       item = this.cleanInputText(item);
       
-      // Detect content and add intelligent sub-items
-      const lowerItem = item.toLowerCase();
+      // Format as numbered item
       let mainItem = `${items.length + 1}. ${item}`;
-      let subItems: string[] = [];
       
-      if (lowerItem.includes('integra') || lowerItem.includes('servicio')) {
-        subItems.push('a. Definir formato de intercambio de datos');
-        subItems.push('b. Configurar timeout de respuesta');
-      }
-      if (lowerItem.includes('combo') || lowerItem.includes('dinamico')) {
-        subItems.push('a. Cache local para mejorar performance');
-        subItems.push('b. Actualización automática periódica');
-      }
-      
-      // Add enhancements
-      if (lowerItem.includes('tiempo') && !lowerItem.includes('máximo')) {
-        mainItem += ' (especificar límite máximo aceptable)';
-      }
-      if (lowerItem.includes('validac') && !lowerItem.includes('obligator')) {
-        mainItem += ' con validación obligatoria';
-      }
-      
-      // Professional formatting
-      mainItem = this.formatProfessionalText(mainItem);
-      
-      // Build complete item
-      if (subItems.length > 0) {
-        items.push(mainItem + '\n   ' + subItems.join('\n   '));
-      } else {
-        items.push(mainItem);
-      }
+      // Add to items list - no sub-items to avoid complex nesting issues
+      items.push(this.formatProfessionalText(mainItem));
     });
+
+    // If no items were processed, return a basic formatted version
+    if (items.length === 0) {
+      return `1. ${this.formatProfessionalText(text)}`;
+    }
 
     return items.join('\n');
   }
