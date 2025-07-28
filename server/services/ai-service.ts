@@ -550,9 +550,13 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
       }
       
-      // For special field types, use the specialized processing logic
-      if (fieldType === 'filtersFromText' || fieldType === 'columnsFromText') {
-        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      // For special field types, use AI with specialized processing
+      if (fieldType === 'filtersFromText') {
+        return await this.processFiltersWithAI(fieldValue, aiModel);
+      }
+      
+      if (fieldType === 'columnsFromText') {
+        return await this.processColumnsWithAI(fieldValue, aiModel);
       }
       
       // For fieldsFromText, try AI first but fallback to enhanced demo if it fails
@@ -764,6 +768,121 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       }
     });
     return response.text || '';
+  }
+
+  private async processFiltersWithAI(fieldValue: string, aiModel: string): Promise<string> {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return this.getDemoFieldImprovement('', fieldValue, 'filtersFromText');
+    }
+
+    const prompt = `CUMPLE MINUTA ING vr19: Convierte esta descripción en filtros de búsqueda profesionales para un sistema bancario.
+
+Descripción: "${fieldValue}"
+
+Reglas:
+- Responde SOLO con los nombres de filtros, uno por línea
+- Usa nombres descriptivos en español para sistemas bancarios
+- NO agregues explicaciones ni comentarios
+- Formato: un filtro por línea
+- Incluye filtros estándar ING: fechas, usuarios, estados
+
+Ejemplo de respuesta:
+Número de cliente
+Nombre completo
+Estado del cliente
+Fecha de registro desde
+Fecha de registro hasta`;
+
+    try {
+      let response: string;
+      
+      switch (aiModel) {
+        case 'openai':
+          response = await this.callOpenAIForImprovement(prompt);
+          break;
+        case 'claude':
+          response = await this.callClaudeForImprovement(prompt);
+          break;
+        case 'grok':
+          response = await this.callGrokForImprovement(prompt);
+          break;
+        case 'gemini':
+          response = await this.callGeminiForImprovement(prompt);
+          break;
+        default:
+          return this.getDemoFieldImprovement('', fieldValue, 'filtersFromText');
+      }
+      
+      // Clean and format the response
+      const lines = response.split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !line.toLowerCase().includes('filtros') && !line.includes(':'))
+        .slice(0, 8); // Limit to 8 filters max
+      
+      return lines.join('\n');
+      
+    } catch (error) {
+      console.error('Error processing filters with AI:', error);
+      return this.getDemoFieldImprovement('', fieldValue, 'filtersFromText');
+    }
+  }
+
+  private async processColumnsWithAI(fieldValue: string, aiModel: string): Promise<string> {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return this.getDemoFieldImprovement('', fieldValue, 'columnsFromText');
+    }
+
+    const prompt = `CUMPLE MINUTA ING vr19: Convierte esta descripción en columnas de resultado para una grilla de sistema bancario.
+
+Descripción: "${fieldValue}"
+
+Reglas:
+- Responde SOLO con los nombres de columnas, uno por línea
+- Usa nombres descriptivos en español para sistemas bancarios
+- NO agregues explicaciones ni comentarios
+- Formato: una columna por línea
+- Incluye columnas estándar ING: ID, fechas, usuarios, estados
+
+Ejemplo de respuesta:
+ID Cliente
+Nombre Completo
+Email
+Teléfono
+Estado
+Fecha Registro`;
+
+    try {
+      let response: string;
+      
+      switch (aiModel) {
+        case 'openai':
+          response = await this.callOpenAIForImprovement(prompt);
+          break;
+        case 'claude':
+          response = await this.callClaudeForImprovement(prompt);
+          break;
+        case 'grok':
+          response = await this.callGrokForImprovement(prompt);
+          break;
+        case 'gemini':
+          response = await this.callGeminiForImprovement(prompt);
+          break;
+        default:
+          return this.getDemoFieldImprovement('', fieldValue, 'columnsFromText');
+      }
+      
+      // Clean and format the response
+      const lines = response.split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !line.toLowerCase().includes('columnas') && !line.includes(':'))
+        .slice(0, 10); // Limit to 10 columns max
+      
+      return lines.join('\n');
+      
+    } catch (error) {
+      console.error('Error processing columns with AI:', error);
+      return this.getDemoFieldImprovement('', fieldValue, 'columnsFromText');
+    }
   }
 
   private async processEntityFieldsWithAI(fieldValue: string, aiModel: string): Promise<string> {

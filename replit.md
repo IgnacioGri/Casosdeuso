@@ -142,6 +142,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Enhanced document service with proper TextRun handling and ImageRun configuration
 ✓ Validated all API endpoints working correctly: use case generation, AI assist, document export
 ✓ Confirmed complete end-to-end functionality from form input through AI assistance to document generation
+✓ Significantly expanded verb validation to 90+ infinitive verbs including banking and technical contexts (January 28, 2025)
+✓ Fixed critical AI Assist production quality issue where filters/columns conversion was using demo mode instead of real AI
+✓ Added comprehensive AI-powered text-to-list conversion for filtersFromText and columnsFromText field types
+✓ Enhanced AI prompts with ING compliance rules for professional banking terminology and formatting standards
 
 ## System Architecture
 
