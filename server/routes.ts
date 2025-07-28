@@ -373,7 +373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // AI Assist for individual fields
-  app.post('/api/use-cases/ai-assist', async (req: Request, res: Response) => {
+  app.post("/api/ai-assist", async (req, res) => {
     try {
       const { fieldName, fieldValue, fieldType, context, aiModel } = req.body;
       
@@ -381,7 +381,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Field name and type are required' });
       }
 
-      // Use AIService.improveField directly (it's a static method)
       const improvedValue = await AIService.improveField(fieldName, fieldValue, fieldType, context, aiModel);
       
       res.json({ improvedValue });
