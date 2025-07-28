@@ -9,6 +9,15 @@ export interface EntityField {
   mandatory: boolean;
 }
 
+export interface TestStep {
+  number: number;
+  action: string;
+  inputData: string;
+  expectedResult: string;
+  observations: string;
+  status: 'P' | 'F' | ''; // Pass/Fail/Not executed
+}
+
 export interface UseCaseFormData {
   useCaseType: UseCaseType;
   clientName: string;
@@ -30,6 +39,11 @@ export interface UseCaseFormData {
   wireframesDescription?: string;
   alternativeFlows?: string[];
   alternativeFlowsDescription?: string;
+  // Test case fields
+  generateTestCase?: boolean;
+  testCaseObjective?: string;
+  testCasePreconditions?: string;
+  testSteps?: TestStep[];
   aiModel: AIModel;
   // Campos específicos para tipos de casos de uso
   apiEndpoint?: string;

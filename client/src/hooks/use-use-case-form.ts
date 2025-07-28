@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { UseCaseFormData, EntityField, UseCaseType } from '@/types/use-case';
+import { UseCaseFormData, EntityField, UseCaseType, TestStep } from '@/types/use-case';
 
 export function useUseCaseForm() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -35,6 +35,11 @@ export function useUseCaseForm() {
     executionTime: '',
     configurationPaths: '',
     webServiceCredentials: '',
+    // Test case fields
+    generateTestCase: false,
+    testCaseObjective: '',
+    testCasePreconditions: '',
+    testSteps: [],
     aiModel: 'demo'
   });
 
@@ -160,6 +165,41 @@ export function useUseCaseForm() {
     }));
   }, []);
 
+  // Test step management functions
+  const addTestStep = useCallback(() => {
+    const nextNumber = (formData.testSteps || []).length + 1;
+    setFormData(prev => ({
+      ...prev,
+      testSteps: [...(prev.testSteps || []), {
+        number: nextNumber,
+        action: '',
+        inputData: '',
+        expectedResult: '',
+        observations: '',
+        status: ''
+      }]
+    }));
+  }, [formData.testSteps]);
+
+  const removeTestStep = useCallback((index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      testSteps: (prev.testSteps || []).filter((_, i) => i !== index).map((step, i) => ({
+        ...step,
+        number: i + 1
+      }))
+    }));
+  }, []);
+
+  const updateTestStep = useCallback((index: number, field: keyof TestStep, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      testSteps: (prev.testSteps || []).map((step, i) => 
+        i === index ? { ...step, [field]: value } : step
+      )
+    }));
+  }, []);
+
   const validateStep = useCallback((step: number): boolean => {
     switch (step) {
       case 1:
@@ -177,13 +217,31 @@ export function useUseCaseForm() {
       case 5:
         return formData.useCaseType !== 'entity' || formData.searchFilters.some(f => f.trim()); // Search Filters (Entity only)
       case 6:
-        return formData.useCaseType !== 'entity' || formData.resultColumns.some(c => c.trim()); // Result Columns (Entity only)
+        if (formData.useCaseType === 'entity') {
+          return formData.resultColumns.some(c => c.trim()); // Result Columns (Entity only)
+        } else {
+          return true; // Optional fields for non-entity types
+        }
       case 7:
-        return formData.useCaseType !== 'entity' || formData.entityFields.some(f => f.name.trim()); // Entity Fields (Entity only)
+        if (formData.useCaseType === 'entity') {
+          return formData.entityFields.some(f => f.name.trim()); // Entity Fields (Entity only)
+        } else {
+          // Test cases step for non-entity if enabled
+          if (formData.generateTestCase) {
+            return !!(formData.testCaseObjective && formData.testCasePreconditions);
+          }
+          return true; // Review step for non-entity without test cases
+        }
       case 8:
         return true; // Optional fields (Business Rules)
       case 9:
+        // Test cases step if enabled, otherwise review step
+        if (formData.generateTestCase && formData.useCaseType === 'entity') {
+          return !!(formData.testCaseObjective && formData.testCasePreconditions);
+        }
         return true; // Review step
+      case 10:
+        return true; // Final review step for entity with test cases
       default:
         return true;
     }
@@ -229,7 +287,13 @@ export function useUseCaseForm() {
       executionTime: '',
       configurationPaths: '',
       webServiceCredentials: '',
-      aiModel: prev.aiModel // Mantiene el modelo seleccionado previamente
+      generateTestCase: false,
+      testCaseObjective: '',
+      testCasePreconditions: '',
+      testSteps: [],
+      aiModel: prev.aiModel, // Mantiene el modelo seleccionado previamente
+      wireframesDescription: '',
+      alternativeFlowsDescription: ''
     }));
   }, []);
 
@@ -490,10 +554,17 @@ Códigos de Error:
       executionTime: '',
       configurationPaths: '',
       webServiceCredentials: '',
+      // Test case fields
+      generateTestCase: false,
+      testCaseObjective: '',
+      testCasePreconditions: '',
+      testSteps: [],
       aiModel: 'demo'
     });
     setCurrentStep(1);
   }, []);
+
+
 
   return {
     currentStep,
@@ -515,6 +586,9 @@ Códigos de Error:
     addAlternativeFlow,
     removeAlternativeFlow,
     updateAlternativeFlow,
+    addTestStep,
+    removeTestStep,
+    updateTestStep,
     validateStep,
     loadDemoData,
     loadComplexExample,

@@ -1,4 +1,5 @@
 import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot } from "lucide-react";
+import { TestCaseStep } from './steps/test-case-step';
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +29,9 @@ interface FormStepsProps {
   onAddAlternativeFlow: () => void;
   onRemoveAlternativeFlow: (index: number) => void;
   onUpdateAlternativeFlow: (index: number, value: string) => void;
+  onAddTestStep?: () => void;
+  onRemoveTestStep?: (index: number) => void;
+  onUpdateTestStep?: (index: number, field: any, value: string | number) => void;
   onLoadDemoData: () => void;
   onLoadComplexExample?: (type: UseCaseType) => void;
 }
@@ -51,6 +55,9 @@ export default function FormSteps({
   onAddAlternativeFlow,
   onRemoveAlternativeFlow,
   onUpdateAlternativeFlow,
+  onAddTestStep,
+  onRemoveTestStep,
+  onUpdateTestStep,
   onLoadDemoData,
   onLoadComplexExample
 }: FormStepsProps) {
@@ -1041,6 +1048,23 @@ export default function FormSteps({
               </div>
             </div>
 
+            <div>
+              <label className="flex items-center space-x-3">
+                <input 
+                  type="checkbox" 
+                  checked={formData.generateTestCase}
+                  onChange={(e) => handleInputChange('generateTestCase', e.target.checked)}
+                  className="form-checkbox"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Generar casos de prueba
+                </span>
+              </label>
+              <div className="text-xs text-gray-500 mt-1 ml-6">
+                Incluye casos de prueba según minuta ING con objetivo, precondiciones y pasos estructurados
+              </div>
+            </div>
+
             {formData.generateWireframes && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1228,8 +1252,45 @@ export default function FormSteps({
     );
   }
 
-  // Step 9: Review and Generation (adjusted step number for non-entity types)
-  const isReviewStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 7;
+  // Test Cases Step (if enabled)
+  const testCaseStepNumber = () => {
+    if (formData.useCaseType === 'entity') {
+      return formData.generateTestCase ? 9 : null;
+    } else {
+      return formData.generateTestCase ? 7 : null;
+    }
+  };
+
+  if (currentStep === testCaseStepNumber() && formData.generateTestCase && onAddTestStep && onRemoveTestStep && onUpdateTestStep) {
+    return (
+      <Card className="shadow-sm border border-ms-border">
+        <CardContent className="p-6">
+          <TestCaseStep
+            testCaseObjective={formData.testCaseObjective || ''}
+            testCasePreconditions={formData.testCasePreconditions || ''}
+            testSteps={formData.testSteps || []}
+            onUpdateObjective={(value) => handleInputChange('testCaseObjective', value)}
+            onUpdatePreconditions={(value) => handleInputChange('testCasePreconditions', value)}
+            onAddTestStep={onAddTestStep}
+            onRemoveTestStep={onRemoveTestStep}
+            onUpdateTestStep={onUpdateTestStep}
+            clientName={formData.clientName}
+            projectName={formData.projectName}
+            useCaseName={formData.useCaseName}
+            aiModel={formData.aiModel}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Step 9/10: Review and Generation (adjusted step number based on options)
+  const getReviewStepNumber = () => {
+    const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
+    return formData.generateTestCase ? baseStep + 1 : baseStep;
+  };
+
+  const isReviewStep = currentStep === getReviewStepNumber();
   if (isReviewStep) {
     const getSummaryData = () => {
       const summary = [];

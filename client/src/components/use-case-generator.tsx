@@ -38,6 +38,9 @@ export default function UseCaseGenerator() {
     addAlternativeFlow,
     removeAlternativeFlow,
     updateAlternativeFlow,
+    addTestStep,
+    removeTestStep,
+    updateTestStep,
     validateStep,
     loadDemoData,
     loadComplexExample,
@@ -46,7 +49,8 @@ export default function UseCaseGenerator() {
 
   // Calculate total steps based on use case type
   const getTotalSteps = () => {
-    return formData.useCaseType === 'entity' ? 9 : 7;
+    const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
+    return formData.generateTestCase ? baseSteps + 1 : baseSteps;
   };
 
   const generateUseCaseMutation = useMutation({
@@ -155,7 +159,11 @@ export default function UseCaseGenerator() {
     });
   };
 
-  const isReviewStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 6;
+  const isReviewStep = () => {
+    const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
+    const totalSteps = formData.generateTestCase ? baseSteps + 1 : baseSteps;
+    return currentStep === totalSteps;
+  };
 
   // Navigation buttons component for reuse
   const NavigationButtons = () => (
@@ -171,7 +179,7 @@ export default function UseCaseGenerator() {
       </Button>
       
       <div className="flex space-x-4">
-        {isReviewStep && (
+        {isReviewStep() && (
           <Button 
             onClick={handleGenerateUseCase}
             disabled={generateUseCaseMutation.isPending}
@@ -182,7 +190,7 @@ export default function UseCaseGenerator() {
           </Button>
         )}
         
-        {!isReviewStep && (
+        {!isReviewStep() && (
           <Button 
             onClick={handleNextStep}
             className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
@@ -260,6 +268,9 @@ export default function UseCaseGenerator() {
               onAddAlternativeFlow={addAlternativeFlow}
               onRemoveAlternativeFlow={removeAlternativeFlow}
               onUpdateAlternativeFlow={updateAlternativeFlow}
+              onAddTestStep={addTestStep}
+              onRemoveTestStep={removeTestStep}
+              onUpdateTestStep={updateTestStep}
               onLoadDemoData={handleLoadDemo}
               onLoadComplexExample={loadComplexExample}
             />

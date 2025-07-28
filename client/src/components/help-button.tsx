@@ -208,7 +208,50 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
           }
         };
 
-      case 9:
+      case 9:  
+        // Could be test cases step or final review depending on configuration
+        if (useCaseType === 'entity') {
+          return {
+            title: "Casos de Prueba (Opcional)",
+            description: "Define casos de prueba según especificaciones de la minuta ING para validar el funcionamiento del caso de uso.",
+            instructions: [
+              "Objetivo: Describe qué se pretende validar con las pruebas",
+              "Precondiciones: Lista los requisitos previos para ejecutar las pruebas",
+              "Pasos de Prueba: Crea una tabla estructurada con cada acción",
+              "Cada paso debe tener: Acción, Datos de entrada, Resultado esperado, Observaciones, Estado P/F",
+              "Sigue el formato exacto de la minuta ING líneas 271-300"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist mejora el contenido de objetivos y precondiciones con terminología técnica profesional.",
+              usage: [
+                "Describe en lenguaje simple qué quieres probar",
+                "Presiona AI Assist para obtener formato técnico profesional",
+                "El AI aplicará terminología de testing y estándares bancarios",
+                "Convierte descripciones informales en especificaciones técnicas"
+              ]
+            }
+          };
+        } else {
+          return {
+            title: "Generación del Documento Final",
+            description: "Crea el documento de caso de uso con formato profesional ING para entregar al cliente.",
+            instructions: [
+              "Revisa que todos los campos estén completos antes de generar",
+              "El documento seguirá automáticamente el formato de la minuta ING vr19",
+              "Incluirá numeración multi-nivel, colores corporativos y tipografía Segoe UI",
+              "Se agregará automáticamente la tabla de 'Historia de Revisiones'",
+              "Puedes exportar en formato HTML (para web) o DOCX (para Word)"
+            ],
+            aiAssistInfo: {
+              available: false,
+              explanation: "En este paso NO se usa AI. El documento se genera aplicando solo formato y estructura ING sin procesamiento de inteligencia artificial.",
+              usage: []
+            }
+          };
+        }
+
+      case 10:
         return {
           title: "Generación del Documento Final",
           description: "Crea el documento de caso de uso con formato profesional ING para entregar al cliente.",

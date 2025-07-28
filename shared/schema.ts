@@ -24,6 +24,11 @@ export const useCases = pgTable("use_cases", {
   alternativeFlowsDescription: text("alternative_flows_description"),
   generatedContent: text("generated_content"),
   aiModel: text("ai_model").notNull(),
+  // Test case fields
+  generateTestCase: boolean("generate_test_case").default(false),
+  testCaseObjective: text("test_case_objective"),
+  testCasePreconditions: text("test_case_preconditions"),
+  testSteps: jsonb("test_steps").default('[]'),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -43,6 +48,15 @@ export const entityFieldSchema = z.object({
   type: z.enum(['text', 'number', 'date', 'boolean', 'email']),
   length: z.number().optional(),
   mandatory: z.boolean().default(false),
+});
+
+export const testStepSchema = z.object({
+  number: z.number(),
+  action: z.string(),
+  inputData: z.string(),
+  expectedResult: z.string(),
+  observations: z.string(),
+  status: z.enum(['P', 'F', '']).default(''),
 });
 
 // Base schema para validación común
@@ -88,6 +102,11 @@ const baseUseCaseFormSchema = z.object({
   executionTime: z.string().optional(),
   configurationPaths: z.string().optional(),
   webServiceCredentials: z.string().optional(),
+  // Test case fields
+  generateTestCase: z.boolean().default(false),
+  testCaseObjective: z.string().optional(),
+  testCasePreconditions: z.string().optional(),
+  testSteps: z.array(testStepSchema).default([]),
   aiModel: z.enum(['demo', 'openai', 'claude', 'grok', 'gemini']),
 });
 
@@ -109,3 +128,4 @@ export const useCaseFormSchema = baseUseCaseFormSchema.refine(
 
 export type UseCaseFormData = z.infer<typeof useCaseFormSchema>;
 export type EntityField = z.infer<typeof entityFieldSchema>;
+export type TestStep = z.infer<typeof testStepSchema>;
