@@ -538,6 +538,12 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       if (fieldType === 'specialRequirements') {
         return this.generateIntelligentSpecialRequirements(fieldValue);
       }
+      if (fieldType === 'wireframesDescription') {
+        return this.generateIntelligentWireframesDescription(fieldValue);
+      }
+      if (fieldType === 'alternativeFlowsDescription') {
+        return this.generateIntelligentAlternativeFlowsDescription(fieldValue);
+      }
       
       // If no AI model specified or it's demo, use demo mode for other fields
       if (!aiModel || aiModel === 'demo') {
@@ -1061,6 +1067,66 @@ Reglas ING:
     }
 
     return this.formatProfessionalText(flow);
+  }
+
+  private generateIntelligentWireframesDescription(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return `Pantalla principal con panel de búsqueda (filtros: Nombre, DNI, Email, Estado), botones Buscar/Limpiar/Agregar.
+Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar.
+Formulario modal para alta/modificación con campos obligatorios y validaciones ING.
+Mensaje de confirmación para operaciones exitosas o de error según corresponda.`;
+    }
+
+    let description = this.cleanInputText(fieldValue);
+    const text = description.toLowerCase();
+
+    // Enhance basic descriptions with ING-specific wireframe details
+    if (text.length < 100) {
+      // Add comprehensive wireframe context if description is too short
+      if (text.includes('buscar') || text.includes('filtro')) {
+        description = `${description}. Incluye panel superior con filtros ING estándar, botones Buscar/Limpiar/Agregar, tabla de resultados con paginado ING y botones de acción por fila.`;
+      } else if (text.includes('formulario') || text.includes('form')) {
+        description = `${description}. Modal o página con campos organizados según estándares ING, validaciones en tiempo real, botones Guardar/Cancelar y mensajes de confirmación.`;
+      } else if (text.includes('tabla') || text.includes('list')) {
+        description = `${description}. Con paginado ING, ordenamiento por columnas, filtros superiores y botones de acción (Editar/Eliminar/Ver) por cada fila.`;
+      } else {
+        description = `${description}. Sistema completo con wireframes ING: pantalla de búsqueda con filtros, tabla de resultados paginada, formularios modales para CRUD y mensajes de confirmación/error.`;
+      }
+    }
+
+    // Ensure proper formatting and professional structure
+    return this.formatProfessionalText(description);
+  }
+
+  private generateIntelligentAlternativeFlowsDescription(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return `Error de sistema: Cuando ocurre un error técnico, mostrar mensaje "Error temporal del sistema. Intente nuevamente" con opciones Reintentar/Cancelar.
+Registro inexistente: Al buscar un elemento que no existe, mostrar "No se encontraron resultados" con opciones para "Crear nuevo" o "Modificar búsqueda".
+Sin permisos: Cuando el usuario no tiene permisos, mostrar "No tiene autorización para esta operación" y redirigir a pantalla principal.
+Validación fallida: Si fallan las validaciones de negocio, resaltar campos incorrectos con mensajes específicos y mantener datos ingresados.`;
+    }
+
+    let description = this.cleanInputText(fieldValue);
+    const text = description.toLowerCase();
+
+    // Enhance basic descriptions with comprehensive error scenario context
+    if (text.length < 100) {
+      // Add comprehensive error handling context if description is too short
+      if (text.includes('error') || text.includes('falla')) {
+        description = `${description}. Incluir manejo de errores técnicos, mensajes claros al usuario, opciones de reintentar/cancelar y log automático del incidente.`;
+      } else if (text.includes('no encontr') || text.includes('inexistent')) {
+        description = `${description}. Mostrar mensaje informativo, opciones para crear nuevo registro o refinar criterios de búsqueda, mantener contexto de la operación.`;
+      } else if (text.includes('permiso') || text.includes('acceso')) {
+        description = `${description}. Mensaje de autorización insuficiente, redirección segura a pantalla permitida, log de intento de acceso no autorizado.`;
+      } else if (text.includes('validaci') || text.includes('campo')) {
+        description = `${description}. Resaltar campos con errores, mensajes específicos por validación, mantener datos válidos ingresados, permitir corrección selectiva.`;
+      } else {
+        description = `${description}. Conjunto completo de flujos alternativos: errores de sistema, registros inexistentes, permisos insuficientes, validaciones fallidas y timeouts de conexión.`;
+      }
+    }
+
+    // Ensure proper formatting and professional structure
+    return this.formatProfessionalText(description);
   }
 
   private generateIntelligentBusinessRules(fieldValue: string): string {

@@ -1046,6 +1046,26 @@ export default function FormSteps({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Descripciones de Wireframes
                 </label>
+                <div className="relative mb-4">
+                  <textarea 
+                    value={formData.wireframesDescription || ''}
+                    onChange={(e) => handleInputChange('wireframesDescription', e.target.value)}
+                    rows={4} 
+                    className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
+                    placeholder="Describe todas las pantallas del sistema en lenguaje natural. Ej: Una pantalla de búsqueda con filtros, una de listado con tabla paginada, una de detalle para ver/editar registros..."
+                  />
+                  <div className="absolute top-2 right-2">
+                    <AIAssistButton
+                      fieldName="wireframesDescription"
+                      fieldValue={formData.wireframesDescription || ''}
+                      fieldType="wireframesDescription"
+                      context={{ step: 8, useCaseType: formData.useCaseType }}
+                      onImprovement={(value) => handleInputChange('wireframesDescription', value)}
+                      size="sm"
+                      aiModel={formData.aiModel}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
                   {(formData.wireframeDescriptions || ['']).map((description, index) => (
                     <div key={index} className="space-y-2">
@@ -1091,6 +1111,26 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Flujos Alternativos
               </label>
+              <div className="relative mb-4">
+                <textarea 
+                  value={formData.alternativeFlowsDescription || ''}
+                  onChange={(e) => handleInputChange('alternativeFlowsDescription', e.target.value)}
+                  rows={4} 
+                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
+                  placeholder="Describe los posibles errores y excepciones del sistema. Ej: Cuando no se encuentra un registro, cuando fallan validaciones, cuando hay problemas de conectividad..."
+                />
+                <div className="absolute top-2 right-2">
+                  <AIAssistButton
+                    fieldName="alternativeFlowsDescription"
+                    fieldValue={formData.alternativeFlowsDescription || ''}
+                    fieldType="alternativeFlowsDescription"
+                    context={{ step: 8, useCaseType: formData.useCaseType }}
+                    onImprovement={(value) => handleInputChange('alternativeFlowsDescription', value)}
+                    size="sm"
+                    aiModel={formData.aiModel}
+                  />
+                </div>
+              </div>
               <div className="space-y-2">
                 {(formData.alternativeFlows || ['']).map((flow, index) => (
                   <div key={index} className="space-y-2">

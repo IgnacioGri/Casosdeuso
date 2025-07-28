@@ -128,6 +128,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Updated form styling to remove unnecessary padding that was reserved for removed AI buttons
 ✓ Updated help button design to show only "?" icon without text for cleaner interface
 ✓ Revised help content to reflect streamlined AI Assist system without individual element buttons
+✓ Added AI Assist buttons for wireframes and alternative flows description fields (January 28, 2025)
+✓ Implemented wireframesDescription and alternativeFlowsDescription fields with dedicated AI processing
+✓ Enhanced AI service with generateIntelligentWireframesDescription and generateIntelligentAlternativeFlowsDescription functions
+✓ Added comprehensive schema support for new description fields with proper database column definitions
 
 ## System Architecture
 
