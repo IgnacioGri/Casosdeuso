@@ -96,6 +96,13 @@ Preferred communication style: Simple, everyday language.
 ✓ Implemented comprehensive text cleaning to remove quotes, extra whitespace, and unwanted characters
 ✓ Enhanced professional formatting with proper capitalization, punctuation, and structure across all field types
 ✓ Added intelligent pattern recognition to ensure consistent numbering and proper sentence structure
+✓ Implemented comprehensive ING compliance improvements with priority features (January 27, 2025)
+✓ Added dynamic prompts based on use case type (entidad/api/proceso) with specific rules for each
+✓ Enhanced entity fields with auto-inclusion of mandatory ING compliance fields (fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion)
+✓ Integrated ING minuta context directly in all AI prompts with professional formatting requirements
+✓ Added development mode logging for complete transparency of AI prompts and responses
+✓ Enhanced wireframe descriptions with ING-specific UI elements and paginado standards
+✓ Implemented multi-level numbered lists (1-a-i) with proper indentation for all structured fields
 
 ## System Architecture
 

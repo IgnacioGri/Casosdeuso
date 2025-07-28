@@ -581,6 +581,19 @@ INSTRUCCIONES:
 
 RESPUESTA:`;
 
+      // Log prompt in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log('\n🤖 AI ASSIST PROMPT LOG:');
+        console.log('Field:', fieldName);
+        console.log('Type:', fieldType);
+        console.log('AI Model:', aiModel);
+        console.log('Use Case Type:', context?.fullFormData?.useCaseType || 'N/A');
+        console.log('Full Prompt:');
+        console.log('---');
+        console.log(prompt);
+        console.log('---\n');
+      }
+
       let improvedValue: string;
       
       switch (aiModel) {
@@ -600,6 +613,12 @@ RESPUESTA:`;
           return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
       }
       
+      // Log AI response in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🤖 AI RESPONSE:', improvedValue);
+        console.log('---\n');
+      }
+
       return improvedValue || fieldValue;
       
     } catch (error) {
@@ -611,52 +630,73 @@ RESPUESTA:`;
 
   private getFieldRules(fieldName: string, fieldType: string, context?: any): string {
     const fieldName_lower = fieldName.toLowerCase();
+    const useCaseType = context?.fullFormData?.useCaseType || 'entidad';
+    
+    // Base ING compliance rules
+    const ingCompliance = this.getINGComplianceRules(useCaseType);
     
     if (fieldName_lower.includes('nombre') && fieldName_lower.includes('cliente')) {
-      return '- Debe ser un nombre de empresa real o banco\n- Primera letra mayúscula\n- Sin abreviaciones innecesarias';
+      return `${ingCompliance}\n- Debe ser un nombre de empresa real o banco\n- Primera letra mayúscula\n- Sin abreviaciones innecesarias`;
     }
     
     if (fieldName_lower.includes('proyecto')) {
-      return '- Debe describir un sistema o proyecto tecnológico\n- Formato profesional\n- Relacionado con el cliente';
+      return `${ingCompliance}\n- Debe describir un sistema o proyecto tecnológico\n- Formato profesional\n- Relacionado con el cliente`;
     }
     
     if (fieldName_lower.includes('codigo')) {
-      return '- Formato: 2 letras mayúsculas + 3 números (ej: CL005, AB123)\n- Las letras deben relacionarse con el módulo o área';
+      return `${ingCompliance}\n- Formato: 2 letras mayúsculas + 3 números (ej: CL005, AB123)\n- Las letras deben relacionarse con el módulo o área`;
     }
     
     if (fieldName_lower.includes('nombre') && fieldName_lower.includes('caso')) {
-      return '- OBLIGATORIO: Debe comenzar con verbo en infinitivo (Gestionar, Crear, Consultar, etc.)\n- Describe claramente la funcionalidad\n- Sin artículos innecesarios';
+      return `${ingCompliance}\n- OBLIGATORIO: Debe comenzar con verbo en infinitivo (Gestionar, Crear, Consultar, etc.)\n- Prepara para título en mayúsculas RGB(0,112,192)\n- Describe claramente la funcionalidad\n- Sin artículos innecesarios\n${this.getUseCaseTypeSpecificRules(useCaseType)}`;
     }
     
     if (fieldName_lower.includes('archivo')) {
-      return '- Formato: 2 letras + 3 números + nombre descriptivo sin espacios\n- Ejemplo: BP005GestionarClientesPremium\n- Sin caracteres especiales';
+      return `${ingCompliance}\n- Formato exacto: 2 letras + 3 números + nombre descriptivo sin espacios\n- Ejemplo: BP005GestionarClientesPremium\n- Sin caracteres especiales`;
     }
     
     if (fieldName_lower.includes('descripcion')) {
-      return '- Explicación clara del alcance del caso de uso\n- Menciona las funcionalidades principales\n- Entre 50-200 palabras\n- Lenguaje técnico pero comprensible';
+      return `${ingCompliance}\n- Explicación clara del alcance del caso de uso (50-200 palabras)\n- Incluye flujos principales con listas indentadas:\n  1. Flujo principal (ej. Buscar [entidad])\n  a. Detallar filtros y columnas\n- Menciona precondiciones y postcondiciones\n- Lenguaje técnico pero comprensible\n${this.getUseCaseTypeSpecificRules(useCaseType)}`;
     }
     
     if (fieldName_lower.includes('reglas') && fieldName_lower.includes('negocio')) {
-      return '- Lista de reglas numeradas con viñetas\n- Cada regla debe ser específica y verificable\n- Incluir validaciones de datos\n- Mencionar restricciones de seguridad';
+      return `${ingCompliance}\n- Lista numerada multi-nivel (1, a, i) con indent 0.2\n- Cada regla debe ser específica y verificable\n- Incluir validaciones de datos obligatorias\n- Mencionar restricciones de seguridad\n- Para modificar/eliminar: incluir verificaciones`;
     }
     
     if (fieldName_lower.includes('requerimientos')) {
-      return '- Requerimientos técnicos específicos\n- Tiempos de respuesta, integraciones\n- Formato de lista con viñetas\n- Mencionar tecnologías si aplica';
+      return `${ingCompliance}\n- Requerimientos técnicos específicos en lista numerada\n- Tiempos de respuesta con límites máximos\n- Integraciones con formato de intercambio\n- Validaciones obligatorias\n- Tecnologías si aplica`;
     }
     
     if (fieldType === 'searchFilter') {
-      return '- Nombre del campo de búsqueda\n- Debe ser un campo lógico de la entidad\n- Formato: "Nombre del campo" sin tipo de dato';
+      return `${ingCompliance}\n- Nombre del campo de búsqueda\n- Debe ser un campo lógico de la entidad\n- Formato lista multi-nivel: 1. Filtro por [campo], a. Lógica [igual/mayor]`;
     }
     
     if (fieldType === 'resultColumn') {
-      return '- Nombre de columna para mostrar en resultados\n- Debe ser información relevante para identificar registros\n- Formato claro y profesional';
+      return `${ingCompliance}\n- Columnas para tabla de resultados\n- Información relevante para identificar registros\n- Formato multi-nivel con indent 0.2`;
     }
     
     if (fieldType === 'entityField') {
-      return '- Campo de entidad con tipo de dato específico\n- Debe incluir validaciones apropiadas\n- Formatos estándar: texto, número, fecha, booleano\n- Nombres descriptivos y técnicamente precisos';
+      return `${ingCompliance}\n- Campo de entidad con tipo/longitud/obligatorio\n- Auto-incluir: fechaAlta (date, mandatory), usuarioAlta (text, mandatory)\n- Tipos ING: text/email/number/date/boolean\n- Nombres descriptivos técnicamente precisos`;
     }
     
-    return '- Seguir buenas prácticas de documentación técnica\n- Usar lenguaje claro y profesional\n- Mantener coherencia con el resto del formulario';
+    return `${ingCompliance}\n- Seguir buenas prácticas de documentación técnica\n- Usar lenguaje claro y profesional\n- Mantener coherencia con el resto del formulario`;
+  }
+
+  private getINGComplianceRules(useCaseType: string): string {
+    return `CUMPLE MINUTA ING vr19: Segoe UI Semilight, interlineado simple, títulos azul RGB(0,112,192), listas multi-nivel (1-a-i), formato profesional`;
+  }
+
+  private getUseCaseTypeSpecificRules(useCaseType: string): string {
+    switch (useCaseType) {
+      case 'entidad':
+        return '\n- Para entidades: incluye filtros/columnas de búsqueda\n- Flujos CRUD (buscar, agregar, modificar, eliminar)\n- Wireframes con paginado y botones estándar';
+      case 'api':
+        return '\n- Para APIs: incluye request/response detallados\n- Códigos de error y manejo de excepciones\n- Documentación de endpoints';
+      case 'proceso':
+        return '\n- Para procesos: describe secuencia de pasos\n- Validaciones en cada etapa\n- Puntos de control y rollback';
+      default:
+        return '\n- Adapta según tipo de caso de uso especificado';
+    }
   }
 
   private buildContextualPrompt(context?: any): string {
@@ -738,11 +778,13 @@ RESPUESTA:`;
 
   private async processEntityFieldsWithAI(fieldValue: string, aiModel: string): Promise<string> {
     if (!fieldValue || fieldValue.trim() === '') {
-      // Return demo content for empty fields
-      return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+      // Return demo content for empty fields with ING compliance
+      return this.generateDefaultEntityFieldsWithINGCompliance();
     }
 
-    const prompt = `Convierte esta descripción de campos en JSON:
+    const prompt = `CUMPLE MINUTA ING vr19: Auto-incluir campos obligatorios para entidades, tipos estándar ING.
+
+Convierte esta descripción de campos en JSON:
 
 "${fieldValue}"
 
@@ -751,11 +793,17 @@ Formato requerido:
   {"name": "nombreCampo", "type": "text", "mandatory": true, "length": 100}
 ]
 
-Reglas:
+Reglas ING:
+- Auto-incluir SIEMPRE: 
+  * {"name": "fechaAlta", "type": "date", "mandatory": true}
+  * {"name": "usuarioAlta", "type": "text", "mandatory": true, "length": 50}
+  * {"name": "fechaModificacion", "type": "date", "mandatory": false}  
+  * {"name": "usuarioModificacion", "type": "text", "mandatory": false, "length": 50}
 - Nombres en camelCase español
-- Tipos: "text", "email", "number", "date", "boolean"
+- Tipos ING: "text", "email", "number", "date", "boolean"
 - mandatory: true si dice "obligatorio", false si dice "opcional"
-- length: solo si se especifica longitud
+- length: especificar cuando sea relevante
+- Para IDs: usar "number" y mandatory: true
 - Responde SOLO el JSON sin explicaciones`;
 
     try {
@@ -807,7 +855,7 @@ Reglas:
 
   private generateEnhancedEntityFields(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
-      return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+      return this.generateDefaultEntityFieldsWithINGCompliance();
     }
 
     const text = fieldValue.toLowerCase();
@@ -881,7 +929,32 @@ Reglas:
       return '[\n  {"name": "nombre", "type": "text", "mandatory": true},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false}\n]';
     }
 
+    // Always add mandatory ING compliance fields
+    const ingFields = [
+      { name: 'fechaAlta', type: 'date', mandatory: true },
+      { name: 'usuarioAlta', type: 'text', mandatory: true, length: 50 },
+      { name: 'fechaModificacion', type: 'date', mandatory: false },
+      { name: 'usuarioModificacion', type: 'text', mandatory: false, length: 50 }
+    ];
+
+    fields.push(...ingFields);
+
     return JSON.stringify(fields, null, 2);
+  }
+
+  private generateDefaultEntityFieldsWithINGCompliance(): string {
+    const defaultFields = [
+      { name: 'numeroCliente', type: 'text', mandatory: true, length: 20 },
+      { name: 'nombreCompleto', type: 'text', mandatory: true, length: 100 },
+      { name: 'email', type: 'email', mandatory: true },
+      { name: 'telefono', type: 'text', mandatory: false, length: 15 },
+      { name: 'fechaAlta', type: 'date', mandatory: true },
+      { name: 'usuarioAlta', type: 'text', mandatory: true, length: 50 },
+      { name: 'fechaModificacion', type: 'date', mandatory: false },
+      { name: 'usuarioModificacion', type: 'text', mandatory: false, length: 50 }
+    ];
+    
+    return JSON.stringify(defaultFields, null, 2);
   }
 
   private cleanInputText(text: string): string {
@@ -922,21 +995,28 @@ Reglas:
 
   private generateIntelligentWireframeDescription(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
-      return 'Panel de búsqueda con filtros (Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta) y botón "Buscar". Tabla de resultados mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado con botones "Editar" y "Ver Detalle" por fila.';
+      return 'Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.';
     }
 
     let description = this.cleanInputText(fieldValue);
     const text = description.toLowerCase();
 
-    // Enhance basic descriptions with professional formatting and additional details
+    // Enhance basic descriptions with ING-specific details
     if (text.length < 50) {
-      // Add context if description is too short
+      // Add ING context if description is too short
       if (text.includes('buscar') || text.includes('filtro')) {
-        description = `Panel de búsqueda con ${description}. Tabla de resultados con opciones de editar y ver detalle.`;
+        description = `Panel de búsqueda ING con ${description}, botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING y opciones de editar/eliminar por fila.`;
       } else if (text.includes('formulario') || text.includes('form')) {
-        description = `Formulario estructurado con ${description}. Incluye validaciones y botones de guardar/cancelar.`;
+        description = `Formulario ING estructurado con ${description}. Incluye validaciones ING estándar y botones Guardar/Cancelar. Layout según minuta ING.`;
       } else if (text.includes('tabla') || text.includes('list')) {
-        description = `${description} con funcionalidades de ordenamiento, paginación y acciones por fila.`;
+        description = `${description} con paginado ING, ordenamiento y botones de acción (Editar/Eliminar/Ver Detalle) por fila según estándares ING.`;
+      } else {
+        description = `Wireframe ING con ${description}. Incluye botones estándar (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado ING. UI textual describiendo layout según minuta ING.`;
+      }
+    } else {
+      // For longer descriptions, add ING compliance elements
+      if (!text.includes('ing') && !text.includes('boton') && !text.includes('paginado')) {
+        description += '. Incluye botones estándar ING (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado según minuta ING';
       }
     }
 
@@ -1107,7 +1187,7 @@ Reglas:
         return 'ID Cliente\nNombre Completo\nEmail\nTeléfono\nEstado';
       }
       if (fieldType === 'fieldsFromText') {
-        return this.generateEnhancedEntityFields(fieldValue);
+        return this.generateDefaultEntityFieldsWithINGCompliance();
       }
       if (fieldType === 'wireframeDescription') {
         return this.generateIntelligentWireframeDescription(fieldValue);
