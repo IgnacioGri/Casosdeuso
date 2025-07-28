@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caso de Uso: Gestionar Casos de Uso con Asistencia de IA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI Semilight', 'Segoe UI', sans-serif;
+            line-height: 1.2;
+            margin: 40px;
+            color: #333;
+        }
+        h1 {
+            color: rgb(0, 112, 192);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: rgb(0, 112, 192);
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        .field-label {
+            font-weight: 600;
+            color: rgb(0, 112, 192);
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .field-value {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        ol {
+            padding-left: 20px;
+        }
+        ol ol {
+            padding-left: 20px;
+            list-style-type: lower-alpha;
+        }
+        ol ol ol {
+            padding-left: 20px;
+            list-style-type: lower-roman;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .wireframe-section {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid rgb(0, 112, 192);
+        }
+    </style>
+</head>
+<body>
+    <h1>GESTIONAR CASOS DE USO CON ASISTENCIA DE IA</h1>
+
+    <div class="field-label">Nombre del Cliente:</div>
+    <div class="field-value">Ingematica Software</div>
+
+    <div class="field-label">Nombre del Proyecto:</div>
+    <div class="field-value">Sistema de Generación Automatizada de Casos de Uso</div>
+
+    <div class="field-label">Código del Caso de Uso:</div>
+    <div class="field-value">IG001</div>
+
+    <div class="field-label">Nombre del Caso de Uso:</div>
+    <div class="field-value">Gestionar casos de uso con asistencia de IA</div>
+
+    <div class="field-label">Nombre del Archivo:</div>
+    <div class="field-value">IG001GestionarCasosDeUsoConIA</div>
+
+    <h2>DESCRIPCIÓN</h2>
+    <p>Este caso de uso permite a los analistas de sistemas generar documentación técnica profesional utilizando múltiples modelos de inteligencia artificial. El sistema guía al usuario a través de un formulario estructurado de 9 pasos, aplicando automáticamente las normas ING y generando documentos en formato DOCX con el estilo corporativo adecuado. Incluye funcionalidades de asistencia inteligente para mejorar la calidad del contenido y garantizar el cumplimiento de estándares técnicos.</p>
+
+    <h2>FLUJO PRINCIPAL DE EVENTOS</h2>
+    <ol>
+        <li><strong>Buscar datos de casos de uso existentes</strong>
+            <ol>
+                <li>El sistema presenta filtros de búsqueda:
+                    <ol>
+                        <li>Código del caso de uso</li>
+                        <li>Nombre del caso de uso</li>
+                        <li>Cliente</li>
+                        <li>Proyecto</li>
+                        <li>Tipo de caso (entidad/api/servicio)</li>
+                        <li>Modelo de IA utilizado</li>
+                        <li>Estado del documento</li>
+                        <li>Fecha de creación</li>
+                    </ol>
+                </li>
+                <li>El sistema muestra resultados con las siguientes columnas:
+                    <ol>
+                        <li>Código del caso</li>
+                        <li>Nombre completo</li>
+                        <li>Cliente</li>
+                        <li>Proyecto</li>
+                        <li>Tipo</li>
+                        <li>Modelo IA</li>
+                        <li>Estado</li>
+                        <li>Fecha de creación</li>
+                        <li>Acciones (Editar/Eliminar/Exportar)</li>
+                    </ol>
+                </li>
+            </ol>
+        </li>
+        <li><strong>Crear un nuevo caso de uso</strong>
+            <ol>
+                <li>El sistema presenta los siguientes campos de la entidad:
+                    <ol>
+                        <li>codigoCasoUso (texto, 20 caracteres, obligatorio)</li>
+                        <li>nombreCaso (texto, 100 caracteres, obligatorio)</li>
+                        <li>clienteNombre (texto, 50 caracteres, obligatorio)</li>
+                        <li>proyectoNombre (texto, 100 caracteres, obligatorio)</li>
+                        <li>tipoCaso (texto, 20 caracteres, obligatorio)</li>
+                        <li>modeloIA (texto, 20 caracteres, obligatorio)</li>
+                        <li>descripcion (texto, 500 caracteres, obligatorio)</li>
+                        <li>filtrosBusqueda (texto, 1000 caracteres, opcional)</li>
+                        <li>columnasResultado (texto, 1000 caracteres, opcional)</li>
+                        <li>camposEntidad (texto, 2000 caracteres, opcional)</li>
+                        <li>reglasNegocio (texto, 2000 caracteres, opcional)</li>
+                        <li>requerimientosEspeciales (texto, 2000 caracteres, opcional)</li>
+                        <li>descripcionWireframes (texto, 2000 caracteres, opcional)</li>
+                        <li>flujosAlternativos (texto, 2000 caracteres, opcional)</li>
+                        <li>contenidoGenerado (texto, 10000 caracteres, opcional)</li>
+                        <li>fechaCreacion (fecha, obligatorio)</li>
+                        <li>usuarioCreacion (texto, 50 caracteres, obligatorio)</li>
+                        <li>fechaModificacion (fecha, opcional)</li>
+                        <li>usuarioModificacion (texto, 50 caracteres, opcional)</li>
+                    </ol>
+                </li>
+                <li>Al crear el registro se almacena automáticamente la fecha y usuario de alta</li>
+            </ol>
+        </li>
+    </ol>
+
+    <h2>FLUJOS ALTERNATIVOS</h2>
+    <ol>
+        <li><strong>Modificar o actualizar un caso de uso existente</strong>
+            <ol>
+                <li>El sistema permite editar todos los campos de la entidad excepto el código</li>
+                <li>El sistema muestra el identificador único del registro</li>
+                <li>El sistema conserva y muestra la fecha y usuario de alta original</li>
+                <li>Al modificar se registra automáticamente la fecha y usuario de modificación</li>
+            </ol>
+        </li>
+        <li><strong>Eliminar un caso de uso</strong>
+            <ol>
+                <li>El sistema verifica que no tenga documentos asociados o referencias activas</li>
+                <li>Se solicita confirmación antes de proceder con la eliminación</li>
+            </ol>
+        </li>
+        <li><strong>Error de conexión con servicios de IA</strong>
+            <ol>
+                <li>El sistema detecta fallas en APIs de OpenAI, Claude, Gemini o Grok</li>
+                <li>Muestra mensaje específico del error y permite continuar en modo demo</li>
+                <li>Registra el incidente para análisis posterior</li>
+            </ol>
+        </li>
+        <li><strong>Timeout en generación de contenido</strong>
+            <ol>
+                <li>Si el proceso excede 30 segundos, se muestra indicador de progreso</li>
+                <li>Se proporciona opción para cancelar la operación</li>
+                <li>Se preservan los datos ingresados para reintento posterior</li>
+            </ol>
+        </li>
+    </ol>
+
+    <h2>REGLAS DE NEGOCIO</h2>
+    <ol>
+        <li>El código del caso de uso debe ser único en el sistema
+            <ol>
+                <li>Formato obligatorio: 2 letras + 3 números + nombre descriptivo</li>
+                <li>Validación en tiempo real durante la captura</li>
+            </ol>
+        </li>
+        <li>El nombre del caso debe comenzar con verbo en infinitivo según normas ING
+            <ol>
+                <li>Verbos válidos: gestionar, crear, consultar, administrar, configurar, procesar</li>
+                <li>Validación automática mediante lista predefinida</li>
+            </ol>
+        </li>
+        <li>Solo usuarios con rol "Analista" o superior pueden crear casos de uso
+            <ol>
+                <li>Verificación de permisos en cada operación CRUD</li>
+                <li>Log de intentos de acceso no autorizado</li>
+            </ol>
+        </li>
+        <li>Se debe validar conectividad con servicios de IA antes de procesar
+            <ol>
+                <li>Verificación de API keys válidas</li>
+                <li>Test de conectividad con timeout de 5 segundos</li>
+            </ol>
+        </li>
+        <li>Registro automático en bitácora de todas las operaciones CRUD
+            <ol>
+                <li>Timestamp, usuario, acción realizada y datos modificados</li>
+                <li>Retención de logs por 12 meses para auditoría</li>
+            </ol>
+        </li>
+    </ol>
+
+    <h2>REQUERIMIENTOS ESPECIALES</h2>
+    <ol>
+        <li>Integración con múltiples APIs de inteligencia artificial
+            <ol>
+                <li>OpenAI GPT-4: para generación de contenido general</li>
+                <li>Claude Anthropic: para análisis de texto y mejoras</li>
+                <li>Google Gemini: para procesamiento multimodal</li>
+                <li>xAI Grok: para análisis contextual avanzado</li>
+            </ol>
+        </li>
+        <li>Generación de documentos DOCX con formato corporativo ING
+            <ol>
+                <li>Fuente Segoe UI Semilight obligatoria</li>
+                <li>Colores corporativos: azul ING (RGB 0,112,192)</li>
+                <li>Listas multinivel con numeración específica (1-a-i)</li>
+            </ol>
+        </li>
+        <li>Tiempo de respuesta máximo 30 segundos para generación de contenido
+            <ol>
+                <li>Indicador de progreso visual para operaciones largas</li>
+                <li>Sistema de timeout con reintentos automáticos</li>
+            </ol>
+        </li>
+        <li>Validación en tiempo real según normas técnicas ING
+            <ol>
+                <li>Verificación de formatos de código y nombres</li>
+                <li>Sugerencias automáticas de mejora de contenido</li>
+            </ol>
+        </li>
+        <li>Sistema de caché para optimizar performance de AI Assist
+            <ol>
+                <li>Cache local de respuestas frecuentes por 24 horas</li>
+                <li>Invalidación automática cuando se actualizan prompts</li>
+            </ol>
+        </li>
+    </ol>
+
+    <h2>BOCETOS GRÁFICOS DE INTERFACES (WIREFRAMES)</h2>
+    
+    <div class="wireframe-section">
+        <h3>Pantalla Principal - Selector de Modelo IA</h3>
+        <ul>
+            <li>Header con título "Generador de Casos de Uso"</li>
+            <li>Grid de 4 tarjetas con modelos disponibles (OpenAI, Claude, Gemini, Grok)</li>
+            <li>Cada tarjeta muestra icono distintivo, nombre del modelo y descripción breve</li>
+            <li>Botón "Continuar" habilitado al seleccionar un modelo</li>
+            <li>Indicador de progreso (Paso 1 de 9)</li>
+        </ul>
+    </div>
+
+    <div class="wireframe-section">
+        <h3>Formularios de Captura por Pasos (Pasos 2-8)</h3>
+        <ul>
+            <li>Navegación superior con breadcrumbs numerados</li>
+            <li>Panel izquierdo con campos del formulario según el paso</li>
+            <li>Panel derecho con botones de ayuda (?) para cada sección</li>
+            <li>Botones AI Assist junto a campos de descripción larga</li>
+            <li>Validación en tiempo real con mensajes informativos</li>
+            <li>Botones "Anterior" y "Siguiente" en parte inferior</li>
+        </ul>
+    </div>
+
+    <div class="wireframe-section">
+        <h3>Vista Previa del Documento (Paso 9)</h3>
+        <ul>
+            <li>Panel principal con preview HTML del caso de uso generado</li>
+            <li>Toolbar superior con opciones de descarga (HTML/DOCX)</li>
+            <li>Botón "Editar" para modificaciones menores</li>
+            <li>Indicador de completitud del documento (porcentaje)</li>
+            <li>Footer con información del modelo IA utilizado</li>
+        </ul>
+    </div>
+
+    <div class="wireframe-section">
+        <h3>Funcionalidades del Buscador de Casos de Uso</h3>
+        <ul>
+            <li>Panel superior con filtros organizados en 3 columnas</li>
+            <li>Botones "Buscar", "Limpiar" y "Agregar Nuevo" alineados a la derecha</li>
+            <li>Tabla de resultados con paginado ING (10, 25, 50 registros por página)</li>
+            <li>Columnas ordenables con iconos de dirección</li>
+            <li>Botones de acción por fila: "Ver", "Editar", "Eliminar", "Exportar"</li>
+            <li>Footer con conteo total de registros y navegación de páginas</li>
+        </ul>
+    </div>
+
+    <h2>PRECONDICIONES</h2>
+    <ul>
+        <li>Usuario autenticado con permisos de analista o superior</li>
+        <li>Conexión a internet estable para acceso a APIs de IA</li>
+        <li>Al menos una API key configurada y válida</li>
+        <li>Navegador web compatible con HTML5 y JavaScript ES6+</li>
+    </ul>
+
+    <h2>POSTCONDICIONES</h2>
+    <ul>
+        <li>Caso de uso almacenado correctamente en la base de datos</li>
+        <li>Documento generado disponible para descarga en formatos HTML y DOCX</li>
+        <li>Registro de auditoría creado con timestamp y usuario</li>
+        <li>Notificación de éxito mostrada al usuario</li>
+    </ul>
+
+    <h2>HISTORIA DE REVISIONES Y APROBACIONES</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 2.17in;">Fecha</th>
+                <th style="width: 2.17in;">Acción</th>
+                <th style="width: 2.17in;">Responsable</th>
+                <th style="width: 2.17in;">Comentario</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>28/01/2025</td>
+                <td>Creación inicial</td>
+                <td>Sistema AI</td>
+                <td>Caso de uso generado siguiendo normas ING v19</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
