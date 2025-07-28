@@ -297,6 +297,9 @@ export default function UseCaseGenerator() {
                   exportUseCaseMutation.mutate();
                 }
               }}
+              onTestCaseUpdate={(testData) => {
+                updateFormData(testData);
+              }}
             />
           </div>
         </div>

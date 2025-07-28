@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, FileText, Download, RefreshCw } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Eye, EyeOff, FileText, Download, RefreshCw, TestTube2 } from "lucide-react";
 import { UseCaseFormData } from "@/types/use-case";
+import { TestCaseStep } from "./steps/test-case-step";
 
 interface EnhancedDocumentPreviewProps {
   formData: UseCaseFormData;
@@ -11,6 +13,7 @@ interface EnhancedDocumentPreviewProps {
   generatedContent?: string;
   onRefresh?: () => void;
   onDownload?: () => void;
+  onTestCaseUpdate?: (testData: { generateTestCase: boolean; testCaseObjective: string; testCasePreconditions: string; testSteps: any[] }) => void;
 }
 
 export default function EnhancedDocumentPreview({ 
@@ -18,10 +21,12 @@ export default function EnhancedDocumentPreview({
   currentStep, 
   generatedContent,
   onRefresh,
-  onDownload 
+  onDownload,
+  onTestCaseUpdate
 }: EnhancedDocumentPreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [previewSections, setPreviewSections] = useState<string[]>([]);
+  const [isTestCaseModalOpen, setIsTestCaseModalOpen] = useState(false);
 
   // Generate dynamic preview based on current form state
   useEffect(() => {
@@ -239,6 +244,96 @@ export default function EnhancedDocumentPreview({
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Actualizar
                 </Button>
+                <Dialog open={isTestCaseModalOpen} onOpenChange={setIsTestCaseModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="text-purple-600 border-purple-200 hover:bg-purple-50">
+                      <TestTube2 className="w-4 h-4 mr-2" />
+                      Casos de Prueba
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="text-xl text-purple-900">
+                        Casos de Prueba - {formData.useCaseName || 'Caso de Uso'}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <TestCaseStep
+                      testCaseObjective={formData.testCaseObjective || ''}
+                      testCasePreconditions={formData.testCasePreconditions || ''}
+                      testSteps={formData.testSteps || []}
+                      onUpdateObjective={(value: string) => {
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({ 
+                            generateTestCase: true, 
+                            testCaseObjective: value, 
+                            testCasePreconditions: formData.testCasePreconditions || '', 
+                            testSteps: formData.testSteps || [] 
+                          });
+                        }
+                      }}
+                      onUpdatePreconditions={(value: string) => {
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({ 
+                            generateTestCase: true, 
+                            testCaseObjective: formData.testCaseObjective || '', 
+                            testCasePreconditions: value, 
+                            testSteps: formData.testSteps || [] 
+                          });
+                        }
+                      }}
+                      onAddTestStep={() => {
+                        const nextNumber = (formData.testSteps || []).length + 1;
+                        const newTestSteps = [...(formData.testSteps || []), {
+                          number: nextNumber,
+                          action: '',
+                          inputData: '',
+                          expectedResult: '',
+                          observations: '',
+                          status: ''
+                        }];
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({ 
+                            generateTestCase: true, 
+                            testCaseObjective: formData.testCaseObjective || '', 
+                            testCasePreconditions: formData.testCasePreconditions || '', 
+                            testSteps: newTestSteps 
+                          });
+                        }
+                      }}
+                      onRemoveTestStep={(index: number) => {
+                        const newTestSteps = (formData.testSteps || []).filter((_, i) => i !== index).map((step, i) => ({
+                          ...step,
+                          number: i + 1
+                        }));
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({ 
+                            generateTestCase: true, 
+                            testCaseObjective: formData.testCaseObjective || '', 
+                            testCasePreconditions: formData.testCasePreconditions || '', 
+                            testSteps: newTestSteps 
+                          });
+                        }
+                      }}
+                      onUpdateTestStep={(index: number, field: keyof TestStep, value: string | number) => {
+                        const newTestSteps = (formData.testSteps || []).map((step, i) => 
+                          i === index ? { ...step, [field]: value } : step
+                        );
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({ 
+                            generateTestCase: true, 
+                            testCaseObjective: formData.testCaseObjective || '', 
+                            testCasePreconditions: formData.testCasePreconditions || '', 
+                            testSteps: newTestSteps 
+                          });
+                        }
+                      }}
+                      clientName={formData.clientName}
+                      projectName={formData.projectName}
+                      useCaseName={formData.useCaseName}
+                      aiModel={formData.aiModel}
+                    />
+                  </DialogContent>
+                </Dialog>
                 <Button size="sm" onClick={onDownload} disabled={!generatedContent}>
                   <Download className="w-4 h-4 mr-2" />
                   .docx
