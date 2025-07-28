@@ -520,19 +520,69 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     if (aiModel && aiModel !== 'demo') {
       (service as any).selectedModel = aiModel;
     }
-    return service.improveFieldInstance(fieldName, fieldValue, fieldType, context);
+    return service.improveFieldInstance(fieldName, fieldValue, fieldType, context, aiModel);
   }
 
-  private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any): Promise<string> {
+  private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any, aiModel?: string): Promise<string> {
     try {
-      // For now, always use demo mode for field improvements to avoid API costs
-      const result = this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
-      return result;
+      // If no AI model specified or it's demo, use demo mode
+      if (!aiModel || aiModel === 'demo') {
+        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+      
+      // For special field types, use the specialized processing logic
+      if (fieldType === 'filtersFromText' || fieldType === 'columnsFromText' || fieldType === 'fieldsFromText') {
+        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+      
+      // Use real AI for regular field improvements
+      const rules = this.getFieldRules(fieldName, fieldType, context);
+      const contextPrompt = this.buildContextualPrompt(context);
+      
+      const prompt = `${contextPrompt}
+
+TAREA: Mejora el siguiente campo según las reglas especificadas.
+
+CAMPO: ${fieldName}
+VALOR ACTUAL: "${fieldValue}"
+TIPO: ${fieldType}
+
+REGLAS:
+${rules}
+
+INSTRUCCIONES:
+- Devuelve SOLO el valor mejorado, sin explicaciones
+- Mantén el formato y estructura apropiados
+- Si el campo está vacío, proporciona un ejemplo profesional y relevante
+- Para descripciones, usa lenguaje técnico pero comprensible
+
+RESPUESTA:`;
+
+      let improvedValue: string;
+      
+      switch (aiModel) {
+        case 'openai':
+          improvedValue = await this.callOpenAIForImprovement(prompt);
+          break;
+        case 'claude':
+          improvedValue = await this.callClaudeForImprovement(prompt);
+          break;
+        case 'grok':
+          improvedValue = await this.callGrokForImprovement(prompt);
+          break;
+        case 'gemini':
+          improvedValue = await this.callGeminiForImprovement(prompt);
+          break;
+        default:
+          return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+      
+      return improvedValue || fieldValue;
       
     } catch (error) {
       console.error('Error improving field:', error);
-      // Return original value if AI fails
-      return fieldValue || '';
+      // Fallback to demo mode if AI fails
+      return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
     }
   }
 
@@ -615,6 +665,52 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     }
     
     return contextPrompt;
+  }
+
+  private async callOpenAIForImprovement(prompt: string): Promise<string> {
+    const openai = getOpenAIClient();
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 500,
+      temperature: 0.3
+    });
+    return response.choices[0].message.content || '';
+  }
+
+  private async callClaudeForImprovement(prompt: string): Promise<string> {
+    const anthropic = getAnthropicClient();
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3
+    });
+    return response.content[0].text || '';
+  }
+
+  private async callGrokForImprovement(prompt: string): Promise<string> {
+    const grok = getGrokClient();
+    const response = await grok.chat.completions.create({
+      model: 'grok-2-1212',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 500,
+      temperature: 0.3
+    });
+    return response.choices[0].message.content || '';
+  }
+
+  private async callGeminiForImprovement(prompt: string): Promise<string> {
+    const ai = getGeminiClient();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        maxOutputTokens: 500,
+        temperature: 0.3
+      }
+    });
+    return response.text || '';
   }
 
   private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {
@@ -784,6 +880,12 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       }
       
       return columns.join('\n');
+    }
+
+    // Process fields from text description for entity fields  
+    if (fieldType === 'fieldsFromText') {
+      // For now, return fallback as this is complex JSON processing
+      return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
     }
 
     // Improve description fields with meaningful content
