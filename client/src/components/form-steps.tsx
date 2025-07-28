@@ -530,15 +530,7 @@ export default function FormSteps({
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
                     placeholder="Nombre del filtro (ej: Nombre)"
                   />
-                  <AIAssistButton
-                    fieldName={`searchFilter_${index}`}
-                    fieldValue={filter}
-                    fieldType="searchFilter"
-                    context={{ step: 5, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => onUpdateSearchFilter(index, value)}
-                    size="sm"
-                    aiModel={formData.aiModel}
-                  />
+
                   <Button 
                     type="button" 
                     variant="ghost"
@@ -642,15 +634,7 @@ export default function FormSteps({
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
                       placeholder="Nombre de la columna (ej: ID)"
                     />
-                    <AIAssistButton
-                      fieldName={`resultColumn_${index}`}
-                      fieldValue={column}
-                      fieldType="resultColumn"
-                      context={{ step: 6, useCaseType: formData.useCaseType }}
-                      onImprovement={(value) => onUpdateResultColumn(index, value)}
-                      size="sm"
-                      aiModel={formData.aiModel}
-                    />
+
                     <Button 
                       type="button" 
                       variant="ghost"
@@ -804,15 +788,7 @@ export default function FormSteps({
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
                         placeholder="Nombre del campo"
                       />
-                      <AIAssistButton
-                        fieldName={`entityField_${index}`}
-                        fieldValue={field.name}
-                        fieldType="entityField"
-                        context={{ step: 7, useCaseType: formData.useCaseType }}
-                        onImprovement={(value) => onUpdateEntityField(index, { name: value })}
-                        size="sm"
-                        aiModel={formData.aiModel}
-                      />
+
                     </div>
                     
                     <select 
@@ -1078,20 +1054,10 @@ export default function FormSteps({
                           value={description}
                           onChange={(e) => onUpdateWireframeDescription(index, e.target.value)}
                           rows={4}
-                          className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
                           placeholder={`Wireframe ${index + 1}: Describe la pantalla en lenguaje natural. Ej: Una pantalla de búsqueda donde el usuario puede filtrar por nombre, ver resultados en tabla y editar registros...`}
                         />
-                        <div className="absolute top-2 right-2">
-                          <AIAssistButton
-                            fieldName={`wireframeDescription_${index}`}
-                            fieldValue={description}
-                            fieldType="wireframeDescription"
-                            context={{ step: 8, useCaseType: formData.useCaseType }}
-                            onImprovement={(value) => onUpdateWireframeDescription(index, value)}
-                            size="sm"
-                            aiModel={formData.aiModel}
-                          />
-                        </div>
+
                       </div>
                       {(formData.wireframeDescriptions || []).length > 1 && (
                         <div className="flex justify-end">
@@ -1133,20 +1099,10 @@ export default function FormSteps({
                         value={flow}
                         onChange={(e) => onUpdateAlternativeFlow(index, e.target.value)}
                         rows={4}
-                        className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
                         placeholder={`Flujo alternativo ${index + 1}: Describe el escenario de error en lenguaje natural. Ej: Cuando el usuario busca un cliente que no existe, que pasa y como se maneja...`}
                       />
-                      <div className="absolute top-2 right-2">
-                        <AIAssistButton
-                          fieldName={`alternativeFlow_${index}`}
-                          fieldValue={flow}
-                          fieldType="alternativeFlow"
-                          context={{ step: 8, useCaseType: formData.useCaseType }}
-                          onImprovement={(value) => onUpdateAlternativeFlow(index, value)}
-                          size="sm"
-                          aiModel={formData.aiModel}
-                        />
-                      </div>
+
                     </div>
                     {(formData.alternativeFlows || []).length > 1 && (
                       <div className="flex justify-end">

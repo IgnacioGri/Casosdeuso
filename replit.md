@@ -121,6 +121,11 @@ Preferred communication style: Simple, everyday language.
 ✓ Added AI Assist usage explanations for applicable steps with clear instructions on how to leverage AI functionality
 ✓ Replaced legacy ContextualHelp component with new comprehensive help system covering all 9 form steps
 ✓ Integrated help dialogs with specific guidance for each use case type (entidad, api, proceso) and field-specific instructions
+✓ Streamlined AI Assist system by removing individual buttons from list items (January 28, 2025)
+✓ Removed individual AI Assist buttons from filters, columns, entity fields, wireframes, and alternative flows
+✓ Maintained only the main AI Assist functionality for text-to-list conversion in each step's description field
+✓ Simplified UX by focusing AI assistance on the primary conversion functions rather than individual item improvements
+✓ Updated form styling to remove unnecessary padding that was reserved for removed AI buttons
 
 ## System Architecture
 
