@@ -29,7 +29,7 @@ interface FormStepsProps {
   onRemoveAlternativeFlow: (index: number) => void;
   onUpdateAlternativeFlow: (index: number, value: string) => void;
   onLoadDemoData: () => void;
-  onLoadPremiumExample?: () => void;
+  onLoadComplexExample?: (type: UseCaseType) => void;
 }
 
 export default function FormSteps({
@@ -52,7 +52,7 @@ export default function FormSteps({
   onRemoveAlternativeFlow,
   onUpdateAlternativeFlow,
   onLoadDemoData,
-  onLoadPremiumExample
+  onLoadComplexExample
 }: FormStepsProps) {
 
   const handleInputChange = (field: keyof UseCaseFormData, value: any) => {
@@ -228,7 +228,7 @@ export default function FormSteps({
           onTypeSelect={(type) => handleInputChange('useCaseType', type)}
         />
 
-        {/* Botón de autocompletado para ejemplo Premium solo cuando está seleccionado "Gestión de Entidades" */}
+        {/* Botones de autocompletado específicos para cada tipo */}
         {formData.useCaseType === 'entity' && (
           <Card className="border-blue-200 bg-blue-50">
             <CardContent className="p-4">
@@ -236,14 +236,60 @@ export default function FormSteps({
                 <div>
                   <h4 className="font-medium text-blue-900">Ejemplo Complejo: Gestionar Clientes Premium</h4>
                   <p className="text-sm text-blue-700">
-                    Autocompletar con un caso de uso bancario completo y detallado
+                    Autocompletar con un caso de uso bancario completo para gestión de entidades
                   </p>
                 </div>
                 <Button
                   type="button"
-                  onClick={onLoadPremiumExample}
+                  onClick={() => onLoadComplexExample?.('entity')}
                   size="sm"
                   className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Autocompletar Ejemplo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {formData.useCaseType === 'api' && (
+          <Card className="border-green-200 bg-green-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-green-900">Ejemplo Complejo: API Consulta Saldos</h4>
+                  <p className="text-sm text-green-700">
+                    Autocompletar con un caso de uso bancario completo para servicios API
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => onLoadComplexExample?.('api')}
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Autocompletar Ejemplo
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {formData.useCaseType === 'service' && (
+          <Card className="border-purple-200 bg-purple-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium text-purple-900">Ejemplo Complejo: Proceso Cierre Diario</h4>
+                  <p className="text-sm text-purple-700">
+                    Autocompletar con un caso de uso bancario completo para procesos automáticos
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => onLoadComplexExample?.('service')}
+                  size="sm"
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   Autocompletar Ejemplo
                 </Button>

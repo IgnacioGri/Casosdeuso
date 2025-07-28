@@ -10,7 +10,7 @@ import FormSteps from "@/components/form-steps";
 import EnhancedDocumentPreview from "@/components/enhanced-document-preview";
 import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 import WireframePreview from "@/components/wireframe-preview";
-import ContextualHelp from "@/components/contextual-help";
+
 import { UseCase } from "@/types/use-case";
 
 export default function UseCaseGenerator() {
@@ -40,7 +40,7 @@ export default function UseCaseGenerator() {
     updateAlternativeFlow,
     validateStep,
     loadDemoData,
-    loadPremiumClientExample,
+    loadComplexExample,
     resetForm
   } = useUseCaseForm();
 
@@ -261,7 +261,7 @@ export default function UseCaseGenerator() {
               onRemoveAlternativeFlow={removeAlternativeFlow}
               onUpdateAlternativeFlow={updateAlternativeFlow}
               onLoadDemoData={handleLoadDemo}
-              onLoadPremiumExample={loadPremiumClientExample}
+              onLoadComplexExample={loadComplexExample}
             />
 
             {/* Navigation Buttons - Bottom */}
