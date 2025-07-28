@@ -37,13 +37,14 @@ export type UseCase = typeof useCases.$inferSelect;
 
 // Form data schemas
 export const entityFieldSchema = z.object({
-  name: z.string().min(1),
+  name: z.string(), // Permitir nombres vacíos, la validación se hace a nivel de formulario
   type: z.enum(['text', 'number', 'date', 'boolean', 'email']),
   length: z.number().optional(),
   mandatory: z.boolean().default(false),
 });
 
-export const useCaseFormSchema = z.object({
+// Base schema para validación común
+const baseUseCaseFormSchema = z.object({
   useCaseType: z.enum(['entity', 'api', 'service']),
   clientName: z.string().min(1, "El nombre del cliente es requerido"),
   projectName: z.string().min(1, "El nombre del proyecto es requerido"),
@@ -64,6 +65,9 @@ export const useCaseFormSchema = z.object({
     "Formato requerido: 2 letras + 3 números + nombre del caso de uso (ej: AB123GestionarUsuarios)"
   ),
   description: z.string().min(1, "La descripción es requerida"),
+  filtersDescription: z.string().optional(),
+  columnsDescription: z.string().optional(),
+  fieldsDescription: z.string().optional(),
   searchFilters: z.array(z.string()).default([]),
   resultColumns: z.array(z.string()).default([]),
   entityFields: z.array(entityFieldSchema).default([]),
@@ -82,6 +86,22 @@ export const useCaseFormSchema = z.object({
   webServiceCredentials: z.string().optional(),
   aiModel: z.enum(['demo', 'openai', 'claude', 'grok', 'gemini']),
 });
+
+// Schema con validación condicional según el tipo de caso de uso
+export const useCaseFormSchema = baseUseCaseFormSchema.refine(
+  (data) => {
+    // Para casos de uso tipo 'entity', al menos un campo de entidad debe tener nombre
+    if (data.useCaseType === 'entity') {
+      return data.entityFields.some(field => field.name.trim().length > 0);
+    }
+    // Para API y service, no se requieren campos de entidad
+    return true;
+  },
+  {
+    message: "Para casos de uso de entidad, debe especificar al menos un campo con nombre",
+    path: ["entityFields"]
+  }
+);
 
 export type UseCaseFormData = z.infer<typeof useCaseFormSchema>;
 export type EntityField = z.infer<typeof entityFieldSchema>;
