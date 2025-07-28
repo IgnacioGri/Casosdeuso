@@ -531,8 +531,17 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       }
       
       // For special field types, use the specialized processing logic
-      if (fieldType === 'filtersFromText' || fieldType === 'columnsFromText' || fieldType === 'fieldsFromText') {
+      if (fieldType === 'filtersFromText' || fieldType === 'columnsFromText') {
         return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+      
+      // For fieldsFromText, try AI first but fallback to enhanced demo if it fails
+      if (fieldType === 'fieldsFromText') {
+        try {
+          return await this.processEntityFieldsWithAI(fieldValue, aiModel);
+        } catch (error) {
+          return this.generateEnhancedEntityFields(fieldValue);
+        }
       }
       
       // Use real AI for regular field improvements
@@ -679,7 +688,7 @@ RESPUESTA:`;
   }
 
   private async callClaudeForImprovement(prompt: string): Promise<string> {
-    const anthropic = getAnthropicClient();
+    const anthropic = await getAnthropicClient();
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 500,
@@ -706,11 +715,159 @@ RESPUESTA:`;
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        maxOutputTokens: 500,
+        maxOutputTokens: 1000,
         temperature: 0.3
       }
     });
     return response.text || '';
+  }
+
+  private async processEntityFieldsWithAI(fieldValue: string, aiModel: string): Promise<string> {
+    if (!fieldValue || fieldValue.trim() === '') {
+      // Return demo content for empty fields
+      return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+    }
+
+    const prompt = `Convierte esta descripción de campos en JSON:
+
+"${fieldValue}"
+
+Formato requerido:
+[
+  {"name": "nombreCampo", "type": "text", "mandatory": true, "length": 100}
+]
+
+Reglas:
+- Nombres en camelCase español
+- Tipos: "text", "email", "number", "date", "boolean"
+- mandatory: true si dice "obligatorio", false si dice "opcional"
+- length: solo si se especifica longitud
+- Responde SOLO el JSON sin explicaciones`;
+
+    try {
+      let response: string;
+      
+      switch (aiModel) {
+        case 'openai':
+          response = await this.callOpenAIForImprovement(prompt);
+          break;
+        case 'claude':
+          response = await this.callClaudeForImprovement(prompt);
+          break;
+        case 'grok':
+          response = await this.callGrokForImprovement(prompt);
+          break;
+        case 'gemini':
+          response = await this.callGeminiForImprovement(prompt);
+          break;
+        default:
+          return this.getDemoFieldImprovement('', fieldValue, 'fieldsFromText');
+      }
+      
+      // Clean the response to extract just the JSON
+      let cleanedResponse = response.trim();
+      
+      // Remove markdown code blocks
+      cleanedResponse = cleanedResponse.replace(/```json\s*/gi, '').replace(/```\s*$/gi, '');
+      
+      const jsonStart = cleanedResponse.indexOf('[');
+      const jsonEnd = cleanedResponse.lastIndexOf(']') + 1;
+      
+      if (jsonStart !== -1 && jsonEnd > jsonStart) {
+        const jsonContent = cleanedResponse.substring(jsonStart, jsonEnd);
+        // Validate it's proper JSON
+        try {
+          JSON.parse(jsonContent);
+          return jsonContent;
+        } catch (e) {
+          return this.generateEnhancedEntityFields(fieldValue);
+        }
+      }
+      
+      return this.generateEnhancedEntityFields(fieldValue);
+      
+    } catch (error) {
+      return this.generateEnhancedEntityFields(fieldValue);
+    }
+  }
+
+  private generateEnhancedEntityFields(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+    }
+
+    const text = fieldValue.toLowerCase();
+    const fields: any[] = [];
+
+    // Patterns to identify different field types and characteristics
+    const fieldPatterns = [
+      // Nombre patterns
+      { patterns: ['nombre completo', 'nombre'], name: 'nombreCompleto', type: 'text' },
+      { patterns: ['apellido'], name: 'apellido', type: 'text' },
+      
+      // Contact patterns
+      { patterns: ['email', 'correo electronico', 'correo'], name: 'email', type: 'email' },
+      { patterns: ['telefono', 'teléfono', 'celular'], name: 'telefono', type: 'text' },
+      
+      // Date patterns
+      { patterns: ['fecha de nacimiento', 'fechanacimiento', 'nacimiento'], name: 'fechaNacimiento', type: 'date' },
+      { patterns: ['fecha de alta', 'fecha alta', 'fechaalta'], name: 'fechaAlta', type: 'date' },
+      { patterns: ['fecha de registro', 'fecha registro'], name: 'fechaRegistro', type: 'date' },
+      { patterns: ['fecha'], name: 'fecha', type: 'date' },
+      
+      // ID patterns
+      { patterns: ['numero de cliente', 'numero cliente', 'numerocliente'], name: 'numeroCliente', type: 'text' },
+      { patterns: ['dni', 'documento'], name: 'dni', type: 'text' },
+      { patterns: ['cuit', 'cuil'], name: 'cuit', type: 'text' },
+      { patterns: ['codigo'], name: 'codigo', type: 'text' },
+      { patterns: ['id'], name: 'id', type: 'number' },
+      
+      // Status patterns
+      { patterns: ['estado', 'estatus'], name: 'estado', type: 'boolean' },
+      { patterns: ['activo'], name: 'activo', type: 'boolean' },
+      
+      // Address patterns
+      { patterns: ['direccion', 'dirección'], name: 'direccion', type: 'text' },
+      { patterns: ['ciudad'], name: 'ciudad', type: 'text' },
+      { patterns: ['provincia'], name: 'provincia', type: 'text' },
+      { patterns: ['codigo postal', 'codigopostal'], name: 'codigoPostal', type: 'text' },
+      
+      // Other common patterns
+      { patterns: ['edad'], name: 'edad', type: 'number' },
+      { patterns: ['sueldo', 'salario'], name: 'sueldo', type: 'number' }
+    ];
+
+    // Extract field information from text
+    fieldPatterns.forEach(pattern => {
+      pattern.patterns.forEach(pat => {
+        if (text.includes(pat)) {
+          // Check if field already exists
+          if (!fields.some(f => f.name === pattern.name)) {
+            // Extract length if specified
+            const lengthMatch = text.match(new RegExp(`${pat}[^,]*?(?:máximo|maximo)\\s+(\\d+)\\s+caracteres`, 'i'));
+            const length = lengthMatch ? parseInt(lengthMatch[1]) : undefined;
+            
+            // Check if mandatory
+            const mandatory = text.includes(`${pat}[^,]*?obligatorio`) || text.includes(`${pat}[^,]*?requerido`);
+            const optional = text.includes(`${pat}[^,]*?opcional`);
+            
+            fields.push({
+              name: pattern.name,
+              type: pattern.type,
+              mandatory: mandatory ? true : optional ? false : true, // Default to true if not specified
+              ...(length && { length })
+            });
+          }
+        }
+      });
+    });
+
+    // If no fields were extracted, provide a basic structure
+    if (fields.length === 0) {
+      return '[\n  {"name": "nombre", "type": "text", "mandatory": true},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false}\n]';
+    }
+
+    return JSON.stringify(fields, null, 2);
   }
 
   private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {
@@ -807,7 +964,7 @@ RESPUESTA:`;
     if (fieldType === 'filtersFromText') {
       // Extract filter names from natural language description
       const text = fieldValue.toLowerCase();
-      let filters = [];
+      let filters: string[] = [];
       
       // Look for "filtrar por" pattern
       if (text.includes('filtrar por')) {
@@ -841,7 +998,7 @@ RESPUESTA:`;
     if (fieldType === 'columnsFromText') {
       // Extract column names from natural language description
       const text = fieldValue.toLowerCase();
-      let columns = [];
+      let columns: string[] = [];
       
       // Look for various column patterns
       const patterns = [
