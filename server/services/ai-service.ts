@@ -1229,19 +1229,8 @@ Reglas ING:
       return 'Ejemplo generado automáticamente según reglas ING';
     }
     
-    // Handle specialized field types with content FIRST
-    if (fieldType === 'wireframeDescription') {
-      return this.generateIntelligentWireframeDescription(fieldValue);
-    }
-    if (fieldType === 'alternativeFlow') {
-      return this.generateIntelligentAlternativeFlow(fieldValue);
-    }
-    if (fieldType === 'businessRules') {
-      return this.generateIntelligentBusinessRules(fieldValue);
-    }
-    if (fieldType === 'specialRequirements') {
-      return this.generateIntelligentSpecialRequirements(fieldValue);
-    }
+    // NOTE: Specialized field types are now handled in improveFieldInstance BEFORE calling this function
+    // This section is kept for backwards compatibility but should not be reached for specialized types
     
     // Improve existing values that have content
     if (fieldName_lower.includes('nombre') && fieldName_lower.includes('caso')) {
