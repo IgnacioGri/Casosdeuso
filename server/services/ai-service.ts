@@ -558,28 +558,12 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         }
       }
       
-      // Use real AI for regular field improvements
+      // Use real AI for regular field improvements with provider-specific optimization
       const rules = this.getFieldRules(fieldName, fieldType, context);
       const contextPrompt = this.buildContextualPrompt(context);
       
-      const prompt = `${contextPrompt}
-
-TAREA: Mejora el siguiente campo según las reglas especificadas.
-
-CAMPO: ${fieldName}
-VALOR ACTUAL: "${fieldValue}"
-TIPO: ${fieldType}
-
-REGLAS:
-${rules}
-
-INSTRUCCIONES:
-- Devuelve SOLO el valor mejorado, sin explicaciones
-- Mantén el formato y estructura apropiados
-- Si el campo está vacío, proporciona un ejemplo profesional y relevante
-- Para descripciones, usa lenguaje técnico pero comprensible
-
-RESPUESTA:`;
+      // Get optimized prompt for the specific AI provider
+      const prompt = this.buildProviderSpecificPrompt(aiModel, contextPrompt, fieldName, fieldValue, rules);
 
       // Log prompt in development mode
       if (process.env.NODE_ENV === 'development') {
@@ -1081,85 +1065,264 @@ Reglas ING:
 
   private generateIntelligentBusinessRules(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
-      return '1. El DNI debe ser único en el sistema\n2. No se puede eliminar un cliente con productos activos\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
+      return '1. El DNI debe ser único en el sistema\n   a. Validar formato correcto\n   b. Verificar no duplicación\n2. No se puede eliminar un cliente con productos activos\n   a. Validar productos asociados\n   b. Mostrar mensaje informativo\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
     }
 
-    // Clean input without forcing lowercase for business rules  
+    // Enhanced multi-level processing for business rules
     let text = fieldValue.trim();
-    
-    // Split by sentences, commas, or line breaks
     const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
-    let rules: string[] = [];
+    let items: string[] = [];
 
     parts.forEach((part) => {
-      let rule = part.trim();
-      if (rule.length === 0) return;
+      let item = part.trim();
+      if (item.length === 0) return;
       
-      // Remove existing numbering to avoid duplication
-      rule = rule.replace(/^\d+\.\s*/, '');
+      // Remove existing numbering
+      item = item.replace(/^\d+\.\s*/, '');
+      if (item.match(/^\d+\.?\s*$/) || item.length === 0) return;
       
-      // Skip if it's just a number or empty after cleaning
-      if (rule.match(/^\d+\.?\s*$/) || rule.length === 0) return;
+      // Clean and format
+      item = this.formatBusinessRuleText(item);
       
-      // Clean the rule text without forcing lowercase
-      rule = this.formatBusinessRuleText(rule);
+      // Detect content and add intelligent sub-items
+      const lowerItem = item.toLowerCase();
+      let mainItem = `${items.length + 1}. ${item}`;
+      let subItems: string[] = [];
       
-      // Add new numbering
-      rule = `${rules.length + 1}. ${rule}`;
+      if (lowerItem.includes('dni') || lowerItem.includes('unico')) {
+        subItems.push('a. Validar formato correcto');
+        subItems.push('b. Verificar no duplicación en sistema');
+      }
+      if (lowerItem.includes('validac') && (lowerItem.includes('email') || lowerItem.includes('correo'))) {
+        subItems.push('a. Verificar estructura de email');
+        subItems.push('b. Confirmar dominio válido');
+      }
+      if (lowerItem.includes('eliminar') || lowerItem.includes('activ')) {
+        subItems.push('a. Validar productos asociados');
+        subItems.push('b. Mostrar mensaje informativo');
+      }
       
-      rules.push(rule);
+      // Build complete item
+      if (subItems.length > 0) {
+        items.push(mainItem + '\n   ' + subItems.join('\n   '));
+      } else {
+        items.push(mainItem);
+      }
     });
 
-    return rules.join('\n');
+    return items.join('\n');
   }
 
   private generateIntelligentSpecialRequirements(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
-      return '1. Integración con servicio externo de scoring crediticio al momento del alta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
+      return '1. Integración con servicio externo de scoring crediticio al momento del alta\n   a. Definir formato de intercambio de datos\n   b. Configurar timeout de respuesta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n   a. Cache local para mejorar performance\n   b. Actualización automática cada 24 horas\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
     }
 
-    // Clean and normalize input
+    // Enhanced multi-level processing for special requirements
     let text = this.cleanInputText(fieldValue);
-    
-    // Split by sentences, commas, or line breaks
     const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
-    let requirements: string[] = [];
+    let items: string[] = [];
 
     parts.forEach((part) => {
-      let req = part.trim();
-      if (req.length === 0) return;
+      let item = part.trim();
+      if (item.length === 0) return;
       
-      // Remove existing numbering to avoid duplication
-      req = req.replace(/^\d+\.\s*/, '');
-      
-      // Skip if it's just a number or empty after cleaning
-      if (req.match(/^\d+\.?\s*$/) || req.length === 0) return;
+      // Remove existing numbering
+      item = item.replace(/^\d+\.\s*/, '');
+      if (item.match(/^\d+\.?\s*$/) || item.length === 0) return;
       
       // Clean the requirement text
-      req = this.cleanInputText(req);
+      item = this.cleanInputText(item);
       
-      // Add new numbering
-      req = `${requirements.length + 1}. ${req}`;
+      // Detect content and add intelligent sub-items
+      const lowerItem = item.toLowerCase();
+      let mainItem = `${items.length + 1}. ${item}`;
+      let subItems: string[] = [];
       
-      // Enhance technical requirements
-      const lowerReq = req.toLowerCase();
-      if (lowerReq.includes('tiempo') && !lowerReq.includes('máximo') && !lowerReq.includes('segundos')) {
-        req += ' (especificar límite máximo aceptable)';
+      if (lowerItem.includes('integra') || lowerItem.includes('servicio')) {
+        subItems.push('a. Definir formato de intercambio de datos');
+        subItems.push('b. Configurar timeout de respuesta');
       }
-      if (lowerReq.includes('integra') && !lowerReq.includes('formato')) {
-        req += ' - definir formato de intercambio de datos';
+      if (lowerItem.includes('combo') || lowerItem.includes('dinamico')) {
+        subItems.push('a. Cache local para mejorar performance');
+        subItems.push('b. Actualización automática periódica');
       }
-      if (lowerReq.includes('validac') && !lowerReq.includes('obligator')) {
-        req += ' con validación obligatoria';
+      
+      // Add enhancements
+      if (lowerItem.includes('tiempo') && !lowerItem.includes('máximo')) {
+        mainItem += ' (especificar límite máximo aceptable)';
+      }
+      if (lowerItem.includes('validac') && !lowerItem.includes('obligator')) {
+        mainItem += ' con validación obligatoria';
       }
       
       // Professional formatting
-      req = this.formatProfessionalText(req);
+      mainItem = this.formatProfessionalText(mainItem);
       
-      requirements.push(req);
+      // Build complete item
+      if (subItems.length > 0) {
+        items.push(mainItem + '\n   ' + subItems.join('\n   '));
+      } else {
+        items.push(mainItem);
+      }
     });
 
-    return requirements.join('\n');
+    return items.join('\n');
+  }
+
+  // Provider-specific prompt optimization for different AI models
+  private buildProviderSpecificPrompt(aiModel: string, contextPrompt: string, fieldName: string, fieldValue: string, rules: string): string {
+    const baseTask = `TAREA: Mejora el siguiente campo según las reglas especificadas.
+
+CAMPO: ${fieldName}
+VALOR ACTUAL: "${fieldValue}"
+REGLAS: ${rules}`;
+
+    switch (aiModel) {
+      case 'openai':
+        // OpenAI works best with structured, step-by-step instructions
+        return `${contextPrompt}
+
+${baseTask}
+
+INSTRUCCIONES PASO A PASO:
+1. Analiza el valor actual del campo
+2. Aplica las reglas especificadas de ING
+3. Mejora el contenido manteniendo el contexto profesional
+4. Responde ÚNICAMENTE con el contenido mejorado
+5. NO agregues explicaciones ni comentarios adicionales
+6. NO uses formato markdown ni bloques de código
+
+RESPUESTA:`;
+
+      case 'claude':
+        // Claude excels with clear context and reasoning
+        return `${contextPrompt}
+
+${baseTask}
+
+CONTEXTO: Estás mejorando documentación técnica para un sistema bancario siguiendo estándares ING.
+
+OBJETIVO: Transformar el valor actual en una versión profesional que cumpla con las reglas especificadas.
+
+FORMATO DE RESPUESTA: Proporciona únicamente el contenido mejorado, sin explicaciones adicionales.
+
+CONTENIDO MEJORADO:`;
+
+      case 'grok':
+        // Grok performs well with direct, no-nonsense instructions
+        return `${contextPrompt}
+
+${baseTask}
+
+INSTRUCCIONES DIRECTAS:
+- Mejora el contenido siguiendo las reglas ING
+- Mantén el estilo profesional bancario
+- Responde solo con el contenido mejorado
+- Sin explicaciones ni formateo extra
+
+RESULTADO:`;
+
+      case 'gemini':
+        // Gemini works well with structured JSON-like instructions
+        return `${contextPrompt}
+
+${baseTask}
+
+INSTRUCCIONES:
+{
+  "accion": "mejorar_campo",
+  "estilo": "profesional_bancario_ING",
+  "formato_respuesta": "solo_contenido_mejorado",
+  "restricciones": ["sin_explicaciones", "sin_markdown", "aplicar_reglas_ING"]
+}
+
+CONTENIDO MEJORADO:`;
+
+      default:
+        // Fallback generic prompt
+        return `${contextPrompt}
+
+${baseTask}
+
+INSTRUCCIONES:
+1. Mejora el contenido siguiendo las reglas especificadas
+2. Mantén el contexto profesional ING
+3. Responde ÚNICAMENTE con el contenido mejorado
+4. NO agregues explicaciones ni comentarios adicionales
+
+CONTENIDO MEJORADO:`;
+    }
+  }
+
+  // Enhanced multi-level list generator for ING compliance
+  private generateMultiLevelList(fieldValue: string, listType: 'businessRules' | 'specialRequirements'): string {
+    let text = fieldValue.trim();
+    
+    // Split by sentences, commas, or line breaks
+    const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
+    let items: string[] = [];
+
+    parts.forEach((part) => {
+      let item = part.trim();
+      if (item.length === 0) return;
+      
+      // Remove existing numbering to avoid duplication
+      item = item.replace(/^\d+\.\s*/, '');
+      
+      // Skip if it's just a number or empty after cleaning
+      if (item.match(/^\d+\.?\s*$/) || item.length === 0) return;
+      
+      // Clean the item text
+      item = listType === 'businessRules' ? this.formatBusinessRuleText(item) : this.cleanInputText(item);
+      
+      // Detect if this item needs sub-items based on content analysis
+      const lowerItem = item.toLowerCase();
+      let mainItem = `${items.length + 1}. ${item}`;
+      let subItems: string[] = [];
+      
+      // Add intelligent sub-items based on content analysis
+      if (listType === 'businessRules') {
+        if (lowerItem.includes('dni') || lowerItem.includes('unico')) {
+          subItems.push('a. Validar formato correcto');
+          subItems.push('b. Verificar no duplicación en sistema');
+        }
+        if (lowerItem.includes('validac') && (lowerItem.includes('format') || lowerItem.includes('email'))) {
+          subItems.push('a. Verificar estructura de email');
+          subItems.push('b. Confirmar dominio válido');
+        }
+        if (lowerItem.includes('eliminar') || lowerItem.includes('activ')) {
+          subItems.push('a. Validar productos asociados');
+          subItems.push('b. Mostrar mensaje informativo');
+        }
+      }
+      
+      if (listType === 'specialRequirements') {
+        if (lowerItem.includes('integra') || lowerItem.includes('servicio')) {
+          subItems.push('a. Definir formato de intercambio de datos');
+          subItems.push('b. Configurar timeout de respuesta');
+        }
+        if (lowerItem.includes('combo') || lowerItem.includes('dinamico')) {
+          subItems.push('a. Cache local para mejorar performance');
+          subItems.push('b. Actualización automática periódica');
+        }
+        if (lowerItem.includes('tiempo') && !lowerItem.includes('máximo')) {
+          mainItem += ' (especificar límite máximo aceptable)';
+        }
+        if (lowerItem.includes('validac') && !lowerItem.includes('obligator')) {
+          mainItem += ' con validación obligatoria';
+        }
+      }
+      
+      // Build the complete item with sub-items
+      if (subItems.length > 0) {
+        items.push(mainItem + '\n   ' + subItems.join('\n   '));
+      } else {
+        items.push(mainItem);
+      }
+    });
+
+    return items.join('\n');
   }
 
   private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {
