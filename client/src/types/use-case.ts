@@ -27,7 +27,9 @@ export interface UseCaseFormData {
   specialRequirements?: string;
   generateWireframes: boolean;
   wireframeDescriptions?: string[];
+  wireframesDescription?: string;
   alternativeFlows?: string[];
+  alternativeFlowsDescription?: string;
   aiModel: AIModel;
   // Campos específicos para tipos de casos de uso
   apiEndpoint?: string;
