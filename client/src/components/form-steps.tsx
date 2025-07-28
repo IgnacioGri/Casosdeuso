@@ -528,28 +528,32 @@ export default function FormSteps({
               </label>
               <div className="relative">
                 <textarea
-                  placeholder="Ej: La tabla de resultados debe mostrar el ID del cliente, nombre completo, email, teléfono, fecha de registro, estado actual y tipo de segmento..."
+                  value={formData.columnsDescription || ''}
+                  onChange={(e) => handleInputChange('columnsDescription', e.target.value)}
+                  placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
                   rows={4}
                   className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
                 />
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
                     fieldName="resultColumnsDescription"
-                    fieldValue=""
+                    fieldValue={formData.columnsDescription || ''}
                     fieldType="columnsFromText"
                     context={{ step: 6, useCaseType: formData.useCaseType }}
                     onImprovement={(value) => {
                       // Procesar el texto y crear columnas automáticamente
                       const columns = value.split('\n').filter(c => c.trim()).map(c => c.trim());
-                      columns.forEach(column => {
-                        onAddResultColumn();
-                        setTimeout(() => {
-                          const currentColumns = formData.resultColumns;
-                          const lastIndex = currentColumns.length - 1;
-                          if (lastIndex >= 0) {
-                            onUpdateResultColumn(lastIndex, column);
-                          }
-                        }, 10);
+                      
+                      // Limpiar columnas existentes vacías
+                      const cleanedColumns = formData.resultColumns.filter(c => c.trim() !== '');
+                      
+                      // Crear la nueva lista de columnas
+                      const allColumns = [...cleanedColumns, ...columns];
+                      
+                      // Actualizar el estado con todas las columnas de una vez
+                      onUpdateFormData({ 
+                        resultColumns: allColumns,
+                        columnsDescription: value 
                       });
                     }}
                     aiModel={formData.aiModel}

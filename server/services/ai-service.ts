@@ -741,6 +741,40 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       return filters.join('\n');
     }
 
+    // Process columns from text description  
+    if (fieldType === 'columnsFromText') {
+      // Extract column names from natural language description
+      const text = fieldValue.toLowerCase();
+      let columns = [];
+      
+      // Look for "mostrar" pattern specifically
+      if (text.includes('mostrar')) {
+        const afterMostrar = text.split('mostrar')[1];
+        if (afterMostrar) {
+          // Split by common separators and clean
+          columns = afterMostrar
+            .split(/[,y]/)
+            .map(c => c.trim())
+            .filter(c => c.length > 0)
+            .map(c => {
+              // Remove common words and capitalize
+              return c.replace(/^(el|la|los|las|de|del|para|con)\s+/gi, '')
+                .trim()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            });
+        }
+      }
+      
+      // If no columns extracted, provide fallback
+      if (columns.length === 0) {
+        return 'ID\nNombre\nEmail\nEstado\nFecha Registro';
+      }
+      
+      return columns.join('\n');
+    }
+
     // Improve description fields with meaningful content
     if (fieldName_lower.includes('descripcion') || fieldName_lower === 'description') {
       // Check if it's placeholder text that needs replacement
