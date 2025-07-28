@@ -419,28 +419,32 @@ export default function FormSteps({
               </label>
               <div className="relative">
                 <textarea
-                  placeholder="Ej: Los usuarios podrán filtrar por nombre del cliente, estado del cliente (activo/inactivo), fecha de registro, y tipo de segmento..."
+                  value={formData.filtersDescription || ''}
+                  onChange={(e) => handleInputChange('filtersDescription', e.target.value)}
+                  placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
                   rows={4}
                   className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
                 />
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
                     fieldName="searchFiltersDescription"
-                    fieldValue=""
+                    fieldValue={formData.filtersDescription || ''}
                     fieldType="filtersFromText"
                     context={{ step: 5, useCaseType: formData.useCaseType }}
                     onImprovement={(value) => {
                       // Procesar el texto y crear filtros automáticamente
                       const filters = value.split('\n').filter(f => f.trim()).map(f => f.trim());
-                      filters.forEach(filter => {
-                        onAddSearchFilter();
-                        setTimeout(() => {
-                          const currentFilters = formData.searchFilters;
-                          const lastIndex = currentFilters.length - 1;
-                          if (lastIndex >= 0) {
-                            onUpdateSearchFilter(lastIndex, filter);
-                          }
-                        }, 10);
+                      
+                      // Limpiar filtros existentes vacíos
+                      const cleanedFilters = formData.searchFilters.filter(f => f.trim() !== '');
+                      
+                      // Crear la nueva lista de filtros
+                      const allFilters = [...cleanedFilters, ...filters];
+                      
+                      // Actualizar el estado con todos los filtros de una vez
+                      onUpdateFormData({ 
+                        searchFilters: allFilters,
+                        filtersDescription: value 
                       });
                     }}
                     aiModel={formData.aiModel}

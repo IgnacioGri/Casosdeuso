@@ -707,6 +707,40 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       return fieldValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
     }
     
+    // Process filters from text description
+    if (fieldType === 'filtersFromText') {
+      // Extract filter names from natural language description
+      const text = fieldValue.toLowerCase();
+      let filters = [];
+      
+      // Look for "filtrar por" pattern
+      if (text.includes('filtrar por')) {
+        const afterFiltrar = text.split('filtrar por')[1];
+        if (afterFiltrar) {
+          // Extract the filter list part and split by common separators
+          filters = afterFiltrar
+            .split(/[,y]/)
+            .map(f => f.trim())
+            .filter(f => f.length > 0)
+            .map(f => {
+              // Remove common words and capitalize
+              return f.replace(/^(el|la|los|las|de|del|para|con)\s+/gi, '')
+                .trim()
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+            });
+        }
+      }
+      
+      // If no filters extracted or empty, provide fallback
+      if (filters.length === 0) {
+        return 'Nombre\nFecha de registro\nEstado\nTipo';
+      }
+      
+      return filters.join('\n');
+    }
+
     // Improve description fields with meaningful content
     if (fieldName_lower.includes('descripcion') || fieldName_lower === 'description') {
       // Check if it's placeholder text that needs replacement

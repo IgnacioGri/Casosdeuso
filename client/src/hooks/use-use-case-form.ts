@@ -11,6 +11,7 @@ export function useUseCaseForm() {
     useCaseName: '',
     fileName: '',
     description: '',
+    filtersDescription: '',
     searchFilters: [''],
     resultColumns: [''],
     entityFields: [{
