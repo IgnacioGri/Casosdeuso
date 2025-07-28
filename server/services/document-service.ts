@@ -49,7 +49,8 @@ export class DocumentService {
             transformation: {
               width: 600,  // Adjusted width for header  
               height: 80   // Adjusted height for header
-            }
+            },
+            type: "png"
           });
         } catch (imageError) {
           console.error('Error creating ImageRun:', imageError);
@@ -346,12 +347,11 @@ export class DocumentService {
                   bold: true,
                   font: "Segoe UI Semilight",
                   size: 20
-                })] : this.parseFormattedText(cellHtml).map(run => new TextRun({
-                  text: run.text || "",
-                  bold: run.bold,
+                })] : [new TextRun({
+                  text: this.extractTextContent(cellHtml),
                   font: "Segoe UI Semilight", 
                   size: 20
-                }))
+                })]
               })
             ],
             shading: isHeader ? {

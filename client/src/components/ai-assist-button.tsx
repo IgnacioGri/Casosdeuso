@@ -31,7 +31,7 @@ export function AIAssistButton({
 
   const improveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch('/api/use-cases/ai-assist', {
+      const response = await fetch('/api/ai-assist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
