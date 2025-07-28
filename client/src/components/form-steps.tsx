@@ -660,6 +660,20 @@ export default function FormSteps({
                           // Crear la nueva lista de campos
                           const allFields = [...cleanedFields];
                           
+                          // Crear texto estructurado para el feedback visual
+                          const structuredText = fields.map(field => {
+                            const typeText = field.type === 'text' ? 'texto' : 
+                                           field.type === 'email' ? 'email' : 
+                                           field.type === 'number' ? 'número' : 
+                                           field.type === 'date' ? 'fecha' : 
+                                           field.type === 'boolean' ? 'booleano' : field.type;
+                            
+                            const mandatoryText = field.mandatory ? 'obligatorio' : 'opcional';
+                            const lengthText = field.length ? `, máximo ${field.length} caracteres` : '';
+                            
+                            return `• ${field.name} (${typeText}, ${mandatoryText}${lengthText})`;
+                          }).join('\n');
+                          
                           fields.forEach(field => {
                             allFields.push({
                               name: field.name || '',
@@ -669,10 +683,10 @@ export default function FormSteps({
                             });
                           });
                           
-                          // Actualizar el estado con todos los campos de una vez
+                          // Actualizar tanto el texto estructurado como los campos
                           onUpdateFormData({ 
                             entityFields: allFields,
-                            fieldsDescription: formData.fieldsDescription || '' 
+                            fieldsDescription: structuredText
                           });
                         }
                       } catch (error) {
@@ -681,6 +695,8 @@ export default function FormSteps({
                         const fieldNames = value.split('\n').filter(f => f.trim()).map(f => f.trim());
                         const cleanedFields = formData.entityFields.filter(f => f.name.trim() !== '');
                         const allFields = [...cleanedFields];
+                        
+                        const structuredText = fieldNames.map(name => `• ${name} (texto, opcional)`).join('\n');
                         
                         fieldNames.forEach(fieldName => {
                           allFields.push({
@@ -693,7 +709,7 @@ export default function FormSteps({
                         
                         onUpdateFormData({ 
                           entityFields: allFields,
-                          fieldsDescription: formData.fieldsDescription || '' 
+                          fieldsDescription: structuredText
                         });
                       }
                     }}
