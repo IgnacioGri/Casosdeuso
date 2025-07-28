@@ -57,9 +57,24 @@ export function LiveValidation({ value, type, label }: LiveValidationProps) {
     
     // Lista de verbos válidos en infinitivo
     const validVerbs = [
-      'gestionar', 'crear', 'modificar', 'eliminar', 'consultar', 'buscar', 'generar',
-      'procesar', 'validar', 'enviar', 'recibir', 'actualizar', 'registrar', 'configurar',
-      'administrar', 'mantener', 'calcular', 'exportar', 'importar', 'sincronizar'
+      // Verbos básicos de gestión
+      'gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar',
+      // Verbos de inicio y control
+      'iniciar', 'arrancar', 'comenzar', 'empezar', 'lanzar', 'ejecutar', 'correr', 'activar', 'desactivar', 'parar', 'detener', 'terminar', 'finalizar', 'cerrar', 'abrir', 'pausar', 'reanudar', 'reiniciar', 'resetear',
+      // Verbos de autenticación y seguridad
+      'autenticar', 'autorizar', 'autentificar', 'verificar', 'validar', 'confirmar', 'aprobar', 'rechazar', 'denegar', 'bloquear', 'desbloquear', 'encriptar', 'desencriptar', 'firmar', 'certificar',
+      // Verbos de comunicación
+      'notificar', 'avisar', 'alertar', 'informar', 'comunicar', 'publicar', 'compartir', 'difundir', 'transmitir', 'propagar',
+      // Verbos de operaciones bancarias
+      'transferir', 'depositar', 'retirar', 'acreditar', 'debitar', 'cargar', 'abonar', 'cobrar', 'pagar', 'facturar', 'liquidar', 'compensar', 'conciliar',
+      // Verbos de mantenimiento
+      'mantener', 'conservar', 'preservar', 'actualizar', 'refrescar', 'renovar', 'restaurar', 'recuperar', 'reparar', 'corregir', 'optimizar', 'mejorar',
+      // Verbos de integración
+      'integrar', 'conectar', 'vincular', 'enlazar', 'asociar', 'relacionar', 'mapear', 'transformar', 'convertir', 'adaptar', 'migrar', 'replicar',
+      // Verbos de control y monitoreo
+      'monitorear', 'supervisar', 'controlar', 'vigilar', 'observar', 'rastrear', 'seguir', 'auditar', 'inspeccionar', 'revisar', 'evaluar', 'medir',
+      // Verbos de administración
+      'administrar', 'dirigir', 'gobernar', 'regular', 'coordinar', 'organizar', 'planificar', 'programar', 'agendar', 'asignar', 'distribuir', 'delegar'
     ];
     
     const firstWord = name.toLowerCase().split(' ')[0];
@@ -67,7 +82,7 @@ export function LiveValidation({ value, type, label }: LiveValidationProps) {
     if (!validVerbs.includes(firstWord)) {
       return { 
         isValid: false, 
-        message: `Debe comenzar con un verbo en infinitivo (ej: ${validVerbs.slice(0, 3).join(', ')})`, 
+        message: `Debe comenzar con un verbo en infinitivo (ej: gestionar, crear, iniciar, procesar, transferir, autenticar)`, 
         type: 'error' as const 
       };
     }

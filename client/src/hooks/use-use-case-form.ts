@@ -209,7 +209,26 @@ export function useUseCaseForm() {
       case 3:
         return !!(formData.clientName && formData.projectName && formData.useCaseCode); // Basic Info
       case 4:
-        const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar'];
+        const infinitiveVerbs = [
+          // Verbos básicos de gestión
+          'gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar',
+          // Verbos de inicio y control
+          'iniciar', 'arrancar', 'comenzar', 'empezar', 'lanzar', 'ejecutar', 'correr', 'activar', 'desactivar', 'parar', 'detener', 'terminar', 'finalizar', 'cerrar', 'abrir', 'pausar', 'reanudar', 'reiniciar', 'resetear',
+          // Verbos de autenticación y seguridad
+          'autenticar', 'autorizar', 'autentificar', 'verificar', 'validar', 'confirmar', 'aprobar', 'rechazar', 'denegar', 'bloquear', 'desbloquear', 'encriptar', 'desencriptar', 'firmar', 'certificar',
+          // Verbos de comunicación
+          'notificar', 'avisar', 'alertar', 'informar', 'comunicar', 'publicar', 'compartir', 'difundir', 'transmitir', 'propagar',
+          // Verbos de operaciones bancarias
+          'transferir', 'depositar', 'retirar', 'acreditar', 'debitar', 'cargar', 'abonar', 'cobrar', 'pagar', 'facturar', 'liquidar', 'compensar', 'conciliar',
+          // Verbos de mantenimiento
+          'mantener', 'conservar', 'preservar', 'actualizar', 'refrescar', 'renovar', 'restaurar', 'recuperar', 'reparar', 'corregir', 'optimizar', 'mejorar',
+          // Verbos de integración
+          'integrar', 'conectar', 'vincular', 'enlazar', 'asociar', 'relacionar', 'mapear', 'transformar', 'convertir', 'adaptar', 'migrar', 'replicar',
+          // Verbos de control y monitoreo
+          'monitorear', 'supervisar', 'controlar', 'vigilar', 'observar', 'rastrear', 'seguir', 'auditar', 'inspeccionar', 'revisar', 'evaluar', 'medir',
+          // Verbos de administración
+          'administrar', 'dirigir', 'gobernar', 'regular', 'coordinar', 'organizar', 'planificar', 'programar', 'agendar', 'asignar', 'distribuir', 'delegar'
+        ];
         const startsWithInfinitive = infinitiveVerbs.some(verb => 
           formData.useCaseName.toLowerCase().startsWith(verb)
         );
