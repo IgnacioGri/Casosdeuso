@@ -525,11 +525,8 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
   private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any): Promise<string> {
     try {
-      console.log(`AI Assist: improving field "${fieldName}" with value "${fieldValue}" (type: ${fieldType})`);
-      
       // For now, always use demo mode for field improvements to avoid API costs
       const result = this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
-      console.log(`AI Assist result: "${result}"`);
       return result;
       
     } catch (error) {
@@ -710,9 +707,46 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       return fieldValue.replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '');
     }
     
+    // Improve description fields with meaningful content
+    if (fieldName_lower.includes('descripcion') || fieldName_lower === 'description') {
+      // Check if it's placeholder text that needs replacement
+      const placeholderText = ['completar', 'algo relevante', 'rellenar', 'escribir aqui', 'ejemplo'];
+      const hasPlaceholder = placeholderText.some(placeholder => 
+        fieldValue.toLowerCase().includes(placeholder)
+      );
+      
+      if (hasPlaceholder || fieldValue.length < 20) {
+        return 'Este caso de uso permite al operador del área de atención gestionar los datos de clientes del segmento Premium. Incluye funcionalidades de búsqueda, alta, modificación y eliminación de clientes, validando condiciones específicas según políticas del banco.';
+      }
+      
+      // If it's already a good description, just improve formatting
+      const improved = fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
+      if (!improved.endsWith('.')) {
+        return improved + '.';
+      }
+      return improved;
+    }
+    
+    // Improve client name field
+    if (fieldName_lower.includes('cliente') || fieldName_lower === 'clientname') {
+      if (fieldValue.toLowerCase().includes('ejemplo') || fieldValue.toLowerCase().includes('test')) {
+        return 'Banco Provincia';
+      }
+      return fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
+    }
+    
+    // Improve project name field
+    if (fieldName_lower.includes('proyecto') || fieldName_lower === 'projectname') {
+      if (fieldValue.toLowerCase().includes('ejemplo') || fieldValue.toLowerCase().includes('test')) {
+        return 'Gestión Integral de Clientes';
+      }
+      return fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
+    }
+    
     // Default improvement: capitalize first letter for text fields
     if (fieldType === 'text' || fieldType === 'textarea') {
-      return fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
+      const improved = fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
+      return improved;
     }
     
     return fieldValue;
