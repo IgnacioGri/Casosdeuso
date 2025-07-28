@@ -747,23 +747,34 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       const text = fieldValue.toLowerCase();
       let columns = [];
       
-      // Look for "mostrar" pattern specifically
-      if (text.includes('mostrar')) {
-        const afterMostrar = text.split('mostrar')[1];
-        if (afterMostrar) {
-          // Split by common separators and clean
-          columns = afterMostrar
-            .split(/[,y]/)
-            .map(c => c.trim())
-            .filter(c => c.length > 0)
-            .map(c => {
-              // Remove common words and capitalize
-              return c.replace(/^(el|la|los|las|de|del|para|con)\s+/gi, '')
-                .trim()
-                .split(' ')
-                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                .join(' ');
-            });
+      // Look for various column patterns
+      const patterns = [
+        'mostrar',
+        'columnas de',
+        'tener columnas de',
+        'incluir',
+        'campos de'
+      ];
+      
+      for (const pattern of patterns) {
+        if (text.includes(pattern)) {
+          const afterPattern = text.split(pattern)[1];
+          if (afterPattern) {
+            // Split by common separators and clean
+            columns = afterPattern
+              .split(/[,y]/)
+              .map(c => c.trim())
+              .filter(c => c.length > 0)
+              .map(c => {
+                // Remove common words and capitalize
+                return c.replace(/^(el|la|los|las|de|del|para|con)\s+/gi, '')
+                  .trim()
+                  .split(' ')
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ');
+              });
+            break;
+          }
         }
       }
       
