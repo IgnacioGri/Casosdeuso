@@ -535,6 +535,20 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
       }
       
+      // For complex structured fields, use our intelligent processors
+      if (fieldType === 'wireframeDescription') {
+        return this.generateIntelligentWireframeDescription(fieldValue);
+      }
+      if (fieldType === 'alternativeFlow') {
+        return this.generateIntelligentAlternativeFlow(fieldValue);
+      }
+      if (fieldType === 'businessRules') {
+        return this.generateIntelligentBusinessRules(fieldValue);
+      }
+      if (fieldType === 'specialRequirements') {
+        return this.generateIntelligentSpecialRequirements(fieldValue);
+      }
+      
       // For fieldsFromText, try AI first but fallback to enhanced demo if it fails
       if (fieldType === 'fieldsFromText') {
         try {
@@ -870,6 +884,170 @@ Reglas:
     return JSON.stringify(fields, null, 2);
   }
 
+  private generateIntelligentWireframeDescription(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return 'Panel de búsqueda con filtros (Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta) y botón "Buscar". Tabla de resultados mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado con botones "Editar" y "Ver Detalle" por fila.';
+    }
+
+    const text = fieldValue.toLowerCase();
+    let description = fieldValue.trim();
+
+    // Enhance basic descriptions with professional formatting and additional details
+    if (text.length < 50) {
+      // Add context if description is too short
+      if (text.includes('buscar') || text.includes('filtro')) {
+        description = `Panel de búsqueda con ${description}. Tabla de resultados con opciones de editar y ver detalle.`;
+      } else if (text.includes('formulario') || text.includes('form')) {
+        description = `Formulario estructurado con ${description}. Incluye validaciones y botones de guardar/cancelar.`;
+      } else if (text.includes('tabla') || text.includes('list')) {
+        description = `${description} con funcionalidades de ordenamiento, paginación y acciones por fila.`;
+      }
+    }
+
+    // Ensure professional formatting
+    description = description.charAt(0).toUpperCase() + description.slice(1);
+    if (!description.endsWith('.')) {
+      description += '.';
+    }
+
+    return description;
+  }
+
+  private generateIntelligentAlternativeFlow(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return 'Cliente inexistente: Al buscar un cliente que no existe en la base de datos, mostrar mensaje "Cliente no encontrado" con opciones para "Crear nuevo cliente" o "Refinar búsqueda".';
+    }
+
+    const text = fieldValue.toLowerCase();
+    let flow = fieldValue.trim();
+
+    // Add structure if missing
+    if (!flow.includes(':')) {
+      // Add a descriptive title
+      if (text.includes('error') || text.includes('falla')) {
+        flow = `Error del sistema: ${flow}`;
+      } else if (text.includes('no encontr') || text.includes('inexistent')) {
+        flow = `Registro inexistente: ${flow}`;
+      } else if (text.includes('permiso') || text.includes('acceso')) {
+        flow = `Sin permisos: ${flow}`;
+      } else {
+        flow = `Situación alternativa: ${flow}`;
+      }
+    }
+
+    // Ensure professional formatting and add resolution if missing
+    if (!text.includes('mostrar') && !text.includes('mensaje') && !text.includes('opcion')) {
+      flow += '. Mostrar mensaje informativo con opciones para el usuario.';
+    }
+
+    flow = flow.charAt(0).toUpperCase() + flow.slice(1);
+    if (!flow.endsWith('.')) {
+      flow += '.';
+    }
+
+    return flow;
+  }
+
+  private generateIntelligentBusinessRules(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return '1. El DNI debe ser único en el sistema\n2. No se puede eliminar un cliente con productos activos\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
+    }
+
+    const text = fieldValue;
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    let rules: string[] = [];
+
+    lines.forEach((line, index) => {
+      let rule = line.trim();
+      
+      // Add numbering if not present
+      if (!rule.match(/^\d+\./)) {
+        rule = `${index + 1}. ${rule}`;
+      }
+      
+      // Ensure professional formatting
+      rule = rule.charAt(0).toUpperCase() + rule.slice(1);
+      if (!rule.endsWith('.') && !rule.endsWith(';')) {
+        rule += '.';
+      }
+      
+      rules.push(rule);
+    });
+
+    // If input was a paragraph, try to split into rules
+    if (rules.length === 1 && rules[0].length > 100) {
+      const sentences = rules[0].split(/[.;]/).filter(s => s.trim() !== '');
+      rules = sentences.map((sentence, index) => {
+        let rule = sentence.trim();
+        if (!rule.match(/^\d+\./)) {
+          rule = `${index + 1}. ${rule}`;
+        }
+        if (!rule.endsWith('.')) {
+          rule += '.';
+        }
+        return rule;
+      });
+    }
+
+    return rules.join('\n');
+  }
+
+  private generateIntelligentSpecialRequirements(fieldValue: string): string {
+    if (!fieldValue || fieldValue.trim() === '') {
+      return '1. Integración con servicio externo de scoring crediticio al momento del alta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
+    }
+
+    const text = fieldValue;
+    const lines = text.split('\n').filter(line => line.trim() !== '');
+    let requirements: string[] = [];
+
+    lines.forEach((line, index) => {
+      let req = line.trim();
+      
+      // Add numbering if not present
+      if (!req.match(/^\d+\./)) {
+        req = `${index + 1}. ${req}`;
+      }
+      
+      // Enhance technical requirements
+      const lowerReq = req.toLowerCase();
+      if (lowerReq.includes('tiempo') && !lowerReq.includes('máximo')) {
+        req += ' (especificar límite máximo aceptable)';
+      }
+      if (lowerReq.includes('integra') && !lowerReq.includes('formato')) {
+        req += ' - definir formato de intercambio de datos';
+      }
+      if (lowerReq.includes('validac') && !lowerReq.includes('obligator')) {
+        req += ' con validación obligatoria';
+      }
+      
+      // Ensure professional formatting
+      req = req.charAt(0).toUpperCase() + req.slice(1);
+      if (!req.endsWith('.') && !req.endsWith(';')) {
+        req += '.';
+      }
+      
+      requirements.push(req);
+    });
+
+    // If input was a paragraph, try to split into requirements
+    if (requirements.length === 1 && requirements[0].length > 100) {
+      const sentences = requirements[0].split(/[.;]/).filter(s => s.trim() !== '');
+      requirements = sentences.map((sentence, index) => {
+        let req = sentence.trim();
+        if (!req.match(/^\d+\./)) {
+          req = `${index + 1}. ${req}`;
+        }
+        if (!req.endsWith('.')) {
+          req += '.';
+        }
+        return req;
+      });
+    }
+
+    return requirements.join('\n');
+  }
+
   private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {
     const fieldName_lower = fieldName.toLowerCase();
     
@@ -918,19 +1096,19 @@ Reglas:
         return 'ID Cliente\nNombre Completo\nEmail\nTeléfono\nEstado';
       }
       if (fieldType === 'fieldsFromText') {
-        return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+        return this.generateEnhancedEntityFields(fieldValue);
       }
       if (fieldType === 'wireframeDescription') {
-        return 'Panel de búsqueda con filtros (Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta) y botón "Buscar". Tabla de resultados mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado con botones "Editar" y "Ver Detalle" por fila.';
+        return this.generateIntelligentWireframeDescription(fieldValue);
       }
       if (fieldType === 'alternativeFlow') {
-        return 'Cliente inexistente: Al buscar un cliente que no existe en la base de datos, mostrar mensaje "Cliente no encontrado" con opciones para "Crear nuevo cliente" o "Refinar búsqueda".';
+        return this.generateIntelligentAlternativeFlow(fieldValue);
       }
       if (fieldType === 'businessRules') {
-        return '1. El DNI debe ser único en el sistema\n2. No se puede eliminar un cliente con productos activos\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
+        return this.generateIntelligentBusinessRules(fieldValue);
       }
       if (fieldType === 'specialRequirements') {
-        return '1. Integración con servicio externo de scoring crediticio al momento del alta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
+        return this.generateIntelligentSpecialRequirements(fieldValue);
       }
       
       // Fallback for any unhandled empty field
@@ -1041,8 +1219,7 @@ Reglas:
 
     // Process fields from text description for entity fields  
     if (fieldType === 'fieldsFromText') {
-      // For now, return fallback as this is complex JSON processing
-      return '[\n  {"name": "numeroCliente", "type": "text", "mandatory": true, "length": 20},\n  {"name": "nombreCompleto", "type": "text", "mandatory": true, "length": 100},\n  {"name": "email", "type": "email", "mandatory": true},\n  {"name": "telefono", "type": "text", "mandatory": false, "length": 15}\n]';
+      return this.generateEnhancedEntityFields(fieldValue);
     }
 
     // Improve description fields with meaningful content
