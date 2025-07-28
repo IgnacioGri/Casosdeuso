@@ -525,17 +525,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
   private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any, aiModel?: string): Promise<string> {
     try {
-      // If no AI model specified or it's demo, use demo mode
-      if (!aiModel || aiModel === 'demo') {
-        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
-      }
-      
-      // For special field types, use the specialized processing logic
-      if (fieldType === 'filtersFromText' || fieldType === 'columnsFromText') {
-        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
-      }
-      
-      // For complex structured fields, use our intelligent processors
+      // Handle specialized field types FIRST (works for both AI and demo modes)
       if (fieldType === 'wireframeDescription') {
         return this.generateIntelligentWireframeDescription(fieldValue);
       }
@@ -547,6 +537,16 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       }
       if (fieldType === 'specialRequirements') {
         return this.generateIntelligentSpecialRequirements(fieldValue);
+      }
+      
+      // If no AI model specified or it's demo, use demo mode for other fields
+      if (!aiModel || aiModel === 'demo') {
+        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+      
+      // For special field types, use the specialized processing logic
+      if (fieldType === 'filtersFromText' || fieldType === 'columnsFromText') {
+        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
       }
       
       // For fieldsFromText, try AI first but fallback to enhanced demo if it fails
@@ -993,6 +993,32 @@ Reglas ING:
     return text;
   }
 
+  private formatBusinessRuleText(text: string): string {
+    // Remove quotes at the beginning and end
+    text = text.replace(/^["'"'"„«»]+|["'"'"„«»]+$/g, '');
+    
+    // Remove quotes around individual phrases
+    text = text.replace(/"([^"]+)"/g, '$1');
+    text = text.replace(/'([^']+)'/g, '$1');
+    text = text.replace(/'([^']+)'/g, '$1');
+    text = text.replace(/"([^"]+)"/g, '$1');
+    
+    // Remove extra whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    
+    // Capitalize first letter and keep the rest as is (don't force lowercase)
+    if (text.length > 0) {
+      text = text.charAt(0).toUpperCase() + text.slice(1);
+    }
+    
+    // Add period if missing
+    if (!text.endsWith('.') && !text.endsWith(';') && !text.endsWith(':')) {
+      text += '.';
+    }
+    
+    return text;
+  }
+
   private generateIntelligentWireframeDescription(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
       return 'Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.';
@@ -1058,8 +1084,8 @@ Reglas ING:
       return '1. El DNI debe ser único en el sistema\n2. No se puede eliminar un cliente con productos activos\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
     }
 
-    // Clean and normalize input
-    let text = this.cleanInputText(fieldValue);
+    // Clean input without forcing lowercase for business rules  
+    let text = fieldValue.trim();
     
     // Split by sentences, commas, or line breaks
     const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
@@ -1075,14 +1101,11 @@ Reglas ING:
       // Skip if it's just a number or empty after cleaning
       if (rule.match(/^\d+\.?\s*$/) || rule.length === 0) return;
       
-      // Clean the rule text
-      rule = this.cleanInputText(rule);
+      // Clean the rule text without forcing lowercase
+      rule = this.formatBusinessRuleText(rule);
       
       // Add new numbering
       rule = `${rules.length + 1}. ${rule}`;
-      
-      // Professional formatting
-      rule = this.formatProfessionalText(rule);
       
       rules.push(rule);
     });
@@ -1204,6 +1227,20 @@ Reglas ING:
       
       // Fallback for any unhandled empty field
       return 'Ejemplo generado automáticamente según reglas ING';
+    }
+    
+    // Handle specialized field types with content FIRST
+    if (fieldType === 'wireframeDescription') {
+      return this.generateIntelligentWireframeDescription(fieldValue);
+    }
+    if (fieldType === 'alternativeFlow') {
+      return this.generateIntelligentAlternativeFlow(fieldValue);
+    }
+    if (fieldType === 'businessRules') {
+      return this.generateIntelligentBusinessRules(fieldValue);
+    }
+    if (fieldType === 'specialRequirements') {
+      return this.generateIntelligentSpecialRequirements(fieldValue);
     }
     
     // Improve existing values that have content
