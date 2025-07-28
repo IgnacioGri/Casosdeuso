@@ -7,6 +7,7 @@ import { LiveValidation } from "@/components/live-validation";
 import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 import ContextualHelp from "@/components/contextual-help";
 import { AIAssistButton } from "@/components/ai-assist-button";
+import { HelpButton } from "@/components/help-button";
 
 interface FormStepsProps {
   currentStep: number;
@@ -64,13 +65,20 @@ export default function FormSteps({
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <Brain className="mx-auto text-ms-blue mb-3" size={32} />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Configuración del Motor de IA
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Selecciona el modelo de inteligencia artificial que utilizarás para asistir en la generación de contenido
-            </p>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex-1">
+                <Brain className="mx-auto text-ms-blue mb-3" size={32} />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Configuración del Motor de IA
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  Selecciona el modelo de inteligencia artificial que utilizarás para asistir en la generación de contenido
+                </p>
+              </div>
+              <div className="ml-4">
+                <HelpButton step={1} useCaseType={formData.useCaseType} />
+              </div>
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -212,7 +220,10 @@ export default function FormSteps({
             <List className="mr-2 text-ms-blue" size={20} />
             Selecciona el Tipo de Caso de Uso
           </h3>
-          <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+          <div className="flex gap-2">
+            <HelpButton step={2} useCaseType={formData.useCaseType} />
+            <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+          </div>
         </div>
         
         <UseCaseTemplatePreview 
@@ -257,7 +268,10 @@ export default function FormSteps({
               <Info className="mr-2 text-ms-blue" size={20} />
               Información Básica
             </h3>
-            <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+            <div className="flex gap-2">
+              <HelpButton step={3} useCaseType={formData.useCaseType} />
+              <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -318,7 +332,10 @@ export default function FormSteps({
               <Edit className="mr-2 text-ms-blue" size={20} />
               Detalles del Caso de Uso
             </h3>
-            <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+            <div className="flex gap-2">
+              <HelpButton step={4} useCaseType={formData.useCaseType} />
+              <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
+            </div>
           </div>
           
           <div className="space-y-4">
@@ -406,10 +423,13 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Filter className="mr-2 text-ms-blue" size={20} />
-            Filtros de Búsqueda
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Filter className="mr-2 text-ms-blue" size={20} />
+              Filtros de Búsqueda
+            </h3>
+            <HelpButton step={5} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-6">
             {/* Campo superior para texto libre */}
@@ -515,10 +535,13 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Columns className="mr-2 text-ms-blue" size={20} />
-            Columnas de Resultado
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Columns className="mr-2 text-ms-blue" size={20} />
+              Columnas de Resultado
+            </h3>
+            <HelpButton step={6} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-6">
             {/* Campo superior para texto libre */}
@@ -624,10 +647,13 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Database className="mr-2 text-ms-blue" size={20} />
-            Datos de la Entidad
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Database className="mr-2 text-ms-blue" size={20} />
+              Datos de la Entidad
+            </h3>
+            <HelpButton step={7} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-6">
             {/* Campo superior para texto libre */}
@@ -976,10 +1002,13 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Settings className="mr-2 text-ms-blue" size={20} />
-            Opciones Adicionales
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Settings className="mr-2 text-ms-blue" size={20} />
+              Opciones Adicionales
+            </h3>
+            <HelpButton step={8} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-4">
             <div>
@@ -1197,10 +1226,13 @@ export default function FormSteps({
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <Settings className="mr-2 text-ms-blue" size={20} />
-            Revisión y Generación
-          </h3>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Settings className="mr-2 text-ms-blue" size={20} />
+              Revisión y Generación
+            </h3>
+            <HelpButton step={9} useCaseType={formData.useCaseType} />
+          </div>
           
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">

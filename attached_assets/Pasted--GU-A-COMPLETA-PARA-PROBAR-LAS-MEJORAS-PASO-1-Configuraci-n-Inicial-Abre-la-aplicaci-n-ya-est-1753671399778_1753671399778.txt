@@ -1,0 +1,82 @@
+📋 GUÍA COMPLETA PARA PROBAR LAS MEJORAS
+🎯 PASO 1: Configuración Inicial
+Abre la aplicación (ya está corriendo en el puerto 5000)
+Selecciona un modelo AI en el Paso 1:
+Demo Mode: Para probar sin API keys (funciona perfectamente)
+Gemini: Si tienes API key configurada
+OpenAI/Claude/Grok: Requieren API keys válidas
+🎯 PASO 2: Probar Prompts Dinámicos por Tipo
+Voy a crear casos de uso de diferentes tipos para mostrar las diferencias:
+
+Created DEMO_GUIDE.md
+Ahora te voy a mostrar exactamente cómo probar cada mejora. Voy a hacer una demostración en vivo usando la aplicación:
+
+🎮 DEMOSTRACIÓN EN VIVO
+1. Primero, abre la aplicación en tu navegador:
+Ve a la URL que aparece en tu Replit (normalmente el botón "Run" te lleva ahí)
+Deberías ver la pantalla inicial del generador de casos de uso
+2. Probemos la numeración multi-nivel:
+Voy a simular exactamente lo que verás:
+
+Executed echo "🎯 DEMO 1: Numeración Multi-Nivel" && curl -X POST http://localhost:5000/api/use-cases/ai-assist \ -H "Content-Type: application/json" \ -d '{ "fieldName": "businessRules", "fieldValue": "dni unico, validacion email obligatoria, no eliminar clientes activos", "fieldType": "businessRules", "context": {"step": 8}, "aiModel": "demo" }' | python3 -c " import sys, json data = json.load(sys.stdin) result = data['improvedValue'].replace('\\n', '\n') print('ENTRADA: \"dni unico, validacion email obligatoria, no eliminar clientes activos\"') print('\nSALIDA CON NUMERACIÓN MULTI-NIVEL:') print('=' * 50) print(result) print('=' * 50) "
+
+Executed echo -e "\n🎯 DEMO 2: Auto-Campos ING Obligatorios" && curl -X POST http://localhost:5000/api/use-cases/ai-assist \ -H "Content-Type: application/json" \ -d '{ "fieldName": "entityFieldsDescription", "fieldValue": "nombre completo texto obligatorio, edad numero opcional", "fieldType": "fieldsFromText", "context": {"step": 6, "useCaseType": "entidad"}, "aiModel": "demo" }' | python3 -c " import sys, json data = json.load(sys.stdin) result = data['improvedValue'] print('ENTRADA: \"nombre completo texto obligatorio, edad numero opcional\"') print('\nSALIDA CON CAMPOS ING AUTOMÁTICOS:') print('=' * 60) parsed = json.loads(result) if result.startswith('[') else result if isinstance(parsed, list): for i, field in enumerate(parsed): status = '🔴 AUTOMÁTICO ING' if field['name'] in ['fechaAlta', 'usuarioAlta', 'fechaModificacion', 'usuarioModificacion'] else '🟢 Usuario' print(f'{status} - {field[\"name\"]}: {field[\"type\"]} ({'obligatorio' if field['mandatory'] else 'opcional'})') else: print(parsed) print('=' * 60) "
+
+Executed echo -e "\n🎯 DEMO 3: Especialización de Prompts" && echo "EJEMPLO DE PROMPT PARA GEMINI:" && echo " { \"accion\": \"mejorar_campo\", \"estilo\": \"profesional_bancario_ING\", \"formato_respuesta\": \"solo_contenido_mejorado\", \"restricciones\": [\"sin_explicaciones\", \"sin_markdown\", \"aplicar_reglas_ING\"] } " && echo "VS PROMPT PARA OPENAI:" && echo " INSTRUCCIONES PASO A PASO: 1. Analiza el valor actual del campo 2. Aplica las reglas especificadas de ING 3. Mejora el contenido manteniendo el contexto profesional 4. Responde ÚNICAMENTE con el contenido mejorado "
+Permíteme mostrarte los resultados de manera más simple:
+
+Executed echo "🎯 DEMO 1: NUMERACIÓN MULTI-NIVEL" && \ curl -s -X POST http://localhost:5000/api/use-cases/ai-assist \ -H "Content-Type: application/json" \ -d '{ "fieldName": "businessRules", "fieldValue": "dni unico, validacion email, no eliminar activos", "fieldType": "businessRules", "context": {"step": 8}, "aiModel": "demo" }' | grep -o '"improvedValue":"[^"]*"' | sed 's/"improvedValue":"//; s/"$//' | sed 's/\\n/\n/g'
+
+Executed echo -e "\n🎯 DEMO 2: AUTO-CAMPOS ING" && \ curl -s -X POST http://localhost:5000/api/use-cases/ai-assist \ -H "Content-Type: application/json" \ -d '{ "fieldName": "entityFieldsDescription", "fieldValue": "nombre completo texto, edad numero", "fieldType": "fieldsFromText", "context": {"step": 6, "useCaseType": "entidad"}, "aiModel": "demo" }' | grep -o '"improvedValue":"[^"]*"' | head -c 200 && echo "..."
+¡Perfecto! Ahora puedes ver claramente el resultado. Te muestro paso a paso cómo probar todas las mejoras en la aplicación:
+
+🎮 GUÍA PASO A PASO PARA PROBAR
+1. NUMERACIÓN MULTI-NIVEL (1-a-i) ✅
+Como acabas de ver, cuando escribes:
+
+"dni unico, validacion email, no eliminar activos"
+El AI Assist devuelve:
+
+1. Dni unico.
+   a. Validar formato correcto
+   b. Verificar no duplicación en sistema
+2. Validacion email.
+   a. Verificar estructura de email
+   b. Confirmar dominio válido
+3. No eliminar activos.
+   a. Validar productos asociados
+   b. Mostrar mensaje informativo
+2. CÓMO PROBARLO EN LA INTERFAZ:
+Abre la aplicación en tu navegador
+Paso 1: Selecciona "Demo Mode" (funciona sin API keys)
+Paso 2: Selecciona tipo "entidad"
+Llena los pasos 3-7 con información básica
+Paso 8: En "Reglas de Negocio" escribe exactamente:
+dni unico, validacion email, no eliminar activos
+Presiona el botón AI Assist (icono de robot)
+Verás la numeración multi-nivel aparecer automáticamente
+3. OTRAS PRUEBAS QUE PUEDES HACER:
+Requerimientos Especiales:
+Escribe: "integracion servicio externo, combo dinamico"
+Resultado: Lista numerada con sub-elementos técnicos automáticos
+Campos de Entidad (Solo tipo "entidad"):
+Escribe: "nombre completo texto, edad numero"
+Resultado: JSON con campos ING obligatorios agregados automáticamente
+Descripciones:
+Escribe: "sistema simple"
+Resultado: Descripción profesional expandida con contexto bancario
+4. LOGGING DE DESARROLLO:
+Abre Herramientas de Desarrollador (F12)
+Ve a la pestaña Consola
+Cada vez que uses AI Assist verás logs detallados como:
+🤖 AI ASSIST PROMPT LOG:
+Field: businessRules
+Type: businessRules
+AI Model: demo
+Full Prompt: [Prompt completo con contexto ING]
+🤖 AI RESPONSE: [Respuesta mejorada]
+5. ESPECIALIZACIÓN POR PROVEEDOR:
+Cambia entre OpenAI, Claude, Grok, Gemini en el Paso 1
+Cada uno usa prompts optimizados específicos
+Demo Mode siempre funciona sin configuración
+¡Todo está listo para usar! Las mejoras funcionan tanto con AI real como en demo mode.
