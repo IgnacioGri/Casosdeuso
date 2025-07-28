@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LiveValidation } from "@/components/live-validation";
 import UseCaseTemplatePreview from "@/components/use-case-template-preview";
-import ContextualHelp from "@/components/contextual-help";
+
 import { AIAssistButton } from "@/components/ai-assist-button";
 import { HelpButton } from "@/components/help-button";
 
@@ -220,10 +220,7 @@ export default function FormSteps({
             <List className="mr-2 text-ms-blue" size={20} />
             Selecciona el Tipo de Caso de Uso
           </h3>
-          <div className="flex gap-2">
-            <HelpButton step={2} useCaseType={formData.useCaseType} />
-            <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
-          </div>
+          <HelpButton step={2} useCaseType={formData.useCaseType} />
         </div>
         
         <UseCaseTemplatePreview 
@@ -268,10 +265,7 @@ export default function FormSteps({
               <Info className="mr-2 text-ms-blue" size={20} />
               Información Básica
             </h3>
-            <div className="flex gap-2">
-              <HelpButton step={3} useCaseType={formData.useCaseType} />
-              <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
-            </div>
+            <HelpButton step={3} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">
@@ -332,10 +326,7 @@ export default function FormSteps({
               <Edit className="mr-2 text-ms-blue" size={20} />
               Detalles del Caso de Uso
             </h3>
-            <div className="flex gap-2">
-              <HelpButton step={4} useCaseType={formData.useCaseType} />
-              <ContextualHelp step={currentStep} useCaseType={formData.useCaseType} />
-            </div>
+            <HelpButton step={4} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">

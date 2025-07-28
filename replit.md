@@ -116,6 +116,11 @@ Preferred communication style: Simple, everyday language.
 ✓ Created buildProviderSpecificPrompt function with optimized prompts for OpenAI, Claude, Grok, and Gemini
 ✓ Enhanced each AI model with provider-specific instruction patterns for maximum effectiveness
 ✓ Added structured prompts tailored to each AI's strengths (step-by-step for OpenAI, contextual for Claude, direct for Grok, JSON-like for Gemini)
+✓ Implemented comprehensive help system with HelpButton component for all form steps (January 27, 2025)
+✓ Created detailed step-by-step instructions explaining ING minuta compliance requirements in user-friendly language
+✓ Added AI Assist usage explanations for applicable steps with clear instructions on how to leverage AI functionality
+✓ Replaced legacy ContextualHelp component with new comprehensive help system covering all 9 form steps
+✓ Integrated help dialogs with specific guidance for each use case type (entidad, api, proceso) and field-specific instructions
 
 ## System Architecture
 
