@@ -375,18 +375,18 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
         </ol>
         
         <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Reglas de Negocio</h2>
+        ${formData.businessRules ? `<div style="margin-left: 20px; margin-bottom: 20px;">${formData.businessRules}</div>` : `
         <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
           <li style="margin-bottom: 4px;">Los datos obligatorios deben ser validados antes de guardar</li>
           <li style="margin-bottom: 4px;">Se debe mantener un log de auditoría de todas las operaciones</li>
-          ${formData.businessRules ? `<li style="margin-bottom: 4px;">${formData.businessRules}</li>` : ''}
-        </ul>
+        </ul>`}
         
         <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Requerimientos Especiales</h2>
+        ${formData.specialRequirements ? `<div style="margin-left: 20px; margin-bottom: 20px;">${formData.specialRequirements}</div>` : `
         <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
           <li style="margin-bottom: 4px;">El sistema debe responder en menos de 3 segundos</li>
           <li style="margin-bottom: 4px;">Se debe implementar paginación para resultados mayores a 50 registros</li>
-          ${formData.specialRequirements ? `<li style="margin-bottom: 4px;">${formData.specialRequirements}</li>` : ''}
-        </ul>
+        </ul>`}
         
         <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Precondiciones</h2>
         <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
@@ -1068,47 +1068,45 @@ Reglas ING:
       return '1. El DNI debe ser único en el sistema\n   a. Validar formato correcto\n   b. Verificar no duplicación\n2. No se puede eliminar un cliente con productos activos\n   a. Validar productos asociados\n   b. Mostrar mensaje informativo\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
     }
 
-    // Enhanced multi-level processing for business rules
-    let text = fieldValue.trim();
-    const parts = text.split(/[.,;\n]/).filter(part => part.trim() !== '');
+    // Clean and split input into meaningful business rules
+    let text = this.cleanInputText(fieldValue);
+    
+    // Split by numbered items with bullet points - this preserves the existing structure
+    let lines = text.split(/(?:\n\d+\.\s*•\s*|\n\d+\.\s*)/m).filter(line => line.trim() !== '');
+    
+    // If no numbered structure is found, try splitting by plain bullet points or line breaks
+    if (lines.length <= 1) {
+      lines = text.split(/(?:•\s*|^\s*-\s*|\n)/m).filter(line => line.trim() !== '');
+    }
+    
+    if (lines.length === 0) {
+      lines = [text]; // Fallback to treat as single rule
+    }
+    
     let items: string[] = [];
 
-    parts.forEach((part) => {
-      let item = part.trim();
+    lines.forEach((line) => {
+      let item = line.trim();
       if (item.length === 0) return;
       
-      // Remove existing numbering
-      item = item.replace(/^\d+\.\s*/, '');
+      // Remove existing numbering and clean bullet points
+      item = item.replace(/^\d+\.\s*/, '').replace(/^[•\-]\s*/, '');
       if (item.match(/^\d+\.?\s*$/) || item.length === 0) return;
       
-      // Clean and format
-      item = this.formatBusinessRuleText(item);
+      // Clean the rule text
+      item = this.cleanInputText(item);
       
-      // Detect content and add intelligent sub-items
-      const lowerItem = item.toLowerCase();
+      // Format as numbered item
       let mainItem = `${items.length + 1}. ${item}`;
-      let subItems: string[] = [];
       
-      if (lowerItem.includes('dni') || lowerItem.includes('unico')) {
-        subItems.push('a. Validar formato correcto');
-        subItems.push('b. Verificar no duplicación en sistema');
-      }
-      if (lowerItem.includes('validac') && (lowerItem.includes('email') || lowerItem.includes('correo'))) {
-        subItems.push('a. Verificar estructura de email');
-        subItems.push('b. Confirmar dominio válido');
-      }
-      if (lowerItem.includes('eliminar') || lowerItem.includes('activ')) {
-        subItems.push('a. Validar productos asociados');
-        subItems.push('b. Mostrar mensaje informativo');
-      }
-      
-      // Build complete item
-      if (subItems.length > 0) {
-        items.push(mainItem + '\n   ' + subItems.join('\n   '));
-      } else {
-        items.push(mainItem);
-      }
+      // Add to items list - simplified to avoid complex formatting issues
+      items.push(this.formatProfessionalText(mainItem));
     });
+
+    // If no items were processed, return a basic formatted version
+    if (items.length === 0) {
+      return `1. ${this.formatProfessionalText(text)}`;
+    }
 
     return items.join('\n');
   }
