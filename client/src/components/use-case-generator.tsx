@@ -51,7 +51,7 @@ export default function UseCaseGenerator() {
   // Calculate total steps based on use case type
   const getTotalSteps = () => {
     // Add 2 for the new type selection (step 1) and minute analysis (step 2)
-    const baseSteps = formData.useCaseType === 'entity' ? 11 : 9;
+    const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
     return formData.generateTestCase ? baseSteps + 1 : baseSteps;
   };
 
@@ -275,6 +275,7 @@ export default function UseCaseGenerator() {
               onLoadComplexExample={loadComplexExample}
               onNextStep={handleNextStep}
               onPreviousStep={handlePreviousStep}
+              onGenerateDocument={handleGenerateUseCase}
             />
 
             {/* Navigation Buttons - Bottom */}

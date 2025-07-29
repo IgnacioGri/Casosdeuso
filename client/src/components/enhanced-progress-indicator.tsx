@@ -20,24 +20,21 @@ const getStepInfo = (stepNumber: number, useCaseType: string) => {
       { name: "Columnas resultado", icon: Table },
       { name: "Campos entidad", icon: Database },
       { name: "Configuración", icon: Cog },
-      { name: "Revisión final", icon: Check },
-      { name: "Generación", icon: Zap }
+      { name: "Revisión y Generación", icon: Zap }
     ][stepNumber - 1] || { name: `Paso ${stepNumber}`, icon: FileText };
   } else if (useCaseType === 'api') {
     return [
       ...baseSteps,
       { name: "Configuración API", icon: Code },
       { name: "Formatos de datos", icon: Settings },
-      { name: "Revisión final", icon: Check },
-      { name: "Generación", icon: Zap }
+      { name: "Revisión y Generación", icon: Zap }
     ][stepNumber - 1] || { name: `Paso ${stepNumber}`, icon: FileText };
   } else {
     return [
       ...baseSteps,
       { name: "Configuración servicio", icon: Cog },
       { name: "Parámetros ejecución", icon: Settings },
-      { name: "Revisión final", icon: Check },
-      { name: "Generación", icon: Zap }
+      { name: "Revisión y Generación", icon: Zap }
     ][stepNumber - 1] || { name: `Paso ${stepNumber}`, icon: FileText };
   }
 };
