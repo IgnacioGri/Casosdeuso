@@ -1,5 +1,7 @@
 import { AIService } from './ai-service.js';
-import { UseCaseFormData, UseCaseType } from '../../shared/schema.js';
+import { UseCaseFormData } from '../../shared/schema.js';
+
+type UseCaseType = 'entity' | 'api' | 'service';
 
 export class MinuteAnalysisService {
   constructor(private aiService: AIService) {}
@@ -9,7 +11,7 @@ export class MinuteAnalysisService {
     
     try {
       // Use AI to analyze the minute text
-      const analysisResult = await this.aiService.processFieldWithAI(
+      const analysisResult = await AIService.processFieldWithAI(
         prompts.systemPrompt,
         text,
         aiModel
@@ -188,22 +190,22 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           resultColumns: ["ID Cliente", "Apellido y Nombres", "Documento", "Email", "Estado"],
           columnsDescription: "Columnas principales para mostrar en la grilla de resultados",
           entityFields: [
-            { name: "clienteId", type: "number", required: true, length: 10 },
-            { name: "tipoDocumento", type: "text", required: true, length: 10 },
-            { name: "numeroDocumento", type: "text", required: true, length: 20 },
-            { name: "apellido", type: "text", required: true, length: 100 },
-            { name: "nombres", type: "text", required: true, length: 100 },
-            { name: "email", type: "text", required: false, length: 150 },
-            { name: "fechaAlta", type: "date", required: true, length: 0 },
-            { name: "usuarioAlta", type: "text", required: true, length: 50 }
+            { name: "clienteId", type: "number", mandatory: true, length: 10 },
+            { name: "tipoDocumento", type: "text", mandatory: true, length: 10 },
+            { name: "numeroDocumento", type: "text", mandatory: true, length: 20 },
+            { name: "apellido", type: "text", mandatory: true, length: 100 },
+            { name: "nombres", type: "text", mandatory: true, length: 100 },
+            { name: "email", type: "text", mandatory: false, length: 150 },
+            { name: "fechaAlta", type: "date", mandatory: true },
+            { name: "usuarioAlta", type: "text", mandatory: true, length: 50 }
           ],
           fieldsDescription: "Campos principales de la entidad cliente con información personal y de auditoría",
           wireframeDescriptions: ["Pantalla de búsqueda con filtros", "Grilla de resultados paginada", "Detalle del cliente"],
           wireframesDescription: "Pantallas necesarias para la gestión completa de clientes",
           alternativeFlows: ["Cliente no encontrado", "Error de validación", "Timeout de sesión"],
           alternativeFlowsDescription: "Flujos alternativos para manejar errores y excepciones",
-          businessRules: ["1. Solo usuarios autorizados pueden acceder", "2. Validar documento con organismos oficiales"],
-          specialRequirements: ["1. Auditoría completa de cambios", "2. Integración con servicios externos"]
+          businessRules: "1. Solo usuarios autorizados pueden acceder\n2. Validar documento con organismos oficiales",
+          specialRequirements: "1. Auditoría completa de cambios\n2. Integración con servicios externos"
         };
 
       case 'api':
@@ -227,8 +229,8 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
   }
 }`,
           alternativeFlows: ["Token inválido", "Cuenta inexistente", "Servicio no disponible"],
-          businessRules: ["1. Autenticación obligatoria", "2. Rate limiting por cliente"],
-          specialRequirements: ["1. Encriptación SSL", "2. Logs de auditoría"]
+          businessRules: "1. Autenticación obligatoria\n2. Rate limiting por cliente",
+          specialRequirements: "1. Encriptación SSL\n2. Logs de auditoría"
         };
 
       case 'service':
@@ -239,8 +241,8 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           serviceConfig: "Ejecución diaria a las 23:00 hrs",
           cronExpression: "0 0 23 * * *",
           alternativeFlows: ["Fallo en comunicación", "Reintento automático", "Notificación de error"],
-          businessRules: ["1. Ejecutar solo en días hábiles", "2. Generar backup antes del proceso"],
-          specialRequirements: ["1. Logging detallado", "2. Alertas por email", "3. Mecanismo de rollback"]
+          businessRules: "1. Ejecutar solo en días hábiles\n2. Generar backup antes del proceso",
+          specialRequirements: "1. Logging detallado\n2. Alertas por email\n3. Mecanismo de rollback"
         };
 
       default:

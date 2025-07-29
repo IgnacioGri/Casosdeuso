@@ -84,11 +84,11 @@ export default function EnhancedDocumentPreview({
         `);
       }
 
-      if (formData.entityFields?.some(f => f.name.trim())) {
+      if (formData.entityFields?.some(f => f && f.name && typeof f.name === 'string' && f.name.trim())) {
         sections.push(`
           <h2>Campos de la Entidad</h2>
           <ul>
-            ${formData.entityFields.filter(f => f.name.trim()).map(field => 
+            ${formData.entityFields.filter(f => f && f.name && typeof f.name === 'string' && f.name.trim()).map(field => 
               `<li><strong>${field.name}</strong>: ${field.type}${field.length ? `(${field.length})` : ''} ${field.mandatory ? '- Obligatorio' : '- Opcional'}</li>`
             ).join('')}
           </ul>
