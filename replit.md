@@ -10,6 +10,10 @@ The application now features robust error handling and can operate without API k
 
 Preferred communication style: Simple, everyday language.
 
+## Migration to C# Blazor WebAssembly (Planned)
+
+The user has approved a plan to migrate the current JavaScript/TypeScript + React + Node.js application to C# + Blazor WebAssembly. This migration will modernize the technology stack and leverage the .NET ecosystem advantages. See `BLAZOR_MIGRATION_PLAN.md` for detailed migration strategy and timeline.
+
 ## Recent Changes (Updated: 27/7/2025)
 
 ✓ Fixed application startup issues when API keys are missing
@@ -146,6 +150,10 @@ Preferred communication style: Simple, everyday language.
 ✓ Fixed critical AI Assist production quality issue where filters/columns conversion was using demo mode instead of real AI
 ✓ Added comprehensive AI-powered text-to-list conversion for filtersFromText and columnsFromText field types
 ✓ Enhanced AI prompts with ING compliance rules for professional banking terminology and formatting standards
+✓ Simplified form flow from 11 to 9 steps eliminating redundant steps for better UX (January 28, 2025)
+✓ Fixed validation errors with businessRules and specialRequirements array-to-string transformation
+✓ Resolved intelligent test case service demo content detection issues
+✓ Approved plan for C# Blazor WebAssembly migration to modernize technology stack
 
 ## System Architecture
 

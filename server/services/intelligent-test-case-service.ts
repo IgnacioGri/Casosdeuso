@@ -28,6 +28,7 @@ export class IntelligentTestCaseService {
       // Generate intelligent test cases using AI
       const prompt = this.buildIntelligentTestPrompt(context, formData.useCaseType);
       
+      // Use processFieldWithAI method for test case generation
       const testCaseResult = await AIService.processFieldWithAI(
         prompt,
         context.fullDescription,
@@ -283,8 +284,8 @@ CONTEXTO BANCARIO ING:
     try {
       console.log('Raw intelligent test result:', aiResult.substring(0, 200) + '...');
       
-      // Check if the result is demo content
-      if (aiResult.includes('Demo Analysis') || aiResult.includes('generateDemoIntelligentTests')) {
+      // Only check for demo content if it's explicitly demo mode response
+      if (aiResult.includes('Demo Analysis Result:') && aiResult.includes('using system prompt')) {
         console.log('Detected demo content in intelligent test response, using fallback');
         throw new Error('Demo content detected');
       }

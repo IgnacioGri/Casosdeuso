@@ -523,6 +523,59 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     return service.improveFieldInstance(fieldName, fieldValue, fieldType, context, aiModel);
   }
 
+  // Test case generation method  
+  async generateTestCases(prompt: string, context: any, aiModel: string): Promise<string> {
+    if (aiModel === 'demo') {
+      return JSON.stringify({
+        objective: `Verificar el funcionamiento completo del caso de uso: ${context.basicInfo?.useCaseName || 'Gestión de entidades'}`,
+        preconditions: `- Usuario autenticado en el sistema\n- Permisos adecuados para gestionar ${context.basicInfo?.useCaseType || 'entidades'}\n- Conexión a base de datos disponible`,
+        testSteps: [
+          {
+            number: 1,
+            action: "Acceder al módulo del caso de uso",
+            inputData: "Credenciales válidas de usuario",
+            expectedResult: "Sistema muestra la interfaz principal",
+            observations: "Verificar carga correcta de la interfaz"
+          },
+          {
+            number: 2,
+            action: "Ejecutar función principal",
+            inputData: "Datos de prueba válidos", 
+            expectedResult: "Operación completada exitosamente",
+            observations: "Validar procesamiento correcto"
+          }
+        ],
+        analysisNotes: "Casos de prueba generados automáticamente basados en el análisis completo del caso de uso"
+      });
+    }
+
+    try {
+      let result: string;
+      
+      switch (aiModel) {
+        case 'openai':
+          result = await AIService.processWithOpenAI(prompt, JSON.stringify(context));
+          break;
+        case 'claude':
+          result = await AIService.processWithClaude(prompt, JSON.stringify(context));
+          break;
+        case 'grok':
+          result = await AIService.processWithGrok(prompt, JSON.stringify(context));
+          break;
+        case 'gemini':
+          result = await AIService.processWithGemini(prompt, JSON.stringify(context));
+          break;
+        default:
+          throw new Error(`Modelo de IA no soportado: ${aiModel}`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error generating test cases:', error);
+      throw error;
+    }
+  }
+
   static async processFieldWithAI(systemPrompt: string, fieldValue: string, aiModel: string): Promise<string> {
     if (aiModel === 'demo') {
       // For minute analysis, return a structured JSON response in demo mode
