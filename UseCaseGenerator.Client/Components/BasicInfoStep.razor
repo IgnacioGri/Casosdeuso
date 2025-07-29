@@ -1,0 +1,96 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject ISnackbar Snackbar
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Información Básica del Caso de Uso
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Completa la información fundamental que identifica el caso de uso en el proyecto.
+        </MudText>
+    </MudItem>
+    
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="FormData.ClientName"
+                      Label="Nombre del Cliente"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      HelperText="Ej: Banco Provincia"
+                      Class="mb-4" />
+    </MudItem>
+    
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="FormData.ProjectName"
+                      Label="Nombre del Proyecto"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      HelperText="Ej: Sistema de Gestión Integral"
+                      Class="mb-4" />
+    </MudItem>
+    
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="FormData.UseCaseCode"
+                      Label="Código del Caso de Uso"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      HelperText="Formato: 2 letras + 3 números (Ej: BP001)"
+                      Class="mb-4" />
+    </MudItem>
+    
+    <MudItem xs="12" md="6">
+        <MudTextField @bind-Value="FormData.UseCaseName"
+                      Label="Nombre del Caso de Uso"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      HelperText="Debe comenzar con verbo infinitivo (Gestionar, Crear, Ver...)"
+                      Class="mb-4" />
+    </MudItem>
+    
+    <MudItem xs="12">
+        <MudTextField @bind-Value="FormData.FileName"
+                      Label="Nombre del Archivo"
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      HelperText="Formato: AB123NombreCasoUso (sin espacios)"
+                      Class="mb-4" />
+    </MudItem>
+    
+    <MudItem xs="12">
+        <MudAlert Severity="Severity.Info" Dense="true">
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
+            <strong>Validaciones automáticas:</strong> El sistema verificará que el código siga el formato correcto 
+            y que el nombre del caso de uso comience con un verbo en infinitivo según estándares ING.
+        </MudAlert>
+    </MudItem>
+    
+    <MudItem xs="12">
+        <MudButton Variant="Variant.Outlined" 
+                   Color="Color.Secondary" 
+                   StartIcon="@Icons.Material.Filled.AutoFixHigh"
+                   OnClick="LoadPremiumClientExample"
+                   Class="mt-2">
+            Cargar Ejemplo: Cliente Premium Bancario
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+
+    private async Task LoadPremiumClientExample()
+    {
+        FormData.ClientName = "Banco Provincia";
+        FormData.ProjectName = "Gestión Integral de Clientes Premium";
+        FormData.UseCaseCode = "BP005";
+        FormData.UseCaseName = "Gestionar Clientes Premium";
+        FormData.FileName = "BP005GestionarClientesPremium";
+        
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Ejemplo cargado correctamente", Severity.Success);
+    }
+}

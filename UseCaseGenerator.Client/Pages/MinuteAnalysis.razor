@@ -1,0 +1,245 @@
+@page "/minute-analysis"
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Análisis de Minutas</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudPaper Elevation="2" Class="pa-6">
+        <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
+            Análisis Inteligente de Minutas
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Sube un documento de minuta y el sistema extraerá automáticamente la información del caso de uso usando IA.
+        </MudText>
+        
+        <MudGrid>
+            <!-- AI Model Selection -->
+            <MudItem xs="12" md="4">
+                <MudCard Elevation="3" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">Configuración IA</MudText>
+                    <MudSelect @bind-Value="selectedAIModel" 
+                               Label="Modelo de IA" 
+                               Variant="Variant.Outlined"
+                               Class="mb-3">
+                        <MudSelectItem Value="AIModel.Demo">Modo Demo</MudSelectItem>
+                        <MudSelectItem Value="AIModel.OpenAI">OpenAI GPT-4o</MudSelectItem>
+                        <MudSelectItem Value="AIModel.Claude">Claude Sonnet</MudSelectItem>
+                        <MudSelectItem Value="AIModel.Gemini">Google Gemini</MudSelectItem>
+                        <MudSelectItem Value="AIModel.Grok">Grok (X.AI)</MudSelectItem>
+                    </MudSelect>
+                </MudCard>
+            </MudItem>
+            
+            <!-- File Upload -->
+            <MudItem xs="12" md="8">
+                <MudCard Elevation="3" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">Subir Minuta</MudText>
+                    
+                    <MudFileUpload T="IBrowserFile" 
+                                   OnFilesChanged="OnInputFileChanged"
+                                   Hidden="false" 
+                                   Class="flex-1" 
+                                   InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20"
+                                   InputStyle="opacity:0"
+                                   @ondragenter="@SetDragClass" 
+                                   @ondragleave="@ClearDragClass" 
+                                   @ondragend="@ClearDragClass">
+                        <ButtonTemplate>
+                            <MudPaper Height="200px" 
+                                      Outlined="true" 
+                                      Class="@dragClass">
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Material.Filled.CloudUpload"
+                                           for="@context">
+                                    Seleccionar Archivo
+                                </MudButton>
+                                <MudText Typo="Typo.body2" Class="mt-2">
+                                    O arrastra el archivo aquí
+                                </MudText>
+                                <MudText Typo="Typo.caption">
+                                    Formatos soportados: .txt, .docx, .pdf
+                                </MudText>
+                            </MudPaper>
+                        </ButtonTemplate>
+                    </MudFileUpload>
+                    
+                    @if (uploadedFile != null)
+                    {
+                        <MudAlert Severity="Severity.Success" Class="mt-3">
+                            Archivo seleccionado: @uploadedFile.Name
+                        </MudAlert>
+                    }
+                </MudCard>
+            </MudItem>
+            
+            <!-- Manual Input -->
+            <MudItem xs="12">
+                <MudCard Elevation="3" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">O Ingresa el Contenido Manualmente</MudText>
+                    
+                    <MudTextField @bind-Value="minuteContent"
+                                  Label="Contenido de la minuta"
+                                  Variant="Variant.Outlined"
+                                  Lines="10"
+                                  Placeholder="Pega aquí el contenido de la minuta a analizar..."
+                                  Class="mb-3" />
+                    
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Analytics"
+                               OnClick="AnalyzeMinute"
+                               Disabled="isAnalyzing || (string.IsNullOrWhiteSpace(minuteContent) && uploadedFile == null)">
+                        @if (isAnalyzing)
+                        {
+                            <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                            <text class="ml-2">Analizando...</text>
+                        }
+                        else
+                        {
+                            <text>Analizar Minuta</text>
+                        }
+                    </MudButton>
+                </MudCard>
+            </MudItem>
+            
+            <!-- Results -->
+            @if (analysisResult != null)
+            {
+                <MudItem xs="12">
+                    <MudCard Elevation="3" Class="pa-4">
+                        <MudText Typo="Typo.h6" Class="mb-3">Información Extraída</MudText>
+                        
+                        @if (analysisResult.Success)
+                        {
+                            <MudGrid>
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudTextField Value="@analysisResult.FormData.ClientName"
+                                                  Label="Cliente"
+                                                  Variant="Variant.Outlined"
+                                                  ReadOnly="true" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudTextField Value="@analysisResult.FormData.ProjectName"
+                                                  Label="Proyecto"
+                                                  Variant="Variant.Outlined"
+                                                  ReadOnly="true" />
+                                </MudItem>
+                                <MudItem xs="12" sm="6" md="4">
+                                    <MudTextField Value="@analysisResult.FormData.UseCaseName"
+                                                  Label="Caso de Uso"
+                                                  Variant="Variant.Outlined"
+                                                  ReadOnly="true" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudTextField Value="@analysisResult.FormData.Description"
+                                                  Label="Descripción"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="3"
+                                                  ReadOnly="true" />
+                                </MudItem>
+                            </MudGrid>
+                            
+                            <MudDivider Class="my-4" />
+                            
+                            <MudButton Variant="Variant.Filled" 
+                                       Color="Color.Success"
+                                       StartIcon="@Icons.Material.Filled.Create"
+                                       OnClick="CreateUseCaseFromAnalysis">
+                                Crear Caso de Uso con Esta Información
+                            </MudButton>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Error">
+                                Error en el análisis: @analysisResult.Error
+                            </MudAlert>
+                        }
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private AIModel selectedAIModel = AIModel.Demo;
+    private string minuteContent = "";
+    private IBrowserFile? uploadedFile;
+    private bool isAnalyzing = false;
+    private MinuteAnalysisResponse? analysisResult;
+    private string dragClass = "";
+    private readonly string defaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
+
+    private async Task OnInputFileChanged(InputFileChangeEventArgs e)
+    {
+        uploadedFile = e.File;
+        ClearDragClass();
+        
+        if (uploadedFile != null)
+        {
+            // Read file content
+            using var reader = new StreamReader(uploadedFile.OpenReadStream());
+            minuteContent = await reader.ReadToEndAsync();
+        }
+    }
+
+    private void SetDragClass() => dragClass = $"{defaultDragClass} mud-border-primary";
+    
+    private void ClearDragClass() => dragClass = defaultDragClass;
+
+    private async Task AnalyzeMinute()
+    {
+        if (string.IsNullOrWhiteSpace(minuteContent))
+        {
+            Snackbar.Add("Debes proporcionar contenido para analizar", Severity.Warning);
+            return;
+        }
+
+        isAnalyzing = true;
+        try
+        {
+            var request = new MinuteAnalysisRequest
+            {
+                MinuteContent = minuteContent,
+                AiModel = selectedAIModel
+            };
+
+            analysisResult = await AIAssistService.AnalyzeMinuteAsync(request);
+            
+            if (analysisResult.Success)
+            {
+                Snackbar.Add("Análisis completado exitosamente", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error en el análisis: {analysisResult.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isAnalyzing = false;
+        }
+    }
+
+    private void CreateUseCaseFromAnalysis()
+    {
+        if (analysisResult?.Success == true)
+        {
+            // TODO: Navigate to generator with pre-filled data
+            Navigation.NavigateTo("/generator");
+            Snackbar.Add("Navegando al generador con datos pre-cargados", Severity.Info);
+        }
+    }
+}

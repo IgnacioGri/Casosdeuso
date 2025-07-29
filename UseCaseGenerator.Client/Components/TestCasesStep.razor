@@ -1,0 +1,296 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Casos de Prueba
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Configura la generación de casos de prueba automáticos o define casos específicos manualmente.
+        </MudText>
+    </MudItem>
+    
+    <!-- Test Case Generation Toggle -->
+    <MudItem xs="12">
+        <MudCheckBox @bind-Checked="FormData.GenerateTestCase"
+                     Label="Generar casos de prueba automáticamente"
+                     Class="mb-4" />
+    </MudItem>
+    
+    @if (FormData.GenerateTestCase)
+    {
+        <!-- Test Case Configuration -->
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h6" Class="mb-3">Configuración de Pruebas</MudText>
+            
+            <MudTextField @bind-Value="FormData.TestCaseObjective"
+                          Label="Objetivo de las pruebas"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          Placeholder="Ej: Verificar el correcto funcionamiento del módulo de gestión de clientes..."
+                          Class="mb-3" />
+            
+            <MudTextField @bind-Value="FormData.TestCasePreconditions"
+                          Label="Precondiciones"
+                          Variant="Variant.Outlined"
+                          Lines="3"
+                          Placeholder="Ej: Usuario autenticado con permisos de administrador, base de datos con datos de prueba..."
+                          Class="mb-3" />
+        </MudItem>
+        
+        <!-- Test Steps -->
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h6" Class="mb-3">Pasos de Prueba</MudText>
+            
+            <div class="d-flex align-center mb-2">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="AddTestStep">
+                    Agregar Paso
+                </MudButton>
+                <MudSpacer />
+                <MudText Typo="Typo.body2" Color="Color.TextSecondary">
+                    @FormData.TestSteps.Count pasos definidos
+                </MudText>
+            </div>
+            
+            @if (FormData.TestSteps.Any())
+            {
+                <MudExpansionPanels Elevation="1">
+                    @foreach (var step in FormData.TestSteps.OrderBy(s => s.Number))
+                    {
+                        <MudExpansionPanel Text="@($"Paso {step.Number}: {step.Action}")">
+                            <MudGrid>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField @bind-Value="step.Action"
+                                                  Label="Acción"
+                                                  Variant="Variant.Outlined"
+                                                  Class="mb-2" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField @bind-Value="step.InputData"
+                                                  Label="Datos de entrada"
+                                                  Variant="Variant.Outlined"
+                                                  Class="mb-2" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField @bind-Value="step.ExpectedResult"
+                                                  Label="Resultado esperado"
+                                                  Variant="Variant.Outlined"
+                                                  Class="mb-2" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField @bind-Value="step.Observations"
+                                                  Label="Observaciones"
+                                                  Variant="Variant.Outlined"
+                                                  Class="mb-2" />
+                                </MudItem>
+                                <MudItem xs="12">
+                                    <MudButton Variant="Variant.Text" 
+                                               Color="Color.Error"
+                                               StartIcon="@Icons.Material.Filled.Delete"
+                                               OnClick="() => RemoveTestStep(step)">
+                                        Eliminar Paso
+                                    </MudButton>
+                                </MudItem>
+                            </MudGrid>
+                        </MudExpansionPanel>
+                    }
+                </MudExpansionPanels>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">
+                    No hay pasos de prueba definidos
+                </MudAlert>
+            }
+        </MudItem>
+        
+        <!-- Quick Test Templates -->
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="mb-3">Plantillas de Prueba</MudText>
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Secondary" 
+                               StartIcon="@Icons.Material.Filled.Create"
+                               OnClick="AddCRUDTestSteps"
+                               FullWidth="true">
+                        Pruebas CRUD
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Secondary" 
+                               StartIcon="@Icons.Material.Filled.Security"
+                               OnClick="AddSecurityTestSteps"
+                               FullWidth="true">
+                        Pruebas Seguridad
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Secondary" 
+                               StartIcon="@Icons.Material.Filled.Search"
+                               OnClick="AddSearchTestSteps"
+                               FullWidth="true">
+                        Pruebas Búsqueda
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="3">
+                    <MudButton Variant="Variant.Outlined" 
+                               Color="Color.Secondary" 
+                               StartIcon="@Icons.Material.Filled.AccountBalance"
+                               OnClick="LoadBankingTestExample"
+                               FullWidth="true">
+                        Ejemplo Bancario
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info">
+                Los casos de prueba no se generarán automáticamente. 
+                Podrás crearlos más tarde usando la funcionalidad de casos de prueba inteligentes.
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+
+    private async Task AddTestStep()
+    {
+        var newStep = new TestStep
+        {
+            Number = FormData.TestSteps.Count + 1,
+            Action = "",
+            InputData = "",
+            ExpectedResult = "",
+            Observations = "",
+            Status = TestStepStatus.Pending
+        };
+
+        FormData.TestSteps.Add(newStep);
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task RemoveTestStep(TestStep step)
+    {
+        FormData.TestSteps.Remove(step);
+        
+        // Renumber remaining steps
+        for (int i = 0; i < FormData.TestSteps.Count; i++)
+        {
+            FormData.TestSteps[i].Number = i + 1;
+        }
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddCRUDTestSteps()
+    {
+        var crudSteps = new[]
+        {
+            new TestStep { Number = 1, Action = "Crear nuevo registro", InputData = "Datos válidos completos", ExpectedResult = "Registro creado exitosamente", Observations = "Verificar mensaje de confirmación" },
+            new TestStep { Number = 2, Action = "Consultar registro creado", InputData = "ID del registro", ExpectedResult = "Datos mostrados correctamente", Observations = "Verificar todos los campos" },
+            new TestStep { Number = 3, Action = "Modificar registro existente", InputData = "Datos actualizados", ExpectedResult = "Registro modificado exitosamente", Observations = "Verificar cambios aplicados" },
+            new TestStep { Number = 4, Action = "Eliminar registro", InputData = "ID del registro", ExpectedResult = "Registro eliminado exitosamente", Observations = "Verificar que no aparece en búsquedas" }
+        };
+
+        FormData.TestSteps.Clear();
+        FormData.TestSteps.AddRange(crudSteps.Select(s => new TestStep 
+        { 
+            Number = s.Number, 
+            Action = s.Action, 
+            InputData = s.InputData, 
+            ExpectedResult = s.ExpectedResult, 
+            Observations = s.Observations,
+            Status = TestStepStatus.Pending
+        }));
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddSecurityTestSteps()
+    {
+        var securitySteps = new[]
+        {
+            new TestStep { Number = 1, Action = "Intentar acceso sin autenticación", InputData = "URL directa", ExpectedResult = "Redirección a login", Observations = "No debe permitir acceso" },
+            new TestStep { Number = 2, Action = "Intentar acceso con usuario sin permisos", InputData = "Usuario limitado", ExpectedResult = "Mensaje de acceso denegado", Observations = "Verificar mensaje claro" },
+            new TestStep { Number = 3, Action = "Verificar timeout de sesión", InputData = "Sesión inactiva > 30 min", ExpectedResult = "Sesión expirada automáticamente", Observations = "Debe solicitar re-login" }
+        };
+
+        FormData.TestSteps.Clear();
+        FormData.TestSteps.AddRange(securitySteps.Select(s => new TestStep 
+        { 
+            Number = s.Number, 
+            Action = s.Action, 
+            InputData = s.InputData, 
+            ExpectedResult = s.ExpectedResult, 
+            Observations = s.Observations,
+            Status = TestStepStatus.Pending
+        }));
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddSearchTestSteps()
+    {
+        var searchSteps = new[]
+        {
+            new TestStep { Number = 1, Action = "Buscar por filtro principal", InputData = "Criterio válido", ExpectedResult = "Resultados filtrados correctamente", Observations = "Verificar paginación" },
+            new TestStep { Number = 2, Action = "Buscar sin criterios", InputData = "Filtros vacíos", ExpectedResult = "Todos los registros mostrados", Observations = "Verificar límite de resultados" },
+            new TestStep { Number = 3, Action = "Buscar con criterio inexistente", InputData = "Valor que no existe", ExpectedResult = "Mensaje 'No se encontraron resultados'", Observations = "Mensaje claro al usuario" }
+        };
+
+        FormData.TestSteps.Clear();
+        FormData.TestSteps.AddRange(searchSteps.Select(s => new TestStep 
+        { 
+            Number = s.Number, 
+            Action = s.Action, 
+            InputData = s.InputData, 
+            ExpectedResult = s.ExpectedResult, 
+            Observations = s.Observations,
+            Status = TestStepStatus.Pending
+        }));
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task LoadBankingTestExample()
+    {
+        FormData.TestCaseObjective = "Verificar el correcto funcionamiento del módulo de gestión de clientes premium, incluyendo operaciones CRUD, validaciones de negocio y cumplimiento de normativas bancarias.";
+        
+        FormData.TestCasePreconditions = "Usuario autenticado con perfil Ejecutivo de Cuentas Premium, base de datos con al menos 10 clientes de prueba, servicios externos de scoring crediticio disponibles.";
+
+        var bankingSteps = new[]
+        {
+            new TestStep { Number = 1, Action = "Ingresar al módulo de clientes premium", InputData = "Credenciales válidas", ExpectedResult = "Pantalla principal con grilla de clientes", Observations = "Verificar carga inicial < 3 segundos" },
+            new TestStep { Number = 2, Action = "Buscar cliente por DNI", InputData = "DNI: 12345678", ExpectedResult = "Cliente encontrado con datos completos", Observations = "Verificar scoring crediticio actualizado" },
+            new TestStep { Number = 3, Action = "Crear nuevo cliente premium", InputData = "Datos completos válidos", ExpectedResult = "Cliente creado con beneficios aplicados", Observations = "Verificar auditoría registrada" },
+            new TestStep { Number = 4, Action = "Intentar crear cliente con DNI duplicado", InputData = "DNI existente", ExpectedResult = "Error de validación claro", Observations = "Mensaje específico de duplicación" }
+        };
+
+        FormData.TestSteps.Clear();
+        FormData.TestSteps.AddRange(bankingSteps.Select(s => new TestStep 
+        { 
+            Number = s.Number, 
+            Action = s.Action, 
+            InputData = s.InputData, 
+            ExpectedResult = s.ExpectedResult, 
+            Observations = s.Observations,
+            Status = TestStepStatus.Pending
+        }));
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+}

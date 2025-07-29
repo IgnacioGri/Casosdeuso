@@ -1,0 +1,303 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject ISnackbar Snackbar
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Reglas de Negocio y Requerimientos Especiales
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Define las reglas de negocio que debe cumplir el caso de uso y los requerimientos técnicos especiales.
+        </MudText>
+    </MudItem>
+    
+    <!-- Business Rules Section -->
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h6" Class="mb-3">Reglas de Negocio</MudText>
+        
+        <div class="d-flex align-center mb-2">
+            <MudText Class="mr-3">Reglas</MudText>
+            <MudButton Variant="Variant.Text" 
+                       Color="Color.Primary" 
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.AutoAwesome"
+                       OnClick="ImproveBusinessRules"
+                       Disabled="isImprovingRules || string.IsNullOrWhiteSpace(FormData.BusinessRules)">
+                @if (isImprovingRules)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                    <text class="ml-2">Mejorando...</text>
+                }
+                else
+                {
+                    <text>AI Assist</text>
+                }
+            </MudButton>
+        </div>
+        
+        <MudTextField @bind-Value="FormData.BusinessRules"
+                      Label="Reglas de negocio"
+                      Variant="Variant.Outlined"
+                      Lines="8"
+                      Placeholder="Describe las reglas que debe cumplir el sistema..."
+                      HelperText="Usa texto libre, la IA las convertirá en listas numeradas"
+                      Class="mb-4" />
+        
+        <MudExpansionPanels Elevation="1" Class="mb-3">
+            <MudExpansionPanel Text="Ejemplo: Reglas de Cliente Bancario">
+                <MudText Typo="Typo.body2" Class="mb-2">
+                    <strong>Ejemplo de reglas de negocio:</strong>
+                </MudText>
+                <MudText Typo="Typo.body2" Style="font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px;">
+                    El DNI debe ser único en el sistema y validar formato correcto. 
+                    No se puede eliminar un cliente con productos activos. 
+                    El email debe tener formato válido. 
+                    Solo usuarios con rol Supervisor pueden eliminar clientes. 
+                    Registro automático en bitácora de todas las operaciones.
+                </MudText>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+    
+    <!-- Special Requirements Section -->
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h6" Class="mb-3">Requerimientos Especiales</MudText>
+        
+        <div class="d-flex align-center mb-2">
+            <MudText Class="mr-3">Requerimientos</MudText>
+            <MudButton Variant="Variant.Text" 
+                       Color="Color.Primary" 
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.AutoAwesome"
+                       OnClick="ImproveSpecialRequirements"
+                       Disabled="isImprovingRequirements || string.IsNullOrWhiteSpace(FormData.SpecialRequirements)">
+                @if (isImprovingRequirements)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                    <text class="ml-2">Mejorando...</text>
+                }
+                else
+                {
+                    <text>AI Assist</text>
+                }
+            </MudButton>
+        </div>
+        
+        <MudTextField @bind-Value="FormData.SpecialRequirements"
+                      Label="Requerimientos especiales"
+                      Variant="Variant.Outlined"
+                      Lines="8"
+                      Placeholder="Describe requerimientos técnicos especiales..."
+                      HelperText="Incluye integraciones, performance, seguridad, etc."
+                      Class="mb-4" />
+        
+        <MudExpansionPanels Elevation="1" Class="mb-3">
+            <MudExpansionPanel Text="Ejemplo: Requerimientos Bancarios">
+                <MudText Typo="Typo.body2" Class="mb-2">
+                    <strong>Ejemplo de requerimientos especiales:</strong>
+                </MudText>
+                <MudText Typo="Typo.body2" Style="font-family: monospace; background: #f5f5f5; padding: 8px; border-radius: 4px;">
+                    Integración con servicio externo de scoring crediticio al momento del alta. 
+                    Combo Segmento cargado dinámicamente desde tabla paramétrica. 
+                    Tiempo de respuesta máximo 3 segundos para búsquedas. 
+                    Validación HTTPS obligatoria para todas las transacciones. 
+                    Auditoria completa de cambios con timestamp y usuario.
+                </MudText>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+    
+    <!-- Quick Actions -->
+    <MudItem xs="12">
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.Security"
+                           OnClick="AddSecurityRules"
+                           FullWidth="true">
+                    Agregar Reglas de Seguridad
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.Speed"
+                           OnClick="AddPerformanceRequirements"
+                           FullWidth="true">
+                    Agregar Req. Performance
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.Integration"
+                           OnClick="AddIntegrationRequirements"
+                           FullWidth="true">
+                    Agregar Integraciones
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.AccountBalance"
+                           OnClick="LoadBankingRulesExample"
+                           FullWidth="true">
+                    Ejemplo Completo Bancario
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    
+    private bool isImprovingRules = false;
+    private bool isImprovingRequirements = false;
+
+    private async Task ImproveBusinessRules()
+    {
+        if (string.IsNullOrWhiteSpace(FormData.BusinessRules))
+            return;
+
+        isImprovingRules = true;
+        try
+        {
+            var request = new AIAssistRequest
+            {
+                FieldName = "businessRules",
+                FieldValue = FormData.BusinessRules,
+                FieldType = "businessRules",
+                AiModel = FormData.AiModel,
+                Context = FormData
+            };
+
+            var response = await AIAssistService.ImproveFieldAsync(request);
+            
+            if (response.Success)
+            {
+                FormData.BusinessRules = response.ImprovedValue;
+                await FormDataChanged.InvokeAsync(FormData);
+                Snackbar.Add("Reglas de negocio mejoradas con IA", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error al mejorar: {response.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isImprovingRules = false;
+        }
+    }
+
+    private async Task ImproveSpecialRequirements()
+    {
+        if (string.IsNullOrWhiteSpace(FormData.SpecialRequirements))
+            return;
+
+        isImprovingRequirements = true;
+        try
+        {
+            var request = new AIAssistRequest
+            {
+                FieldName = "specialRequirements",
+                FieldValue = FormData.SpecialRequirements,
+                FieldType = "specialRequirements",
+                AiModel = FormData.AiModel,
+                Context = FormData
+            };
+
+            var response = await AIAssistService.ImproveFieldAsync(request);
+            
+            if (response.Success)
+            {
+                FormData.SpecialRequirements = response.ImprovedValue;
+                await FormDataChanged.InvokeAsync(FormData);
+                Snackbar.Add("Requerimientos especiales mejorados con IA", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error al mejorar: {response.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isImprovingRequirements = false;
+        }
+    }
+
+    private async Task AddSecurityRules()
+    {
+        var securityRules = @"
+Usuario debe estar autenticado para acceder al sistema.
+Validación de permisos según rol del usuario.
+Encriptación de datos sensibles en tránsito y reposo.
+Registro de auditoría para todas las operaciones críticas.";
+
+        if (!string.IsNullOrWhiteSpace(FormData.BusinessRules))
+            FormData.BusinessRules += "\n\n" + securityRules;
+        else
+            FormData.BusinessRules = securityRules;
+
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Reglas de seguridad agregadas", Severity.Success);
+    }
+
+    private async Task AddPerformanceRequirements()
+    {
+        var performanceReqs = @"
+Tiempo de respuesta máximo de 3 segundos para consultas.
+Soporte para mínimo 100 usuarios concurrentes.
+Disponibilidad del sistema del 99.5% mensual.
+Optimización de consultas en base de datos.";
+
+        if (!string.IsNullOrWhiteSpace(FormData.SpecialRequirements))
+            FormData.SpecialRequirements += "\n\n" + performanceReqs;
+        else
+            FormData.SpecialRequirements = performanceReqs;
+
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Requerimientos de performance agregados", Severity.Success);
+    }
+
+    private async Task AddIntegrationRequirements()
+    {
+        var integrationReqs = @"
+Integración con sistema legado a través de API REST.
+Sincronización de datos en tiempo real.
+Manejo de fallos en servicios externos con reintentos automáticos.
+Formato de intercambio de datos en JSON estándar.";
+
+        if (!string.IsNullOrWhiteSpace(FormData.SpecialRequirements))
+            FormData.SpecialRequirements += "\n\n" + integrationReqs;
+        else
+            FormData.SpecialRequirements = integrationReqs;
+
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Requerimientos de integración agregados", Severity.Success);
+    }
+
+    private async Task LoadBankingRulesExample()
+    {
+        FormData.BusinessRules = @"El DNI debe ser único en el sistema y validar formato correcto. No se puede eliminar un cliente con productos activos. El email debe tener formato válido. Solo usuarios con rol Supervisor pueden eliminar clientes. Registro automático en bitácora de alta modificación eliminación. Validación de scoring crediticio antes del alta de cliente premium.";
+
+        FormData.SpecialRequirements = @"Integración con servicio externo de scoring crediticio al momento del alta. Combo Segmento cargado dinámicamente desde tabla paramétrica. Tiempo de respuesta máximo 3 segundos para búsquedas. Validación HTTPS obligatoria para todas las transacciones. Auditoria completa de cambios con timestamp y usuario.";
+
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Ejemplo bancario completo cargado", Severity.Success);
+    }
+}

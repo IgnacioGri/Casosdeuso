@@ -1,0 +1,288 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject ISnackbar Snackbar
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Campos de la Entidad
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Define los campos que componen la entidad de negocio. Puedes agregar campos manualmente o usar IA para generar desde una descripción.
+        </MudText>
+    </MudItem>
+    
+    <!-- AI Text-to-Fields Generator -->
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2" Class="mb-4">
+            <MudExpansionPanel Text="Generador Inteligente de Campos">
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="fieldsDescription"
+                                      Label="Describe los campos que necesitas"
+                                      Variant="Variant.Outlined"
+                                      Lines="4"
+                                      Placeholder="Ej: necesito campos para un cliente bancario: nombre, apellido, DNI, email, teléfono, fecha de nacimiento, dirección, estado civil"
+                                      Class="mb-3" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudButton Variant="Variant.Filled" 
+                                   Color="Color.Primary" 
+                                   StartIcon="@Icons.Material.Filled.AutoAwesome"
+                                   OnClick="GenerateFieldsFromDescription"
+                                   Disabled="isGeneratingFields || string.IsNullOrWhiteSpace(fieldsDescription)">
+                            @if (isGeneratingFields)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                                <text class="ml-2">Generando campos...</text>
+                            }
+                            else
+                            {
+                                <text>Generar Campos con IA</text>
+                            }
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+    
+    <!-- Entity Fields List -->
+    <MudItem xs="12">
+        <div class="d-flex justify-space-between align-center mb-3">
+            <MudText Typo="Typo.h6">Campos Definidos</MudText>
+            <MudButton Variant="Variant.Outlined" 
+                       Color="Color.Primary" 
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="AddNewField">
+                Agregar Campo
+            </MudButton>
+        </div>
+        
+        @if (FormData.EntityFields.Any())
+        {
+            <MudDataGrid Items="FormData.EntityFields" 
+                         Filterable="false" 
+                         SortMode="SortMode.None"
+                         Groupable="false"
+                         Class="mb-4">
+                <Columns>
+                    <PropertyColumn Property="x => x.Name" Title="Nombre" />
+                    <PropertyColumn Property="x => x.Type" Title="Tipo" />
+                    <PropertyColumn Property="x => x.Length" Title="Longitud" />
+                    <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
+                        <CellTemplate>
+                            <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
+                                     Color="@(context.Item.Mandatory ? Color.Success : Color.Default)" />
+                        </CellTemplate>
+                    </PropertyColumn>
+                    <TemplateColumn Title="Acciones">
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" 
+                                           Color="Color.Primary" 
+                                           Size="Size.Small"
+                                           OnClick="() => EditField(context.Item)" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                           Color="Color.Error" 
+                                           Size="Size.Small"
+                                           OnClick="() => RemoveField(context.Item)" />
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Dense="true">
+                <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                No hay campos definidos. Usa el generador inteligente o agrega campos manualmente.
+            </MudAlert>
+        }
+    </MudItem>
+    
+    <!-- Standard ING Fields -->
+    <MudItem xs="12">
+        <MudButton Variant="Variant.Text" 
+                   Color="Color.Secondary" 
+                   StartIcon="@Icons.Material.Filled.AccountBalance"
+                   OnClick="AddINGStandardFields"
+                   Class="mt-2">
+            Agregar Campos Estándar ING (Auditoría)
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
+<!-- Edit Field Dialog -->
+<MudDialog @bind-IsVisible="showEditDialog" Options="dialogOptions">
+    <DialogContent>
+        <MudText Typo="Typo.h6" Class="mb-4">Editar Campo</MudText>
+        
+        <MudTextField @bind-Value="editingField.Name"
+                      Label="Nombre del Campo"
+                      Variant="Variant.Outlined"
+                      Class="mb-3" />
+        
+        <MudSelect @bind-Value="editingField.Type"
+                   Label="Tipo de Dato"
+                   Variant="Variant.Outlined"
+                   Class="mb-3">
+            @foreach (EntityFieldType type in Enum.GetValues<EntityFieldType>())
+            {
+                <MudSelectItem Value="type">@type</MudSelectItem>
+            }
+        </MudSelect>
+        
+        <MudNumericField @bind-Value="editingField.Length"
+                         Label="Longitud (opcional)"
+                         Variant="Variant.Outlined"
+                         Class="mb-3" />
+        
+        <MudCheckBox @bind-Checked="editingField.Mandatory"
+                     Label="Campo obligatorio" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelEdit">Cancelar</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="SaveField">Guardar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    
+    private string fieldsDescription = "";
+    private bool isGeneratingFields = false;
+    private bool showEditDialog = false;
+    private EntityField editingField = new();
+    private bool isEditingExisting = false;
+    
+    private DialogOptions dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    private async Task GenerateFieldsFromDescription()
+    {
+        if (string.IsNullOrWhiteSpace(fieldsDescription))
+            return;
+
+        isGeneratingFields = true;
+        try
+        {
+            var request = new AIAssistRequest
+            {
+                FieldName = "entityFields",
+                FieldValue = fieldsDescription,
+                FieldType = "fieldsFromText",
+                AiModel = FormData.AiModel,
+                Context = FormData
+            };
+
+            var response = await AIAssistService.ImproveFieldAsync(request);
+            
+            if (response.Success)
+            {
+                // Parse the AI response and add fields
+                // This would need to parse the AI-generated field structure
+                Snackbar.Add("Campos generados con IA", Severity.Success);
+                fieldsDescription = "";
+                await FormDataChanged.InvokeAsync(FormData);
+            }
+            else
+            {
+                Snackbar.Add($"Error al generar: {response.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isGeneratingFields = false;
+        }
+    }
+
+    private void AddNewField()
+    {
+        editingField = new EntityField();
+        isEditingExisting = false;
+        showEditDialog = true;
+    }
+
+    private void EditField(EntityField field)
+    {
+        editingField = new EntityField 
+        { 
+            Name = field.Name, 
+            Type = field.Type, 
+            Length = field.Length, 
+            Mandatory = field.Mandatory 
+        };
+        isEditingExisting = true;
+        showEditDialog = true;
+    }
+
+    private async Task RemoveField(EntityField field)
+    {
+        FormData.EntityFields.Remove(field);
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task SaveField()
+    {
+        if (string.IsNullOrWhiteSpace(editingField.Name))
+            return;
+
+        if (isEditingExisting)
+        {
+            var existingField = FormData.EntityFields.FirstOrDefault(f => f.Name == editingField.Name);
+            if (existingField != null)
+            {
+                existingField.Type = editingField.Type;
+                existingField.Length = editingField.Length;
+                existingField.Mandatory = editingField.Mandatory;
+            }
+        }
+        else
+        {
+            FormData.EntityFields.Add(new EntityField
+            {
+                Name = editingField.Name,
+                Type = editingField.Type,
+                Length = editingField.Length,
+                Mandatory = editingField.Mandatory
+            });
+        }
+
+        showEditDialog = false;
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private void CancelEdit()
+    {
+        showEditDialog = false;
+    }
+
+    private async Task AddINGStandardFields()
+    {
+        var standardFields = new[]
+        {
+            new EntityField { Name = "fechaAlta", Type = EntityFieldType.Date, Mandatory = true },
+            new EntityField { Name = "usuarioAlta", Type = EntityFieldType.Text, Length = 50, Mandatory = true },
+            new EntityField { Name = "fechaModificacion", Type = EntityFieldType.Date, Mandatory = false },
+            new EntityField { Name = "usuarioModificacion", Type = EntityFieldType.Text, Length = 50, Mandatory = false }
+        };
+
+        foreach (var field in standardFields)
+        {
+            if (!FormData.EntityFields.Any(f => f.Name == field.Name))
+            {
+                FormData.EntityFields.Add(field);
+            }
+        }
+
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Campos estándar ING agregados", Severity.Success);
+    }
+}

@@ -1,0 +1,178 @@
+/* ING Corporate Styles */
+:root {
+    --ing-primary: #0070C0;
+    --ing-secondary: #28A745;
+    --ing-background: #F8F9FA;
+    --ing-surface: #FFFFFF;
+    --ing-text-primary: #333333;
+    --ing-text-secondary: #666666;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    margin: 0;
+    background-color: var(--ing-background);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.hover\:elevation-4:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08) !important;
+}
+
+/* Blazor Error UI */
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}
+
+/* Custom MudBlazor overrides */
+.mud-stepper .mud-stepper-header .mud-stepper-header-text {
+    font-weight: 500;
+}
+
+.mud-card.hover-card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* ING specific colors */
+.ing-primary {
+    color: var(--ing-primary) !important;
+}
+
+.ing-bg-primary {
+    background-color: var(--ing-primary) !important;
+}
+
+.ing-secondary {
+    color: var(--ing-secondary) !important;
+}
+
+.ing-bg-secondary {
+    background-color: var(--ing-secondary) !important;
+}
+
+/* Loading animation */
+.loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--ing-primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Form validation styles */
+.mud-input-error .mud-input-slot {
+    border-color: #d32f2f !important;
+}
+
+.mud-input-helper-text.mud-input-error {
+    color: #d32f2f;
+}
+
+/* Custom card hover effects */
+.interactive-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.interactive-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+/* ING Document preview styles */
+.document-preview {
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.document-preview h1 {
+    color: var(--ing-primary);
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.document-preview h2 {
+    color: var(--ing-primary);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 12px 0;
+}
+
+.document-preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+
+.document-preview th,
+.document-preview td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.document-preview th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .document-preview {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .mud-container {
+        padding: 12px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .mud-appbar,
+    .mud-drawer,
+    .mud-fab,
+    .mud-button {
+        display: none !important;
+    }
+    
+    .document-preview {
+        box-shadow: none;
+        max-width: none;
+        padding: 0;
+    }
+}

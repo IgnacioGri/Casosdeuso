@@ -1,0 +1,285 @@
+@page "/test-cases"
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject IFormStateService FormStateService
+@inject ISnackbar Snackbar
+
+<PageTitle>Casos de Prueba Inteligentes</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudPaper Elevation="2" Class="pa-6">
+        <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
+            Generador de Casos de Prueba Inteligentes
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Genera casos de prueba automáticamente basados en la información completa del caso de uso.
+        </MudText>
+        
+        <MudGrid>
+            <!-- Configuration Panel -->
+            <MudItem xs="12" md="4">
+                <MudCard Elevation="3" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">Configuración</MudText>
+                    
+                    <MudSelect @bind-Value="selectedAIModel" 
+                               Label="Modelo de IA" 
+                               Variant="Variant.Outlined"
+                               Class="mb-3">
+                        <MudSelectItem Value="AIModel.Demo">Modo Demo</MudSelectItem>
+                        <MudSelectItem Value="AIModel.OpenAI">OpenAI GPT-4o</MudSelectItem>
+                        <MudSelectItem Value="AIModel.Claude">Claude Sonnet</MudSelectItem>
+                        <MudSelectItem Value="AIModel.Gemini">Google Gemini</MudSelectItem>
+                        <MudSelectItem Value="AIModel.Grok">Grok (X.AI)</MudSelectItem>
+                    </MudSelect>
+                    
+                    <MudCheckBox @bind-Checked="includeSecurityTests"
+                                 Label="Incluir pruebas de seguridad"
+                                 Class="mb-2" />
+                    
+                    <MudCheckBox @bind-Checked="includePerformanceTests"
+                                 Label="Incluir pruebas de rendimiento"
+                                 Class="mb-2" />
+                    
+                    <MudCheckBox @bind-Checked="includeErrorHandling"
+                                 Label="Incluir manejo de errores"
+                                 Class="mb-3" />
+                    
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.AutoAwesome"
+                               OnClick="GenerateIntelligentTestCases"
+                               Disabled="isGenerating || !HasValidFormData()"
+                               FullWidth="true">
+                        @if (isGenerating)
+                        {
+                            <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                            <text class="ml-2">Generando...</text>
+                        }
+                        else
+                        {
+                            <text>Generar Casos de Prueba</text>
+                        }
+                    </MudButton>
+                </MudCard>
+            </MudItem>
+            
+            <!-- Form Data Preview -->
+            <MudItem xs="12" md="8">
+                <MudCard Elevation="3" Class="pa-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">Datos del Caso de Uso</MudText>
+                    
+                    @if (formData != null)
+                    {
+                        <MudGrid>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.subtitle2">Cliente:</MudText>
+                                <MudText Typo="Typo.body2" Class="mb-2">@formData.ClientName</MudText>
+                            </MudItem>
+                            <MudItem xs="12" sm="6">
+                                <MudText Typo="Typo.subtitle2">Proyecto:</MudText>
+                                <MudText Typo="Typo.body2" Class="mb-2">@formData.ProjectName</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.subtitle2">Caso de Uso:</MudText>
+                                <MudText Typo="Typo.body1" Color="Color.Primary">@formData.UseCaseName</MudText>
+                            </MudItem>
+                            <MudItem xs="12">
+                                <MudText Typo="Typo.subtitle2">Descripción:</MudText>
+                                <MudText Typo="Typo.body2">@formData.Description</MudText>
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Warning">
+                            <MudIcon Icon="@Icons.Material.Filled.Warning" Class="mr-2" />
+                            No hay datos de caso de uso disponibles. 
+                            <MudLink Href="/generator">Crea un caso de uso primero</MudLink>.
+                        </MudAlert>
+                    }
+                </MudCard>
+            </MudItem>
+            
+            <!-- Generated Test Cases -->
+            @if (testCaseResult != null)
+            {
+                <MudItem xs="12">
+                    <MudCard Elevation="3" Class="pa-4">
+                        <MudText Typo="Typo.h6" Class="mb-3">Casos de Prueba Generados</MudText>
+                        
+                        @if (testCaseResult.Success)
+                        {
+                            <MudGrid>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Value="@testCaseResult.Objective"
+                                                  Label="Objetivo"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="3"
+                                                  ReadOnly="true"
+                                                  Class="mb-3" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Value="@testCaseResult.Preconditions"
+                                                  Label="Precondiciones"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="3"
+                                                  ReadOnly="true"
+                                                  Class="mb-3" />
+                                </MudItem>
+                                
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h6" Class="mb-3">Pasos de Prueba</MudText>
+                                    <MudDataGrid Items="@testCaseResult.TestSteps" 
+                                                 Filterable="false" 
+                                                 SortMode="SortMode.None"
+                                                 Groupable="false">
+                                        <Columns>
+                                            <PropertyColumn Property="x => x.Number" Title="#" />
+                                            <PropertyColumn Property="x => x.Action" Title="Acción" />
+                                            <PropertyColumn Property="x => x.InputData" Title="Datos de Entrada" />
+                                            <PropertyColumn Property="x => x.ExpectedResult" Title="Resultado Esperado" />
+                                            <PropertyColumn Property="x => x.Observations" Title="Observaciones" />
+                                        </Columns>
+                                    </MudDataGrid>
+                                </MudItem>
+                                
+                                @if (!string.IsNullOrWhiteSpace(testCaseResult.AnalysisNotes))
+                                {
+                                    <MudItem xs="12">
+                                        <MudTextField Value="@testCaseResult.AnalysisNotes"
+                                                      Label="Notas de Análisis"
+                                                      Variant="Variant.Outlined"
+                                                      Lines="3"
+                                                      ReadOnly="true"
+                                                      Class="mt-3" />
+                                    </MudItem>
+                                }
+                                
+                                <!-- Export Options -->
+                                <MudItem xs="12" Class="mt-4">
+                                    <MudButtonGroup Variant="Variant.Outlined">
+                                        <MudButton StartIcon="@Icons.Material.Filled.Download"
+                                                   Color="Color.Primary"
+                                                   OnClick="ExportToExcel">
+                                            Exportar a Excel
+                                        </MudButton>
+                                        <MudButton StartIcon="@Icons.Material.Filled.FileCopy"
+                                                   Color="Color.Secondary"
+                                                   OnClick="CopyToClipboard">
+                                            Copiar al Portapapeles
+                                        </MudButton>
+                                        <MudButton StartIcon="@Icons.Material.Filled.Create"
+                                                   Color="Color.Success"
+                                                   OnClick="AddToUseCaseForm">
+                                            Agregar al Formulario
+                                        </MudButton>
+                                    </MudButtonGroup>
+                                </MudItem>
+                            </MudGrid>
+                        }
+                        else
+                        {
+                            <MudAlert Severity="Severity.Error">
+                                Error al generar casos de prueba: @testCaseResult.Error
+                            </MudAlert>
+                        }
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private AIModel selectedAIModel = AIModel.Demo;
+    private bool includeSecurityTests = true;
+    private bool includePerformanceTests = false;
+    private bool includeErrorHandling = true;
+    private bool isGenerating = false;
+    
+    private UseCaseFormData? formData;
+    private IntelligentTestCaseResponse? testCaseResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load form data from local storage
+        formData = await FormStateService.LoadFormStateAsync();
+    }
+
+    private bool HasValidFormData()
+    {
+        return formData != null && 
+               !string.IsNullOrWhiteSpace(formData.UseCaseName) && 
+               !string.IsNullOrWhiteSpace(formData.Description);
+    }
+
+    private async Task GenerateIntelligentTestCases()
+    {
+        if (formData == null) return;
+
+        isGenerating = true;
+        try
+        {
+            var request = new IntelligentTestCaseRequest
+            {
+                FormData = formData,
+                AiModel = selectedAIModel
+            };
+
+            testCaseResult = await AIAssistService.GenerateTestCasesAsync(request);
+            
+            if (testCaseResult.Success)
+            {
+                Snackbar.Add("Casos de prueba generados exitosamente", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error al generar casos de prueba: {testCaseResult.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
+
+    private async Task ExportToExcel()
+    {
+        if (testCaseResult?.Success == true)
+        {
+            // TODO: Implement Excel export
+            Snackbar.Add("Exportación a Excel en desarrollo", Severity.Info);
+        }
+    }
+
+    private async Task CopyToClipboard()
+    {
+        if (testCaseResult?.Success == true)
+        {
+            // TODO: Implement clipboard copy
+            Snackbar.Add("Funcionalidad de copia al portapapeles en desarrollo", Severity.Info);
+        }
+    }
+
+    private async Task AddToUseCaseForm()
+    {
+        if (testCaseResult?.Success == true && formData != null)
+        {
+            // Update form data with generated test cases
+            formData.GenerateTestCase = true;
+            formData.TestCaseObjective = testCaseResult.Objective;
+            formData.TestCasePreconditions = testCaseResult.Preconditions;
+            formData.TestSteps = testCaseResult.TestSteps;
+
+            await FormStateService.SaveFormStateAsync(formData);
+            Snackbar.Add("Casos de prueba agregados al formulario principal", Severity.Success);
+        }
+    }
+}

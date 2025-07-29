@@ -1,0 +1,296 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Wireframes y Flujos Alternativos
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Define los wireframes de las pantallas y los flujos alternativos para manejo de errores y casos especiales.
+        </MudText>
+    </MudItem>
+    
+    <!-- Wireframes Section -->
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h6" Class="mb-3">Wireframes</MudText>
+        
+        <MudCheckBox @bind-Checked="FormData.GenerateWireframes"
+                     Label="Generar wireframes automáticamente"
+                     Class="mb-3" />
+        
+        @if (FormData.GenerateWireframes)
+        {
+            <div class="d-flex align-center mb-2">
+                <MudTextField @bind-Value="newWireframe"
+                              Label="Descripción de wireframe"
+                              Variant="Variant.Outlined"
+                              Class="flex-grow-1 mr-2"
+                              Placeholder="Ej: Pantalla de consulta con filtros laterales"
+                              @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddWireframe(); })" />
+                <MudButton Variant="Variant.Filled" 
+                           Color="Color.Primary"
+                           OnClick="AddWireframe"
+                           Disabled="string.IsNullOrWhiteSpace(newWireframe)">
+                    Agregar
+                </MudButton>
+            </div>
+            
+            @if (FormData.WireframeDescriptions.Any())
+            {
+                <MudList Dense="true">
+                    @foreach (var wireframe in FormData.WireframeDescriptions.ToList())
+                    {
+                        <MudListItem>
+                            <div class="d-flex justify-space-between align-center">
+                                <MudText>@wireframe</MudText>
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                               Color="Color.Error" 
+                                               Size="Size.Small"
+                                               OnClick="() => RemoveWireframe(wireframe)" />
+                            </div>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">
+                    No hay wireframes definidos
+                </MudAlert>
+            }
+            
+            <MudTextField @bind-Value="FormData.WireframesDescription"
+                          Label="Descripción general de wireframes"
+                          Variant="Variant.Outlined"
+                          Lines="4"
+                          Placeholder="Describe el flujo general de pantallas..."
+                          Class="mt-3" />
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Dense="true">
+                Los wireframes no se generarán automáticamente
+            </MudAlert>
+        }
+    </MudItem>
+    
+    <!-- Alternative Flows Section -->
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h6" Class="mb-3">Flujos Alternativos</MudText>
+        
+        <div class="d-flex align-center mb-2">
+            <MudTextField @bind-Value="newAlternativeFlow"
+                          Label="Flujo alternativo"
+                          Variant="Variant.Outlined"
+                          Class="flex-grow-1 mr-2"
+                          Placeholder="Ej: Error en validación de DNI duplicado"
+                          @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddAlternativeFlow(); })" />
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary"
+                       OnClick="AddAlternativeFlow"
+                       Disabled="string.IsNullOrWhiteSpace(newAlternativeFlow)">
+                Agregar
+            </MudButton>
+        </div>
+        
+        @if (FormData.AlternativeFlows.Any())
+        {
+            <MudList Dense="true">
+                @foreach (var flow in FormData.AlternativeFlows.ToList())
+                {
+                    <MudListItem>
+                        <div class="d-flex justify-space-between align-center">
+                            <MudText>@flow</MudText>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                           Color="Color.Error" 
+                                           Size="Size.Small"
+                                           OnClick="() => RemoveAlternativeFlow(flow)" />
+                        </div>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Dense="true">
+                No hay flujos alternativos definidos
+            </MudAlert>
+        }
+        
+        <MudTextField @bind-Value="FormData.AlternativeFlowsDescription"
+                      Label="Descripción de flujos alternativos"
+                      Variant="Variant.Outlined"
+                      Lines="4"
+                      Placeholder="Describe los escenarios de error y casos especiales..."
+                      Class="mt-3" />
+    </MudItem>
+    
+    <!-- Quick Examples -->
+    <MudItem xs="12">
+        <MudText Typo="Typo.h6" Class="mb-3">Ejemplos Comunes</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.Web"
+                           OnClick="AddCRUDWireframes"
+                           FullWidth="true">
+                    Wireframes CRUD
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.Error"
+                           OnClick="AddErrorFlows"
+                           FullWidth="true">
+                    Flujos de Error
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.AccountBalance"
+                           OnClick="AddBankingFlows"
+                           FullWidth="true">
+                    Flujos Bancarios
+                </MudButton>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary" 
+                           StartIcon="@Icons.Material.Filled.Security"
+                           OnClick="AddSecurityFlows"
+                           FullWidth="true">
+                    Flujos Seguridad
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    
+    private string newWireframe = "";
+    private string newAlternativeFlow = "";
+
+    private async Task AddWireframe()
+    {
+        if (!string.IsNullOrWhiteSpace(newWireframe) && !FormData.WireframeDescriptions.Contains(newWireframe))
+        {
+            FormData.WireframeDescriptions.Add(newWireframe.Trim());
+            newWireframe = "";
+            await FormDataChanged.InvokeAsync(FormData);
+        }
+    }
+
+    private async Task RemoveWireframe(string wireframe)
+    {
+        FormData.WireframeDescriptions.Remove(wireframe);
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddAlternativeFlow()
+    {
+        if (!string.IsNullOrWhiteSpace(newAlternativeFlow) && !FormData.AlternativeFlows.Contains(newAlternativeFlow))
+        {
+            FormData.AlternativeFlows.Add(newAlternativeFlow.Trim());
+            newAlternativeFlow = "";
+            await FormDataChanged.InvokeAsync(FormData);
+        }
+    }
+
+    private async Task RemoveAlternativeFlow(string flow)
+    {
+        FormData.AlternativeFlows.Remove(flow);
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddCRUDWireframes()
+    {
+        var crudWireframes = new[]
+        {
+            "Pantalla de búsqueda con filtros laterales y grilla de resultados",
+            "Modal de alta con formulario de campos obligatorios y opcionales",
+            "Modal de modificación con campos pre-cargados y validaciones",
+            "Modal de confirmación para eliminación con advertencias"
+        };
+
+        FormData.GenerateWireframes = true;
+        foreach (var wireframe in crudWireframes)
+        {
+            if (!FormData.WireframeDescriptions.Contains(wireframe))
+            {
+                FormData.WireframeDescriptions.Add(wireframe);
+            }
+        }
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddErrorFlows()
+    {
+        var errorFlows = new[]
+        {
+            "Error de validación: mostrar mensajes específicos por campo",
+            "Error de conexión: mostrar mensaje y botón de reintentar",
+            "Error de permisos: redirigir a pantalla de acceso denegado",
+            "Timeout de sesión: mostrar modal de re-autenticación"
+        };
+
+        foreach (var flow in errorFlows)
+        {
+            if (!FormData.AlternativeFlows.Contains(flow))
+            {
+                FormData.AlternativeFlows.Add(flow);
+            }
+        }
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddBankingFlows()
+    {
+        var bankingFlows = new[]
+        {
+            "DNI duplicado: mostrar mensaje y opciones de resolución",
+            "Cliente con productos activos: impedir eliminación con detalle",
+            "Scoring crediticio negativo: solicitar autorización supervisor",
+            "Límite de transacciones diarias excedido: bloquear hasta próximo día"
+        };
+
+        foreach (var flow in bankingFlows)
+        {
+            if (!FormData.AlternativeFlows.Contains(flow))
+            {
+                FormData.AlternativeFlows.Add(flow);
+            }
+        }
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddSecurityFlows()
+    {
+        var securityFlows = new[]
+        {
+            "Intento de acceso no autorizado: registrar en log y bloquear",
+            "Cambio de datos sensibles: requerir re-autenticación",
+            "Múltiples intentos fallidos: bloquear usuario temporalmente",
+            "Acceso desde ubicación inusual: enviar notificación de seguridad"
+        };
+
+        foreach (var flow in securityFlows)
+        {
+            if (!FormData.AlternativeFlows.Contains(flow))
+            {
+                FormData.AlternativeFlows.Add(flow);
+            }
+        }
+
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+}

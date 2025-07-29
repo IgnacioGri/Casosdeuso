@@ -1,0 +1,285 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
+            Revisar y Generar Caso de Uso
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-6">
+            Revisa toda la información del caso de uso antes de generar el documento final.
+        </MudText>
+    </MudItem>
+    
+    <!-- Summary Card -->
+    <MudItem xs="12" md="8">
+        <MudCard Elevation="3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Resumen del Caso de Uso</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudChip Icon="@GetAIModelIcon()" Color="Color.Primary" Variant="Variant.Filled">
+                        @FormData.AiModel
+                    </MudChip>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Cliente</MudText>
+                        <MudText Typo="Typo.body1" Class="mb-3">@FormData.ClientName</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Proyecto</MudText>
+                        <MudText Typo="Typo.body1" Class="mb-3">@FormData.ProjectName</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Código</MudText>
+                        <MudText Typo="Typo.body1" Class="mb-3">@FormData.UseCaseCode</MudText>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Tipo</MudText>
+                        <MudChip Color="Color.Secondary" Size="Size.Small">@FormData.UseCaseType</MudChip>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Nombre del Caso de Uso</MudText>
+                        <MudText Typo="Typo.h6" Color="Color.Primary">@FormData.UseCaseName</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText Typo="Typo.subtitle2" Class="mb-1">Descripción</MudText>
+                        <MudText Typo="Typo.body2">@FormData.Description</MudText>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    <!-- Generation Options -->
+    <MudItem xs="12" md="4">
+        <MudCard Elevation="3">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Opciones de Generación</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudStack>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Success" 
+                               StartIcon="@Icons.Material.Filled.AutoAwesome"
+                               FullWidth="true"
+                               Size="Size.Large"
+                               OnClick="OnGenerateClicked"
+                               Class="mb-3">
+                        Generar Documento
+                    </MudButton>
+                    
+                    <MudDivider />
+                    
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                        <MudText Typo="Typo.body2">
+                            El documento incluirá formato ING profesional
+                        </MudText>
+                    </div>
+                    
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Download" Class="mr-2" />
+                        <MudText Typo="Typo.body2">
+                            Disponible en HTML y DOCX
+                        </MudText>
+                    </div>
+                    
+                    <div class="d-flex align-center">
+                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Class="mr-2" />
+                        <MudText Typo="Typo.body2">
+                            Tiempo estimado: 30-60 segundos
+                        </MudText>
+                    </div>
+                </MudStack>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    <!-- Detailed Information Accordion -->
+    <MudItem xs="12">
+        <MudExpansionPanels MultiExpansion="true" Elevation="2">
+            
+            @if (FormData.UseCaseType == UseCaseType.Entity && FormData.EntityFields.Any())
+            {
+                <MudExpansionPanel Text="@($"Campos de Entidad ({FormData.EntityFields.Count})")">
+                    <MudDataGrid Items="FormData.EntityFields" Filterable="false" SortMode="SortMode.None" Groupable="false">
+                        <Columns>
+                            <PropertyColumn Property="x => x.Name" Title="Nombre" />
+                            <PropertyColumn Property="x => x.Type" Title="Tipo" />
+                            <PropertyColumn Property="x => x.Length" Title="Longitud" />
+                            <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
+                                <CellTemplate>
+                                    <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
+                                             Color="@(context.Item.Mandatory ? Color.Success : Color.Default)" />
+                                </CellTemplate>
+                            </PropertyColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudExpansionPanel>
+            }
+            
+            @if (FormData.SearchFilters.Any())
+            {
+                <MudExpansionPanel Text="@($"Filtros de Búsqueda ({FormData.SearchFilters.Count})")">
+                    <MudList Dense="true">
+                        @foreach (var filter in FormData.SearchFilters)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.FilterList" Text="@filter" />
+                        }
+                    </MudList>
+                </MudExpansionPanel>
+            }
+            
+            @if (FormData.ResultColumns.Any())
+            {
+                <MudExpansionPanel Text="@($"Columnas de Resultado ({FormData.ResultColumns.Count})")">
+                    <MudList Dense="true">
+                        @foreach (var column in FormData.ResultColumns)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.ViewColumn" Text="@column" />
+                        }
+                    </MudList>
+                </MudExpansionPanel>
+            }
+            
+            @if (!string.IsNullOrWhiteSpace(FormData.BusinessRules))
+            {
+                <MudExpansionPanel Text="Reglas de Negocio">
+                    <MudText>@FormData.BusinessRules</MudText>
+                </MudExpansionPanel>
+            }
+            
+            @if (!string.IsNullOrWhiteSpace(FormData.SpecialRequirements))
+            {
+                <MudExpansionPanel Text="Requerimientos Especiales">
+                    <MudText>@FormData.SpecialRequirements</MudText>
+                </MudExpansionPanel>
+            }
+            
+            @if (FormData.GenerateWireframes && FormData.WireframeDescriptions.Any())
+            {
+                <MudExpansionPanel Text="@($"Wireframes ({FormData.WireframeDescriptions.Count})")">
+                    <MudList Dense="true">
+                        @foreach (var wireframe in FormData.WireframeDescriptions)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.Web" Text="@wireframe" />
+                        }
+                    </MudList>
+                </MudExpansionPanel>
+            }
+            
+            @if (FormData.AlternativeFlows.Any())
+            {
+                <MudExpansionPanel Text="@($"Flujos Alternativos ({FormData.AlternativeFlows.Count})")">
+                    <MudList Dense="true">
+                        @foreach (var flow in FormData.AlternativeFlows)
+                        {
+                            <MudListItem Icon="@Icons.Material.Filled.AccountTree" Text="@flow" />
+                        }
+                    </MudList>
+                </MudExpansionPanel>
+            }
+            
+            @if (FormData.GenerateTestCase && FormData.TestSteps.Any())
+            {
+                <MudExpansionPanel Text="@($"Casos de Prueba ({FormData.TestSteps.Count} pasos)")">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Objetivo:</MudText>
+                    <MudText Class="mb-3">@FormData.TestCaseObjective</MudText>
+                    
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Precondiciones:</MudText>
+                    <MudText Class="mb-3">@FormData.TestCasePreconditions</MudText>
+                    
+                    <MudText Typo="Typo.subtitle2" Class="mb-2">Pasos:</MudText>
+                    <MudDataGrid Items="FormData.TestSteps" Filterable="false" SortMode="SortMode.None" Groupable="false">
+                        <Columns>
+                            <PropertyColumn Property="x => x.Number" Title="#" />
+                            <PropertyColumn Property="x => x.Action" Title="Acción" />
+                            <PropertyColumn Property="x => x.InputData" Title="Datos" />
+                            <PropertyColumn Property="x => x.ExpectedResult" Title="Resultado Esperado" />
+                        </Columns>
+                    </MudDataGrid>
+                </MudExpansionPanel>
+            }
+            
+        </MudExpansionPanels>
+    </MudItem>
+    
+    <!-- Validation Alerts -->
+    <MudItem xs="12">
+        @if (GetValidationErrors().Any())
+        {
+            <MudAlert Severity="Severity.Warning" Class="mb-3">
+                <MudText Typo="Typo.subtitle2" Class="mb-2">Se encontraron las siguientes advertencias:</MudText>
+                <MudList Dense="true">
+                    @foreach (var error in GetValidationErrors())
+                    {
+                        <MudListItem Icon="@Icons.Material.Filled.Warning" Text="@error" />
+                    }
+                </MudList>
+            </MudAlert>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Success">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
+                El caso de uso está completo y listo para generar.
+            </MudAlert>
+        }
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    [Parameter] public EventCallback OnGenerate { get; set; }
+
+    private async Task OnGenerateClicked()
+    {
+        await OnGenerate.InvokeAsync();
+    }
+
+    private string GetAIModelIcon()
+    {
+        return FormData.AiModel switch
+        {
+            AIModel.OpenAI => Icons.Material.Filled.Psychology,
+            AIModel.Claude => Icons.Material.Filled.AutoAwesome,
+            AIModel.Gemini => Icons.Material.Filled.Diamond,
+            AIModel.Grok => Icons.Material.Filled.Rocket,
+            _ => Icons.Material.Filled.Preview
+        };
+    }
+
+    private List<string> GetValidationErrors()
+    {
+        var errors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(FormData.ClientName))
+            errors.Add("Nombre del cliente es requerido");
+
+        if (string.IsNullOrWhiteSpace(FormData.ProjectName))
+            errors.Add("Nombre del proyecto es requerido");
+
+        if (string.IsNullOrWhiteSpace(FormData.UseCaseCode))
+            errors.Add("Código del caso de uso es requerido");
+
+        if (string.IsNullOrWhiteSpace(FormData.UseCaseName))
+            errors.Add("Nombre del caso de uso es requerido");
+
+        if (string.IsNullOrWhiteSpace(FormData.Description))
+            errors.Add("Descripción es requerida");
+
+        if (FormData.UseCaseType == UseCaseType.Entity && !FormData.EntityFields.Any())
+            errors.Add("Casos de uso de entidad requieren al menos un campo definido");
+
+        return errors;
+    }
+}

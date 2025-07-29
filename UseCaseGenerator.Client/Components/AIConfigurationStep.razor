@@ -1,0 +1,120 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Configuración de Inteligencia Artificial
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Selecciona el modelo de IA que utilizarás para generar y mejorar el contenido del caso de uso.
+        </MudText>
+    </MudItem>
+    
+    <MudItem xs="12" md="8">
+        <MudRadioGroup @bind-SelectedOption="selectedModel" T="string">
+            <MudRadio Option="@("demo")" Color="Color.Primary">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Preview" Color="Color.Info" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">Modo Demo</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.TextSecondary">
+                            Utiliza ejemplos predefinidos. Ideal para probar la funcionalidad.
+                        </MudText>
+                    </div>
+                </div>
+            </MudRadio>
+            
+            <MudRadio Option="@("openai")" Color="Color.Primary">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Psychology" Color="Color.Success" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">OpenAI GPT-4o</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.TextSecondary">
+                            Modelo avanzado para contenido creativo y detallado.
+                        </MudText>
+                    </div>
+                </div>
+            </MudRadio>
+            
+            <MudRadio Option="@("claude")" Color="Color.Primary">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.AutoAwesome" Color="Color.Warning" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">Claude Sonnet</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.TextSecondary">
+                            Excelente para análisis contextual y documentación técnica.
+                        </MudText>
+                    </div>
+                </div>
+            </MudRadio>
+            
+            <MudRadio Option="@("gemini")" Color="Color.Primary">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Diamond" Color="Color.Secondary" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">Google Gemini</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.TextSecondary">
+                            Optimizado para tareas estructuradas y procesamiento de datos.
+                        </MudText>
+                    </div>
+                </div>
+            </MudRadio>
+            
+            <MudRadio Option="@("grok")" Color="Color.Primary">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Rocket" Color="Color.Error" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">Grok (X.AI)</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.TextSecondary">
+                            Enfoque directo y eficiente para documentación empresarial.
+                        </MudText>
+                    </div>
+                </div>
+            </MudRadio>
+        </MudRadioGroup>
+    </MudItem>
+    
+    <MudItem xs="12" md="4">
+        <MudPaper Elevation="1" Class="pa-4" Style="background-color: #f8f9fa;">
+            <MudText Typo="Typo.h6" GutterBottom="true">
+                <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                Información
+            </MudText>
+            <MudText Typo="Typo.body2" Class="mb-2">
+                <strong>AI Assist:</strong> Todos los modelos incluyen funcionalidad de mejora automática de campos individuales.
+            </MudText>
+            <MudText Typo="Typo.body2" Class="mb-2">
+                <strong>Estándares ING:</strong> El contenido generado cumple automáticamente con las reglas corporativas.
+            </MudText>
+            <MudText Typo="Typo.body2">
+                <strong>Modo Demo:</strong> No requiere configuración de API keys.
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+
+    private string selectedModel
+    {
+        get => FormData.AiModel.ToString().ToLower();
+        set
+        {
+            var aiModel = value switch
+            {
+                "openai" => AIModel.OpenAI,
+                "claude" => AIModel.Claude,
+                "gemini" => AIModel.Gemini,
+                "grok" => AIModel.Grok,
+                _ => AIModel.Demo
+            };
+
+            FormData.AiModel = aiModel;
+            FormDataChanged.InvokeAsync(FormData);
+        }
+    }
+}

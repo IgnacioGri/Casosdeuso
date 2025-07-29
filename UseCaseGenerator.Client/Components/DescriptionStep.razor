@@ -1,0 +1,116 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject ISnackbar Snackbar
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Descripción del Caso de Uso
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Describe claramente el propósito y alcance del caso de uso. Esta descripción será la base para la generación automática del documento.
+        </MudText>
+    </MudItem>
+    
+    <MudItem xs="12">
+        <div class="d-flex align-center mb-2">
+            <MudText Typo="Typo.h6" Class="mr-3">Descripción</MudText>
+            <MudButton Variant="Variant.Text" 
+                       Color="Color.Primary" 
+                       Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.AutoAwesome"
+                       OnClick="ImproveDescription"
+                       Disabled="isImproving || string.IsNullOrWhiteSpace(FormData.Description)">
+                @if (isImproving)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                    <text class="ml-2">Mejorando...</text>
+                }
+                else
+                {
+                    <text>AI Assist</text>
+                }
+            </MudButton>
+        </div>
+        
+        <MudTextField @bind-Value="FormData.Description"
+                      Label="Descripción detallada del caso de uso"
+                      Variant="Variant.Outlined"
+                      Lines="6"
+                      Required="true"
+                      HelperText="Explica qué hace el caso de uso, quién lo utiliza y en qué contexto"
+                      Class="mb-4" />
+    </MudItem>
+    
+    <MudItem xs="12">
+        <MudExpansionPanels Elevation="2">
+            <MudExpansionPanel Text="Ejemplo: Gestionar Clientes Premium">
+                <MudText Typo="Typo.body2">
+                    "Permite gestionar la información completa de los clientes premium del banco, incluyendo 
+                    la consulta de datos personales y financieros, actualización de información de contacto, 
+                    seguimiento de productos contratados, gestión del perfil de riesgo crediticio, y 
+                    administración de beneficios exclusivos. El caso de uso abarca desde la búsqueda 
+                    avanzada de clientes hasta la generación de reportes personalizados para el área 
+                    comercial, garantizando el cumplimiento de normativas bancarias y la trazabilidad 
+                    completa de todas las operaciones realizadas."
+                </MudText>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+    </MudItem>
+    
+    <MudItem xs="12">
+        <MudAlert Severity="Severity.Info" Dense="true">
+            <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Class="mr-2" />
+            <strong>Tip:</strong> Una buena descripción incluye: qué hace, quién lo usa, cuándo se ejecuta y qué valor aporta al negocio.
+        </MudAlert>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    
+    private bool isImproving = false;
+
+    private async Task ImproveDescription()
+    {
+        if (string.IsNullOrWhiteSpace(FormData.Description))
+            return;
+
+        isImproving = true;
+        try
+        {
+            var request = new AIAssistRequest
+            {
+                FieldName = "description",
+                FieldValue = FormData.Description,
+                FieldType = "description",
+                AiModel = FormData.AiModel,
+                Context = FormData
+            };
+
+            var response = await AIAssistService.ImproveFieldAsync(request);
+            
+            if (response.Success)
+            {
+                FormData.Description = response.ImprovedValue;
+                await FormDataChanged.InvokeAsync(FormData);
+                Snackbar.Add("Descripción mejorada con IA", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error al mejorar: {response.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isImproving = false;
+        }
+    }
+}

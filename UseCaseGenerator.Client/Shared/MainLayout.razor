@@ -1,0 +1,60 @@
+@using MudBlazor
+@inherits LayoutView
+
+<MudThemeProvider Theme="CustomTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Color="Color.Primary">
+        <MudIconButton Icon="Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <MudText Typo="Typo.h6">Generador de Casos de Uso</MudText>
+        <MudSpacer />
+        <MudIconButton Icon="Icons.Material.Filled.Help" Color="Color.Inherit" />
+    </MudAppBar>
+    
+    <MudDrawer @bind-Open="drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">ING Sistema</MudText>
+        </MudDrawerHeader>
+        <NavMenu />
+    </MudDrawer>
+    
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        drawerOpen = !drawerOpen;
+    }
+
+    private MudTheme CustomTheme = new()
+    {
+        Palette = new PaletteLight()
+        {
+            Primary = "#0070C0",        // ING Blue
+            Secondary = "#28A745",      // ING Green  
+            Background = "#F8F9FA",     // Light background
+            Surface = "#FFFFFF",        // White surface
+            AppbarBackground = "#0070C0",
+            AppbarText = "#FFFFFF",
+            TextPrimary = "#333333",
+            TextSecondary = "#666666"
+        },
+        Typography = new Typography()
+        {
+            Default = new Default()
+            {
+                FontFamily = new[] { "Segoe UI", "Roboto", "Arial", "sans-serif" }
+            }
+        }
+    };
+}

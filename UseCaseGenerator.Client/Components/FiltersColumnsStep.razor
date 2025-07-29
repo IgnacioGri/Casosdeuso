@@ -1,0 +1,325 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Client.Services
+@inject IAIAssistService AIAssistService
+@inject ISnackbar Snackbar
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Filtros de Búsqueda y Columnas de Resultado
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Define los filtros que los usuarios podrán usar para buscar registros y las columnas que se mostrarán en los resultados.
+        </MudText>
+    </MudItem>
+    
+    <!-- Search Filters Section -->
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h6" Class="mb-3">Filtros de Búsqueda</MudText>
+        
+        <MudExpansionPanels Elevation="1" Class="mb-3">
+            <MudExpansionPanel Text="Generador Inteligente de Filtros">
+                <MudTextField @bind-Value="filtersDescription"
+                              Label="Describe los filtros que necesitas"
+                              Variant="Variant.Outlined"
+                              Lines="3"
+                              Placeholder="Ej: necesito filtros para buscar clientes por DNI, apellido, email y número de cliente"
+                              Class="mb-3" />
+                <MudButton Variant="Variant.Filled" 
+                           Color="Color.Primary" 
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.AutoAwesome"
+                           OnClick="GenerateFiltersFromDescription"
+                           Disabled="isGeneratingFilters || string.IsNullOrWhiteSpace(filtersDescription)">
+                    @if (isGeneratingFilters)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <text class="ml-2">Generando...</text>
+                    }
+                    else
+                    {
+                        <text>Generar con IA</text>
+                    }
+                </MudButton>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+        
+        <div class="d-flex align-center mb-2">
+            <MudTextField @bind-Value="newFilter"
+                          Label="Nuevo filtro"
+                          Variant="Variant.Outlined"
+                          Class="flex-grow-1 mr-2"
+                          @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddFilter(); })" />
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary"
+                       OnClick="AddFilter"
+                       Disabled="string.IsNullOrWhiteSpace(newFilter)">
+                Agregar
+            </MudButton>
+        </div>
+        
+        @if (FormData.SearchFilters.Any())
+        {
+            <MudList Dense="true">
+                @foreach (var filter in FormData.SearchFilters.ToList())
+                {
+                    <MudListItem>
+                        <div class="d-flex justify-space-between align-center">
+                            <MudText>@filter</MudText>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                           Color="Color.Error" 
+                                           Size="Size.Small"
+                                           OnClick="() => RemoveFilter(filter)" />
+                        </div>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Dense="true">
+                No hay filtros definidos
+            </MudAlert>
+        }
+    </MudItem>
+    
+    <!-- Result Columns Section -->
+    <MudItem xs="12" md="6">
+        <MudText Typo="Typo.h6" Class="mb-3">Columnas de Resultado</MudText>
+        
+        <MudExpansionPanels Elevation="1" Class="mb-3">
+            <MudExpansionPanel Text="Generador Inteligente de Columnas">
+                <MudTextField @bind-Value="columnsDescription"
+                              Label="Describe las columnas que necesitas"
+                              Variant="Variant.Outlined"
+                              Lines="3"
+                              Placeholder="Ej: necesito mostrar ID cliente, apellido y nombres, documento, email y estado"
+                              Class="mb-3" />
+                <MudButton Variant="Variant.Filled" 
+                           Color="Color.Primary" 
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.AutoAwesome"
+                           OnClick="GenerateColumnsFromDescription"
+                           Disabled="isGeneratingColumns || string.IsNullOrWhiteSpace(columnsDescription)">
+                    @if (isGeneratingColumns)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <text class="ml-2">Generando...</text>
+                    }
+                    else
+                    {
+                        <text>Generar con IA</text>
+                    }
+                </MudButton>
+            </MudExpansionPanel>
+        </MudExpansionPanels>
+        
+        <div class="d-flex align-center mb-2">
+            <MudTextField @bind-Value="newColumn"
+                          Label="Nueva columna"
+                          Variant="Variant.Outlined"
+                          Class="flex-grow-1 mr-2"
+                          @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddColumn(); })" />
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary"
+                       OnClick="AddColumn"
+                       Disabled="string.IsNullOrWhiteSpace(newColumn)">
+                Agregar
+            </MudButton>
+        </div>
+        
+        @if (FormData.ResultColumns.Any())
+        {
+            <MudList Dense="true">
+                @foreach (var column in FormData.ResultColumns.ToList())
+                {
+                    <MudListItem>
+                        <div class="d-flex justify-space-between align-center">
+                            <MudText>@column</MudText>
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                           Color="Color.Error" 
+                                           Size="Size.Small"
+                                           OnClick="() => RemoveColumn(column)" />
+                        </div>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Dense="true">
+                No hay columnas definidas
+            </MudAlert>
+        }
+    </MudItem>
+    
+    <MudItem xs="12">
+        <MudButton Variant="Variant.Text" 
+                   Color="Color.Secondary" 
+                   StartIcon="@Icons.Material.Filled.AutoFixHigh"
+                   OnClick="LoadBankingExample"
+                   Class="mt-2">
+            Cargar Ejemplo: Cliente Bancario
+        </MudButton>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    
+    private string newFilter = "";
+    private string newColumn = "";
+    private string filtersDescription = "";
+    private string columnsDescription = "";
+    private bool isGeneratingFilters = false;
+    private bool isGeneratingColumns = false;
+
+    private async Task AddFilter()
+    {
+        if (!string.IsNullOrWhiteSpace(newFilter) && !FormData.SearchFilters.Contains(newFilter))
+        {
+            FormData.SearchFilters.Add(newFilter.Trim());
+            newFilter = "";
+            await FormDataChanged.InvokeAsync(FormData);
+        }
+    }
+
+    private async Task RemoveFilter(string filter)
+    {
+        FormData.SearchFilters.Remove(filter);
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task AddColumn()
+    {
+        if (!string.IsNullOrWhiteSpace(newColumn) && !FormData.ResultColumns.Contains(newColumn))
+        {
+            FormData.ResultColumns.Add(newColumn.Trim());
+            newColumn = "";
+            await FormDataChanged.InvokeAsync(FormData);
+        }
+    }
+
+    private async Task RemoveColumn(string column)
+    {
+        FormData.ResultColumns.Remove(column);
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+
+    private async Task GenerateFiltersFromDescription()
+    {
+        if (string.IsNullOrWhiteSpace(filtersDescription))
+            return;
+
+        isGeneratingFilters = true;
+        try
+        {
+            var request = new AIAssistRequest
+            {
+                FieldName = "searchFilters",
+                FieldValue = filtersDescription,
+                FieldType = "filtersFromText",
+                AiModel = FormData.AiModel,
+                Context = FormData
+            };
+
+            var response = await AIAssistService.ImproveFieldAsync(request);
+            
+            if (response.Success)
+            {
+                // In a real implementation, this would parse the AI response and extract filters
+                var generatedFilters = new[] { "DNI/CUIT", "Apellido", "Email", "Número de Cliente" };
+                foreach (var filter in generatedFilters)
+                {
+                    if (!FormData.SearchFilters.Contains(filter))
+                    {
+                        FormData.SearchFilters.Add(filter);
+                    }
+                }
+                
+                filtersDescription = "";
+                await FormDataChanged.InvokeAsync(FormData);
+                Snackbar.Add("Filtros generados con IA", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error al generar: {response.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isGeneratingFilters = false;
+        }
+    }
+
+    private async Task GenerateColumnsFromDescription()
+    {
+        if (string.IsNullOrWhiteSpace(columnsDescription))
+            return;
+
+        isGeneratingColumns = true;
+        try
+        {
+            var request = new AIAssistRequest
+            {
+                FieldName = "resultColumns",
+                FieldValue = columnsDescription,
+                FieldType = "columnsFromText",
+                AiModel = FormData.AiModel,
+                Context = FormData
+            };
+
+            var response = await AIAssistService.ImproveFieldAsync(request);
+            
+            if (response.Success)
+            {
+                // In a real implementation, this would parse the AI response and extract columns
+                var generatedColumns = new[] { "ID Cliente", "Apellido y Nombres", "Documento", "Email", "Estado" };
+                foreach (var column in generatedColumns)
+                {
+                    if (!FormData.ResultColumns.Contains(column))
+                    {
+                        FormData.ResultColumns.Add(column);
+                    }
+                }
+                
+                columnsDescription = "";
+                await FormDataChanged.InvokeAsync(FormData);
+                Snackbar.Add("Columnas generadas con IA", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Error al generar: {response.Error}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isGeneratingColumns = false;
+        }
+    }
+
+    private async Task LoadBankingExample()
+    {
+        FormData.SearchFilters.Clear();
+        FormData.ResultColumns.Clear();
+        
+        var exampleFilters = new[] { "DNI/CUIT", "Apellido", "Email", "Número de Cliente", "Segmento", "Estado" };
+        var exampleColumns = new[] { "ID Cliente", "Apellido y Nombres", "Tipo y Nro. Documento", "Email", "Teléfono", "Segmento", "Estado" };
+        
+        FormData.SearchFilters.AddRange(exampleFilters);
+        FormData.ResultColumns.AddRange(exampleColumns);
+        
+        await FormDataChanged.InvokeAsync(FormData);
+        Snackbar.Add("Ejemplo bancario cargado", Severity.Success);
+    }
+}

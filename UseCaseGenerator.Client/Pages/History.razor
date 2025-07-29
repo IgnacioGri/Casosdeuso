@@ -1,0 +1,271 @@
+@page "/history"
+@using MudBlazor
+@using UseCaseGenerator.Shared.Models
+@using UseCaseGenerator.Client.Services
+@inject IUseCaseService UseCaseService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<PageTitle>Historial de Casos de Uso</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudPaper Elevation="2" Class="pa-6">
+        <div class="d-flex justify-space-between align-center mb-4">
+            <MudText Typo="Typo.h4" Color="Color.Primary">
+                Historial de Casos de Uso
+            </MudText>
+            <MudButton Variant="Variant.Filled" 
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       Href="/generator">
+                Crear Nuevo
+            </MudButton>
+        </div>
+        
+        <MudDataGrid T="UseCase" 
+                     Items="@useCases" 
+                     Loading="@isLoading"
+                     Filterable="true"
+                     FilterMode="DataGridFilterMode.ColumnFilterMenu"
+                     SortMode="SortMode.Multiple"
+                     Pageable="true"
+                     RowsPerPage="10">
+            
+            <Columns>
+                <PropertyColumn Property="x => x.UseCaseCode" 
+                                Title="Código" 
+                                Filterable="true" 
+                                Sortable="true" />
+                
+                <PropertyColumn Property="x => x.UseCaseName" 
+                                Title="Nombre del Caso de Uso" 
+                                Filterable="true" 
+                                Sortable="true" />
+                
+                <PropertyColumn Property="x => x.ClientName" 
+                                Title="Cliente" 
+                                Filterable="true" 
+                                Sortable="true" />
+                
+                <PropertyColumn Property="x => x.ProjectName" 
+                                Title="Proyecto" 
+                                Filterable="true" 
+                                Sortable="true" />
+                
+                <PropertyColumn Property="x => x.UseCaseType" 
+                                Title="Tipo" 
+                                Filterable="true" 
+                                Sortable="true">
+                    <CellTemplate>
+                        <MudChip Size="Size.Small" 
+                                 Color="@GetTypeColor(context.Item.UseCaseType)">
+                            @context.Item.UseCaseType
+                        </MudChip>
+                    </CellTemplate>
+                </PropertyColumn>
+                
+                <PropertyColumn Property="x => x.AiModel" 
+                                Title="Modelo IA" 
+                                Filterable="true" 
+                                Sortable="true">
+                    <CellTemplate>
+                        <div class="d-flex align-center">
+                            <MudIcon Icon="@GetAIModelIcon(context.Item.AiModel)" 
+                                     Size="Size.Small" 
+                                     Class="mr-2" />
+                            <MudText Typo="Typo.caption">@context.Item.AiModel</MudText>
+                        </div>
+                    </CellTemplate>
+                </PropertyColumn>
+                
+                <PropertyColumn Property="x => x.CreatedAt" 
+                                Title="Fecha Creación" 
+                                Format="dd/MM/yyyy HH:mm"
+                                Filterable="false" 
+                                Sortable="true" />
+                
+                <TemplateColumn Title="Acciones" Filterable="false" Sortable="false">
+                    <CellTemplate>
+                        <MudButtonGroup Variant="Variant.Text" Size="Size.Small">
+                            <MudButton StartIcon="@Icons.Material.Filled.Visibility"
+                                       Color="Color.Primary"
+                                       OnClick="() => ViewUseCase(context.Item)">
+                                Ver
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Download"
+                                       Color="Color.Secondary"
+                                       OnClick="() => DownloadUseCase(context.Item)">
+                                Descargar
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       OnClick="() => DeleteUseCase(context.Item)">
+                                Eliminar
+                            </MudButton>
+                        </MudButtonGroup>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            
+            <PagerContent>
+                <MudDataGridPager T="UseCase" />
+            </PagerContent>
+        </MudDataGrid>
+        
+        @if (!useCases.Any() && !isLoading)
+        {
+            <MudAlert Severity="Severity.Info" Class="mt-4">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">No hay casos de uso generados</MudText>
+                        <MudText Typo="Typo.body2">
+                            Comienza creando tu primer caso de uso utilizando el generador inteligente.
+                        </MudText>
+                        <MudButton Variant="Variant.Text" 
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   Href="/generator"
+                                   Class="mt-2">
+                            Crear Primer Caso de Uso
+                        </MudButton>
+                    </div>
+                </div>
+            </MudAlert>
+        }
+        
+        @if (isLoading)
+        {
+            <div class="d-flex justify-center mt-4">
+                <MudProgressCircular Indeterminate="true" />
+            </div>
+        }
+    </MudPaper>
+</MudContainer>
+
+<!-- Delete Confirmation Dialog -->
+<MudDialog @bind-IsVisible="showDeleteDialog" Options="dialogOptions">
+    <DialogContent>
+        <MudText Typo="Typo.h6" Class="mb-3">Confirmar Eliminación</MudText>
+        <MudText>
+            ¿Estás seguro de que deseas eliminar el caso de uso 
+            <strong>"@selectedUseCase?.UseCaseName"</strong>?
+        </MudText>
+        <MudText Color="Color.Error" Class="mt-2">
+            Esta acción no se puede deshacer.
+        </MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CancelDelete">Cancelar</MudButton>
+        <MudButton Color="Color.Error" 
+                   Variant="Variant.Filled" 
+                   OnClick="ConfirmDelete"
+                   StartIcon="@Icons.Material.Filled.Delete">
+            Eliminar
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private List<UseCase> useCases = new();
+    private bool isLoading = true;
+    private bool showDeleteDialog = false;
+    private UseCase? selectedUseCase;
+    
+    private DialogOptions dialogOptions = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUseCases();
+    }
+
+    private async Task LoadUseCases()
+    {
+        isLoading = true;
+        try
+        {
+            useCases = await UseCaseService.GetAllUseCasesAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al cargar casos de uso: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void ViewUseCase(UseCase useCase)
+    {
+        Navigation.NavigateTo($"/result/{useCase.Id}");
+    }
+
+    private async Task DownloadUseCase(UseCase useCase)
+    {
+        try
+        {
+            // TODO: Implement document download
+            Snackbar.Add("Funcionalidad de descarga en desarrollo", Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al descargar: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void DeleteUseCase(UseCase useCase)
+    {
+        selectedUseCase = useCase;
+        showDeleteDialog = true;
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteDialog = false;
+        selectedUseCase = null;
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (selectedUseCase != null)
+        {
+            try
+            {
+                await UseCaseService.DeleteUseCaseAsync(selectedUseCase.Id);
+                useCases.Remove(selectedUseCase);
+                Snackbar.Add("Caso de uso eliminado exitosamente", Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error al eliminar: {ex.Message}", Severity.Error);
+            }
+        }
+        
+        showDeleteDialog = false;
+        selectedUseCase = null;
+    }
+
+    private Color GetTypeColor(UseCaseType type)
+    {
+        return type switch
+        {
+            UseCaseType.Entity => Color.Primary,
+            UseCaseType.Api => Color.Secondary,
+            UseCaseType.Service => Color.Info,
+            _ => Color.Default
+        };
+    }
+
+    private string GetAIModelIcon(AIModel model)
+    {
+        return model switch
+        {
+            AIModel.OpenAI => Icons.Material.Filled.Psychology,
+            AIModel.Claude => Icons.Material.Filled.AutoAwesome,
+            AIModel.Gemini => Icons.Material.Filled.Diamond,
+            AIModel.Grok => Icons.Material.Filled.Rocket,
+            _ => Icons.Material.Filled.Preview
+        };
+    }
+}

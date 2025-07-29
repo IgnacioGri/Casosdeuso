@@ -1,0 +1,103 @@
+@page "/"
+@using MudBlazor
+
+<PageTitle>Inicio - Generador de Casos de Uso</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large">
+    <MudPaper Elevation="2" Class="pa-8">
+        <MudText Typo="Typo.h3" GutterBottom="true" Color="Color.Primary">
+            Generador de Casos de Uso ING
+        </MudText>
+        
+        <MudText Typo="Typo.h6" Class="mb-6" Color="Color.Secondary">
+            Sistema inteligente para la generación automática de documentación técnica
+        </MudText>
+        
+        <MudDivider Class="mb-6" />
+        
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="3" Class="ma-2">
+                    <MudCardContent>
+                        <div class="d-flex align-center mb-4">
+                            <MudIcon Icon="@Icons.Material.Filled.Create" Color="Color.Primary" Size="Size.Large" Class="mr-3" />
+                            <MudText Typo="Typo.h5">Generar Caso de Uso</MudText>
+                        </div>
+                        <MudText Typo="Typo.body1" Class="mb-4">
+                            Crea casos de uso profesionales siguiendo los estándares ING con asistencia de IA integrada.
+                        </MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Create" Href="/generator">
+                            Comenzar
+                        </MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="3" Class="ma-2">
+                    <MudCardContent>
+                        <div class="d-flex align-center mb-4">
+                            <MudIcon Icon="@Icons.Material.Filled.DocumentScanner" Color="Color.Secondary" Size="Size.Large" Class="mr-3" />
+                            <MudText Typo="Typo.h5">Análisis de Minutas</MudText>
+                        </div>
+                        <MudText Typo="Typo.body1" Class="mb-4">
+                            Analiza documentos existentes y extrae automáticamente la información del caso de uso.
+                        </MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Upload" Href="/minute-analysis">
+                            Subir Minuta
+                        </MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="3" Class="ma-2">
+                    <MudCardContent>
+                        <div class="d-flex align-center mb-4">
+                            <MudIcon Icon="@Icons.Material.Filled.BugReport" Color="Color.Info" Size="Size.Large" Class="mr-3" />
+                            <MudText Typo="Typo.h5">Casos de Prueba</MudText>
+                        </div>
+                        <MudText Typo="Typo.body1" Class="mb-4">
+                            Genera casos de prueba inteligentes basados en el análisis completo del caso de uso.
+                        </MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Material.Filled.PlayArrow" Href="/test-cases">
+                            Generar Pruebas
+                        </MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="3" Class="ma-2">
+                    <MudCardContent>
+                        <div class="d-flex align-center mb-4">
+                            <MudIcon Icon="@Icons.Material.Filled.History" Color="Color.Warning" Size="Size.Large" Class="mr-3" />
+                            <MudText Typo="Typo.h5">Historial</MudText>
+                        </div>
+                        <MudText Typo="Typo.body1" Class="mb-4">
+                            Consulta y gestiona todos los casos de uso generados anteriormente.
+                        </MudText>
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" StartIcon="@Icons.Material.Filled.List" Href="/history">
+                            Ver Historial
+                        </MudButton>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+        
+        <MudDivider Class="my-6" />
+        
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Características Principales
+        </MudText>
+        
+        <MudList>
+            <MudListItem Icon="@Icons.Material.Filled.AutoAwesome" Text="Asistencia IA con múltiples modelos (OpenAI, Claude, Grok, Gemini)" />
+            <MudListItem Icon="@Icons.Material.Filled.Description" Text="Generación automática de documentos DOCX y HTML" />
+            <MudListItem Icon="@Icons.Material.Filled.Verified" Text="Cumplimiento estricto de estándares ING" />
+            <MudListItem Icon="@Icons.Material.Filled.Speed" Text="Formulario inteligente de 9 pasos optimizado" />
+            <MudListItem Icon="@Icons.Material.Filled.Extension" Text="Ejemplos auto-completables para casos complejos" />
+            <MudListItem Icon="@Icons.Material.Filled.CloudSync" Text="Guardado automático del progreso" />
+        </MudList>
+    </MudPaper>
+</MudContainer>

@@ -1,0 +1,118 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.DTOs
+@using UseCaseGenerator.Shared.Models
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+            Tipo de Caso de Uso
+        </MudText>
+        <MudText Typo="Typo.body1" Class="mb-4">
+            Selecciona el tipo de caso de uso que vas a documentar. Esto determinará los campos específicos del formulario.
+        </MudText>
+    </MudItem>
+    
+    <MudItem xs="12" md="4">
+        <MudCard Elevation="@(FormData.UseCaseType == UseCaseType.Entity ? 6 : 2)" 
+                 Style="@(FormData.UseCaseType == UseCaseType.Entity ? "border: 2px solid #0070C0;" : "")"
+                 Class="pa-4 cursor-pointer hover:elevation-4"
+                 @onclick="() => SelectType(UseCaseType.Entity)">
+            <MudCardContent>
+                <div class="d-flex align-center mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.TableRows" 
+                             Color="@(FormData.UseCaseType == UseCaseType.Entity ? Color.Primary : Color.Default)" 
+                             Size="Size.Large" Class="mr-3" />
+                    <MudText Typo="Typo.h6" Color="@(FormData.UseCaseType == UseCaseType.Entity ? Color.Primary : Color.Default)">
+                        Entidad
+                    </MudText>
+                </div>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Para gestión de entidades de negocio con operaciones CRUD (crear, consultar, actualizar, eliminar).
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+                    Incluye: campos de entidad, filtros de búsqueda, columnas de resultado, validaciones.
+                </MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    <MudItem xs="12" md="4">
+        <MudCard Elevation="@(FormData.UseCaseType == UseCaseType.Api ? 6 : 2)" 
+                 Style="@(FormData.UseCaseType == UseCaseType.Api ? "border: 2px solid #0070C0;" : "")"
+                 Class="pa-4 cursor-pointer hover:elevation-4"
+                 @onclick="() => SelectType(UseCaseType.Api)">
+            <MudCardContent>
+                <div class="d-flex align-center mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Api" 
+                             Color="@(FormData.UseCaseType == UseCaseType.Api ? Color.Primary : Color.Default)" 
+                             Size="Size.Large" Class="mr-3" />
+                    <MudText Typo="Typo.h6" Color="@(FormData.UseCaseType == UseCaseType.Api ? Color.Primary : Color.Default)">
+                        API / Servicio Web
+                    </MudText>
+                </div>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Para documentar APIs REST, servicios web y integraciones entre sistemas.
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+                    Incluye: endpoints, formatos de request/response, códigos de estado HTTP.
+                </MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    <MudItem xs="12" md="4">
+        <MudCard Elevation="@(FormData.UseCaseType == UseCaseType.Service ? 6 : 2)" 
+                 Style="@(FormData.UseCaseType == UseCaseType.Service ? "border: 2px solid #0070C0;" : "")"
+                 Class="pa-4 cursor-pointer hover:elevation-4"
+                 @onclick="() => SelectType(UseCaseType.Service)">
+            <MudCardContent>
+                <div class="d-flex align-center mb-3">
+                    <MudIcon Icon="@Icons.Material.Filled.Schedule" 
+                             Color="@(FormData.UseCaseType == UseCaseType.Service ? Color.Primary : Color.Default)" 
+                             Size="Size.Large" Class="mr-3" />
+                    <MudText Typo="Typo.h6" Color="@(FormData.UseCaseType == UseCaseType.Service ? Color.Primary : Color.Default)">
+                        Proceso / Servicio
+                    </MudText>
+                </div>
+                <MudText Typo="Typo.body2" Class="mb-3">
+                    Para procesos de negocio, servicios programados y workflows automatizados.
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+                    Incluye: frecuencia de ejecución, configuraciones, dependencias externas.
+                </MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    
+    @if (FormData.UseCaseType != UseCaseType.Entity)
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Info" Dense="true">
+                <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-2" />
+                Has seleccionado tipo <strong>@FormData.UseCaseType</strong>. 
+                El formulario se adaptará para incluir los campos específicos de este tipo de caso de uso.
+            </MudAlert>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Success" Dense="true">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
+                Tipo <strong>Entidad</strong> seleccionado. 
+                El formulario incluirá todos los pasos para definición completa de entidades de negocio.
+            </MudAlert>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter] public UseCaseFormData FormData { get; set; } = new();
+    [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+
+    private async Task SelectType(UseCaseType type)
+    {
+        FormData.UseCaseType = type;
+        await FormDataChanged.InvokeAsync(FormData);
+    }
+}
