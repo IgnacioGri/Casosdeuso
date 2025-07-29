@@ -140,13 +140,13 @@ export default function EnhancedDocumentPreview({
 
     if (formData.useCaseType === 'entity') {
       requiredFields.push(
-        formData.searchFilters?.some(f => f.trim()) ? 'filters' : '',
-        formData.resultColumns?.some(c => c.trim()) ? 'columns' : '',
-        formData.entityFields?.some(f => f.name.trim()) ? 'fields' : ''
+        formData.searchFilters?.some(f => typeof f === 'string' && f.trim()) ? 'filters' : '',
+        formData.resultColumns?.some(c => typeof c === 'string' && c.trim()) ? 'columns' : '',
+        formData.entityFields?.some(f => f && f.name && typeof f.name === 'string' && f.name.trim()) ? 'fields' : ''
       );
     }
 
-    const filledFields = requiredFields.filter(field => field && field.trim()).length;
+    const filledFields = requiredFields.filter(field => field && typeof field === 'string' && field.trim()).length;
     return Math.round((filledFields / requiredFields.length) * 100);
   };
 

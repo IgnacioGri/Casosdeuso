@@ -525,6 +525,27 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
   static async processFieldWithAI(systemPrompt: string, fieldValue: string, aiModel: string): Promise<string> {
     if (aiModel === 'demo') {
+      // For minute analysis, return a structured JSON response in demo mode
+      if (systemPrompt.includes('minute-analysis') || systemPrompt.includes('minuta')) {
+        return JSON.stringify({
+          clientName: "Banco Provincia",
+          projectName: "Sistema de Gestión Integral",
+          useCaseCode: "BP001",
+          useCaseName: "Gestionar información del cliente",
+          fileName: "BP001GestionarInformacionCliente",
+          description: "Permite gestionar la información completa de los clientes del banco incluyendo consulta, actualización y seguimiento de la relación comercial.",
+          searchFilters: ["DNI/CUIT", "Apellido", "Email", "Número de Cliente"],
+          resultColumns: ["ID Cliente", "Apellido y Nombres", "Documento", "Email", "Estado"],
+          entityFields: [
+            { name: "clienteId", type: "number", mandatory: true, length: 10 },
+            { name: "tipoDocumento", type: "text", mandatory: true, length: 10 },
+            { name: "numeroDocumento", type: "text", mandatory: true, length: 20 }
+          ],
+          businessRules: ["1. Solo usuarios autorizados pueden acceder", "2. Se debe validar formato de documentos"],
+          specialRequirements: ["1. Integración con sistema legado", "2. Logging de operaciones críticas"],
+          isAIGenerated: true
+        });
+      }
       return `Demo Analysis Result: Processed text with ${fieldValue.length} characters using system prompt.`;
     }
 

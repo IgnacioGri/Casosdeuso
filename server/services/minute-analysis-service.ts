@@ -148,12 +148,24 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
 
   private parseAnalysisResult(result: string, useCaseType: UseCaseType): Partial<UseCaseFormData> {
     try {
+      console.log('Raw AI analysis result:', result.substring(0, 200) + '...');
+      
+      // Check if the result is demo content
+      if (result.includes('Demo Analysis') || result.includes('generateDemoAnalysis')) {
+        console.log('Detected demo content in AI response, using fallback');
+        return this.generateDemoAnalysis(useCaseType);
+      }
+
       // Clean the result to ensure it's valid JSON
       const cleanedResult = result
         .replace(/^```json\s*/, '')
         .replace(/\s*```$/, '')
         .replace(/^```\s*/, '')
+        .replace(/^\s*\{/, '{')
+        .replace(/\}\s*$/, '}')
         .trim();
+
+      console.log('Cleaned result for JSON parsing:', cleanedResult.substring(0, 200) + '...');
 
       const parsed = JSON.parse(cleanedResult);
       
@@ -165,6 +177,7 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
       };
     } catch (error) {
       console.error('Error parsing AI analysis result:', error);
+      console.error('Raw result was:', result.substring(0, 500));
       return this.generateDemoAnalysis(useCaseType);
     }
   }

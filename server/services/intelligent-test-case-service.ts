@@ -281,12 +281,22 @@ CONTEXTO BANCARIO ING:
 
   private parseIntelligentTestResult(aiResult: string, formData: UseCaseFormData): IntelligentTestCaseResult {
     try {
+      console.log('Raw intelligent test result:', aiResult.substring(0, 200) + '...');
+      
+      // Check if the result is demo content
+      if (aiResult.includes('Demo Analysis') || aiResult.includes('generateDemoIntelligentTests')) {
+        console.log('Detected demo content in intelligent test response, using fallback');
+        throw new Error('Demo content detected');
+      }
+
       // Clean the AI response
       const cleanedResult = aiResult
         .replace(/```json\s*/g, '')
         .replace(/```\s*/g, '')
         .replace(/^[^{]*(\{.*\})[^}]*$/, '$1')
         .trim();
+
+      console.log('Cleaned intelligent test result for JSON parsing:', cleanedResult.substring(0, 200) + '...');
 
       const parsed = JSON.parse(cleanedResult);
 
