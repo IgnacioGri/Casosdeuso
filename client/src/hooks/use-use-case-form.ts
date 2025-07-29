@@ -180,7 +180,7 @@ export function useUseCaseForm() {
         inputData: '',
         expectedResult: '',
         observations: '',
-        status: ''
+        status: 'pending'
       }]
     }));
   }, [formData.testSteps]);

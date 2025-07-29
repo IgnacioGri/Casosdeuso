@@ -297,7 +297,7 @@ CONTEXTO BANCARIO ING:
         inputData: step.inputData || 'Datos de entrada',
         expectedResult: step.expectedResult || 'Resultado esperado',
         observations: step.observations || '',
-        status: ''
+        status: 'pending'
       }));
 
       return {
@@ -354,7 +354,7 @@ CONTEXTO BANCARIO ING:
         inputData: 'Usuario: admin, Contraseña: validPassword123',
         expectedResult: 'Login exitoso, redirección a página principal',
         observations: 'Verificar que el token de sesión se genere correctamente',
-        status: ''
+        status: 'pending'
       },
       {
         number: 2,
@@ -362,7 +362,7 @@ CONTEXTO BANCARIO ING:
         inputData: 'Clic en módulo correspondiente del menú principal',
         expectedResult: 'Pantalla del caso de uso se carga correctamente',
         observations: 'Verificar tiempos de carga < 3 segundos',
-        status: ''
+        status: 'pending'
       }
     ];
 
@@ -379,7 +379,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'DNI: 12345678, Apellido: "González"',
               expectedResult: 'Lista de resultados filtrados correctamente',
               observations: 'Verificar paginación y ordenamiento',
-              status: ''
+              status: 'pending'
             },
             {
               number: 4,
@@ -387,7 +387,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'DNI: "abc123", Email: formato_inválido',
               expectedResult: 'Mensajes de validación específicos mostrados',
               observations: 'No permitir búsqueda con datos inválidos',
-              status: ''
+              status: 'pending'
             },
             {
               number: 5,
@@ -395,7 +395,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Todos los campos obligatorios con datos válidos',
               expectedResult: 'Registro creado exitosamente, ID asignado',
               observations: 'Verificar auditoría (fechaAlta, usuarioAlta)',
-              status: ''
+              status: 'pending'
             },
             {
               number: 6,
@@ -403,7 +403,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Dejar campos requeridos sin completar',
               expectedResult: 'Validaciones impiden el guardado',
               observations: 'Mensajes de error claros para cada campo',
-              status: ''
+              status: 'pending'
             }
           ],
           analysisNotes: 'Cobertura completa: CRUD, validaciones, auditoría, filtros, paginación'
@@ -421,7 +421,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'JSON con estructura y datos correctos',
               expectedResult: 'Respuesta HTTP 200 con datos esperados',
               observations: 'Verificar estructura del JSON de respuesta',
-              status: ''
+              status: 'pending'
             },
             {
               number: 4,
@@ -429,7 +429,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'JSON con sintaxis incorrecta',
               expectedResult: 'Error HTTP 400 - Bad Request',
               observations: 'Mensaje de error descriptivo',
-              status: ''
+              status: 'pending'
             },
             {
               number: 5,
@@ -437,7 +437,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Token expirado o inválido',
               expectedResult: 'Error HTTP 401 - Unauthorized',
               observations: 'No revelar información sensible',
-              status: ''
+              status: 'pending'
             },
             {
               number: 6,
@@ -445,7 +445,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Múltiples peticiones rápidas consecutivas',
               expectedResult: 'Error HTTP 429 después del límite',
               observations: 'Implementación correcta de throttling',
-              status: ''
+              status: 'pending'
             }
           ],
           analysisNotes: 'Cobertura completa: endpoints, validaciones, autenticación, rate limiting, manejo de errores'
@@ -463,7 +463,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Trigger manual del proceso programado',
               expectedResult: 'Ejecución exitosa con logs generados',
               observations: 'Verificar todas las etapas del proceso',
-              status: ''
+              status: 'pending'
             },
             {
               number: 4,
@@ -471,7 +471,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Condición de error controlada',
               expectedResult: 'Manejo de error y rollback automático',
               observations: 'Verificar mecanismos de recuperación',
-              status: ''
+              status: 'pending'
             },
             {
               number: 5,
@@ -479,7 +479,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Configuración de schedule activa',
               expectedResult: 'Servicio se ejecuta según programación',
               observations: 'Monitorear logs de ejecución automática',
-              status: ''
+              status: 'pending'
             },
             {
               number: 6,
@@ -487,7 +487,7 @@ CONTEXTO BANCARIO ING:
               inputData: 'Dataset de gran tamaño',
               expectedResult: 'Procesamiento exitoso sin timeouts',
               observations: 'Verificar rendimiento y uso de recursos',
-              status: ''
+              status: 'pending'
             }
           ],
           analysisNotes: 'Cobertura completa: ejecución manual/automática, manejo de errores, rendimiento, logs'

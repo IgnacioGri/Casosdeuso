@@ -289,7 +289,7 @@ export default function EnhancedDocumentPreview({
                           inputData: '',
                           expectedResult: '',
                           observations: '',
-                          status: ''
+                          status: 'pending'
                         }];
                         if (onTestCaseUpdate) {
                           onTestCaseUpdate({ 

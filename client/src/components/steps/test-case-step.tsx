@@ -259,7 +259,7 @@ export function TestCaseStep({
                     <SelectValue placeholder="Seleccionar estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sin ejecutar</SelectItem>
+                    <SelectItem value="pending">Sin ejecutar</SelectItem>
                     <SelectItem value="P">P - Pass (Aprobado)</SelectItem>
                     <SelectItem value="F">F - Fail (Falló)</SelectItem>
                   </SelectContent>
