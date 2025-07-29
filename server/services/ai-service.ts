@@ -523,6 +523,90 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     return service.improveFieldInstance(fieldName, fieldValue, fieldType, context, aiModel);
   }
 
+  static async processFieldWithAI(systemPrompt: string, fieldValue: string, aiModel: string): Promise<string> {
+    if (aiModel === 'demo') {
+      return `Demo Analysis Result: Processed text with ${fieldValue.length} characters using system prompt.`;
+    }
+
+    try {
+      let result: string;
+      
+      switch (aiModel) {
+        case 'openai':
+          result = await this.processWithOpenAI(systemPrompt, fieldValue);
+          break;
+        case 'claude':
+          result = await this.processWithClaude(systemPrompt, fieldValue);
+          break;
+        case 'grok':
+          result = await this.processWithGrok(systemPrompt, fieldValue);
+          break;
+        case 'gemini':
+          result = await this.processWithGemini(systemPrompt, fieldValue);
+          break;
+        default:
+          throw new Error(`Modelo de IA no soportado: ${aiModel}`);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error processing field with AI:', error);
+      throw error;
+    }
+  }
+
+  private static async processWithOpenAI(systemPrompt: string, fieldValue: string): Promise<string> {
+    const client = getOpenAIClient();
+    const response = await client.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: fieldValue }
+      ],
+      temperature: 0.3
+    });
+    return response.choices[0].message.content || '';
+  }
+
+  private static async processWithClaude(systemPrompt: string, fieldValue: string): Promise<string> {
+    const client = await getAnthropicClient();
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [
+        { role: "user", content: fieldValue }
+      ]
+    });
+    return response.content[0].text || '';
+  }
+
+  private static async processWithGrok(systemPrompt: string, fieldValue: string): Promise<string> {
+    const client = getGrokClient();
+    const response = await client.chat.completions.create({
+      model: "grok-2-1212",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: fieldValue }
+      ],
+      temperature: 0.3
+    });
+    return response.choices[0].message.content || '';
+  }
+
+  private static async processWithGemini(systemPrompt: string, fieldValue: string): Promise<string> {
+    const client = getGeminiClient();
+    const response = await client.models.generateContent({
+      model: "gemini-2.5-pro",
+      config: {
+        systemInstruction: systemPrompt,
+        responseMimeType: "text/plain"
+      },
+      contents: fieldValue
+    });
+    return response.text || '';
+  }
+
   private async improveFieldInstance(fieldName: string, fieldValue: string, fieldType: string, context?: any, aiModel?: string): Promise<string> {
     try {
       // Handle specialized field types FIRST (works for both AI and demo modes)

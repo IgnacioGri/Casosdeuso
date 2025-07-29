@@ -9,11 +9,10 @@ export class MinuteAnalysisService {
     
     try {
       // Use AI to analyze the minute text
-      const analysisResult = await this.aiService.improveField(
+      const analysisResult = await this.aiService.processFieldWithAI(
         prompts.systemPrompt,
         text,
-        aiModel,
-        prompts.context
+        aiModel
       );
 
       // Parse the AI response into form data

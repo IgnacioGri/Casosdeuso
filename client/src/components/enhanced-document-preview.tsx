@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Eye, EyeOff, FileText, Download, RefreshCw, TestTube2 } from "lucide-react";
-import { UseCaseFormData } from "@/types/use-case";
+import { UseCaseFormData, TestStep } from "@/types/use-case";
 import { TestCaseStep } from "./steps/test-case-step";
 
 interface EnhancedDocumentPreviewProps {
@@ -62,22 +62,22 @@ export default function EnhancedDocumentPreview({
     }
 
     if (formData.useCaseType === 'entity') {
-      if (formData.searchFilters?.some(f => f.trim())) {
+      if (formData.searchFilters?.some(f => typeof f === 'string' && f.trim())) {
         sections.push(`
           <h2>Filtros de Búsqueda</h2>
           <ul>
-            ${formData.searchFilters.filter(f => f.trim()).map(filter => 
+            ${formData.searchFilters.filter(f => typeof f === 'string' && f.trim()).map(filter => 
               `<li>${filter}</li>`
             ).join('')}
           </ul>
         `);
       }
 
-      if (formData.resultColumns?.some(c => c.trim())) {
+      if (formData.resultColumns?.some(c => typeof c === 'string' && c.trim())) {
         sections.push(`
           <h2>Columnas de Resultado</h2>
           <ul>
-            ${formData.resultColumns.filter(c => c.trim()).map(column => 
+            ${formData.resultColumns.filter(c => typeof c === 'string' && c.trim()).map(column => 
               `<li>${column}</li>`
             ).join('')}
           </ul>
