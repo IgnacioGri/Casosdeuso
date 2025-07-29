@@ -55,9 +55,16 @@ export default function EnhancedDocumentPreview({
     if (formData.businessRules) {
       sections.push(`
         <h2>Reglas de Negocio</h2>
-        <div>${formData.businessRules.split('\n').map(rule => 
-          rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
-        ).join('')}</div>
+        <div>${Array.isArray(formData.businessRules) 
+          ? formData.businessRules.map(rule => 
+              typeof rule === 'string' && rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
+            ).join('')
+          : typeof formData.businessRules === 'string'
+            ? formData.businessRules.split('\n').map(rule => 
+                rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
+              ).join('')
+            : `<p>• ${formData.businessRules}</p>`
+        }</div>
       `);
     }
 

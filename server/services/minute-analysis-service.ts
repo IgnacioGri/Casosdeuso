@@ -227,7 +227,7 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           useCaseName: "Consultar saldo de cuenta",
           fileName: "BP001ConsultarSaldoCuenta",
           apiEndpoint: "/api/v1/consulta-saldo",
-          httpMethod: "POST",
+
           requestFormat: `{
   "numeroCliente": "12345678",
   "numeroCuenta": "001-234567-8",
@@ -251,8 +251,9 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           ...baseData,
           useCaseName: "Procesar cierre diario",
           fileName: "BP001ProcesarCierreDiario",
-          serviceConfig: "Ejecución diaria a las 23:00 hrs",
-          cronExpression: "0 0 23 * * *",
+          serviceFrequency: "Ejecución diaria a las 23:00 hrs",
+          executionTime: "23:00 hrs",
+          configurationPaths: "0 0 23 * * *",
           alternativeFlows: ["Fallo en comunicación", "Reintento automático", "Notificación de error"],
           businessRules: "1. Ejecutar solo en días hábiles\n2. Generar backup antes del proceso",
           specialRequirements: "1. Logging detallado\n2. Alertas por email\n3. Mecanismo de rollback"
