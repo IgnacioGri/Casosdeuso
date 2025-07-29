@@ -1170,6 +1170,14 @@ export default function FormSteps({
             projectName={formData.projectName}
             useCaseName={formData.useCaseName}
             aiModel={formData.aiModel}
+            formData={formData}
+            onReplaceAllTestData={(data) => {
+              onUpdateFormData({
+                testCaseObjective: data.objective,
+                testCasePreconditions: data.preconditions,
+                testSteps: data.testSteps
+              });
+            }}
           />
         </CardContent>
       </Card>

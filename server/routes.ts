@@ -5,6 +5,7 @@ import { insertUseCaseSchema, useCaseFormSchema } from "@shared/schema";
 import { AIService } from "./services/ai-service";
 import { DocumentService } from "./services/document-service";
 import { MinuteAnalysisService } from "./services/minute-analysis-service";
+import { IntelligentTestCaseService } from "./services/intelligent-test-case-service";
 
 const USE_CASE_RULES = `
 REGLAS PARA CASOS DE USO CON IA - SEGUIR ESTRICTAMENTE:
@@ -485,6 +486,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching use case:", error);
       res.status(500).json({
         message: error instanceof Error ? error.message : "Error obteniendo el caso de uso"
+      });
+    }
+  });
+
+  // Intelligent Test Case Generation endpoint
+  app.post("/api/generate-intelligent-tests", async (req, res) => {
+    try {
+      const { formData, aiModel = 'demo' } = req.body;
+      
+      if (!formData) {
+        return res.status(400).json({ 
+          error: 'Form data is required',
+          success: false 
+        });
+      }
+
+      const aiServiceInstance = new AIService();
+      const intelligentTestService = new IntelligentTestCaseService(aiServiceInstance);
+      
+      const testResult = await intelligentTestService.generateIntelligentTestCases(
+        formData,
+        aiModel
+      );
+      
+      res.json({
+        success: true,
+        ...testResult
+      });
+    } catch (error) {
+      console.error('Error generating intelligent test cases:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate intelligent test cases',
+        success: false
       });
     }
   });

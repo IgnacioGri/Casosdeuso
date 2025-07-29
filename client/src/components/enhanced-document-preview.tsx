@@ -331,6 +331,17 @@ export default function EnhancedDocumentPreview({
                       projectName={formData.projectName}
                       useCaseName={formData.useCaseName}
                       aiModel={formData.aiModel}
+                      formData={formData}
+                      onReplaceAllTestData={(data) => {
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({
+                            generateTestCase: true,
+                            testCaseObjective: data.objective,
+                            testCasePreconditions: data.preconditions,
+                            testSteps: data.testSteps
+                          });
+                        }
+                      }}
                     />
                   </DialogContent>
                 </Dialog>

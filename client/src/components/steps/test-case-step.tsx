@@ -2,11 +2,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Sparkles, Brain, RefreshCw } from "lucide-react";
 import { TestStep } from "@/types/use-case";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HelpButton } from "@/components/help-button";
 import { AIAssistButton } from "@/components/ai-assist-button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 interface TestCaseStepProps {
   testCaseObjective: string;
@@ -21,6 +24,9 @@ interface TestCaseStepProps {
   projectName: string;
   useCaseName: string;
   aiModel: string;
+  // Add the complete form data for intelligent test generation
+  formData?: any;
+  onReplaceAllTestData?: (data: { objective: string; preconditions: string; testSteps: TestStep[] }) => void;
 }
 
 export function TestCaseStep({
@@ -35,13 +41,83 @@ export function TestCaseStep({
   clientName,
   projectName,
   useCaseName,
-  aiModel
+  aiModel,
+  formData,
+  onReplaceAllTestData
 }: TestCaseStepProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleIntelligentGeneration = async () => {
+    if (!formData || !onReplaceAllTestData) return;
+    
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-intelligent-tests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData,
+          aiModel
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        onReplaceAllTestData({
+          objective: result.objective,
+          preconditions: result.preconditions,
+          testSteps: result.testSteps
+        });
+      }
+    } catch (error) {
+      console.error('Error generating intelligent tests:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        <h3 className="text-lg font-semibold">Casos de Prueba</h3>
-        <HelpButton step={10} useCaseType="entity" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">Casos de Prueba</h3>
+          <HelpButton step={10} useCaseType="entity" />
+        </div>
+        
+        {formData && onReplaceAllTestData && (
+          <Card className="border-purple-200 bg-purple-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <p className="font-medium text-purple-900">Generación Inteligente</p>
+                    <p className="text-sm text-purple-700">Analiza todo el caso de uso y crea pruebas completas</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleIntelligentGeneration} 
+                  disabled={isGenerating}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Generar Casos Inteligentes
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4">
