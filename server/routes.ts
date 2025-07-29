@@ -295,7 +295,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Generate use case
   app.post("/api/use-cases/generate", async (req, res) => {
     try {
-      const validatedData = useCaseFormSchema.parse(req.body);
+      // Transform arrays to strings if needed for businessRules and specialRequirements
+      const requestData = {
+        ...req.body,
+        businessRules: Array.isArray(req.body.businessRules) 
+          ? req.body.businessRules.join('\n') 
+          : req.body.businessRules,
+        specialRequirements: Array.isArray(req.body.specialRequirements) 
+          ? req.body.specialRequirements.join('\n') 
+          : req.body.specialRequirements
+      };
+      
+      const validatedData = useCaseFormSchema.parse(requestData);
       
       // Create specific rules based on use case type
       const specificRules = getSpecificRules(validatedData.useCaseType, validatedData);

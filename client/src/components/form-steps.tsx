@@ -38,7 +38,7 @@ interface FormStepsProps {
   onLoadComplexExample?: (type: UseCaseType) => void;
   onNextStep?: () => void;
   onPreviousStep?: () => void;
-  onGenerateDocument?: () => void;
+
 }
 
 export default function FormSteps({
@@ -66,8 +66,7 @@ export default function FormSteps({
   onLoadDemoData,
   onLoadComplexExample,
   onNextStep,
-  onPreviousStep,
-  onGenerateDocument
+  onPreviousStep
 }: FormStepsProps) {
 
   const handleInputChange = (field: keyof UseCaseFormData, value: any) => {
@@ -1247,14 +1246,6 @@ export default function FormSteps({
                 className="bg-blue-500 hover:bg-blue-600 text-white"
               >
                 Cargar Datos Demo
-              </Button>
-              <Button 
-                type="button" 
-                onClick={onGenerateDocument}
-                className="bg-green-600 hover:bg-green-700 text-white flex items-center"
-              >
-                <Sparkles className="mr-2" size={16} />
-                Generar Documento
               </Button>
             </div>
           </div>

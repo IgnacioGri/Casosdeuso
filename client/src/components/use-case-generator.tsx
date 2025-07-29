@@ -275,7 +275,7 @@ export default function UseCaseGenerator() {
               onLoadComplexExample={loadComplexExample}
               onNextStep={handleNextStep}
               onPreviousStep={handlePreviousStep}
-              onGenerateDocument={handleGenerateUseCase}
+
             />
 
             {/* Navigation Buttons - Bottom */}
