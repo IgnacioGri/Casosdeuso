@@ -10,8 +10,9 @@ import FormSteps from "@/components/form-steps";
 import EnhancedDocumentPreview from "@/components/enhanced-document-preview";
 import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 import WireframePreview from "@/components/wireframe-preview";
+import { AIModelHeader } from "@/components/ai-model-header";
 
-import { UseCase } from "@/types/use-case";
+import { UseCase, AIModel } from "@/types/use-case";
 
 export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
@@ -49,7 +50,8 @@ export default function UseCaseGenerator() {
 
   // Calculate total steps based on use case type
   const getTotalSteps = () => {
-    const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
+    // Add 2 for the new type selection (step 1) and minute analysis (step 2)
+    const baseSteps = formData.useCaseType === 'entity' ? 11 : 9;
     return formData.generateTestCase ? baseSteps + 1 : baseSteps;
   };
 
@@ -160,9 +162,7 @@ export default function UseCaseGenerator() {
   };
 
   const isReviewStep = () => {
-    const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
-    const totalSteps = formData.generateTestCase ? baseSteps + 1 : baseSteps;
-    return currentStep === totalSteps;
+    return currentStep === getTotalSteps();
   };
 
   // Navigation buttons component for reuse
@@ -216,10 +216,10 @@ export default function UseCaseGenerator() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600 flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Modo {formData.aiModel === 'demo' ? 'Demo' : formData.aiModel.toUpperCase()} Activo
-              </div>
+              <AIModelHeader 
+                currentModel={formData.aiModel}
+                onModelChange={(model: AIModel) => updateFormData({ aiModel: model })}
+              />
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -273,6 +273,8 @@ export default function UseCaseGenerator() {
               onUpdateTestStep={updateTestStep}
               onLoadDemoData={handleLoadDemo}
               onLoadComplexExample={loadComplexExample}
+              onNextStep={handleNextStep}
+              onPreviousStep={handlePreviousStep}
             />
 
             {/* Navigation Buttons - Bottom */}

@@ -20,6 +20,10 @@ export interface TestStep {
 
 export interface UseCaseFormData {
   useCaseType: UseCaseType;
+  // Minute analysis fields
+  uploadedMinute?: string;
+  minuteFile?: File;
+  aiGeneratedFields?: Record<string, boolean>; // Track which fields were AI-generated
   clientName: string;
   projectName: string;
   useCaseCode: string;

@@ -1,5 +1,6 @@
 import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot } from "lucide-react";
 import { TestCaseStep } from './steps/test-case-step';
+import { MinuteAnalysisStep } from './steps/minute-analysis-step';
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 
 import { AIAssistButton } from "@/components/ai-assist-button";
 import { HelpButton } from "@/components/help-button";
+import { AIGeneratedTag } from "@/components/ai-generated-tag";
 
 interface FormStepsProps {
   currentStep: number;
@@ -34,6 +36,8 @@ interface FormStepsProps {
   onUpdateTestStep?: (index: number, field: any, value: string | number) => void;
   onLoadDemoData: () => void;
   onLoadComplexExample?: (type: UseCaseType) => void;
+  onNextStep?: () => void;
+  onPreviousStep?: () => void;
 }
 
 export default function FormSteps({
@@ -59,14 +63,16 @@ export default function FormSteps({
   onRemoveTestStep,
   onUpdateTestStep,
   onLoadDemoData,
-  onLoadComplexExample
+  onLoadComplexExample,
+  onNextStep,
+  onPreviousStep
 }: FormStepsProps) {
 
   const handleInputChange = (field: keyof UseCaseFormData, value: any) => {
     onUpdateFormData({ [field]: value });
   };
 
-  // Step 1: AI Model Selection
+  // Step 1: Use Case Type Selection
   if (currentStep === 1) {
     return (
       <Card className="shadow-sm border border-ms-border">
@@ -74,12 +80,12 @@ export default function FormSteps({
           <div className="text-center mb-6">
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
-                <Brain className="mx-auto text-ms-blue mb-3" size={32} />
+                <List className="mx-auto text-ms-blue mb-3" size={32} />
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  Configuración del Motor de IA
+                  Tipo de Caso de Uso
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
-                  Selecciona el modelo de inteligencia artificial que utilizarás para asistir en la generación de contenido
+                  Selecciona el tipo de caso de uso que vas a crear para ayudar a la IA a generar contenido específico
                 </p>
               </div>
               <div className="ml-4">
@@ -91,104 +97,68 @@ export default function FormSteps({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Modelo de IA a utilizar
+                Tipo de caso de uso
               </label>
               <Select 
-                value={formData.aiModel} 
-                onValueChange={(value) => handleInputChange('aiModel', value as AIModel)}
+                value={formData.useCaseType} 
+                onValueChange={(value) => handleInputChange('useCaseType', value as UseCaseType)}
               >
                 <SelectTrigger className="w-full h-14 px-4 border-2 border-gray-200 hover:border-ms-blue focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/20 rounded-lg bg-white dark:bg-gray-800 transition-colors">
                   <SelectValue className="flex items-center">
-                    {formData.aiModel === 'demo' && (
+                    {formData.useCaseType === 'entity' && (
                       <div className="flex items-center">
-                        <Sparkles className="mr-3 text-purple-500" size={20} />
+                        <Database className="mr-3 text-blue-500" size={20} />
                         <div className="text-left">
-                          <div className="font-medium text-gray-900 dark:text-white">Modo Demo</div>
-                          <div className="text-xs text-gray-500">Sin API necesaria</div>
+                          <div className="font-medium text-gray-900 dark:text-white">Entidad</div>
+                          <div className="text-xs text-gray-500">CRUD de datos, wireframes, filtros</div>
                         </div>
                       </div>
                     )}
-                    {formData.aiModel === 'openai' && (
+                    {formData.useCaseType === 'api' && (
                       <div className="flex items-center">
-                        <Bot className="mr-3 text-green-500" size={20} />
+                        <Globe className="mr-3 text-green-500" size={20} />
                         <div className="text-left">
-                          <div className="font-medium text-gray-900 dark:text-white">OpenAI GPT-4</div>
-                          <div className="text-xs text-gray-500">Avanzado y preciso</div>
+                          <div className="font-medium text-gray-900 dark:text-white">API/Web Service</div>
+                          <div className="text-xs text-gray-500">Endpoints, request/response</div>
                         </div>
                       </div>
                     )}
-                    {formData.aiModel === 'claude' && (
+                    {formData.useCaseType === 'service' && (
                       <div className="flex items-center">
-                        <Cpu className="mr-3 text-orange-500" size={20} />
+                        <Clock className="mr-3 text-purple-500" size={20} />
                         <div className="text-left">
-                          <div className="font-medium text-gray-900 dark:text-white">Anthropic Claude</div>
-                          <div className="text-xs text-gray-500">Análisis profundo</div>
-                        </div>
-                      </div>
-                    )}
-                    {formData.aiModel === 'grok' && (
-                      <div className="flex items-center">
-                        <Zap className="mr-3 text-blue-500" size={20} />
-                        <div className="text-left">
-                          <div className="font-medium text-gray-900 dark:text-white">Grok API</div>
-                          <div className="text-xs text-gray-500">Velocidad y eficiencia</div>
-                        </div>
-                      </div>
-                    )}
-                    {formData.aiModel === 'gemini' && (
-                      <div className="flex items-center">
-                        <Brain className="mr-3 text-red-500" size={20} />
-                        <div className="text-left">
-                          <div className="font-medium text-gray-900 dark:text-white">Google Gemini</div>
-                          <div className="text-xs text-gray-500">Multimodal avanzado</div>
+                          <div className="font-medium text-gray-900 dark:text-white">Servicio/Proceso</div>
+                          <div className="text-xs text-gray-500">Procesos automáticos, timing</div>
                         </div>
                       </div>
                     )}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="w-full border-2 border-gray-200 rounded-lg bg-white dark:bg-gray-800 shadow-lg">
-                  <SelectItem value="demo" className="h-14 px-4 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer">
+                  <SelectItem value="entity" className="h-14 px-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
                     <div className="flex items-center w-full">
-                      <Sparkles className="mr-3 text-purple-500" size={20} />
+                      <Database className="mr-3 text-blue-500" size={20} />
                       <div className="text-left">
-                        <div className="font-medium text-gray-900 dark:text-white">Modo Demo</div>
-                        <div className="text-xs text-gray-500">Sin API necesaria • Ideal para pruebas</div>
+                        <div className="font-medium text-gray-900 dark:text-white">Entidad</div>
+                        <div className="text-xs text-gray-500">CRUD de datos • Wireframes • Filtros y columnas</div>
                       </div>
                     </div>
                   </SelectItem>
-                  <SelectItem value="openai" className="h-14 px-4 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer">
+                  <SelectItem value="api" className="h-14 px-4 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer">
                     <div className="flex items-center w-full">
-                      <Bot className="mr-3 text-green-500" size={20} />
+                      <Globe className="mr-3 text-green-500" size={20} />
                       <div className="text-left">
-                        <div className="font-medium text-gray-900 dark:text-white">OpenAI GPT-4</div>
-                        <div className="text-xs text-gray-500">Avanzado y preciso • Requiere API key</div>
+                        <div className="font-medium text-gray-900 dark:text-white">API/Web Service</div>
+                        <div className="text-xs text-gray-500">Endpoints • Request/Response • Documentación técnica</div>
                       </div>
                     </div>
                   </SelectItem>
-                  <SelectItem value="claude" className="h-14 px-4 hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer">
+                  <SelectItem value="service" className="h-14 px-4 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer">
                     <div className="flex items-center w-full">
-                      <Cpu className="mr-3 text-orange-500" size={20} />
+                      <Clock className="mr-3 text-purple-500" size={20} />
                       <div className="text-left">
-                        <div className="font-medium text-gray-900 dark:text-white">Anthropic Claude</div>
-                        <div className="text-xs text-gray-500">Análisis profundo • Requiere API key</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="grok" className="h-14 px-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
-                    <div className="flex items-center w-full">
-                      <Zap className="mr-3 text-blue-500" size={20} />
-                      <div className="text-left">
-                        <div className="font-medium text-gray-900 dark:text-white">Grok API</div>
-                        <div className="text-xs text-gray-500">Velocidad y eficiencia • Requiere API key</div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="gemini" className="h-14 px-4 hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
-                    <div className="flex items-center w-full">
-                      <Brain className="mr-3 text-red-500" size={20} />
-                      <div className="text-left">
-                        <div className="font-medium text-gray-900 dark:text-white">Google Gemini</div>
-                        <div className="text-xs text-gray-500">Multimodal avanzado • Requiere API key</div>
+                        <div className="font-medium text-gray-900 dark:text-white">Servicio/Proceso</div>
+                        <div className="text-xs text-gray-500">Procesos automáticos • Configuración • Timing</div>
                       </div>
                     </div>
                   </SelectItem>
@@ -201,13 +171,13 @@ export default function FormSteps({
                 <Info className="text-blue-500 mt-0.5 mr-3 flex-shrink-0" size={18} />
                 <div className="text-sm">
                   <div className="font-medium text-gray-900 dark:text-white mb-1">
-                    ¿Qué hace esta configuración?
+                    ¿Por qué seleccionar el tipo?
                   </div>
                   <div className="text-gray-700 dark:text-gray-300">
-                    El modelo seleccionado se usará únicamente para los <strong>botones AI Assist</strong> que aparecen junto a los campos del formulario. El documento final siempre mantiene formato profesional sin procesamiento de IA.
+                    El tipo de caso de uso determina qué campos aparecerán en el formulario y cómo la IA analizará las minutas en el siguiente paso. Cada tipo tiene un enfoque específico según los estándares ING.
                   </div>
                   <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                    💡 Recomendación: Usa <strong>Modo Demo</strong> para probar sin APIs o <strong>OpenAI</strong> para mejores resultados.
+                    💡 Consejo: <strong>Entidad</strong> es el más completo con wireframes, <strong>API</strong> para servicios web, <strong>Servicio</strong> para procesos automáticos.
                   </div>
                 </div>
               </div>
@@ -218,97 +188,19 @@ export default function FormSteps({
     );
   }
 
-  // Step 2: Use Case Type with Template Preview
+  // Step 2: Minute Analysis 
   if (currentStep === 2) {
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-            <List className="mr-2 text-ms-blue" size={20} />
-            Selecciona el Tipo de Caso de Uso
-          </h3>
-          <HelpButton step={2} useCaseType={formData.useCaseType} />
-        </div>
-        
-        <UseCaseTemplatePreview 
-          selectedType={formData.useCaseType}
-          onTypeSelect={(type) => handleInputChange('useCaseType', type)}
-        />
-
-        {/* Botones de autocompletado específicos para cada tipo */}
-        {formData.useCaseType === 'entity' && (
-          <Card className="border-blue-200 bg-blue-50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-blue-900">Ejemplo Complejo: Gestionar Clientes Premium</h4>
-                  <p className="text-sm text-blue-700">
-                    Autocompletar con un caso de uso bancario completo para gestión de entidades
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  onClick={() => onLoadComplexExample?.('entity')}
-                  size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Autocompletar Ejemplo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {formData.useCaseType === 'api' && (
-          <Card className="border-green-200 bg-green-50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-green-900">Ejemplo Complejo: API Consulta Saldos</h4>
-                  <p className="text-sm text-green-700">
-                    Autocompletar con un caso de uso bancario completo para servicios API
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  onClick={() => onLoadComplexExample?.('api')}
-                  size="sm"
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                >
-                  Autocompletar Ejemplo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {formData.useCaseType === 'service' && (
-          <Card className="border-purple-200 bg-purple-50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-purple-900">Ejemplo Complejo: Proceso Cierre Diario</h4>
-                  <p className="text-sm text-purple-700">
-                    Autocompletar con un caso de uso bancario completo para procesos automáticos
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  onClick={() => onLoadComplexExample?.('service')}
-                  size="sm"
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  Autocompletar Ejemplo
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      <MinuteAnalysisStep
+        formData={formData}
+        onFormChange={onUpdateFormData}
+        onNext={onNextStep || (() => {})}
+        onPrevious={onPreviousStep || (() => {})}
+      />
     );
   }
 
-  // Step 3: Basic Information
+  // Step 3: Basic Information (previously Step 2)  
   if (currentStep === 3) {
     return (
       <Card className="shadow-sm border border-ms-border">
@@ -319,7 +211,7 @@ export default function FormSteps({
               Información Básica
             </h3>
             <HelpButton step={3} useCaseType={formData.useCaseType} />
-          </div>
+        </div>
           
           <div className="space-y-4">
             <div>
@@ -369,7 +261,7 @@ export default function FormSteps({
     );
   }
 
-  // Step 4: Use Case Details
+  // Step 4: Use Case Details (previously Step 3)
   if (currentStep === 4) {
     return (
       <Card className="shadow-sm border border-ms-border">

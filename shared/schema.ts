@@ -24,6 +24,9 @@ export const useCases = pgTable("use_cases", {
   alternativeFlowsDescription: text("alternative_flows_description"),
   generatedContent: text("generated_content"),
   aiModel: text("ai_model").notNull(),
+  // Minute analysis fields
+  uploadedMinute: text("uploaded_minute"),
+  aiGeneratedFields: jsonb("ai_generated_fields").default('{}'), // Track which fields were AI-generated
   // Test case fields
   generateTestCase: boolean("generate_test_case").default(false),
   testCaseObjective: text("test_case_objective"),
@@ -107,6 +110,9 @@ const baseUseCaseFormSchema = z.object({
   testCaseObjective: z.string().optional(),
   testCasePreconditions: z.string().optional(),
   testSteps: z.array(testStepSchema).default([]),
+  
+  // AI-generated content tracking
+  isAIGenerated: z.boolean().default(false),
   aiModel: z.enum(['demo', 'openai', 'claude', 'grok', 'gemini']),
 });
 

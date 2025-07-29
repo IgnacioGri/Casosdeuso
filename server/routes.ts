@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertUseCaseSchema, useCaseFormSchema } from "@shared/schema";
 import { AIService } from "./services/ai-service";
 import { DocumentService } from "./services/document-service";
+import { MinuteAnalysisService } from "./services/minute-analysis-service";
 
 const USE_CASE_RULES = `
 REGLAS PARA CASOS DE USO CON IA - SEGUIR ESTRICTAMENTE:
@@ -387,6 +388,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error with AI assist:', error);
       res.status(500).json({ error: 'Error processing field with AI' });
+    }
+  });
+
+  // Minute Analysis endpoint
+  app.post("/api/analyze-minute", async (req, res) => {
+    try {
+      const { minuteContent, useCaseType, aiModel = 'demo', fileName } = req.body;
+      
+      if (!minuteContent && !fileName) {
+        return res.status(400).json({ 
+          error: 'Se requiere contenido de minuta o archivo',
+          success: false 
+        });
+      }
+
+      const aiServiceInstance = new AIService();
+      const minuteAnalysisService = new MinuteAnalysisService(aiServiceInstance);
+      const analysisResult = await minuteAnalysisService.analyzeMinute(
+        minuteContent,
+        useCaseType,
+        aiModel
+      );
+      
+      res.json({
+        success: true,
+        formData: analysisResult
+      });
+    } catch (error) {
+      console.error('Error analyzing minute:', error);
+      res.status(500).json({ 
+        error: 'Failed to analyze minute',
+        success: false,
+        formData: {},
+        aiGeneratedFields: {}
+      });
     }
   });
 

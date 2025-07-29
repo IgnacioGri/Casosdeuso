@@ -5,6 +5,10 @@ export function useUseCaseForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<UseCaseFormData>({
     useCaseType: 'entity',
+    // Minute analysis fields
+    uploadedMinute: '',
+    minuteFile: undefined,
+    aiGeneratedFields: {},
     clientName: '',
     projectName: '',
     useCaseCode: '',
