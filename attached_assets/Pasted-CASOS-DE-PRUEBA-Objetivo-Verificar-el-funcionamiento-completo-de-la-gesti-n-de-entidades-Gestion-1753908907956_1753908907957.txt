@@ -1,0 +1,23 @@
+CASOS DE PRUEBA
+Objetivo:
+Verificar el funcionamiento completo de la gestión de entidades: Gestionar información del cliente
+Precondiciones:
+Usuario autenticado en el sistema Permisos de acceso configurados correctamente Sistema operativo y base de datos disponibles Conexión de red estable Datos de prueba disponibles en la base de datos Validaciones de negocio configuradas
+Pasos de Prueba:
+Historial de Revisiones
+CASOS DE PRUEBA
+Objetivo:
+Verificar el funcionamiento completo de la gestión de entidades: Gestionar información del cliente
+Precondiciones:
+Usuario autenticado en el sistema Permisos de acceso configurados correctamente Sistema operativo y base de datos disponibles Conexión de red estable Datos de prueba disponibles en la base de datos Validaciones de negocio configuradas
+Pasos de Prueba:
+#	Acción	Datos de Entrada	Resultado Esperado	Observaciones
+1	Acceder al sistema con credenciales válidas	Usuario: admin, Contraseña: validPassword123	Login exitoso, redirección a página principal	Verificar que el token de sesión se genere correctamente
+2	Navegar a la funcionalidad del caso de uso	Clic en módulo correspondiente del menú principal	Pantalla del caso de uso se carga correctamente	Verificar tiempos de carga < 3 segundos
+3	Realizar búsqueda con filtros válidos	DNI: 12345678, Apellido: "González"	Lista de resultados filtrados correctamente	Verificar paginación y ordenamiento
+4	Intentar búsqueda con filtros inválidos	DNI: "abc123", Email: formato_inválido	Mensajes de validación específicos mostrados	No permitir búsqueda con datos inválidos
+5	Crear nuevo registro con datos completos	Todos los campos obligatorios con datos válidos	Registro creado exitosamente, ID asignado	Verificar auditoría (fechaAlta, usuarioAlta)
+6	Intentar crear registro con campos obligatorios vacíos	Dejar campos requeridos sin completar	Validaciones impiden el guardado	Mensajes de error claros para cada campo
+HISTORIA DE REVISIONES Y APROBACIONES
+Fecha	Acción	Responsable	Comentario
+27/7/2025	Versión original	Sistema	Documento generado automáticamente
