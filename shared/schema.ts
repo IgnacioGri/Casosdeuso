@@ -51,6 +51,8 @@ export const entityFieldSchema = z.object({
   type: z.enum(['text', 'number', 'date', 'boolean', 'email']),
   length: z.number().optional(),
   mandatory: z.boolean().default(false),
+  description: z.string().default(''), // Documentar propósito del campo
+  validationRules: z.string().default(''), // Reglas de validación específicas
 });
 
 export const testStepSchema = z.object({

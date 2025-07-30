@@ -679,36 +679,51 @@ export default function FormSteps({
               <div className="space-y-3">
               {formData.entityFields.map((field, index) => (
                 <div key={index} className="p-4 border border-gray-200 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="flex items-center space-x-2">
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <input 
                         type="text" 
                         value={field.name}
                         onChange={(e) => onUpdateEntityField(index, { name: e.target.value })}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
                         placeholder="Nombre del campo"
                       />
-
+                      
+                      <select 
+                        value={field.type}
+                        onChange={(e) => onUpdateEntityField(index, { type: e.target.value as EntityField['type'] })}
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
+                      >
+                        <option value="text">Texto</option>
+                        <option value="number">Número</option>
+                        <option value="date">Fecha</option>
+                        <option value="boolean">Booleano</option>
+                        <option value="email">Email</option>
+                      </select>
+                      
+                      <input 
+                        type="number" 
+                        value={field.length || ''}
+                        onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
+                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                        placeholder="Longitud máxima"
+                      />
                     </div>
                     
-                    <select 
-                      value={field.type}
-                      onChange={(e) => onUpdateEntityField(index, { type: e.target.value as EntityField['type'] })}
-                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
-                    >
-                      <option value="text">Texto</option>
-                      <option value="number">Número</option>
-                      <option value="date">Fecha</option>
-                      <option value="boolean">Booleano</option>
-                      <option value="email">Email</option>
-                    </select>
+                    <input 
+                      type="text" 
+                      value={field.description || ''}
+                      onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                      placeholder="Descripción del campo (propósito/contexto)"
+                    />
                     
                     <input 
-                      type="number" 
-                      value={field.length || ''}
-                      onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
-                      className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                      placeholder="Longitud máxima"
+                      type="text" 
+                      value={field.validationRules || ''}
+                      onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                      placeholder="Reglas de validación (ej: 'Solo números', 'Formato YYYY-MM-DD')"
                     />
                     
                     <div className="flex items-center justify-between">

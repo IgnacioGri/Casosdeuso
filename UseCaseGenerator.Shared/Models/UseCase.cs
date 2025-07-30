@@ -84,6 +84,8 @@ public class EntityField
     public string Type { get; set; } = string.Empty;
     public int? Length { get; set; }
     public bool Mandatory { get; set; }
+    public string Description { get; set; } = string.Empty; // Documentar propósito del campo
+    public string ValidationRules { get; set; } = string.Empty; // Reglas de validación específicas
 }
 
 public class TestCase

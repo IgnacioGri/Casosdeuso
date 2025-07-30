@@ -7,6 +7,8 @@ export interface EntityField {
   type: 'text' | 'number' | 'date' | 'boolean' | 'email';
   length?: number;
   mandatory: boolean;
+  description?: string; // Documentar propósito del campo
+  validationRules?: string; // Reglas de validación específicas
 }
 
 export interface TestStep {

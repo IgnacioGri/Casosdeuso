@@ -115,6 +115,8 @@
                             <PropertyColumn Property="x => x.Name" Title="Nombre" />
                             <PropertyColumn Property="x => x.Type" Title="Tipo" />
                             <PropertyColumn Property="x => x.Length" Title="Longitud" />
+                            <PropertyColumn Property="x => x.Description" Title="Descripción" />
+                            <PropertyColumn Property="x => x.ValidationRules" Title="Validación" />
                             <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
                                 <CellTemplate>
                                     <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 

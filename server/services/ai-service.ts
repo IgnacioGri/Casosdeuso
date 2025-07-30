@@ -1221,10 +1221,10 @@ Reglas ING:
 
     // Always add mandatory ING compliance fields
     const ingFields = [
-      { name: 'fechaAlta', type: 'date', mandatory: true },
-      { name: 'usuarioAlta', type: 'text', mandatory: true, length: 50 },
-      { name: 'fechaModificacion', type: 'date', mandatory: false },
-      { name: 'usuarioModificacion', type: 'text', mandatory: false, length: 50 }
+      { name: 'fechaAlta', type: 'date', mandatory: true, description: 'Fecha de creación del registro', validationRules: 'Formato ISO 8601' },
+      { name: 'usuarioAlta', type: 'text', mandatory: true, length: 50, description: 'Usuario que creó el registro', validationRules: 'Debe existir en el sistema de usuarios' },
+      { name: 'fechaModificacion', type: 'date', mandatory: false, description: 'Fecha de última modificación', validationRules: 'Fecha posterior a fechaAlta' },
+      { name: 'usuarioModificacion', type: 'text', mandatory: false, length: 50, description: 'Usuario que modificó el registro', validationRules: 'Debe existir en el sistema de usuarios' }
     ];
 
     fields.push(...ingFields);
@@ -1234,12 +1234,12 @@ Reglas ING:
 
   private generateDefaultEntityFieldsWithINGCompliance(): string {
     const defaultFields = [
-      { name: 'numeroCliente', type: 'text', mandatory: true, length: 20 },
-      { name: 'nombreCompleto', type: 'text', mandatory: true, length: 100 },
-      { name: 'email', type: 'email', mandatory: true },
-      { name: 'telefono', type: 'text', mandatory: false, length: 15 },
-      { name: 'fechaAlta', type: 'date', mandatory: true },
-      { name: 'usuarioAlta', type: 'text', mandatory: true, length: 50 },
+      { name: 'numeroCliente', type: 'text', mandatory: true, length: 20, description: 'Número único del cliente', validationRules: 'Formato alfanumérico' },
+      { name: 'nombreCompleto', type: 'text', mandatory: true, length: 100, description: 'Nombre completo del cliente', validationRules: 'Solo letras y espacios' },
+      { name: 'email', type: 'email', mandatory: true, description: 'Correo electrónico', validationRules: 'Formato email válido' },
+      { name: 'telefono', type: 'text', mandatory: false, length: 15, description: 'Número de teléfono', validationRules: 'Solo números y símbolos telefónicos' },
+      { name: 'fechaAlta', type: 'date', mandatory: true, description: 'Fecha de creación', validationRules: 'Formato ISO 8601' },
+      { name: 'usuarioAlta', type: 'text', mandatory: true, length: 50, description: 'Usuario creador', validationRules: 'Debe existir en el sistema' },
       { name: 'fechaModificacion', type: 'date', mandatory: false },
       { name: 'usuarioModificacion', type: 'text', mandatory: false, length: 50 }
     ];

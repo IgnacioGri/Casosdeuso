@@ -203,14 +203,14 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           resultColumns: ["ID Cliente", "Apellido y Nombres", "Documento", "Email", "Estado"],
           columnsDescription: "Columnas principales para mostrar en la grilla de resultados",
           entityFields: [
-            { name: "clienteId", type: "number", mandatory: true, length: 10 },
-            { name: "tipoDocumento", type: "text", mandatory: true, length: 10 },
-            { name: "numeroDocumento", type: "text", mandatory: true, length: 20 },
-            { name: "apellido", type: "text", mandatory: true, length: 100 },
-            { name: "nombres", type: "text", mandatory: true, length: 100 },
-            { name: "email", type: "text", mandatory: false, length: 150 },
-            { name: "fechaAlta", type: "date", mandatory: true },
-            { name: "usuarioAlta", type: "text", mandatory: true, length: 50 }
+            { name: "clienteId", type: "number", mandatory: true, length: 10, description: "Identificador único del cliente", validationRules: "Número entero positivo" },
+            { name: "tipoDocumento", type: "text", mandatory: true, length: 10, description: "Tipo de documento de identidad", validationRules: "DNI, CUIT, CUIL" },
+            { name: "numeroDocumento", type: "text", mandatory: true, length: 20, description: "Número del documento de identidad", validationRules: "Solo números, sin puntos ni guiones" },
+            { name: "apellido", type: "text", mandatory: true, length: 100, description: "Apellido del cliente", validationRules: "Solo letras y espacios" },
+            { name: "nombres", type: "text", mandatory: true, length: 100, description: "Nombres del cliente", validationRules: "Solo letras y espacios" },
+            { name: "email", type: "text", mandatory: false, length: 150, description: "Correo electrónico del cliente", validationRules: "Formato email válido" },
+            { name: "fechaAlta", type: "date", mandatory: true, description: "Fecha de creación del registro", validationRules: "Formato ISO 8601" },
+            { name: "usuarioAlta", type: "text", mandatory: true, length: 50, description: "Usuario que creó el registro", validationRules: "Debe existir en el sistema" }
           ],
           fieldsDescription: "Campos principales de la entidad cliente con información personal y de auditoría",
           wireframeDescriptions: ["Pantalla de búsqueda con filtros", "Grilla de resultados paginada", "Detalle del cliente"],

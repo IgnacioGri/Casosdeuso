@@ -96,7 +96,7 @@ export default function EnhancedDocumentPreview({
           <h2>Campos de la Entidad</h2>
           <ul>
             ${formData.entityFields.filter(f => f && f.name && typeof f.name === 'string' && f.name.trim()).map(field => 
-              `<li><strong>${field.name}</strong>: ${field.type}${field.length ? `(${field.length})` : ''} ${field.mandatory ? '- Obligatorio' : '- Opcional'}</li>`
+              `<li><strong>${field.name}</strong>: ${field.type}${field.length ? `(${field.length})` : ''} ${field.mandatory ? '- Obligatorio' : '- Opcional'}${field.description ? `<br><em>Descripción: ${field.description}</em>` : ''}${field.validationRules ? `<br><em>Validación: ${field.validationRules}</em>` : ''}</li>`
             ).join('')}
           </ul>
         `);

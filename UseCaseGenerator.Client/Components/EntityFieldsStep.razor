@@ -74,6 +74,7 @@
                     <PropertyColumn Property="x => x.Name" Title="Nombre" />
                     <PropertyColumn Property="x => x.Type" Title="Tipo" />
                     <PropertyColumn Property="x => x.Length" Title="Longitud" />
+                    <PropertyColumn Property="x => x.Description" Title="Descripción" />
                     <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
                         <CellTemplate>
                             <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
@@ -141,6 +142,19 @@
                          Label="Longitud (opcional)"
                          Variant="Variant.Outlined"
                          Class="mb-3" T="int?" />
+        
+        <MudTextField @bind-Value="editingField.Description"
+                      Label="Descripción del campo (propósito/contexto)"
+                      Variant="Variant.Outlined"
+                      Lines="2"
+                      Class="mb-3" />
+        
+        <MudTextField @bind-Value="editingField.ValidationRules"
+                      Label="Reglas de validación (opcional)"
+                      Variant="Variant.Outlined"
+                      HelperText="Ej: 'Solo números', 'Longitud mínima 5 caracteres', 'Formato YYYY-MM-DD'"
+                      Lines="2"
+                      Class="mb-3" />
         
         <MudCheckBox @bind-Value="editingField.Mandatory"
                      Label="Campo obligatorio" T="bool" />
@@ -218,7 +232,9 @@
             Name = field.Name, 
             Type = field.Type, 
             Length = field.Length, 
-            Mandatory = field.Mandatory 
+            Mandatory = field.Mandatory,
+            Description = field.Description,
+            ValidationRules = field.ValidationRules
         };
         isEditingExisting = true;
         showEditDialog = true;
@@ -243,6 +259,8 @@
                 existingField.Type = editingField.Type;
                 existingField.Length = editingField.Length;
                 existingField.Mandatory = editingField.Mandatory;
+                existingField.Description = editingField.Description;
+                existingField.ValidationRules = editingField.ValidationRules;
             }
         }
         else
@@ -252,7 +270,9 @@
                 Name = editingField.Name,
                 Type = editingField.Type,
                 Length = editingField.Length,
-                Mandatory = editingField.Mandatory
+                Mandatory = editingField.Mandatory,
+                Description = editingField.Description,
+                ValidationRules = editingField.ValidationRules
             });
         }
 
@@ -269,10 +289,10 @@
     {
         var standardFields = new[]
         {
-            new EntityField { Name = "fechaAlta", Type = "Date", Mandatory = true },
-            new EntityField { Name = "usuarioAlta", Type = "Text", Length = 50, Mandatory = true },
-            new EntityField { Name = "fechaModificacion", Type = "Date", Mandatory = false },
-            new EntityField { Name = "usuarioModificacion", Type = "Text", Length = 50, Mandatory = false }
+            new EntityField { Name = "fechaAlta", Type = "Date", Mandatory = true, Description = "Fecha de creación del registro", ValidationRules = "Formato fecha estándar ISO 8601" },
+            new EntityField { Name = "usuarioAlta", Type = "Text", Length = 50, Mandatory = true, Description = "Usuario que creó el registro", ValidationRules = "Debe existir en el sistema de usuarios" },
+            new EntityField { Name = "fechaModificacion", Type = "Date", Mandatory = false, Description = "Fecha de última modificación", ValidationRules = "Fecha posterior a fechaAlta" },
+            new EntityField { Name = "usuarioModificacion", Type = "Text", Length = 50, Mandatory = false, Description = "Usuario que modificó el registro", ValidationRules = "Debe existir en el sistema de usuarios" }
         };
 
         foreach (var field in standardFields)
