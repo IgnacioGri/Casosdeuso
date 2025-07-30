@@ -159,13 +159,20 @@ export class DocumentService {
         })]
       }));
       
-      const rules = formData.businessRules.split('\n').filter((r: string) => r.trim());
+      // Handle both string and array formats
+      let rules: string[] = [];
+      if (typeof formData.businessRules === 'string') {
+        rules = formData.businessRules.split('\n').filter((r: string) => r.trim());
+      } else if (Array.isArray(formData.businessRules)) {
+        rules = formData.businessRules.filter((r: any) => r && r.toString().trim());
+      }
+      
       rules.forEach((rule: string, index: number) => {
         sections.push(new Paragraph({
           spacing: { after: 80 },
           indent: { left: 720 },
           children: [new TextRun({
-            text: `${index + 1}. ${rule.trim()}`,
+            text: `${index + 1}. ${rule.toString().trim()}`,
             font: "Segoe UI Semilight"
           })]
         }));
