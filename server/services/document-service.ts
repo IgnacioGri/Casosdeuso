@@ -106,13 +106,8 @@ export class DocumentService {
             ]
           }),
           
-          // Add remaining sections based on form data
+          // Add remaining sections based on form data (includes test cases)
           ...this.addFormDataSections(formData),
-          
-          // Add test cases if provided (check both sources)
-          ...((testCases && testCases.length > 0) || (formData.testCases && formData.testCases.length > 0) 
-            ? this.formatTestCases(testCases || formData.testCases, formData.useCaseName) 
-            : []),
           
           // History table
           ...this.createHistorySection()
@@ -259,6 +254,130 @@ export class DocumentService {
             new TextRun({ text: field.description ? ` - ${field.description}` : '', font: "Segoe UI Semilight" })
           ]
         }));
+      });
+    }
+    
+    // Test Cases Section - Just another form section
+    if (formData.generateTestCase && formData.testSteps && formData.testSteps.length > 0) {
+      // Test Cases header
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 400, after: 120 },
+        children: [new TextRun({
+          text: "CASOS DE PRUEBA",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Objective
+      if (formData.testCaseObjective) {
+        sections.push(new Paragraph({
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 120, after: 80 },
+          children: [new TextRun({
+            text: "Objetivo:",
+            bold: true,
+            size: 24,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        sections.push(new Paragraph({
+          spacing: { after: 120 },
+          children: [new TextRun({
+            text: formData.testCaseObjective,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      // Preconditions
+      if (formData.testCasePreconditions) {
+        sections.push(new Paragraph({
+          heading: HeadingLevel.HEADING_3,
+          spacing: { before: 120, after: 80 },
+          children: [new TextRun({
+            text: "Precondiciones:",
+            bold: true,
+            size: 24,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        const preconditions = formData.testCasePreconditions.split('\n').filter((p: string) => p.trim());
+        preconditions.forEach((condition: string) => {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 720 },
+            children: [
+              new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+              new TextRun({ text: condition.trim(), font: "Segoe UI Semilight" })
+            ]
+          }));
+        });
+      }
+      
+      // Test Steps
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_3,
+        spacing: { before: 120, after: 80 },
+        children: [new TextRun({
+          text: "Pasos de Prueba:",
+          bold: true,
+          size: 24,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Test steps as a numbered list
+      formData.testSteps.forEach((testStep: any, index: number) => {
+        sections.push(new Paragraph({
+          spacing: { after: 120, before: 80 },
+          children: [new TextRun({
+            text: `${testStep.number || index + 1}. ${testStep.action || ''}`,
+            bold: true,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        if (testStep.inputData) {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 720 },
+            children: [
+              new TextRun({ text: "• Datos de Entrada: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: testStep.inputData, font: "Segoe UI Semilight" })
+            ]
+          }));
+        }
+        
+        if (testStep.expectedResult) {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 720 },
+            children: [
+              new TextRun({ text: "• Resultado Esperado: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: testStep.expectedResult, font: "Segoe UI Semilight" })
+            ]
+          }));
+        }
+        
+        if (testStep.observations) {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 720 },
+            children: [
+              new TextRun({ text: "• Observaciones: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: testStep.observations, font: "Segoe UI Semilight" })
+            ]
+          }));
+        }
       });
     }
     
