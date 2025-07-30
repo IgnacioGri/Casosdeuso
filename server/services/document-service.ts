@@ -125,7 +125,9 @@ export class DocumentService {
 
   private static parseHtmlToParagraphs(htmlContent: string): (Paragraph | Table)[] {
     try {
-      // Clean the HTML content properly and remove duplicated history sections
+      const result: (Paragraph | Table)[] = [];
+      
+      // Clean and parse HTML content in order
       let cleanContent = htmlContent
         .replace(/<style[^>]*>.*?<\/style>/gi, '')
         .replace(/<script[^>]*>.*?<\/script>/gi, '')
@@ -133,138 +135,158 @@ export class DocumentService {
         .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '')
         .trim();
         
-      // Remove all existing "HISTORIA DE REVISIONES Y APROBACIONES" content to avoid duplicates
-      cleanContent = cleanContent.replace(/<h[1-6][^>]*>.*?HISTORIA DE REVISIONES Y APROBACIONES.*?<\/h[1-6]>/gi, '');
-      cleanContent = cleanContent.replace(/<table[^>]*>[\s\S]*?HISTORIA DE REVISIONES[\s\S]*?<\/table>/gi, '');
-
-      const result: (Paragraph | Table)[] = [];
-      
-      // Extract and process tables first
-      const tableMatches = cleanContent.match(/<table[^>]*>.*?<\/table>/gi);
-      if (tableMatches) {
-        for (const tableHtml of tableMatches) {
-          const table = this.parseHtmlTable(tableHtml);
-          if (table) {
-            result.push(table);
-          }
-        }
-        // Remove processed tables from content
-        for (const tableHtml of tableMatches) {
-          cleanContent = cleanContent.replace(tableHtml, '');
+      // Remove any duplicate history sections - only keep first if exists
+      const historyPattern = /(<h[1-6][^>]*>.*?HISTORIA DE REVISIONES.*?<\/h[1-6]>.*?<table[^>]*>[\s\S]*?<\/table>)/gi;
+      const historyMatches = cleanContent.match(historyPattern);
+      if (historyMatches && historyMatches.length > 1) {
+        // Remove all but first occurrence
+        for (let i = 1; i < historyMatches.length; i++) {
+          cleanContent = cleanContent.replace(historyMatches[i], '');
         }
       }
       
-      // Process remaining content by lines to preserve indentation
-      const lines = cleanContent.split(/\n+/);
+      // Process content sequentially to maintain order
+      const elements = this.parseHtmlElements(cleanContent);
       
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        
-        const text = this.extractTextContent(trimmed);
-        if (!text) continue;
-        
-        // Handle headings - check if this line might be a title even without h tags
-        if (trimmed.match(/<h1[^>]*>/i) || (text && text.match(/^(Gestionar|Crear|Administrar|Configurar).*/i) && !trimmed.match(/<[^>]+>/))) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_1,
-            spacing: { after: 200 },
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 32,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        } else if (trimmed.match(/<h2[^>]*>/i) || (text && text.match(/^(Descripción|Flujo Principal|Reglas de Negocio|Requerimientos|Precondiciones|Postcondiciones|Boceto)/i))) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 240, after: 120 },
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 28,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        } else if (trimmed.match(/<h3[^>]*>/i)) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_3,
-            spacing: { before: 200, after: 100 },
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 24,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        } else if (trimmed.match(/<h4[^>]*>/i)) {
-          result.push(new Paragraph({
-            heading: HeadingLevel.HEADING_4,
-            spacing: { before: 120, after: 80 },
-            children: [new TextRun({
-              text,
-              bold: true,
-              size: 22,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        } else {
-          // Create hierarchical list items based on text patterns
-          let indentLevel = 0;
-          let isListItem = false;
-          
-          // Detect numbered patterns (1., 2., etc) 
-          if (text.match(/^\d+\./)) {
-            indentLevel = 720; // 0.5 inch for first level
-            isListItem = true;
-          }
-          // Check for letter patterns (a., b., etc) - second level
-          else if (text.match(/^[a-z]\./)) {
-            indentLevel = 1080; // 0.75 inch for second level
-            isListItem = true;
-          }
-          // Check for roman numeral patterns (i., ii., etc) - third level
-          else if (text.match(/^[ivx]+\./)) {
-            indentLevel = 1440; // 1 inch for third level
-            isListItem = true;
-          }
-          
-          if (isListItem) {
-            result.push(new Paragraph({
-              indent: {
-                left: indentLevel,
-                hanging: 360 // Hanging indent for numbered lists
-              },
-              spacing: { after: 120 },
-              children: this.parseFormattedText(trimmed)
-            }));
-          } else {
-            // Regular paragraph
-            result.push(new Paragraph({
-              spacing: { after: 120 },
-              children: this.parseFormattedText(trimmed)
-            }));
-          }
+      for (const element of elements) {
+        if (element.type === 'table') {
+          const table = this.parseHtmlTable(element.content);
+          if (table) result.push(table);
+        } else if (element.type === 'heading') {
+          result.push(this.createHeading(element.content, element.level));
+        } else if (element.type === 'list') {
+          const listItems = this.parseHtmlList(element.content);
+          result.push(...listItems);
+        } else if (element.type === 'paragraph' && element.content.trim()) {
+          result.push(this.createParagraph(element.content));
         }
       }
       
       return result;
     } catch (error) {
       console.error('Error parsing HTML content:', error);
-      const textContent = htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-      return [new Paragraph({
-        children: [new TextRun({
-          text: textContent,
-          font: "Segoe UI Semilight",
-          size: 22
-        })]
-      })];
+      return [new Paragraph({ children: [new TextRun({ text: "Error parsing document content" })] })];
     }
+  }
+
+  private static parseHtmlElements(htmlContent: string): Array<{type: string, content: string, level?: number}> {
+    const elements: Array<{type: string, content: string, level?: number}> = [];
+    
+    // Use regex to find all HTML elements in order
+    const elementRegex = /<(h[1-6]|table|ul|ol|p|div)[^>]*>[\s\S]*?<\/\1>|<(h[1-6])[^>]*>(.*?)<\/\2>/gi;
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = elementRegex.exec(htmlContent)) !== null) {
+      const tag = match[1] || match[2];
+      const content = match[0];
+      
+      if (tag === 'table') {
+        elements.push({ type: 'table', content });
+      } else if (tag.match(/h[1-6]/)) {
+        const level = parseInt(tag.charAt(1));
+        elements.push({ type: 'heading', content, level });
+      } else if (tag === 'ul' || tag === 'ol') {
+        elements.push({ type: 'list', content });
+      } else if (tag === 'p' || tag === 'div') {
+        // Only add if it contains meaningful content
+        const textContent = this.extractTextContent(content);
+        if (textContent && textContent.trim().length > 0) {
+          elements.push({ type: 'paragraph', content: textContent });
+        }
+      }
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    return elements;
+  }
+
+  private static createHeading(htmlContent: string, level: number): Paragraph {
+    const text = this.extractTextContent(htmlContent);
+    
+    let headingLevel: HeadingLevel;
+    let fontSize: number;
+    let spacingBefore: number;
+    let spacingAfter: number;
+    
+    switch (level) {
+      case 1:
+        headingLevel = HeadingLevel.HEADING_1;
+        fontSize = 32;
+        spacingBefore = 0;
+        spacingAfter = 200;
+        break;
+      case 2:
+        headingLevel = HeadingLevel.HEADING_2;
+        fontSize = 28;
+        spacingBefore = 240;
+        spacingAfter = 120;
+        break;
+      case 3:
+        headingLevel = HeadingLevel.HEADING_3;
+        fontSize = 24;
+        spacingBefore = 200;
+        spacingAfter = 100;
+        break;
+      default:
+        headingLevel = HeadingLevel.HEADING_4;
+        fontSize = 22;
+        spacingBefore = 120;
+        spacingAfter = 80;
+    }
+    
+    return new Paragraph({
+      heading: headingLevel,
+      spacing: { before: spacingBefore, after: spacingAfter },
+      children: [new TextRun({
+        text,
+        bold: true,
+        size: fontSize,
+        color: "0070C0",
+        font: "Segoe UI Semilight"
+      })]
+    });
+  }
+
+  private static parseHtmlList(htmlContent: string): Paragraph[] {
+    const paragraphs: Paragraph[] = [];
+    
+    // Extract list items
+    const listItemRegex = /<li[^>]*>(.*?)<\/li>/gi;
+    let match;
+    
+    while ((match = listItemRegex.exec(htmlContent)) !== null) {
+      const text = this.extractTextContent(match[1]);
+      if (text && text.trim()) {
+        paragraphs.push(new Paragraph({
+          indent: { left: 720 }, // 0.5 inch indent
+          spacing: { after: 80 },
+          children: [
+            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+            new TextRun({ text: text.trim(), font: "Segoe UI Semilight" })
+          ]
+        }));
+      }
+    }
+    
+    return paragraphs;
+  }
+
+  private static createParagraph(text: string): Paragraph {
+    // Check if it's a list item pattern
+    if (text.match(/^•\s*/)) {
+      return new Paragraph({
+        indent: { left: 720 },
+        spacing: { after: 80 },
+        children: [new TextRun({ text, font: "Segoe UI Semilight" })]
+      });
+    }
+    
+    return new Paragraph({
+      spacing: { after: 120 },
+      children: [new TextRun({ text, font: "Segoe UI Semilight" })]
+    });
   }
 
   private static extractTextContent(html: string): string {
