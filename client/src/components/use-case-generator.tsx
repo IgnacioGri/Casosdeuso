@@ -273,7 +273,7 @@ export default function UseCaseGenerator() {
           `;
         }
 
-        if (formData.testSteps?.length) {
+        if (formData.testSteps && formData.testSteps.length > 0) {
           testCaseSection += `
             <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Pasos de Prueba:</h3>
             <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
@@ -354,9 +354,7 @@ export default function UseCaseGenerator() {
         entityFields: formData.entityFields || [],
         businessRules: formData.businessRules || '',
         specialRequirements: formData.specialRequirements || '',
-        generateWireframes: formData.generateWireframes || false,
-        wireframeDescriptions: formData.wireframeDescriptions || [],
-        alternativeFlows: formData.alternativeFlows || []
+        generateWireframes: formData.generateWireframes || false
       });
       
       toast({
@@ -468,58 +466,57 @@ export default function UseCaseGenerator() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form Section */}
-          <div className="lg:col-span-2">
-            <EnhancedProgressIndicator 
-              currentStep={currentStep} 
-              totalSteps={getTotalSteps()} 
-              useCaseType={formData.useCaseType}
-            />
-            
-            {/* Navigation Buttons - Top */}
-            <div className="mb-6 pt-4 border-t border-gray-200">
-              <NavigationButtons />
-            </div>
-            
-            <FormSteps
-              currentStep={currentStep}
-              formData={formData}
-              onUpdateFormData={updateFormData}
-              onAddSearchFilter={addSearchFilter}
-              onRemoveSearchFilter={removeSearchFilter}
-              onUpdateSearchFilter={updateSearchFilter}
-              onAddResultColumn={addResultColumn}
-              onRemoveResultColumn={removeResultColumn}
-              onUpdateResultColumn={updateResultColumn}
-              onAddEntityField={addEntityField}
-              onRemoveEntityField={removeEntityField}
-              onUpdateEntityField={updateEntityField}
-              onAddWireframeDescription={addWireframeDescription}
-              onRemoveWireframeDescription={removeWireframeDescription}
-              onUpdateWireframeDescription={updateWireframeDescription}
-              onAddAlternativeFlow={addAlternativeFlow}
-              onRemoveAlternativeFlow={removeAlternativeFlow}
-              onUpdateAlternativeFlow={updateAlternativeFlow}
-              onAddTestStep={addTestStep}
-              onRemoveTestStep={removeTestStep}
-              onUpdateTestStep={updateTestStep}
-              onLoadDemoData={handleLoadDemo}
-              onLoadComplexExample={loadComplexExample}
-              onNextStep={handleNextStep}
-              onPreviousStep={handlePreviousStep}
-
-            />
-
-            {/* Navigation Buttons - Bottom */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <NavigationButtons />
-            </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Form Section - Always full width */}
+        <div className="w-full">
+          <EnhancedProgressIndicator 
+            currentStep={currentStep} 
+            totalSteps={getTotalSteps()} 
+            useCaseType={formData.useCaseType}
+          />
+          
+          {/* Navigation Buttons - Top */}
+          <div className="mb-6 pt-4 border-t border-gray-200">
+            <NavigationButtons />
           </div>
+          
+          <FormSteps
+            currentStep={currentStep}
+            formData={formData}
+            onUpdateFormData={updateFormData}
+            onAddSearchFilter={addSearchFilter}
+            onRemoveSearchFilter={removeSearchFilter}
+            onUpdateSearchFilter={updateSearchFilter}
+            onAddResultColumn={addResultColumn}
+            onRemoveResultColumn={removeResultColumn}
+            onUpdateResultColumn={updateResultColumn}
+            onAddEntityField={addEntityField}
+            onRemoveEntityField={removeEntityField}
+            onUpdateEntityField={updateEntityField}
+            onAddWireframeDescription={addWireframeDescription}
+            onRemoveWireframeDescription={removeWireframeDescription}
+            onUpdateWireframeDescription={updateWireframeDescription}
+            onAddAlternativeFlow={addAlternativeFlow}
+            onRemoveAlternativeFlow={removeAlternativeFlow}
+            onUpdateAlternativeFlow={updateAlternativeFlow}
+            onAddTestStep={addTestStep}
+            onRemoveTestStep={removeTestStep}
+            onUpdateTestStep={updateTestStep}
+            onLoadDemoData={handleLoadDemo}
+            onLoadComplexExample={loadComplexExample}
+            onNextStep={handleNextStep}
+            onPreviousStep={handlePreviousStep}
+          />
 
-          {/* Preview Section */}
-          <div className="lg:col-span-1">
+          {/* Navigation Buttons - Bottom */}
+          <div className="mt-8 pt-6 border-t border-gray-200">
+            <NavigationButtons />
+          </div>
+        </div>
+
+        {/* Preview Section - Always below the form */}
+        <div className="w-full mt-12">
+          <div className="border-t-4 border-ms-blue pt-8">
             <EnhancedDocumentPreview
               formData={formData}
               currentStep={currentStep}
@@ -534,7 +531,6 @@ export default function UseCaseGenerator() {
                   exportUseCaseMutation.mutate();
                 }
               }}
-
             />
           </div>
         </div>
