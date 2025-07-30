@@ -29,6 +29,14 @@ The complete rewrite from JavaScript/TypeScript + React + Node.js to C# + Blazor
 
 ## Recent Changes (Updated: 30/1/2025)
 
+✅ **PROBLEMA CRÍTICO RESUELTO - CASOS DE PRUEBA PRESERVADOS (January 30, 2025)**
+✅ TypeScript: Casos de prueba ahora se conservan durante generación final del documento
+✅ C#: Mismo fix aplicado - casos de prueba se procesan como documento unificado
+✅ Flujo corregido: contenido + casos de prueba → limpieza de estilos → documento final
+✅ Los estilos ING se aplican correctamente a todo el documento incluyendo casos de prueba
+✅ Exportación DOCX ahora incluye casos de prueba con formato profesional completo
+✅ **PARIDAD TOTAL: AMBOS SISTEMAS PRESERVAN CASOS DE PRUEBA CORRECTAMENTE**
+
 ✅ **CÓDIGO C# REVISADO Y VALIDADO - LISTO PARA PRODUCCIÓN (January 30, 2025)**
 ✅ Compilación exitosa: 0 errores, solo 53 warnings menores no críticos
 ✅ Todos los servicios verificados: AIService, DocumentService, Repository completos  

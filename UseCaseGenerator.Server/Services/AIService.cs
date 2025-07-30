@@ -78,8 +78,8 @@ public class AIService : IAIService
             var content = await GenerateWithAI(prompt, request.FormData.AiModel);
             var cleanedContent = CleanAIResponse(content);
 
-            // ✨ CRITICAL FIX: Combine generated content with test cases if they exist
-            var finalContent = cleanedContent;
+            // ✨ CRITICAL FIX: Build complete document with test cases BEFORE applying cleaning/styling
+            var completeRawContent = content;
             
             if (request.FormData.GenerateTestCase && 
                 (request.FormData.TestSteps?.Count > 0 || 
@@ -145,10 +145,13 @@ public class AIService : IAIService
           ";
                 }
 
-                // Insert test cases before closing tags but after main content
-                finalContent = cleanedContent + testCaseSection;
-                _logger.LogInformation("Test cases successfully added to final content");
+                // Combine BEFORE any cleaning/styling
+                completeRawContent = content + testCaseSection;
+                _logger.LogInformation("Test cases successfully added to raw content");
             }
+
+            // ✨ NOW apply cleaning and styling to the UNIFIED document (including test cases)
+            var finalContent = CleanAIResponse(completeRawContent);
 
             return new GenerateUseCaseResponse
             {

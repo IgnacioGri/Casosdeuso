@@ -180,7 +180,7 @@ ${formData.alternativeFlows?.length ? `- Flujos alternativos: ${formData.alterna
 Responde SOLO con el HTML del documento completo. Usa estilos inline para el formato Microsoft especificado. NO agregues explicaciones antes o después.`;
   }
 
-  private static cleanAIResponse(content: string): string {
+  static cleanAIResponse(content: string): string {
     // Remove any explanatory text before HTML
     let cleaned = content;
     

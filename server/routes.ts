@@ -323,8 +323,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // ✨ CRITICAL FIX: Combine generated content with test cases if they exist
-      let finalContent = response.content;
+      // ✨ CRITICAL FIX: Build complete document with test cases BEFORE applying cleaning/styling
+      let completeRawContent = response.content;
       
       if (validatedData.generateTestCase && (validatedData.testSteps?.length > 0 || validatedData.testCaseObjective || validatedData.testCasePreconditions)) {
         console.log('Adding test cases to generated document...');
@@ -382,10 +382,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           `;
         }
 
-        // Insert test cases before closing tags but after main content
-        finalContent = response.content + testCaseSection;
-        console.log('Test cases successfully added to final content');
+        // Combine BEFORE any cleaning/styling
+        completeRawContent = response.content + testCaseSection;
+        console.log('Test cases successfully added to raw content');
       }
+
+      // ✨ NOW apply cleaning and styling to the UNIFIED document (including test cases)
+      const finalContent = AIService.cleanAIResponse(completeRawContent);
 
       // Save to storage
       const insertData = insertUseCaseSchema.parse({
