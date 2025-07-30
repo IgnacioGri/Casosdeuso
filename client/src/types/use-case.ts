@@ -15,7 +15,7 @@ export interface TestStep {
   inputData: string;
   expectedResult: string;
   observations: string;
-  status: 'P' | 'F' | 'pending'; // Pass/Fail/Not executed
+  status: 'P' | 'F' | '' | 'pending'; // Pass/Fail/Empty/Not executed
 }
 
 export interface UseCaseFormData {

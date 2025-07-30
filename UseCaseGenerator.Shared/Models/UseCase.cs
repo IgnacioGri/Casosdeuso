@@ -130,6 +130,7 @@ public class TestStep
 
 public enum TestStepStatus
 {
+    Empty,
     Pending,
     Passed,
     Failed

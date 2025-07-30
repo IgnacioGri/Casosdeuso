@@ -59,7 +59,7 @@ export const testStepSchema = z.object({
   inputData: z.string(),
   expectedResult: z.string(),
   observations: z.string(),
-  status: z.enum(['P', 'F', '']).default(''),
+  status: z.enum(['P', 'F', '', 'pending']).default(''),
 });
 
 // Base schema para validación común
@@ -113,7 +113,7 @@ const baseUseCaseFormSchema = z.object({
   
   // AI-generated content tracking
   isAIGenerated: z.boolean().default(false),
-  aiModel: z.enum(['demo', 'openai', 'claude', 'grok', 'gemini']),
+  aiModel: z.enum(['demo', 'openai', 'claude', 'grok', 'gemini', 'copilot']),
 });
 
 // Schema con validación condicional según el tipo de caso de uso

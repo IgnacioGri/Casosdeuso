@@ -25,6 +25,8 @@ public class UseCaseController : ControllerBase
     {
         try
         {
+
+            
             var response = await _aiService.GenerateUseCaseAsync(request);
             
             if (response.Success && response.UseCase != null)
@@ -44,6 +46,8 @@ public class UseCaseController : ControllerBase
             });
         }
     }
+
+
 
     [HttpPost("edit")]
     public async Task<ActionResult<string>> EditUseCase([FromBody] EditUseCaseRequest request)
