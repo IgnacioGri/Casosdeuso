@@ -65,7 +65,6 @@ public enum UseCaseType
 {
     Entity,
     API,
-    Process,
     Service
 }
 
@@ -83,10 +82,8 @@ public class EntityField
 {
     public string Name { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
-    public bool IsMandatory { get; set; }
-    public int? MaxLength { get; set; }
-    public string? Description { get; set; }
-    public string? ValidationRules { get; set; }
+    public int? Length { get; set; }
+    public bool Mandatory { get; set; }
 }
 
 public class TestCase

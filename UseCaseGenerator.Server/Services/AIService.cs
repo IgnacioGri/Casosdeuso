@@ -58,9 +58,9 @@ public class AIService : IAIService
         if (!string.IsNullOrEmpty(copilotKey))
         {
             _copilotClient = new HttpClient();
-            _copilotClient.BaseAddress = new Uri("https://api.github.com/copilot/");
+            _copilotClient.BaseAddress = new Uri("https://api.copilot.microsoft.com/v1/");
             _copilotClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {copilotKey}");
-            _copilotClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+            _copilotClient.DefaultRequestHeaders.Add("Accept", "application/json");
             _copilotClient.DefaultRequestHeaders.Add("User-Agent", "UseCaseGenerator");
         }
     }

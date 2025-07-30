@@ -73,11 +73,11 @@
                 <Columns>
                     <PropertyColumn Property="x => x.Name" Title="Nombre" />
                     <PropertyColumn Property="x => x.Type" Title="Tipo" />
-                    <PropertyColumn Property="x => x.MaxLength" Title="Longitud" />
-                    <PropertyColumn Property="x => x.IsMandatory" Title="Obligatorio">
+                    <PropertyColumn Property="x => x.Length" Title="Longitud" />
+                    <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
                         <CellTemplate>
-                            <MudIcon Icon="@(context.Item.IsMandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
-                                     Color="@(context.Item.IsMandatory ? Color.Success : Color.Default)" />
+                            <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
+                                     Color="@(context.Item.Mandatory ? Color.Success : Color.Default)" />
                         </CellTemplate>
                     </PropertyColumn>
                     <TemplateColumn Title="Acciones">
@@ -137,12 +137,12 @@
             <MudSelectItem Value='"email"'>Email</MudSelectItem>
         </MudSelect>
         
-        <MudNumericField @bind-Value="editingField.MaxLength"
+        <MudNumericField @bind-Value="editingField.Length"
                          Label="Longitud (opcional)"
                          Variant="Variant.Outlined"
                          Class="mb-3" T="int?" />
         
-        <MudCheckBox @bind-Value="editingField.IsMandatory"
+        <MudCheckBox @bind-Value="editingField.Mandatory"
                      Label="Campo obligatorio" T="bool" />
     </DialogContent>
     <DialogActions>
@@ -217,8 +217,8 @@
         { 
             Name = field.Name, 
             Type = field.Type, 
-            MaxLength = field.MaxLength, 
-            IsMandatory = field.IsMandatory 
+            Length = field.Length, 
+            Mandatory = field.Mandatory 
         };
         isEditingExisting = true;
         showEditDialog = true;
@@ -241,8 +241,8 @@
             if (existingField != null)
             {
                 existingField.Type = editingField.Type;
-                existingField.MaxLength = editingField.MaxLength;
-                existingField.IsMandatory = editingField.IsMandatory;
+                existingField.Length = editingField.Length;
+                existingField.Mandatory = editingField.Mandatory;
             }
         }
         else
@@ -251,8 +251,8 @@
             {
                 Name = editingField.Name,
                 Type = editingField.Type,
-                MaxLength = editingField.MaxLength,
-                IsMandatory = editingField.IsMandatory
+                Length = editingField.Length,
+                Mandatory = editingField.Mandatory
             });
         }
 
@@ -269,10 +269,10 @@
     {
         var standardFields = new[]
         {
-            new EntityField { Name = "fechaAlta", Type = "Date", IsMandatory = true },
-            new EntityField { Name = "usuarioAlta", Type = "Text", MaxLength = 50, IsMandatory = true },
-            new EntityField { Name = "fechaModificacion", Type = "Date", IsMandatory = false },
-            new EntityField { Name = "usuarioModificacion", Type = "Text", MaxLength = 50, IsMandatory = false }
+            new EntityField { Name = "fechaAlta", Type = "Date", Mandatory = true },
+            new EntityField { Name = "usuarioAlta", Type = "Text", Length = 50, Mandatory = true },
+            new EntityField { Name = "fechaModificacion", Type = "Date", Mandatory = false },
+            new EntityField { Name = "usuarioModificacion", Type = "Text", Length = 50, Mandatory = false }
         };
 
         foreach (var field in standardFields)

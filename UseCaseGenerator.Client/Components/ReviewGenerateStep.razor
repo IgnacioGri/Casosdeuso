@@ -114,11 +114,11 @@
                         <Columns>
                             <PropertyColumn Property="x => x.Name" Title="Nombre" />
                             <PropertyColumn Property="x => x.Type" Title="Tipo" />
-                            <PropertyColumn Property="x => x.MaxLength" Title="Longitud" />
-                            <PropertyColumn Property="x => x.IsMandatory" Title="Obligatorio">
+                            <PropertyColumn Property="x => x.Length" Title="Longitud" />
+                            <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
                                 <CellTemplate>
-                                    <MudIcon Icon="@(context.Item.IsMandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
-                                             Color="@(context.Item.IsMandatory ? Color.Success : Color.Default)" />
+                                    <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
+                                             Color="@(context.Item.Mandatory ? Color.Success : Color.Default)" />
                                 </CellTemplate>
                             </PropertyColumn>
                         </Columns>
