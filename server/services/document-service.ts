@@ -135,16 +135,10 @@ export class DocumentService {
         .replace(/<\/?(?:html|head|body|meta|link|title)[^>]*>/gi, '')
         .trim();
         
-      // CRITICAL: Remove ALL duplicate test case sections to prevent duplication
-      // Find and keep only the FIRST occurrence of test cases (which comes from our structured generation)
-      const testCasePattern = /(CASOS DE PRUEBA[\s\S]*?)(?=HISTORIA DE REVISIONES|$)/gi;
-      const testCaseMatches = cleanContent.match(testCasePattern);
-      
-      if (testCaseMatches && testCaseMatches.length > 1) {
-        // Remove all duplicate test case sections - keep only first
-        cleanContent = cleanContent.replace(testCasePattern, '');
-        cleanContent += testCaseMatches[0]; // Add back the first occurrence at the end
-      }
+      // CRITICAL: Remove ONLY the duplicate plain text version of test cases that appears before the table version
+      // The structured version with the table should be preserved
+      const duplicateTestPattern = /CASOS DE PRUEBA\s*Objetivo:\s*Verificar[^<]*?Pasos de Prueba:\s*(?=Historial de Revisiones|CASOS DE PRUEBA|<)/gi;
+      cleanContent = cleanContent.replace(duplicateTestPattern, '');
       
       // Now parse the cleaned content sequentially
       this.parseContentSequentially(cleanContent, result);
@@ -157,63 +151,98 @@ export class DocumentService {
   }
 
   private static parseContentSequentially(content: string, result: (Paragraph | Table)[]): void {
-    // Parse in order: titles, tables, lists, paragraphs
-    let remainingContent = content;
+    // DEBUG: First let's find ALL tables to make sure they're being detected
+    const allTables = content.match(/<table[^>]*>[\s\S]*?<\/table>/gi);
+    console.log('DEBUG: Found tables:', allTables?.length || 0);
+    if (allTables) {
+      allTables.forEach((table, i) => {
+        console.log(`Table ${i + 1} preview:`, table.substring(0, 100) + '...');
+      });
+    }
     
-    // Split content into sections by looking for major structural elements
-    const sections = remainingContent.split(/(?=<h[1-6][^>]*>|<table[^>]*>)/gi).filter(section => section.trim());
+    // Process content by finding elements in order they appear
+    let currentIndex = 0;
+    const elements: { type: string, content: string, index: number, level?: number }[] = [];
     
-    for (const section of sections) {
-      // Check if section starts with a heading
-      const headingMatch = section.match(/^<(h[1-6])[^>]*>(.*?)<\/\1>/i);
-      if (headingMatch) {
-        const level = parseInt(headingMatch[1].charAt(1));
-        const headingText = this.extractTextContent(headingMatch[0]);
-        result.push(this.createHeading(headingMatch[0], level));
-        
-        // Process remaining content in this section
-        const afterHeading = section.substring(headingMatch[0].length);
-        this.processNonHeadingContent(afterHeading, result);
-      } else {
-        // Process non-heading content
-        this.processNonHeadingContent(section, result);
+    // Find all headings
+    const headingRegex = /<(h[1-6])[^>]*>.*?<\/\1>/gi;
+    let match;
+    while ((match = headingRegex.exec(content)) !== null) {
+      const level = parseInt(match[1].charAt(1));
+      elements.push({
+        type: 'heading',
+        content: match[0],
+        index: match.index,
+        level
+      });
+    }
+    
+    // Find all tables
+    const tableRegex = /<table[^>]*>[\s\S]*?<\/table>/gi;
+    while ((match = tableRegex.exec(content)) !== null) {
+      elements.push({
+        type: 'table',
+        content: match[0],
+        index: match.index
+      });
+    }
+    
+    // Find all lists
+    const listRegex = /<(ul|ol)[^>]*>[\s\S]*?<\/\1>/gi;
+    while ((match = listRegex.exec(content)) !== null) {
+      elements.push({
+        type: 'list',
+        content: match[0],
+        index: match.index
+      });
+    }
+    
+    // Sort elements by their position in the content
+    elements.sort((a, b) => a.index - b.index);
+    
+    // Process each element
+    for (const element of elements) {
+      if (element.type === 'heading') {
+        result.push(this.createHeading(element.content, element.level!));
+      } else if (element.type === 'table') {
+        const table = this.parseHtmlTable(element.content);
+        if (table) {
+          console.log('DEBUG: Successfully parsed table');
+          result.push(table);
+        } else {
+          console.log('DEBUG: Failed to parse table:', element.content.substring(0, 100));
+        }
+      } else if (element.type === 'list') {
+        const listItems = this.parseHtmlList(element.content);
+        result.push(...listItems);
       }
+    }
+    
+    // Process any remaining text content between elements
+    let lastIndex = 0;
+    for (const element of elements) {
+      if (element.index > lastIndex) {
+        const textBetween = content.substring(lastIndex, element.index);
+        this.processTextContent(textBetween, result);
+      }
+      lastIndex = element.index + element.content.length;
+    }
+    
+    // Process any remaining content after the last element
+    if (lastIndex < content.length) {
+      const remainingText = content.substring(lastIndex);
+      this.processTextContent(remainingText, result);
     }
   }
 
-  private static processNonHeadingContent(content: string, result: (Paragraph | Table)[]): void {
-    // Look for tables first
-    const tableMatches = content.match(/<table[^>]*>[\s\S]*?<\/table>/gi);
-    if (tableMatches) {
-      for (const tableHtml of tableMatches) {
-        const table = this.parseHtmlTable(tableHtml);
-        if (table) {
-          result.push(table);
-        }
-        // Remove processed table from content
-        content = content.replace(tableHtml, '');
-      }
-    }
-    
-    // Look for lists
-    const listMatches = content.match(/<ul[^>]*>[\s\S]*?<\/ul>|<ol[^>]*>[\s\S]*?<\/ol>/gi);
-    if (listMatches) {
-      for (const listHtml of listMatches) {
-        const listItems = this.parseHtmlList(listHtml);
-        result.push(...listItems);
-        // Remove processed list from content
-        content = content.replace(listHtml, '');
-      }
-    }
-    
-    // Process remaining content as paragraphs
-    const cleanText = this.extractTextContent(content);
+  private static processTextContent(textContent: string, result: (Paragraph | Table)[]): void {
+    const cleanText = this.extractTextContent(textContent);
     if (cleanText && cleanText.trim().length > 0) {
       result.push(this.createParagraph(cleanText));
     }
   }
 
-  // This function is replaced by parseContentSequentially - remove this old implementation
+  // Removed old unused functions
 
   private static createHeading(htmlContent: string, level: number): Paragraph {
     const text = this.extractTextContent(htmlContent);
