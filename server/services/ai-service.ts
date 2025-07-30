@@ -6,6 +6,7 @@ let openai: OpenAI | null = null;
 let anthropic: any | null = null;
 let grokClient: OpenAI | null = null;
 let gemini: GoogleGenAI | null = null;
+let copilotClient: OpenAI | null = null;
 
 function getOpenAIClient(): OpenAI {
   if (!openai && process.env.OPENAI_API_KEY) {
@@ -41,6 +42,16 @@ function getGeminiClient(): GoogleGenAI {
     gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   }
   return gemini!;
+}
+
+function getCopilotClient(): OpenAI {
+  if (!copilotClient && process.env.COPILOT_API_KEY) {
+    copilotClient = new OpenAI({ 
+      baseURL: "https://api.copilot.microsoft.com/v1", // URL hipotética para Microsoft Copilot
+      apiKey: process.env.COPILOT_API_KEY 
+    });
+  }
+  return copilotClient!;
 }
 
 export interface GenerateUseCaseRequest {
@@ -81,6 +92,9 @@ export class AIService {
           break;
         case 'gemini':
           content = await this.generateWithGemini(prompt);
+          break;
+        case 'copilot':
+          content = await this.generateWithCopilot(prompt);
           break;
         default:
           throw new Error(`Modelo de IA no soportado: ${aiModel}`);
@@ -493,6 +507,9 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         case 'gemini':
           modifiedContent = await this.generateWithGemini(prompt);
           break;
+        case 'copilot':
+          modifiedContent = await this.generateWithCopilot(prompt);
+          break;
         default:
           throw new Error(`Modelo de IA no soportado: ${aiModel}`);
       }
@@ -565,6 +582,9 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         case 'gemini':
           result = await AIService.processWithGemini(prompt, JSON.stringify(context));
           break;
+        case 'copilot':
+          result = await AIService.processWithCopilot(prompt, JSON.stringify(context));
+          break;
         default:
           throw new Error(`Modelo de IA no soportado: ${aiModel}`);
       }
@@ -617,6 +637,9 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
           break;
         case 'gemini':
           result = await this.processWithGemini(systemPrompt, fieldValue);
+          break;
+        case 'copilot':
+          result = await this.processWithCopilot(systemPrompt, fieldValue);
           break;
         default:
           throw new Error(`Modelo de IA no soportado: ${aiModel}`);
@@ -1872,5 +1895,34 @@ CONTENIDO MEJORADO:`;
     }
     
     return fieldValue;
+  }
+
+  private static async generateWithCopilot(prompt: string): Promise<string> {
+    const copilot = getCopilotClient();
+    const response = await copilot.chat.completions.create({
+      model: "gpt-4", // Microsoft Copilot usa modelos GPT
+      messages: [
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 4000,
+    });
+
+    return response.choices[0]?.message?.content || "No response from Microsoft Copilot";
+  }
+
+  private static async processWithCopilot(systemPrompt: string, fieldValue: string): Promise<string> {
+    const copilot = getCopilotClient();
+    const response = await copilot.chat.completions.create({
+      model: "gpt-4", // Microsoft Copilot usa modelos GPT
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: fieldValue }
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+    });
+
+    return response.choices[0]?.message?.content || "No response from Microsoft Copilot";
   }
 }

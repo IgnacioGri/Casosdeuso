@@ -20,6 +20,8 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
         return '⚡';
       case 'gemini':
         return '💎';
+      case 'copilot':
+        return '💻';
       case 'demo':
         return '🎯';
       default:
@@ -37,6 +39,8 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
         return 'Grok - Rápido y directo';
       case 'gemini':
         return 'Gemini 2.5 - Google AI';
+      case 'copilot':
+        return 'Microsoft Copilot - Empresarial';
       case 'demo':
         return 'Modo Demo - Sin API';
       default:
@@ -53,6 +57,8 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
       case 'grok':
         return 'outline';
       case 'gemini':
+        return 'default';
+      case 'copilot':
         return 'default';
       case 'demo':
         return 'secondary';
@@ -122,6 +128,15 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
               <div className="flex flex-col items-start">
                 <span className="font-medium">Gemini 2.5</span>
                 <span className="text-xs text-gray-500">Google AI</span>
+              </div>
+            </div>
+          </SelectItem>
+          <SelectItem value="copilot">
+            <div className="flex items-center gap-3 w-full">
+              <span className="text-lg">💻</span>
+              <div className="flex flex-col items-start">
+                <span className="font-medium">Microsoft Copilot</span>
+                <span className="text-xs text-gray-500">Microsoft Copilot - Empresarial</span>
               </div>
             </div>
           </SelectItem>

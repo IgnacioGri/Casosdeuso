@@ -1,6 +1,6 @@
 export type UseCaseType = 'entity' | 'api' | 'service';
 
-export type AIModel = 'demo' | 'openai' | 'claude' | 'grok' | 'gemini';
+export type AIModel = 'demo' | 'openai' | 'claude' | 'grok' | 'gemini' | 'copilot';
 
 export interface EntityField {
   name: string;
