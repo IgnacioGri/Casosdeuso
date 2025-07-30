@@ -132,10 +132,238 @@ export default function UseCaseGenerator() {
 
   const handleGenerateUseCase = () => {
     if (validateStep(currentStep)) {
-      // IMPORTANTE: El último paso NUNCA usa IA, solo aplica estilos y formato
-      // La IA se usa únicamente en los botones AI Assist de campos individuales
-      const formDataWithDemoMode = { ...formData, aiModel: 'demo' as const };
-      generateUseCaseMutation.mutate(formDataWithDemoMode);
+      // ✨ CRITICAL FIX: En el paso final, aplicar formato al contenido existente, no generar nuevo
+      // Construir el contenido completo con datos del formulario + casos de prueba
+      const contentSections = [];
+      
+      // Header con estilos Microsoft
+      contentSections.push(`
+        <div style="border-bottom: 3px solid rgb(0, 112, 192); padding-bottom: 12px; margin-bottom: 24px;">
+          <h1 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 24px; margin: 0;">ESPECIFICACIÓN DE CASO DE USO</h1>
+        </div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Información del Proyecto</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
+          <tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold; width: 150px;">Cliente</td>
+            <td style="border: 1px solid #666; padding: 8px;">${formData.clientName || 'No especificado'}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Proyecto</td>
+            <td style="border: 1px solid #666; padding: 8px;">${formData.projectName || 'No especificado'}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Código</td>
+            <td style="border: 1px solid #666; padding: 8px;">${formData.useCaseCode || 'No especificado'}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Archivo</td>
+            <td style="border: 1px solid #666; padding: 8px;">${formData.fileName || 'No especificado'}</td>
+          </tr>
+        </table>
+      `);
+
+      // Caso de uso principal
+      contentSections.push(`
+        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Descripción del Caso de Uso</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
+          <tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold; width: 150px;">Nombre</td>
+            <td style="border: 1px solid #666; padding: 8px;">${formData.useCaseName || 'No especificado'}</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Tipo</td>
+            <td style="border: 1px solid #666; padding: 8px;">${
+              formData.useCaseType === 'entity' ? 'Gestión de Entidades' : 
+              formData.useCaseType === 'api' ? 'Integración API' : 
+              'Proceso Automático'
+            }</td>
+          </tr>
+          ${formData.description ? `<tr>
+            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Descripción</td>
+            <td style="border: 1px solid #666; padding: 8px;">${formData.description}</td>
+          </tr>` : ''}
+        </table>
+      `);
+
+      // Filtros de búsqueda si existen
+      if (formData.searchFilters?.length) {
+        contentSections.push(`
+          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Filtros de Búsqueda</h2>
+          <ul style="font-family: 'Segoe UI Semilight', sans-serif; margin-left: 20px;">
+            ${formData.searchFilters.map(filter => filter.trim() ? `<li>${filter.trim()}</li>` : '').join('')}
+          </ul>
+        `);
+      }
+
+      // Columnas de resultado si existen
+      if (formData.resultColumns?.length) {
+        contentSections.push(`
+          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Columnas de Resultado</h2>
+          <ul style="font-family: 'Segoe UI Semilight', sans-serif; margin-left: 20px;">
+            ${formData.resultColumns.map(column => column.trim() ? `<li>${column.trim()}</li>` : '').join('')}
+          </ul>
+        `);
+      }
+
+      // Campos de entidad si existen
+      if (formData.entityFields?.length) {
+        contentSections.push(`
+          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Campos de Entidad</h2>
+          <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
+            <thead>
+              <tr style="background-color: #f8f9fa;">
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Nombre</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Tipo</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Longitud</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Obligatorio</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${formData.entityFields.map(field => `
+                <tr>
+                  <td style="border: 1px solid #666; padding: 8px;">${field.name || ''}</td>
+                  <td style="border: 1px solid #666; padding: 8px;">${field.type || ''}</td>
+                  <td style="border: 1px solid #666; padding: 8px; text-align: center;">${field.length || ''}</td>
+                  <td style="border: 1px solid #666; padding: 8px; text-align: center;">${field.mandatory ? 'Sí' : 'No'}</td>
+                  <td style="border: 1px solid #666; padding: 8px;">${field.description || ''}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `);
+      }
+
+      // Reglas de negocio
+      if (formData.businessRules) {
+        contentSections.push(`
+          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif;">Reglas de Negocio</h2>
+          <div style="font-family: 'Segoe UI Semilight', sans-serif;">${
+            Array.isArray(formData.businessRules) 
+              ? formData.businessRules.map(rule => 
+                  typeof rule === 'string' && rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
+                ).join('')
+              : typeof formData.businessRules === 'string'
+                ? formData.businessRules.split('\n').map(rule => 
+                    rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
+                  ).join('')
+                : `<p>• ${formData.businessRules}</p>`
+          }</div>
+        `);
+      }
+
+      // Casos de prueba si están habilitados
+      if (formData.generateTestCase && (formData.testSteps?.length > 0 || formData.testCaseObjective || formData.testCasePreconditions)) {
+        let testCaseSection = `
+          <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">CASOS DE PRUEBA</h2>
+        `;
+
+        if (formData.testCaseObjective) {
+          testCaseSection += `
+            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Objetivo:</h3>
+            <p style="margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;">${formData.testCaseObjective}</p>
+          `;
+        }
+
+        if (formData.testCasePreconditions) {
+          testCaseSection += `
+            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Precondiciones:</h3>
+            <p style="margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;">${formData.testCasePreconditions}</p>
+          `;
+        }
+
+        if (formData.testSteps?.length) {
+          testCaseSection += `
+            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Pasos de Prueba:</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
+              <thead>
+                <tr style="background-color: #f8f9fa;">
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 50px;">#</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Datos de Entrada</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Resultado Esperado</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          formData.testSteps.forEach((step) => {
+            testCaseSection += `
+              <tr>
+                <td style="border: 1px solid #666; padding: 8px; text-align: center;">${step.number}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.action || ''}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.inputData || ''}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.expectedResult || ''}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.observations || ''}</td>
+              </tr>
+            `;
+          });
+
+          testCaseSection += `
+              </tbody>
+            </table>
+          `;
+        }
+
+        contentSections.push(testCaseSection);
+      }
+
+      // Agregar tabla de historial de revisiones
+      const currentDate = new Date().toLocaleDateString('es-ES');
+      contentSections.push(`
+        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 32px 0 12px 0;">Historial de Revisiones</h2>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
+          <thead>
+            <tr style="background-color: #f8f9fa;">
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 80px;">Versión</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 100px;">Fecha</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 150px;">Responsable</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">1.0</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">${currentDate}</td>
+              <td style="border: 1px solid #666; padding: 8px;">Analista de Sistemas</td>
+              <td style="border: 1px solid #666; padding: 8px;">Creación inicial del documento de caso de uso.</td>
+            </tr>
+          </tbody>
+        </table>
+      `);
+
+      // Construir el documento final completo
+      const finalContent = contentSections.join('');
+      
+      // Simular la respuesta sin llamar al servidor - NO generamos contenido nuevo con IA
+      setGeneratedContent(finalContent);
+      
+      // También simular el objeto generatedUseCase para que las descargas funcionen
+      setGeneratedUseCase({
+        clientName: formData.clientName || 'No especificado',
+        projectName: formData.projectName || 'No especificado',
+        useCaseCode: formData.useCaseCode || 'No especificado',
+        useCaseName: formData.useCaseName || 'No especificado',
+        fileName: formData.fileName || 'documento',
+        description: formData.description || '',
+        useCaseType: formData.useCaseType || 'entity',
+        searchFilters: formData.searchFilters || [],
+        resultColumns: formData.resultColumns || [],
+        entityFields: formData.entityFields || [],
+        businessRules: formData.businessRules || '',
+        specialRequirements: formData.specialRequirements || '',
+        generateWireframes: formData.generateWireframes || false,
+        wireframeDescriptions: formData.wireframeDescriptions || [],
+        alternativeFlows: formData.alternativeFlows || []
+      });
+      
+      toast({
+        title: "Éxito",
+        description: "Documento generado con formato aplicado correctamente"
+      });
+      
     } else {
       toast({
         title: "Formulario incompleto",
