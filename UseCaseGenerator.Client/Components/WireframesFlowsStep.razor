@@ -1,5 +1,6 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Web
 
 <MudGrid>
     <MudItem xs="12">
@@ -28,7 +29,7 @@
                               Variant="Variant.Outlined"
                               Class="flex-grow-1 mr-2"
                               Placeholder="Ej: Pantalla de consulta con filtros laterales"
-                              @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddWireframe(); })" />
+                              @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddWireframe(); })" />
                 <MudButton Variant="Variant.Filled" 
                            Color="Color.Primary"
                            OnClick="AddWireframe"
@@ -86,7 +87,7 @@
                           Variant="Variant.Outlined"
                           Class="flex-grow-1 mr-2"
                           Placeholder="Ej: Error en validación de DNI duplicado"
-                          @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddAlternativeFlow(); })" />
+                          @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddAlternativeFlow(); })" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddAlternativeFlow"

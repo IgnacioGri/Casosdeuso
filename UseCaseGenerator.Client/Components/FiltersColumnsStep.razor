@@ -1,6 +1,8 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
+@using Microsoft.AspNetCore.Components.Web
 @using UseCaseGenerator.Client.Services
+@using System.Text.Json
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
 
@@ -50,7 +52,7 @@
                           Label="Nuevo filtro"
                           Variant="Variant.Outlined"
                           Class="flex-grow-1 mr-2"
-                          @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddFilter(); })" />
+                          @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddFilter(); })" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddFilter"
@@ -61,10 +63,10 @@
         
         @if (FormData.SearchFilters.Any())
         {
-            <MudList Dense="true">
+            <MudList Dense="true" T="string">
                 @foreach (var filter in FormData.SearchFilters.ToList())
                 {
-                    <MudListItem>
+                    <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
                             <MudText>@filter</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" 
@@ -120,7 +122,7 @@
                           Label="Nueva columna"
                           Variant="Variant.Outlined"
                           Class="flex-grow-1 mr-2"
-                          @onkeypress="@(async (e) => { if (e.Key == "Enter") await AddColumn(); })" />
+                          @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddColumn(); })" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddColumn"
@@ -131,10 +133,10 @@
         
         @if (FormData.ResultColumns.Any())
         {
-            <MudList Dense="true">
+            <MudList Dense="true" T="string">
                 @foreach (var column in FormData.ResultColumns.ToList())
                 {
-                    <MudListItem>
+                    <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
                             <MudText>@column</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" 
@@ -219,10 +221,9 @@
             var request = new AIAssistRequest
             {
                 FieldName = "searchFilters",
-                FieldValue = filtersDescription,
-                FieldType = "filtersFromText",
+                CurrentValue = filtersDescription,
                 AiModel = FormData.AiModel,
-                Context = FormData
+                Context = JsonSerializer.Serialize(FormData)
             };
 
             var response = await AIAssistService.ImproveFieldAsync(request);
@@ -269,10 +270,9 @@
             var request = new AIAssistRequest
             {
                 FieldName = "resultColumns",
-                FieldValue = columnsDescription,
-                FieldType = "columnsFromText",
+                CurrentValue = columnsDescription,
                 AiModel = FormData.AiModel,
-                Context = FormData
+                Context = JsonSerializer.Serialize(FormData)
             };
 
             var response = await AIAssistService.ImproveFieldAsync(request);

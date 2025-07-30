@@ -3,6 +3,7 @@
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
 @using UseCaseGenerator.Client.Services
+@using Microsoft.AspNetCore.Components
 @inject IAIAssistService AIAssistService
 @inject IFormStateService FormStateService
 @inject ISnackbar Snackbar
@@ -27,7 +28,7 @@
                     <MudSelect @bind-Value="selectedAIModel" 
                                Label="Modelo de IA" 
                                Variant="Variant.Outlined"
-                               Class="mb-3">
+                               Class="mb-3" T="AIModel">
                         <MudSelectItem Value="AIModel.Demo">Modo Demo</MudSelectItem>
                         <MudSelectItem Value="AIModel.OpenAI">OpenAI GPT-4o</MudSelectItem>
                         <MudSelectItem Value="AIModel.Claude">Claude Sonnet</MudSelectItem>
@@ -115,54 +116,50 @@
                         
                         @if (testCaseResult.Success)
                         {
-                            <MudGrid>
-                                <MudItem xs="12" md="6">
-                                    <MudTextField Value="@testCaseResult.Objective"
-                                                  Label="Objetivo"
-                                                  Variant="Variant.Outlined"
-                                                  Lines="3"
-                                                  ReadOnly="true"
-                                                  Class="mb-3" />
-                                </MudItem>
-                                <MudItem xs="12" md="6">
-                                    <MudTextField Value="@testCaseResult.Preconditions"
-                                                  Label="Precondiciones"
-                                                  Variant="Variant.Outlined"
-                                                  Lines="3"
-                                                  ReadOnly="true"
-                                                  Class="mb-3" />
-                                </MudItem>
-                                
-                                <MudItem xs="12">
-                                    <MudText Typo="Typo.h6" Class="mb-3">Pasos de Prueba</MudText>
-                                    <MudDataGrid Items="@testCaseResult.TestSteps" 
-                                                 Filterable="false" 
-                                                 SortMode="SortMode.None"
-                                                 Groupable="false">
-                                        <Columns>
-                                            <PropertyColumn Property="x => x.Number" Title="#" />
-                                            <PropertyColumn Property="x => x.Action" Title="Acción" />
-                                            <PropertyColumn Property="x => x.InputData" Title="Datos de Entrada" />
-                                            <PropertyColumn Property="x => x.ExpectedResult" Title="Resultado Esperado" />
-                                            <PropertyColumn Property="x => x.Observations" Title="Observaciones" />
-                                        </Columns>
-                                    </MudDataGrid>
-                                </MudItem>
-                                
-                                @if (!string.IsNullOrWhiteSpace(testCaseResult.AnalysisNotes))
-                                {
+                            @foreach (var testCase in testCaseResult.TestCases)
+                            {
+                                <MudGrid Class="mb-4">
                                     <MudItem xs="12">
-                                        <MudTextField Value="@testCaseResult.AnalysisNotes"
-                                                      Label="Notas de Análisis"
+                                        <MudText Typo="Typo.h6" Class="mb-3">@testCase.Name</MudText>
+                                    </MudItem>
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Value="@testCase.Objective"
+                                                      Label="Objetivo"
                                                       Variant="Variant.Outlined"
                                                       Lines="3"
                                                       ReadOnly="true"
-                                                      Class="mt-3" />
+                                                      Class="mb-3" T="string" />
                                     </MudItem>
-                                }
+                                    <MudItem xs="12" md="6">
+                                        <MudTextField Value="@testCase.Preconditions"
+                                                      Label="Precondiciones"
+                                                      Variant="Variant.Outlined"
+                                                      Lines="3"
+                                                      ReadOnly="true"
+                                                      Class="mb-3" T="string" />
+                                    </MudItem>
+                                    
+                                    <MudItem xs="12">
+                                        <MudText Typo="Typo.h6" Class="mb-3">Pasos de Prueba</MudText>
+                                        <MudDataGrid Items="@testCase.Steps" 
+                                                     Filterable="false" 
+                                                     SortMode="SortMode.None"
+                                                     Groupable="false" T="TestStep">
+                                            <Columns>
+                                                <PropertyColumn Property="x => x.Number" Title="#" />
+                                                <PropertyColumn Property="x => x.Action" Title="Acción" />
+                                                <PropertyColumn Property="x => x.InputData" Title="Datos de Entrada" />
+                                                <PropertyColumn Property="x => x.ExpectedResult" Title="Resultado Esperado" />
+                                                <PropertyColumn Property="x => x.Observations" Title="Observaciones" />
+                                            </Columns>
+                                        </MudDataGrid>
+                                    </MudItem>
+                                </MudGrid>
+                            }
                                 
-                                <!-- Export Options -->
-                                <MudItem xs="12" Class="mt-4">
+                            <!-- Export Options -->
+                            <MudGrid Class="mt-4">
+                                <MudItem xs="12">
                                     <MudButtonGroup Variant="Variant.Outlined">
                                         <MudButton StartIcon="@Icons.Material.Filled.Download"
                                                    Color="Color.Primary"

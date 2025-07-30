@@ -1,6 +1,7 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Client.Services
+@using System.Text.Json
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
 
@@ -134,7 +135,7 @@
             <MudItem xs="12" sm="6" md="3">
                 <MudButton Variant="Variant.Outlined" 
                            Color="Color.Secondary" 
-                           StartIcon="@Icons.Material.Filled.Integration"
+                           StartIcon="@Icons.Material.Filled.AutoAwesome"
                            OnClick="AddIntegrationRequirements"
                            FullWidth="true">
                     Agregar Integraciones
@@ -171,10 +172,9 @@
             var request = new AIAssistRequest
             {
                 FieldName = "businessRules",
-                FieldValue = FormData.BusinessRules,
-                FieldType = "businessRules",
-                AiModel = FormData.AiModel,
-                Context = FormData
+                CurrentValue = FormData.BusinessRules ?? "",
+                Context = "Reglas de negocio para caso de uso",
+                AiModel = FormData.AiModel
             };
 
             var response = await AIAssistService.ImproveFieldAsync(request);
@@ -211,10 +211,9 @@
             var request = new AIAssistRequest
             {
                 FieldName = "specialRequirements",
-                FieldValue = FormData.SpecialRequirements,
-                FieldType = "specialRequirements",
-                AiModel = FormData.AiModel,
-                Context = FormData
+                CurrentValue = FormData.SpecialRequirements ?? "",
+                Context = "Requerimientos especiales para caso de uso",
+                AiModel = FormData.AiModel
             };
 
             var response = await AIAssistService.ImproveFieldAsync(request);

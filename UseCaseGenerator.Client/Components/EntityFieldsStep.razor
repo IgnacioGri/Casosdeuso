@@ -1,6 +1,7 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
+@using System.Text.Json
 @using UseCaseGenerator.Client.Services
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
@@ -128,21 +129,21 @@
         <MudSelect @bind-Value="editingField.Type"
                    Label="Tipo de Dato"
                    Variant="Variant.Outlined"
-                   Class="mb-3">
-            <MudSelectItem Value="Text">Texto</MudSelectItem>
-            <MudSelectItem Value="Number">Número</MudSelectItem>
-            <MudSelectItem Value="Date">Fecha</MudSelectItem>
-            <MudSelectItem Value="Boolean">Booleano</MudSelectItem>
-            <MudSelectItem Value="Email">Email</MudSelectItem>
+                   Class="mb-3" T="string">
+            <MudSelectItem Value="text">Texto</MudSelectItem>
+            <MudSelectItem Value="number">Número</MudSelectItem>
+            <MudSelectItem Value="date">Fecha</MudSelectItem>
+            <MudSelectItem Value="boolean">Booleano</MudSelectItem>
+            <MudSelectItem Value="email">Email</MudSelectItem>
         </MudSelect>
         
         <MudNumericField @bind-Value="editingField.MaxLength"
                          Label="Longitud (opcional)"
                          Variant="Variant.Outlined"
-                         Class="mb-3" />
+                         Class="mb-3" T="int?" />
         
         <MudCheckBox @bind-Value="editingField.IsMandatory"
-                     Label="Campo obligatorio" />
+                     Label="Campo obligatorio" T="bool" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="CancelEdit">Cancelar</MudButton>
@@ -173,10 +174,9 @@
             var request = new AIAssistRequest
             {
                 FieldName = "entityFields",
-                FieldValue = fieldsDescription,
-                FieldType = "fieldsFromText",
+                CurrentValue = fieldsDescription,
                 AiModel = FormData.AiModel,
-                Context = FormData
+                Context = JsonSerializer.Serialize(FormData)
             };
 
             var response = await AIAssistService.ImproveFieldAsync(request);

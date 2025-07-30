@@ -20,7 +20,7 @@
                     <MudText Typo="Typo.h6">Resumen del Caso de Uso</MudText>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudChip Icon="@GetAIModelIcon()" Color="Color.Primary" Variant="Variant.Filled">
+                    <MudChip Icon="@GetAIModelIcon()" Color="Color.Primary" Variant="Variant.Filled" T="string">
                         @FormData.AiModel
                     </MudChip>
                 </CardHeaderActions>
@@ -41,7 +41,7 @@
                     </MudItem>
                     <MudItem xs="12" sm="6">
                         <MudText Typo="Typo.subtitle2" Class="mb-1">Tipo</MudText>
-                        <MudChip Color="Color.Secondary" Size="Size.Small">@FormData.UseCaseType</MudChip>
+                        <MudChip Color="Color.Secondary" Size="Size.Small" T="string">@FormData.UseCaseType</MudChip>
                     </MudItem>
                     <MudItem xs="12">
                         <MudText Typo="Typo.subtitle2" Class="mb-1">Nombre del Caso de Uso</MudText>
@@ -129,10 +129,10 @@
             @if (FormData.SearchFilters.Any())
             {
                 <MudExpansionPanel Text="@($"Filtros de Búsqueda ({FormData.SearchFilters.Count})")">
-                    <MudList Dense="true">
+                    <MudList Dense="true" T="string">
                         @foreach (var filter in FormData.SearchFilters)
                         {
-                            <MudListItem Icon="@Icons.Material.Filled.FilterList" Text="@filter" />
+                            <MudListItem Icon="@Icons.Material.Filled.FilterList" Text="@filter" T="string" />
                         }
                     </MudList>
                 </MudExpansionPanel>
@@ -141,10 +141,10 @@
             @if (FormData.ResultColumns.Any())
             {
                 <MudExpansionPanel Text="@($"Columnas de Resultado ({FormData.ResultColumns.Count})")">
-                    <MudList Dense="true">
+                    <MudList Dense="true" T="string">
                         @foreach (var column in FormData.ResultColumns)
                         {
-                            <MudListItem Icon="@Icons.Material.Filled.ViewColumn" Text="@column" />
+                            <MudListItem Icon="@Icons.Material.Filled.ViewColumn" Text="@column" T="string" />
                         }
                     </MudList>
                 </MudExpansionPanel>
@@ -218,10 +218,10 @@
         {
             <MudAlert Severity="Severity.Warning" Class="mb-3">
                 <MudText Typo="Typo.subtitle2" Class="mb-2">Se encontraron las siguientes advertencias:</MudText>
-                <MudList Dense="true">
+                <MudList Dense="true" T="string">
                     @foreach (var error in GetValidationErrors())
                     {
-                        <MudListItem Icon="@Icons.Material.Filled.Warning" Text="@error" />
+                        <MudListItem Icon="@Icons.Material.Filled.Warning" Text="@error" T="string" />
                     }
                 </MudList>
             </MudAlert>

@@ -29,7 +29,7 @@
                 <MudText Typo="Typo.body2" Class="mb-3">
                     Para gestión de entidades de negocio con operaciones CRUD (crear, consultar, actualizar, eliminar).
                 </MudText>
-                <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+                <MudText Typo="Typo.caption" Color="Color.Default">
                     Incluye: campos de entidad, filtros de búsqueda, columnas de resultado, validaciones.
                 </MudText>
             </MudCardContent>
@@ -37,23 +37,23 @@
     </MudItem>
     
     <MudItem xs="12" md="4">
-        <MudCard Elevation="@(FormData.UseCaseType == UseCaseType.Api ? 6 : 2)" 
-                 Style="@(FormData.UseCaseType == UseCaseType.Api ? "border: 2px solid #0070C0;" : "")"
+        <MudCard Elevation="@(FormData.UseCaseType == UseCaseType.API ? 6 : 2)" 
+                 Style="@(FormData.UseCaseType == UseCaseType.API ? "border: 2px solid #0070C0;" : "")"
                  Class="pa-4 cursor-pointer hover:elevation-4"
-                 @onclick="() => SelectType(UseCaseType.Api)">
+                 @onclick="() => SelectType(UseCaseType.API)">
             <MudCardContent>
                 <div class="d-flex align-center mb-3">
                     <MudIcon Icon="@Icons.Material.Filled.Api" 
-                             Color="@(FormData.UseCaseType == UseCaseType.Api ? Color.Primary : Color.Default)" 
+                             Color="@(FormData.UseCaseType == UseCaseType.API ? Color.Primary : Color.Default)" 
                              Size="Size.Large" Class="mr-3" />
-                    <MudText Typo="Typo.h6" Color="@(FormData.UseCaseType == UseCaseType.Api ? Color.Primary : Color.Default)">
+                    <MudText Typo="Typo.h6" Color="@(FormData.UseCaseType == UseCaseType.API ? Color.Primary : Color.Default)">
                         API / Servicio Web
                     </MudText>
                 </div>
                 <MudText Typo="Typo.body2" Class="mb-3">
                     Para documentar APIs REST, servicios web y integraciones entre sistemas.
                 </MudText>
-                <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+                <MudText Typo="Typo.caption" Color="Color.Default">
                     Incluye: endpoints, formatos de request/response, códigos de estado HTTP.
                 </MudText>
             </MudCardContent>
@@ -77,7 +77,7 @@
                 <MudText Typo="Typo.body2" Class="mb-3">
                     Para procesos de negocio, servicios programados y workflows automatizados.
                 </MudText>
-                <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+                <MudText Typo="Typo.caption" Color="Color.Default">
                     Incluye: frecuencia de ejecución, configuraciones, dependencias externas.
                 </MudText>
             </MudCardContent>
