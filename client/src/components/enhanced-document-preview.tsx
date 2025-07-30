@@ -132,6 +132,66 @@ export default function EnhancedDocumentPreview({
       `);
     }
 
+    // Add test cases section if test case generation is enabled
+    if (formData.generateTestCase && (formData.testCaseObjective || formData.testCasePreconditions || (formData.testSteps && formData.testSteps.length > 0))) {
+      let testCaseSection = `
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0;">CASOS DE PRUEBA</h2>
+      `;
+
+      // Add objective if provided
+      if (formData.testCaseObjective) {
+        testCaseSection += `
+          <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Objetivo:</h3>
+          <p style="margin-bottom: 16px;">${formData.testCaseObjective}</p>
+        `;
+      }
+
+      // Add preconditions if provided
+      if (formData.testCasePreconditions) {
+        testCaseSection += `
+          <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Precondiciones:</h3>
+          <p style="margin-bottom: 16px;">${formData.testCasePreconditions}</p>
+        `;
+      }
+
+      // Add test steps table if provided
+      if (formData.testSteps && formData.testSteps.length > 0) {
+        testCaseSection += `
+          <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Pasos de Prueba:</h3>
+          <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+            <thead>
+              <tr style="background-color: #f8f9fa;">
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 50px;">#</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Datos de Entrada</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Resultado Esperado</th>
+                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Observaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        formData.testSteps.forEach((step) => {
+          testCaseSection += `
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">${step.number}</td>
+              <td style="border: 1px solid #666; padding: 8px;">${step.action || ''}</td>
+              <td style="border: 1px solid #666; padding: 8px;">${step.inputData || ''}</td>
+              <td style="border: 1px solid #666; padding: 8px;">${step.expectedResult || ''}</td>
+              <td style="border: 1px solid #666; padding: 8px;">${step.observations || ''}</td>
+            </tr>
+          `;
+        });
+
+        testCaseSection += `
+            </tbody>
+          </table>
+        `;
+      }
+
+      sections.push(testCaseSection);
+    }
+
     setPreviewSections(sections);
   }, [formData]);
 

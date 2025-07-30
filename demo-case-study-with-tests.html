@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar información del cliente - CON CASOS DE PRUEBA</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; margin: 40px; }
+    </style>
+</head>
+<body>
+    
+      <div style="font-family: 'Segoe UI', sans-serif; line-height: 1.2;">
+        <h1 style="color: rgb(0, 112, 192); font-size: 18px; font-weight: 600; margin-bottom: 20px; text-transform: uppercase;">
+          Gestionar información del cliente
+        </h1>
+        
+        <div style="margin-bottom: 16px;"><strong>Nombre del Cliente:</strong> Banco Provincia</div>
+        <div style="margin-bottom: 16px;"><strong>Nombre del Proyecto:</strong> Sistema de Gestión Integral</div>
+        <div style="margin-bottom: 16px;"><strong>Código del Caso de Uso:</strong> BP001</div>
+        <div style="margin-bottom: 16px;"><strong>Nombre del Caso de Uso:</strong> Gestionar información del cliente</div>
+        <div style="margin-bottom: 20px;"><strong>Nombre del Archivo:</strong> BP001GestionarInformacionCliente</div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Descripción</h2>
+        <p style="margin-bottom: 20px; text-align: justify;">Permite gestionar la información completa de los clientes del banco incluyendo consulta, actualización y seguimiento de la relación comercial.</p>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Flujo Principal de Eventos</h2>
+        <ol style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 8px;">Buscar datos de la entidad
+            <ol style="margin-left: 0.2in; list-style-type: lower-alpha; margin-top: 4px;">
+              <li style="margin-bottom: 4px;">Filtros de búsqueda disponibles: DNI/CUIT, Apellido, Email, Número de Cliente</li>
+              <li style="margin-bottom: 4px;">Columnas del resultado de búsqueda: ID Cliente, Apellido y Nombres, Documento, Email, Estado</li>
+            </ol>
+          </li>
+          <li style="margin-bottom: 8px;">Agregar una nueva entidad
+            <ol style="margin-left: 0.2in; list-style-type: lower-alpha; margin-top: 4px;">
+              <li style="margin-bottom: 4px;">Campos de la entidad: clienteId (number, obligatorio), tipoDocumento (text, obligatorio), numeroDocumento (text, obligatorio)</li>
+              <li style="margin-bottom: 4px;">Al agregar se registra automáticamente la fecha y usuario de alta</li>
+            </ol>
+          </li>
+        </ol>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Campos de la Entidad</h2>
+        <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 4px;"><strong>clienteId</strong>: number(10) - Obligatorio<br><em>Descripción: Identificador único del cliente</em><br><em>Validación: Número entero positivo</em></li>
+          <li style="margin-bottom: 4px;"><strong>tipoDocumento</strong>: text(10) - Obligatorio<br><em>Descripción: Tipo de documento de identidad</em><br><em>Validación: DNI, CUIT, CUIL</em></li>
+          <li style="margin-bottom: 4px;"><strong>numeroDocumento</strong>: text(20) - Obligatorio<br><em>Descripción: Número del documento de identidad</em><br><em>Validación: Solo números, sin puntos ni guiones</em></li>
+          <li style="margin-bottom: 4px;"><strong>apellido</strong>: text(100) - Obligatorio<br><em>Descripción: Apellido del cliente</em><br><em>Validación: Solo letras y espacios</em></li>
+          <li style="margin-bottom: 4px;"><strong>nombres</strong>: text(100) - Obligatorio<br><em>Descripción: Nombres del cliente</em><br><em>Validación: Solo letras y espacios</em></li>
+          <li style="margin-bottom: 4px;"><strong>email</strong>: text(150) - Opcional<br><em>Descripción: Correo electrónico del cliente</em><br><em>Validación: Formato email válido</em></li>
+          <li style="margin-bottom: 4px;"><strong>fechaAlta</strong>: date - Obligatorio<br><em>Descripción: Fecha de creación del registro</em><br><em>Validación: Formato ISO 8601</em></li>
+          <li style="margin-bottom: 4px;"><strong>usuarioAlta</strong>: text(50) - Obligatorio<br><em>Descripción: Usuario que creó el registro</em><br><em>Validación: Debe existir en el sistema</em></li>
+        </ul>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Reglas de Negocio</h2>
+        <div style="margin-left: 20px; margin-bottom: 20px;">1. Solo usuarios autorizados pueden acceder
+2. Se debe validar formato de documentos</div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Requerimientos Especiales</h2>
+        <div style="margin-left: 20px; margin-bottom: 20px;">1. Integración con sistema legado
+2. Logging de operaciones críticas</div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Precondiciones</h2>
+        <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 4px;">El usuario debe estar autenticado en el sistema</li>
+          <li style="margin-bottom: 4px;">El usuario debe tener permisos para gestionar la entidad</li>
+        </ul>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Postcondiciones</h2>
+        <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 4px;">Los cambios se reflejan inmediatamente en la base de datos</li>
+          <li style="margin-bottom: 4px;">Se genera una entrada en el log de auditoría</li>
+        </ul>
+        
+        <!-- ✨ NUEVA SECCIÓN: CASOS DE PRUEBA -->
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0;">CASOS DE PRUEBA</h2>
+        
+        <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Objetivo:</h3>
+        <p style="margin-bottom: 16px;">Verificar el funcionamiento completo del caso de uso de gestión de información de clientes, incluyendo operaciones de búsqueda, creación, modificación y eliminación de registros de clientes en el sistema bancario.</p>
+        
+        <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Precondiciones:</h3>
+        <p style="margin-bottom: 16px;">- Usuario autenticado en el sistema<br>- Permisos adecuados para gestionar información de clientes<br>- Conexión a base de datos disponible<br>- Sistema de auditoría funcionando correctamente</p>
+        
+        <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Pasos de Prueba:</h3>
+        <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
+          <thead>
+            <tr style="background-color: #f8f9fa;">
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 50px;">#</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Datos de Entrada</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Resultado Esperado</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">1</td>
+              <td style="border: 1px solid #666; padding: 8px;">Acceder al módulo de gestión de clientes</td>
+              <td style="border: 1px solid #666; padding: 8px;">Credenciales válidas de usuario autorizado</td>
+              <td style="border: 1px solid #666; padding: 8px;">Sistema muestra la interfaz principal de gestión de clientes</td>
+              <td style="border: 1px solid #666; padding: 8px;">Verificar carga correcta de filtros y opciones</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">2</td>
+              <td style="border: 1px solid #666; padding: 8px;">Buscar cliente por DNI</td>
+              <td style="border: 1px solid #666; padding: 8px;">DNI: 12345678</td>
+              <td style="border: 1px solid #666; padding: 8px;">Grilla muestra resultados coincidentes con el DNI</td>
+              <td style="border: 1px solid #666; padding: 8px;">Validar formato de grilla y columnas</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">3</td>
+              <td style="border: 1px solid #666; padding: 8px;">Crear nuevo cliente</td>
+              <td style="border: 1px solid #666; padding: 8px;">Datos completos: DNI, apellido, nombres, email</td>
+              <td style="border: 1px solid #666; padding: 8px;">Cliente creado exitosamente con ID generado</td>
+              <td style="border: 1px solid #666; padding: 8px;">Verificar auditoría de fechaAlta y usuarioAlta</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">4</td>
+              <td style="border: 1px solid #666; padding: 8px;">Modificar datos de cliente existente</td>
+              <td style="border: 1px solid #666; padding: 8px;">ID cliente válido, nuevos datos de email</td>
+              <td style="border: 1px solid #666; padding: 8px;">Datos actualizados correctamente</td>
+              <td style="border: 1px solid #666; padding: 8px;">Verificar fechaModificacion y usuarioModificacion</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">5</td>
+              <td style="border: 1px solid #666; padding: 8px;">Validar reglas de negocio</td>
+              <td style="border: 1px solid #666; padding: 8px;">DNI duplicado o formato inválido</td>
+              <td style="border: 1px solid #666; padding: 8px;">Sistema muestra mensaje de error apropiado</td>
+              <td style="border: 1px solid #666; padding: 8px;">Verificar que no se crean registros inválidos</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0;">HISTORIA DE REVISIONES Y APROBACIONES</h2>
+        <table style="width: 2.17in; border-collapse: collapse; margin-top: 12px;">
+          <thead>
+            <tr style="background-color: #f8f9fa;">
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Fecha</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Acción</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Responsable</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle; width: 200px;">Comentario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">30/1/2025</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">Versión con casos de prueba</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">Sistema Integrado</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">Funcionalidad casos de prueba completamente implementada</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+</body>
+</html>

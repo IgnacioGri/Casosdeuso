@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar información del cliente</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; margin: 40px; }
+    </style>
+</head>
+<body>
+    
+      <div style="font-family: 'Segoe UI', sans-serif; line-height: 1.2;">
+        <h1 style="color: rgb(0, 112, 192); font-size: 18px; font-weight: 600; margin-bottom: 20px; text-transform: uppercase;">
+          Gestionar información del cliente
+        </h1>
+        
+        <div style="margin-bottom: 16px;"><strong>Nombre del Cliente:</strong> Banco Provincia</div>
+        <div style="margin-bottom: 16px;"><strong>Nombre del Proyecto:</strong> Sistema de Gestión Integral</div>
+        <div style="margin-bottom: 16px;"><strong>Código del Caso de Uso:</strong> BP001</div>
+        <div style="margin-bottom: 16px;"><strong>Nombre del Caso de Uso:</strong> Gestionar información del cliente</div>
+        <div style="margin-bottom: 20px;"><strong>Nombre del Archivo:</strong> BP001GestionarInformacionCliente</div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Descripción</h2>
+        <p style="margin-bottom: 20px; text-align: justify;">Permite gestionar la información completa de los clientes del banco incluyendo consulta, actualización y seguimiento de la relación comercial.</p>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Flujo Principal de Eventos</h2>
+        <ol style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 8px;">Buscar datos de la entidad
+            <ol style="margin-left: 0.2in; list-style-type: lower-alpha; margin-top: 4px;">
+              <li style="margin-bottom: 4px;">Filtros de búsqueda disponibles: DNI/CUIT, Apellido, Email, Número de Cliente</li>
+              <li style="margin-bottom: 4px;">Columnas del resultado de búsqueda: ID Cliente, Apellido y Nombres, Documento, Email, Estado</li>
+            </ol>
+          </li>
+          <li style="margin-bottom: 8px;">Agregar una nueva entidad
+            <ol style="margin-left: 0.2in; list-style-type: lower-alpha; margin-top: 4px;">
+              <li style="margin-bottom: 4px;">Campos de la entidad: clienteId (number, obligatorio), tipoDocumento (text, obligatorio), numeroDocumento (text, obligatorio)</li>
+              <li style="margin-bottom: 4px;">Al agregar se registra automáticamente la fecha y usuario de alta</li>
+            </ol>
+          </li>
+        </ol>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Flujos Alternativos</h2>
+        <ol style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 8px;">Modificar o actualizar una entidad
+            <ol style="margin-left: 0.2in; list-style-type: lower-alpha; margin-top: 4px;">
+              <li style="margin-bottom: 4px;">Se debe mostrar el identificador único</li>
+              <li style="margin-bottom: 4px;">Se muestra la fecha y usuario de alta</li>
+              <li style="margin-bottom: 4px;">Al modificar se registra la fecha y usuario de modificación</li>
+            </ol>
+          </li>
+          <li style="margin-bottom: 8px;">Eliminar una entidad
+            <ol style="margin-left: 0.2in; list-style-type: lower-alpha; margin-top: 4px;">
+              <li style="margin-bottom: 4px;">Se debe verificar que no tenga relaciones con otras entidades</li>
+            </ol>
+          </li>
+        </ol>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Reglas de Negocio</h2>
+        <div style="margin-left: 20px; margin-bottom: 20px;">1. Solo usuarios autorizados pueden acceder
+2. Se debe validar formato de documentos</div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Requerimientos Especiales</h2>
+        <div style="margin-left: 20px; margin-bottom: 20px;">1. Integración con sistema legado
+2. Logging de operaciones críticas</div>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Precondiciones</h2>
+        <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 4px;">El usuario debe estar autenticado en el sistema</li>
+          <li style="margin-bottom: 4px;">El usuario debe tener permisos para gestionar la entidad</li>
+        </ul>
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;">Postcondiciones</h2>
+        <ul style="margin-left: 20px; margin-bottom: 20px; padding-left: 0;">
+          <li style="margin-bottom: 4px;">Los cambios se reflejan inmediatamente en la base de datos</li>
+          <li style="margin-bottom: 4px;">Se genera una entrada en el log de auditoría</li>
+        </ul>
+        
+        
+        
+        <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0;">HISTORIA DE REVISIONES Y APROBACIONES</h2>
+        <table style="width: 2.17in; border-collapse: collapse; margin-top: 12px;">
+          <thead>
+            <tr style="background-color: #f8f9fa;">
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Fecha</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Acción</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Responsable</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle; width: 200px;">Comentario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">26/7/2025</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">Versión original</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">Sistema Demo</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;">Generado vía modo demo</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: left; vertical-align: middle;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    
+</body>
+</html>
