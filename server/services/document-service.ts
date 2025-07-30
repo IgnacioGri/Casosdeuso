@@ -1,8 +1,432 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun, Media } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun } from 'docx';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface TestCase {
+  action: string;
+  inputData: string;
+  expectedResult: string;
+  observations: string;
+}
+
 export class DocumentService {
+  // Generate DOCX directly from form data - no HTML conversion needed
+  static async generateDirectFromFormData(formData: any, testCases?: TestCase[]): Promise<Buffer> {
+    const headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+    
+    const doc = new Document({
+      sections: [{
+        children: [
+          // Title
+          new Paragraph({
+            heading: HeadingLevel.TITLE,
+            spacing: { after: 400 },
+            alignment: AlignmentType.LEFT,
+            children: [new TextRun({
+              text: "ESPECIFICACIÓN DE CASO DE USO",
+              bold: true,
+              size: 48,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }),
+          
+          // Project Information Section
+          new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 240, after: 120 },
+            children: [new TextRun({
+              text: "Información del Proyecto",
+              bold: true,
+              size: 28,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Cliente: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.clientName || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Proyecto: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.projectName || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Código: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.useCaseCode || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Archivo: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.fileName || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          
+          // Use Case Description Section
+          new Paragraph({
+            heading: HeadingLevel.HEADING_2,
+            spacing: { before: 240, after: 120 },
+            children: [new TextRun({
+              text: "Descripción del Caso de Uso",
+              bold: true,
+              size: 28,
+              color: "0070C0",
+              font: "Segoe UI Semilight"
+            })]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Nombre: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.useCaseName || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Tipo: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.useCaseType === 'entity' ? 'Gestión de Entidades' : formData.useCaseType || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          new Paragraph({
+            spacing: { after: 120 },
+            children: [
+              new TextRun({ text: "• Descripción: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: formData.description || '', font: "Segoe UI Semilight" })
+            ]
+          }),
+          
+          // Add remaining sections based on form data
+          ...this.addFormDataSections(formData),
+          
+          // Add test cases if provided
+          ...(testCases && testCases.length > 0 ? this.formatTestCases(testCases, formData.useCaseName) : []),
+          
+          // History table
+          ...this.createHistorySection()
+        ],
+        headers: {
+          default: new Header({
+            children: [
+              fs.existsSync(headerImagePath) ? new Paragraph({
+                children: [
+                  new ImageRun({
+                    data: fs.readFileSync(headerImagePath),
+                    transformation: { width: 580, height: 120 }
+                  })
+                ]
+              }) : new Paragraph({
+                children: [new TextRun({
+                  text: "ING Bank",
+                  bold: true,
+                  size: 28,
+                  color: "FF6600"
+                })]
+              })
+            ]
+          })
+        }
+      }]
+    });
+    
+    return await Packer.toBuffer(doc);
+  }
+  
+  private static addFormDataSections(formData: any): Paragraph[] {
+    const sections: Paragraph[] = [];
+    
+    // Business Rules
+    if (formData.businessRules) {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Reglas de Negocio",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      const rules = formData.businessRules.split('\n').filter((r: string) => r.trim());
+      rules.forEach((rule: string, index: number) => {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 720 },
+          children: [new TextRun({
+            text: `${index + 1}. ${rule.trim()}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      });
+    }
+    
+    // Search Filters (for entity use cases)
+    if (formData.searchFilters && formData.searchFilters.length > 0) {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Filtros de Búsqueda",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      formData.searchFilters.forEach((filter: string) => {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 720 },
+          children: [
+            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+            new TextRun({ text: filter, font: "Segoe UI Semilight" })
+          ]
+        }));
+      });
+    }
+    
+    // Result Columns (for entity use cases)
+    if (formData.resultColumns && formData.resultColumns.length > 0) {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Columnas de Resultado",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      formData.resultColumns.forEach((column: string) => {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 720 },
+          children: [
+            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+            new TextRun({ text: column, font: "Segoe UI Semilight" })
+          ]
+        }));
+      });
+    }
+    
+    // Entity Fields (for entity use cases)
+    if (formData.entityFields && formData.entityFields.length > 0) {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Campos de Entidad",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      formData.entityFields.forEach((field: any) => {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 720 },
+          children: [
+            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+            new TextRun({ text: `${field.name} (${field.type})`, bold: true, font: "Segoe UI Semilight" }),
+            new TextRun({ text: field.length ? ` - Longitud: ${field.length}` : '', font: "Segoe UI Semilight" }),
+            new TextRun({ text: field.mandatory ? ' - Obligatorio' : '', font: "Segoe UI Semilight" }),
+            new TextRun({ text: field.description ? ` - ${field.description}` : '', font: "Segoe UI Semilight" })
+          ]
+        }));
+      });
+    }
+    
+    return sections;
+  }
+  
+  private static createHistorySection(): Paragraph[] {
+    const today = new Date();
+    const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+    
+    return [
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 400, after: 120 },
+        children: [new TextRun({
+          text: "HISTORIA DE REVISIONES Y APROBACIONES",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }),
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({ text: "• Fecha: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: formattedDate, font: "Segoe UI Semilight" })
+        ]
+      }),
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({ text: "• Acción: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: "Versión original", font: "Segoe UI Semilight" })
+        ]
+      }),
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({ text: "• Responsable: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: "Sistema", font: "Segoe UI Semilight" })
+        ]
+      }),
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({ text: "• Comentario: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: "Documento generado automáticamente", font: "Segoe UI Semilight" })
+        ]
+      })
+    ];
+  }
+  
+  private static formatTestCases(testCases: TestCase[], useCaseName: string): Paragraph[] {
+    const paragraphs: Paragraph[] = [];
+    
+    // Test Cases header
+    paragraphs.push(new Paragraph({
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 400, after: 120 },
+      children: [new TextRun({
+        text: "CASOS DE PRUEBA",
+        bold: true,
+        size: 28,
+        color: "0070C0",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    // Objective
+    paragraphs.push(new Paragraph({
+      heading: HeadingLevel.HEADING_3,
+      spacing: { before: 120, after: 80 },
+      children: [new TextRun({
+        text: "Objetivo:",
+        bold: true,
+        size: 24,
+        color: "0070C0",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    paragraphs.push(new Paragraph({
+      spacing: { after: 120 },
+      children: [new TextRun({
+        text: `Verificar el funcionamiento completo de la gestión de entidades: ${useCaseName}`,
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    // Preconditions
+    paragraphs.push(new Paragraph({
+      heading: HeadingLevel.HEADING_3,
+      spacing: { before: 120, after: 80 },
+      children: [new TextRun({
+        text: "Precondiciones:",
+        bold: true,
+        size: 24,
+        color: "0070C0",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    const preconditions = [
+      "Usuario autenticado en el sistema",
+      "Permisos de acceso configurados correctamente",
+      "Sistema operativo y base de datos disponibles",
+      "Conexión de red estable",
+      "Datos de prueba disponibles en la base de datos",
+      "Validaciones de negocio configuradas"
+    ];
+    
+    preconditions.forEach(condition => {
+      paragraphs.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 720 },
+        children: [
+          new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+          new TextRun({ text: condition, font: "Segoe UI Semilight" })
+        ]
+      }));
+    });
+    
+    // Test Steps
+    paragraphs.push(new Paragraph({
+      heading: HeadingLevel.HEADING_3,
+      spacing: { before: 120, after: 80 },
+      children: [new TextRun({
+        text: "Pasos de Prueba:",
+        bold: true,
+        size: 24,
+        color: "0070C0",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    // Test steps as a numbered list
+    testCases.forEach((testCase, index) => {
+      paragraphs.push(new Paragraph({
+        spacing: { after: 120, before: 80 },
+        children: [new TextRun({
+          text: `${index + 1}. ${testCase.action}`,
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      paragraphs.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 720 },
+        children: [
+          new TextRun({ text: "• Datos de Entrada: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: testCase.inputData, font: "Segoe UI Semilight" })
+        ]
+      }));
+      
+      paragraphs.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 720 },
+        children: [
+          new TextRun({ text: "• Resultado Esperado: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: testCase.expectedResult, font: "Segoe UI Semilight" })
+        ]
+      }));
+      
+      paragraphs.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 720 },
+        children: [
+          new TextRun({ text: "• Observaciones: ", bold: true, font: "Segoe UI Semilight" }),
+          new TextRun({ text: testCase.observations, font: "Segoe UI Semilight" })
+        ]
+      }));
+    });
+    
+    return paragraphs;
+  }
   static async generateDocx(htmlContent: string, fileName: string, useCaseName: string = '', testCaseData?: any): Promise<Buffer> {
     // Convert HTML to docx structure
     const paragraphs = this.parseHtmlToParagraphs(htmlContent);

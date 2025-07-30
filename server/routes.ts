@@ -514,12 +514,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Content is required for DOCX export" });
       }
 
-      const docxBuffer = await DocumentService.generateDocx(
-        content,
-        fileName || 'caso-de-uso',
-        useCaseName || 'Caso de Uso',
-        formData || null
-      );
+      // Use direct generation from form data if available
+      const docxBuffer = formData && Object.keys(formData).length > 0
+        ? await DocumentService.generateDirectFromFormData(formData, formData.testCases)
+        : await DocumentService.generateDocx(
+            content,
+            fileName || 'caso-de-uso',
+            useCaseName || 'Caso de Uso',
+            formData || null
+          );
 
       res.set({
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
