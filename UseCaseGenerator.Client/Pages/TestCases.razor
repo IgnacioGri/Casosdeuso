@@ -274,9 +274,20 @@
         {
             // Update form data with generated test cases
             formData.GenerateTestCase = true;
-            formData.TestCaseObjective = testCaseResult.Objective;
-            formData.TestCasePreconditions = testCaseResult.Preconditions;
-            formData.TestSteps = testCaseResult.TestSteps;
+            if (testCaseResult.TestCases.Any())
+            {
+                var firstTestCase = testCaseResult.TestCases.First();
+                formData.TestCaseObjective = firstTestCase.Objective;
+                formData.TestCasePreconditions = firstTestCase.Preconditions;
+                formData.TestSteps = firstTestCase.Steps.Select(s => new TestStep
+                {
+                    Number = s.Number,
+                    Action = s.Action,
+                    InputData = s.InputData,
+                    ExpectedResult = s.ExpectedResult,
+                    Observations = s.Observations
+                }).ToList();
+            }
 
             await FormStateService.SaveFormStateAsync(formData);
             Snackbar.Add("Casos de prueba agregados al formulario principal", Severity.Success);

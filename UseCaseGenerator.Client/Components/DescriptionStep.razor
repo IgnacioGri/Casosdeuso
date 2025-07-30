@@ -86,10 +86,9 @@
             var request = new AIAssistRequest
             {
                 FieldName = "description",
-                FieldValue = FormData.Description,
-                FieldType = "description",
-                AiModel = FormData.AiModel,
-                Context = FormData
+                CurrentValue = FormData.Description ?? "",
+                Context = "Descripción detallada del caso de uso",
+                AiModel = FormData.AiModel
             };
 
             var response = await AIAssistService.ImproveFieldAsync(request);

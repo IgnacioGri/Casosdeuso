@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UseCaseGenerator.Client\UseCaseGenerator.Client.csproj" />
     <ProjectReference Include="..\UseCaseGenerator.Shared\UseCaseGenerator.Shared.csproj" />
   </ItemGroup>
 
