@@ -42,10 +42,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseWebAssemblyDebugging();
+    app.UseDeveloperExceptionPage();
 }
-
-app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();

@@ -75,7 +75,8 @@ public enum AIModel
     OpenAI,
     Claude,
     Grok,
-    Gemini
+    Gemini,
+    Copilot
 }
 
 public class EntityField

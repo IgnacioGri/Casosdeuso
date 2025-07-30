@@ -14,6 +14,7 @@ public class AIService : IAIService
     private HttpClient? _anthropicClient;
     private HttpClient? _grokClient;
     private HttpClient? _geminiClient;
+    private HttpClient? _copilotClient;
 
     public AIService(ILogger<AIService> logger, IConfiguration configuration)
     {
@@ -51,6 +52,16 @@ public class AIService : IAIService
         {
             _geminiClient = new HttpClient();
             _geminiClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+        }
+
+        var copilotKey = _configuration["Copilot:ApiKey"];
+        if (!string.IsNullOrEmpty(copilotKey))
+        {
+            _copilotClient = new HttpClient();
+            _copilotClient.BaseAddress = new Uri("https://api.github.com/copilot/");
+            _copilotClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {copilotKey}");
+            _copilotClient.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+            _copilotClient.DefaultRequestHeaders.Add("User-Agent", "UseCaseGenerator");
         }
     }
 
@@ -198,6 +209,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
             AIModel.Claude => await GenerateWithClaude(prompt),
             AIModel.Grok => await GenerateWithGrok(prompt),
             AIModel.Gemini => await GenerateWithGemini(prompt),
+            AIModel.Copilot => await GenerateWithCopilot(prompt),
             _ => throw new ArgumentException($"Unsupported AI model: {aiModel}")
         };
     }
@@ -210,6 +222,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
             AIModel.Claude => await ProcessWithClaude(systemPrompt, fieldValue),
             AIModel.Grok => await ProcessWithGrok(systemPrompt, fieldValue),
             AIModel.Gemini => await ProcessWithGemini(systemPrompt, fieldValue),
+            AIModel.Copilot => await ProcessWithCopilot(systemPrompt, fieldValue),
             _ => throw new ArgumentException($"Unsupported AI model: {aiModel}")
         };
     }
@@ -323,6 +336,53 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         throw new NotImplementedException("Gemini integration pending");
     }
 
+    private async Task<string> GenerateWithCopilot(string prompt)
+    {
+        if (_copilotClient == null)
+        {
+            throw new InvalidOperationException("Microsoft Copilot API key not configured");
+        }
+
+        try
+        {
+            var requestBody = new
+            {
+                messages = new[]
+                {
+                    new { role = "system", content = "Eres un experto en análisis de negocio que genera casos de uso siguiendo los estándares corporativos de ING." },
+                    new { role = "user", content = prompt }
+                },
+                model = "gpt-4", // Copilot uses GPT models
+                max_tokens = 4000,
+                temperature = 0.3
+            };
+
+            var jsonContent = JsonSerializer.Serialize(requestBody);
+            var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _copilotClient.PostAsync("chat/completions", httpContent);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Copilot API error: {response.StatusCode}");
+                return GenerateDemoContent(new UseCaseFormData()).Content;
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+            
+            return responseObj.GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString() ?? "";
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calling Microsoft Copilot API");
+            return GenerateDemoContent(new UseCaseFormData()).Content;
+        }
+    }
+
     private async Task<string> ProcessWithClaude(string systemPrompt, string fieldValue)
     {
         throw new NotImplementedException("Claude integration pending");
@@ -336,6 +396,55 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     private async Task<string> ProcessWithGemini(string systemPrompt, string fieldValue)
     {
         throw new NotImplementedException("Gemini integration pending");
+    }
+
+    private async Task<string> ProcessWithCopilot(string systemPrompt, string fieldValue)
+    {
+        if (_copilotClient == null)
+        {
+            throw new InvalidOperationException("Microsoft Copilot API key not configured");
+        }
+
+        try
+        {
+            var prompt = $"{systemPrompt}\n\nCampo actual: {fieldValue}\n\nMejora el campo siguiendo las mejores prácticas.";
+            
+            var requestBody = new
+            {
+                messages = new[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = $"Mejora este campo: {fieldValue}" }
+                },
+                model = "gpt-4",
+                max_tokens = 500,
+                temperature = 0.2
+            };
+
+            var jsonContent = JsonSerializer.Serialize(requestBody);
+            var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _copilotClient.PostAsync("chat/completions", httpContent);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogError($"Copilot API error: {response.StatusCode}");
+                return fieldValue; // Return original if API fails
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+            
+            return responseObj.GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString() ?? fieldValue;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calling Microsoft Copilot API for field processing");
+            return fieldValue; // Return original if error
+        }
     }
 
     private string BuildPrompt(UseCaseFormData formData, string rules)

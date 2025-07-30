@@ -32,6 +32,9 @@ public class DocumentService : IDocumentService
                 // Convert HTML to Word paragraphs
                 ConvertHtmlToWord(htmlContent, body);
 
+                // Add test cases if they exist (before revision history)
+                AddTestCasesToDocument(body, useCase);
+
                 // Add revision history table
                 AddRevisionHistoryTable(body, useCase);
 
@@ -137,5 +140,106 @@ public class DocumentService : IDocumentService
         }
 
         body.AppendChild(table);
+    }
+
+    private void AddTestCasesToDocument(Body body, UseCase useCase)
+    {
+        // Only add test cases if they exist and have been generated
+        if (!useCase.GenerateTestCase || useCase.TestSteps == null || !useCase.TestSteps.Any())
+        {
+            return;
+        }
+
+        // Add section header for test cases
+        var testCaseHeaderPara = new Paragraph();
+        var testCaseHeaderRun = testCaseHeaderPara.AppendChild(new Run());
+        testCaseHeaderRun.AppendChild(new Text("CASOS DE PRUEBA"));
+        
+        var testCaseHeaderProps = testCaseHeaderRun.AppendChild(new RunProperties());
+        testCaseHeaderProps.AppendChild(new Bold());
+        testCaseHeaderProps.AppendChild(new FontSize() { Val = "20" });
+        testCaseHeaderProps.AppendChild(new Color() { Val = "0070C0" }); // ING Blue
+
+        body.AppendChild(testCaseHeaderPara);
+
+        // Add objective if exists
+        if (!string.IsNullOrEmpty(useCase.TestCaseObjective))
+        {
+            var objectivePara = new Paragraph();
+            var objectiveRun = objectivePara.AppendChild(new Run());
+            objectiveRun.AppendChild(new Text($"Objetivo: {useCase.TestCaseObjective}"));
+            
+            var objectiveProps = objectiveRun.AppendChild(new RunProperties());
+            objectiveProps.AppendChild(new Bold());
+            
+            body.AppendChild(objectivePara);
+        }
+
+        // Add preconditions if exists
+        if (!string.IsNullOrEmpty(useCase.TestCasePreconditions))
+        {
+            var preconditionsPara = new Paragraph();
+            var preconditionsRun = preconditionsPara.AppendChild(new Run());
+            preconditionsRun.AppendChild(new Text($"Precondiciones: {useCase.TestCasePreconditions}"));
+            
+            body.AppendChild(preconditionsPara);
+        }
+
+        // Create test steps table
+        var testTable = new Table();
+        
+        // Table properties
+        var testTableProps = testTable.AppendChild(new TableProperties());
+        testTableProps.AppendChild(new TableBorders(
+            new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 }
+        ));
+
+        // Header row for test steps
+        var testHeaderRow = testTable.AppendChild(new TableRow());
+        var testHeaders = new[] { "#", "Acción", "Datos de Entrada", "Resultado Esperado", "Observaciones" };
+        
+        foreach (var header in testHeaders)
+        {
+            var cell = testHeaderRow.AppendChild(new TableCell());
+            var para = cell.AppendChild(new Paragraph());
+            var run = para.AppendChild(new Run());
+            run.AppendChild(new Text(header));
+            
+            var runProps = run.AppendChild(new RunProperties());
+            runProps.AppendChild(new Bold());
+        }
+
+        // Add test steps
+        foreach (var step in useCase.TestSteps)
+        {
+            var stepRow = testTable.AppendChild(new TableRow());
+            var stepValues = new[] 
+            { 
+                step.Number.ToString(),
+                step.Action ?? "",
+                step.InputData ?? "",
+                step.ExpectedResult ?? "",
+                step.Observations ?? ""
+            };
+            
+            foreach (var value in stepValues)
+            {
+                var cell = stepRow.AppendChild(new TableCell());
+                var para = cell.AppendChild(new Paragraph());
+                var run = para.AppendChild(new Run());
+                run.AppendChild(new Text(value));
+            }
+        }
+
+        body.AppendChild(testTable);
+
+        // Add spacing before revision history
+        var spacingPara = new Paragraph();
+        body.AppendChild(spacingPara);
     }
 }
