@@ -95,9 +95,15 @@ export default function UseCaseGenerator() {
 
   const exportUseCaseMutation = useMutation({
     mutationFn: async () => {
-      if (!generatedUseCase) throw new Error("No use case to export");
+      if (!generatedContent || !generatedUseCase) throw new Error("No document content to export");
       
-      const response = await apiRequest('GET', `/api/use-cases/${generatedUseCase.id}/export`);
+      // Send the current content to server for DOCX conversion
+      const response = await apiRequest('POST', '/api/export-docx', {
+        content: generatedContent,
+        fileName: generatedUseCase.fileName,
+        useCaseName: generatedUseCase.useCaseName,
+        formData: formData
+      });
       
       // Create blob and download
       const blob = await response.blob();

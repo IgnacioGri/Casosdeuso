@@ -505,7 +505,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Export use case to docx
+  // NEW: Direct DOCX export endpoint for locally generated content
+  app.post("/api/export-docx", async (req, res) => {
+    try {
+      const { content, fileName, useCaseName, formData } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ message: "Content is required for DOCX export" });
+      }
+
+      const docxBuffer = await DocumentService.generateDocx(
+        content,
+        fileName || 'caso-de-uso',
+        useCaseName || 'Caso de Uso',
+        formData || null
+      );
+
+      res.set({
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'Content-Disposition': `attachment; filename="${fileName || 'caso-de-uso'}.docx"`
+      });
+
+      res.send(docxBuffer);
+    } catch (error) {
+      console.error("Error generating DOCX:", error);
+      res.status(500).json({
+        message: error instanceof Error ? error.message : "Error generando documento DOCX"
+      });
+    }
+  });
+
+  // Legacy: Export use case to docx (kept for backward compatibility)
   app.get("/api/use-cases/:id/export", async (req, res) => {
     try {
       const { id } = req.params;
