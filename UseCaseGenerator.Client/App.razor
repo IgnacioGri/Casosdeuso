@@ -1,40 +1,70 @@
-<!DOCTYPE html>
-<html lang="es">
+@using MudBlazor
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Generador de Casos de Uso - ING</title>
-    <base href="/" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-    <link href="css/app.css" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-</head>
+<MudThemeProvider Theme="customTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-<body>
-    <div id="app">
-        <Router AppAssembly="@typeof(App).Assembly">
-            <Found Context="routeData">
-                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-            </Found>
-            <NotFound>
-                <PageTitle>No encontrado</PageTitle>
-                <LayoutView Layout="@typeof(MainLayout)">
-                    <p role="alert">Lo sentimos, no hay nada en esta dirección.</p>
-                </LayoutView>
-            </NotFound>
-        </Router>
-    </div>
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>No encontrado</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div class="d-flex justify-center align-center" style="height: 60vh;">
+                <MudPaper Class="pa-8 text-center" Elevation="3">
+                    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline" 
+                             Size="Size.Large" 
+                             Color="Color.Error" 
+                             Class="mb-4" />
+                    <MudText Typo="Typo.h4" Class="mb-4">Página No Encontrada</MudText>
+                    <MudText Typo="Typo.body1" Class="mb-4">
+                        La página que buscas no existe o ha sido movida.
+                    </MudText>
+                    <MudButton Variant="Variant.Filled" 
+                               Color="Color.Primary" 
+                               Href="/"
+                               StartIcon="@Icons.Material.Filled.Home">
+                        Ir al Inicio
+                    </MudButton>
+                </MudPaper>
+            </div>
+        </LayoutView>
+    </NotFound>
+</Router>
 
-    <div id="blazor-error-ui">
-        Ha ocurrido un error inesperado. Esta aplicación puede dejar de responder hasta que se recargue.
-        <a href="" class="reload">Recargar</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-</body>
-
-</html>
+@code {
+    private MudTheme customTheme = new()
+    {
+        Palette = new PaletteLight()
+        {
+            Primary = "#FF6200",
+            Secondary = "#1976D2",
+            Background = "#F5F5F5",
+            Surface = "#FFFFFF",
+            TextPrimary = "#212121",
+            TextSecondary = "#757575",
+            AppbarBackground = "#FF6200",
+            DrawerBackground = "#FFFFFF"
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#FF6200",
+            Secondary = "#42A5F5",
+            Background = "#121212",
+            Surface = "#1E1E1E",
+            TextPrimary = "#FFFFFF",
+            TextSecondary = "#AAAAAA",
+            AppbarBackground = "#1E1E1E",
+            DrawerBackground = "#1E1E1E"
+        },
+        Typography = new Typography()
+        {
+            Default = new Default()
+            {
+                FontFamily = new[] { "Segoe UI", "Arial", "sans-serif" }
+            }
+        }
+    };
+}

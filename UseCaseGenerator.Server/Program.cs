@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UseCaseGenerator.Server.Data;
 using UseCaseGenerator.Server.Services;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using UseCaseGenerator.Shared.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,16 +16,6 @@ if (useInMemoryDb)
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseInMemoryDatabase("UseCaseGeneratorDb"));
 }
-else
-{
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
-
-// Validation
-builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<UseCaseFormValidator>();
 
 // Custom Services
 builder.Services.AddScoped<IAIService, AIService>();

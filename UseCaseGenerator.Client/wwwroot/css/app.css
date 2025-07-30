@@ -1,28 +1,105 @@
-/* ING Corporate Styles */
+/* ING Corporate Theme */
 :root {
-    --ing-primary: #0070C0;
-    --ing-secondary: #28A745;
-    --ing-background: #F8F9FA;
+    --ing-primary: #FF6200;
+    --ing-secondary: #1976D2;
     --ing-surface: #FFFFFF;
-    --ing-text-primary: #333333;
-    --ing-text-secondary: #666666;
+    --ing-background: #F5F5F5;
+    --ing-text-primary: #212121;
+    --ing-text-secondary: #757575;
+    --ing-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-body {
-    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+html, body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
+    padding: 0;
     background-color: var(--ing-background);
 }
 
-.cursor-pointer {
-    cursor: pointer;
+#app {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-.hover\:elevation-4:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08) !important;
+.mud-appbar {
+    background: linear-gradient(135deg, var(--ing-primary) 0%, #E65100 100%);
+    box-shadow: var(--ing-shadow);
 }
 
-/* Blazor Error UI */
+.mud-nav-link {
+    border-radius: 8px;
+    margin: 2px 0;
+    transition: all 0.3s ease;
+}
+
+.mud-nav-link:hover {
+    background-color: rgba(255, 98, 0, 0.1);
+    transform: translateX(4px);
+}
+
+.mud-nav-link.active {
+    background-color: var(--ing-primary);
+    color: white;
+}
+
+.mud-paper {
+    box-shadow: var(--ing-shadow);
+    border-radius: 12px;
+}
+
+.mud-button-filled-primary {
+    background: linear-gradient(135deg, var(--ing-primary) 0%, #E65100 100%);
+    box-shadow: 0 4px 8px rgba(255, 98, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.mud-button-filled-primary:hover {
+    box-shadow: 0 6px 12px rgba(255, 98, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.mud-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.mud-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+.loading-progress {
+    position: relative;
+    display: block;
+    width: 8rem;
+    height: 8rem;
+    margin: 20vh auto 1rem auto;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: var(--ing-primary);
+    stroke-width: 0.6rem;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+}
+
+.loading-progress circle:last-child {
+    stroke: #e0e0e0;
+    stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
+    transition: stroke-dasharray 0.05s ease-in-out;
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    color: var(--ing-primary);
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
@@ -42,137 +119,73 @@ body {
     top: 0.5rem;
 }
 
-/* Custom MudBlazor overrides */
-.mud-stepper .mud-stepper-header .mud-stepper-header-text {
-    font-weight: 500;
+/* AI Model Icons */
+.ai-model-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
 }
 
-.mud-card.hover-card:hover {
-    transform: translateY(-2px);
-    transition: transform 0.2s ease-in-out;
+/* Form Steps Progress */
+.step-progress {
+    margin: 16px 0;
+    padding: 0 16px;
 }
 
-/* ING specific colors */
-.ing-primary {
+.step-progress .mud-stepper-step.active {
+    background-color: var(--ing-primary);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .mud-drawer {
+        width: 280px;
+    }
+    
+    .step-progress {
+        margin: 8px 0;
+        padding: 0 8px;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+/* Custom MudBlazor Overrides */
+.mud-theme-primary {
     color: var(--ing-primary) !important;
 }
 
-.ing-bg-primary {
-    background-color: var(--ing-primary) !important;
-}
-
-.ing-secondary {
-    color: var(--ing-secondary) !important;
-}
-
-.ing-bg-secondary {
-    background-color: var(--ing-secondary) !important;
-}
-
-/* Loading animation */
-.loading-spinner {
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid var(--ing-primary);
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Form validation styles */
-.mud-input-error .mud-input-slot {
-    border-color: #d32f2f !important;
-}
-
-.mud-input-helper-text.mud-input-error {
-    color: #d32f2f;
-}
-
-/* Custom card hover effects */
-.interactive-card {
-    transition: all 0.2s ease-in-out;
-}
-
-.interactive-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-}
-
-/* ING Document preview styles */
-.document-preview {
-    font-family: 'Segoe UI', sans-serif;
-    line-height: 1.6;
-    color: #333;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.document-preview h1 {
+.mud-progress-circular.mud-primary .mud-progress-circle-svg {
     color: var(--ing-primary);
-    text-align: center;
-    margin-bottom: 30px;
-    font-weight: 600;
 }
 
-.document-preview h2 {
-    color: var(--ing-primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin: 20px 0 12px 0;
+.mud-chip.mud-chip-color-primary {
+    background-color: var(--ing-primary);
+    color: white;
 }
 
-.document-preview table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 20px 0;
+.mud-input.mud-input-focus .mud-input-slot::before {
+    border-color: var(--ing-primary);
 }
 
-.document-preview th,
-.document-preview td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-
-.document-preview th {
-    background-color: #f2f2f2;
-    font-weight: 600;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .document-preview {
-        padding: 15px;
-        margin: 10px;
-    }
-    
-    .mud-container {
-        padding: 12px;
-    }
-}
-
-/* Print styles */
-@media print {
-    .mud-appbar,
-    .mud-drawer,
-    .mud-fab,
-    .mud-button {
-        display: none !important;
-    }
-    
-    .document-preview {
-        box-shadow: none;
-        max-width: none;
-        padding: 0;
-    }
+.mud-select.mud-input-focus .mud-input-slot::before {
+    border-color: var(--ing-primary);
 }

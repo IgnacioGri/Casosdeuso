@@ -1,33 +1,58 @@
 @using MudBlazor
 
 <MudNavMenu>
+    <div class="pa-4">
+        <MudText Typo="Typo.h6" Color="Color.Primary">Navegación</MudText>
+    </div>
+    
     <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
         Inicio
     </MudNavLink>
     
-    <MudNavLink Href="/generator" Icon="@Icons.Material.Filled.Create">
-        Generar Caso de Uso
+    <MudNavLink Href="/generator" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Create">
+        Generador
     </MudNavLink>
     
-    <MudNavLink Href="/minute-analysis" Icon="@Icons.Material.Filled.DocumentScanner">
+    <MudNavLink Href="/history" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.History">
+        Historial
+    </MudNavLink>
+    
+    <MudNavLink Href="/minute-analysis" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Analytics">
         Análisis de Minutas
     </MudNavLink>
     
-    <MudNavLink Href="/test-cases" Icon="@Icons.Material.Filled.BugReport">
+    <MudNavLink Href="/test-cases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BugReport">
         Casos de Prueba
-    </MudNavLink>
-    
-    <MudNavLink Href="/history" Icon="@Icons.Material.Filled.History">
-        Historial
     </MudNavLink>
     
     <MudDivider Class="my-2" />
     
-    <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings">
-        Configuración
-    </MudNavLink>
-    
-    <MudNavLink Href="/help" Icon="@Icons.Material.Filled.Help">
-        Ayuda
-    </MudNavLink>
+    <div class="pa-4">
+        <MudText Typo="Typo.caption" Color="Color.TextSecondary">
+            Versión 2.0 - C# Blazor
+        </MudText>
+    </div>
 </MudNavMenu>
+
+<style>
+    .mud-nav-link {
+        border-radius: 8px;
+        margin: 2px 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .mud-nav-link:hover {
+        background-color: rgba(255, 98, 0, 0.1);
+        transform: translateX(4px);
+    }
+    
+    .mud-nav-link.active {
+        background-color: var(--mud-palette-primary);
+        color: white;
+    }
+    
+    .mud-nav-link.active .mud-nav-link-icon,
+    .mud-nav-link.active .mud-nav-link-text {
+        color: white !important;
+    }
+</style>
