@@ -15,7 +15,7 @@ public class UseCaseService : IUseCaseService
 
     public async Task<GenerateUseCaseResponse> GenerateUseCaseAsync(GenerateUseCaseRequest request)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/usecase/generate", request);
+        var response = await _httpClient.PostAsJsonAsync("api/UseCase/generate", request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<GenerateUseCaseResponse>() 
             ?? new GenerateUseCaseResponse { Success = false, Error = "Error de respuesta" };
@@ -23,24 +23,24 @@ public class UseCaseService : IUseCaseService
 
     public async Task<string> EditUseCaseAsync(string content, string instructions, AIModel aiModel)
     {
-        var request = new { Content = content, Instructions = instructions, AiModel = aiModel };
-        var response = await _httpClient.PostAsJsonAsync("api/usecase/edit", request);
+        var request = new EditUseCaseRequest { Content = content, Instructions = instructions, AiModel = aiModel };
+        var response = await _httpClient.PostAsJsonAsync("api/UseCase/edit", request);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync();
     }
 
     public async Task<List<UseCase>> GetAllUseCasesAsync()
     {
-        return await _httpClient.GetFromJsonAsync<List<UseCase>>("api/usecase") ?? new List<UseCase>();
+        return await _httpClient.GetFromJsonAsync<List<UseCase>>("api/UseCase") ?? new List<UseCase>();
     }
 
     public async Task<UseCase?> GetUseCaseAsync(string id)
     {
-        return await _httpClient.GetFromJsonAsync<UseCase>($"api/usecase/{id}");
+        return await _httpClient.GetFromJsonAsync<UseCase>($"api/UseCase/{id}");
     }
 
     public async Task DeleteUseCaseAsync(string id)
     {
-        await _httpClient.DeleteAsync($"api/usecase/{id}");
+        await _httpClient.DeleteAsync($"api/UseCase/{id}");
     }
 }

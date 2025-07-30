@@ -27,4 +27,6 @@ builder.Services.AddScoped<IAIAssistService, AIAssistService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IFormStateService, FormStateService>();
 
+// IJSRuntime is automatically available in Blazor WASM
+
 await builder.Build().RunAsync();

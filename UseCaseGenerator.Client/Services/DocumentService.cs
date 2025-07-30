@@ -15,7 +15,7 @@ public class DocumentService : IDocumentService
 
     public async Task<byte[]> DownloadDocxAsync(string content, string fileName)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/document/docx", new { Content = content, FileName = fileName });
+        var response = await _httpClient.PostAsJsonAsync("api/Document/docx", new { Content = content, FileName = fileName });
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsByteArrayAsync();
     }

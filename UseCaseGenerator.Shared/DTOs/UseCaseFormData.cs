@@ -57,3 +57,53 @@ public class UseCaseFormData
     public AIModel AiModel { get; set; } = AIModel.Demo;
 }
 
+public class EditUseCaseRequest
+{
+    public string Content { get; set; } = string.Empty;
+    public string Instructions { get; set; } = string.Empty;
+    public AIModel AiModel { get; set; } = AIModel.Demo;
+}
+
+public class GenerateDocxRequest
+{
+    public string Content { get; set; } = string.Empty;
+    public string FileName { get; set; } = string.Empty;
+}
+
+public class ConvertToHtmlRequest
+{
+    public string Content { get; set; } = string.Empty;
+}
+
+public class IntelligentTestCaseRequest
+{
+    public UseCaseFormData FormData { get; set; } = new();
+    public AIModel AiModel { get; set; } = AIModel.Demo;
+}
+
+public class IntelligentTestCaseResponse
+{
+    public bool Success { get; set; }
+    public string? Error { get; set; }
+    public List<TestCase> TestCases { get; set; } = new();
+}
+
+public class AnalyzeForTestCasesRequest
+{
+    public UseCaseFormData FormData { get; set; } = new();
+    public AIModel AiModel { get; set; } = AIModel.Demo;
+}
+
+public class MinuteAnalysisRequest
+{
+    public string Content { get; set; } = string.Empty;
+    public AIModel AiModel { get; set; } = AIModel.Demo;
+}
+
+public class MinuteAnalysisResponse
+{
+    public bool Success { get; set; }
+    public string? Error { get; set; }
+    public UseCaseFormData? ExtractedData { get; set; }
+}
+

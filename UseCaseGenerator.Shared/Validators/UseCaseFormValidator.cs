@@ -1,9 +1,20 @@
-using FluentValidation;
+using System.ComponentModel.DataAnnotations;
 using UseCaseGenerator.Shared.DTOs;
 
 namespace UseCaseGenerator.Shared.Validators;
 
-public class UseCaseFormValidator : AbstractValidator<UseCaseFormData>
+public class ValidationResult
+{
+    public List<string> Errors { get; set; } = new();
+    public bool IsValid => !Errors.Any();
+    
+    public void AddError(string error)
+    {
+        Errors.Add(error);
+    }
+}
+
+public class UseCaseFormValidator
 {
     private readonly string[] _infinitiveVerbs = {
         "gestionar", "crear", "actualizar", "eliminar", "consultar", "registrar", 
@@ -25,54 +36,56 @@ public class UseCaseFormValidator : AbstractValidator<UseCaseFormData>
         "alertar", "informar", "publicar", "compartir", "distribuir"
     };
 
-    public UseCaseFormValidator()
+    public static ValidationResult ValidateUseCaseFormData(UseCaseFormData formData)
     {
-        RuleFor(x => x.ClientName)
-            .NotEmpty()
-            .WithMessage("El nombre del cliente es requerido");
-
-        RuleFor(x => x.ProjectName)
-            .NotEmpty()
-            .WithMessage("El nombre del proyecto es requerido");
-
-        RuleFor(x => x.UseCaseCode)
-            .NotEmpty()
-            .WithMessage("El código del caso de uso es requerido");
-
-        RuleFor(x => x.UseCaseName)
-            .NotEmpty()
-            .WithMessage("El nombre del caso de uso es requerido")
-            .Must(BeValidInfinitiveVerb)
-            .WithMessage("Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, etc.)");
-
-        RuleFor(x => x.FileName)
-            .NotEmpty()
-            .WithMessage("El nombre del archivo es requerido")
-            .Matches(@"^[A-Z]{2}\d{3}.+$")
-            .WithMessage("Formato requerido: 2 letras + 3 números + nombre del caso de uso (ej: AB123GestionarUsuarios)");
-
-        RuleFor(x => x.Description)
-            .NotEmpty()
-            .WithMessage("La descripción es requerida");
-
-        // Entity-specific validation
-        When(x => x.UseCaseType == Models.UseCaseType.Entity, () => {
-            RuleFor(x => x.EntityFields)
-                .Must(HaveAtLeastOneFieldWithName)
-                .WithMessage("Para casos de uso de entidad, debe especificar al menos un campo con nombre");
-        });
+        var result = new ValidationResult();
+        
+        if (string.IsNullOrEmpty(formData.ClientName))
+            result.AddError("El nombre del cliente es requerido");
+            
+        if (string.IsNullOrEmpty(formData.ProjectName))
+            result.AddError("El nombre del proyecto es requerido");
+            
+        if (string.IsNullOrEmpty(formData.UseCaseCode))
+            result.AddError("El código del caso de uso es requerido");
+            
+        if (string.IsNullOrEmpty(formData.UseCaseName))
+            result.AddError("El nombre del caso de uso es requerido");
+        else if (!BeValidInfinitiveVerb(formData.UseCaseName))
+            result.AddError("Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, etc.)");
+            
+        if (string.IsNullOrEmpty(formData.FileName))
+            result.AddError("El nombre del archivo es requerido");
+        else if (!System.Text.RegularExpressions.Regex.IsMatch(formData.FileName, @"^[A-Z]{2}\d{3}.+$"))
+            result.AddError("Formato requerido: 2 letras + 3 números + nombre del caso de uso (ej: AB123GestionarUsuarios)");
+            
+        if (string.IsNullOrEmpty(formData.Description))
+            result.AddError("La descripción es requerida");
+            
+        if (formData.UseCaseType == Models.UseCaseType.Entity && !HaveAtLeastOneFieldWithName(formData.EntityFields))
+            result.AddError("Para casos de uso de entidad, debe especificar al menos un campo con nombre");
+            
+        return result;
     }
 
-    private bool BeValidInfinitiveVerb(string useCaseName)
+    private static bool BeValidInfinitiveVerb(string useCaseName)
     {
         if (string.IsNullOrEmpty(useCaseName))
             return false;
 
-        return _infinitiveVerbs.Any(verb => 
+        var infinitiveVerbs = new string[] {
+            "gestionar", "crear", "actualizar", "eliminar", "consultar", "registrar", 
+            "modificar", "validar", "procesar", "generar", "obtener", "establecer", 
+            "configurar", "sincronizar", "enviar", "recibir", "ver", "mostrar", 
+            "listar", "buscar", "filtrar", "exportar", "importar", "calcular", 
+            "analizar", "reportar", "administrar", "mantener", "controlar", "supervisar"
+        };
+        
+        return infinitiveVerbs.Any(verb => 
             useCaseName.ToLower().StartsWith(verb));
     }
 
-    private bool HaveAtLeastOneFieldWithName(List<Models.EntityField> entityFields)
+    private static bool HaveAtLeastOneFieldWithName(List<Models.EntityField> entityFields)
     {
         return entityFields.Any(field => !string.IsNullOrWhiteSpace(field.Name));
     }

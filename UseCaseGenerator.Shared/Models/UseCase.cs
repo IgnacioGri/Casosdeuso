@@ -64,8 +64,8 @@ public class UseCase
 public enum UseCaseType
 {
     Entity,
-    Api,
-    Service
+    API,
+    Process
 }
 
 public enum AIModel
@@ -80,18 +80,40 @@ public enum AIModel
 public class EntityField
 {
     public string Name { get; set; } = string.Empty;
-    public EntityFieldType Type { get; set; }
-    public int? Length { get; set; }
-    public bool Mandatory { get; set; }
+    public string Type { get; set; } = string.Empty;
+    public bool IsMandatory { get; set; }
+    public int? MaxLength { get; set; }
+    public string? Description { get; set; }
+    public string? ValidationRules { get; set; }
 }
 
-public enum EntityFieldType
+public class TestCase
 {
-    Text,
-    Number,
-    Date,
-    Boolean,
-    Email
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Objective { get; set; } = string.Empty;
+    public string Preconditions { get; set; } = string.Empty;
+    public List<TestStep> Steps { get; set; } = new();
+    public string ExpectedResult { get; set; } = string.Empty;
+    public TestCaseType Type { get; set; } = TestCaseType.Positive;
+    public TestCasePriority Priority { get; set; } = TestCasePriority.Medium;
+}
+
+public enum TestCaseType
+{
+    Positive,
+    Negative,
+    Boundary,
+    Integration
+}
+
+public enum TestCasePriority
+{
+    Low,
+    Medium,
+    High,
+    Critical
 }
 
 public class TestStep
