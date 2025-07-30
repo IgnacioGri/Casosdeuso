@@ -109,8 +109,10 @@ export class DocumentService {
           // Add remaining sections based on form data
           ...this.addFormDataSections(formData),
           
-          // Add test cases if provided
-          ...(testCases && testCases.length > 0 ? this.formatTestCases(testCases, formData.useCaseName) : []),
+          // Add test cases if provided (check both sources)
+          ...((testCases && testCases.length > 0) || (formData.testCases && formData.testCases.length > 0) 
+            ? this.formatTestCases(testCases || formData.testCases, formData.useCaseName) 
+            : []),
           
           // History table
           ...this.createHistorySection()
