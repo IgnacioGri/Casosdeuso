@@ -451,7 +451,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const docxBuffer = await DocumentService.generateDocx(
         useCase.generatedContent || '',
         useCase.fileName || 'caso-de-uso',
-        useCase.useCaseName || ''
+        useCase.useCaseName || '',
+        useCase.formData || null
       );
 
       res.set({

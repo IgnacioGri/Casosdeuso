@@ -3,9 +3,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export class DocumentService {
-  static async generateDocx(htmlContent: string, fileName: string, useCaseName: string = ''): Promise<Buffer> {
+  static async generateDocx(htmlContent: string, fileName: string, useCaseName: string = '', testCaseData?: any): Promise<Buffer> {
     // Convert HTML to docx structure
     const paragraphs = this.parseHtmlToParagraphs(htmlContent);
+    
+    // Add test cases section before history table if test cases exist
+    if (testCaseData && testCaseData.generateTestCase && (testCaseData.testSteps?.length > 0 || testCaseData.testCaseObjective || testCaseData.testCasePreconditions)) {
+      this.addTestCasesToDocument(paragraphs, testCaseData);
+    }
     
     // Always add the mandatory history table at the end
     const historyTitle = new Paragraph({
@@ -463,5 +468,240 @@ export class DocumentService {
         insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "666666" }
       }
     });
+  }
+
+  private static addTestCasesToDocument(paragraphs: (Paragraph | Table)[], testCaseData: any): void {
+    // Add test cases title
+    const testCaseTitle = new Paragraph({
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 400, after: 200 },
+      children: [
+        new TextRun({
+          text: "CASOS DE PRUEBA",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })
+      ]
+    });
+    paragraphs.push(testCaseTitle);
+
+    // Add objective if provided
+    if (testCaseData.testCaseObjective) {
+      const objectiveTitle = new Paragraph({
+        spacing: { before: 200, after: 100 },
+        children: [
+          new TextRun({
+            text: "Objetivo:",
+            bold: true,
+            size: 22,
+            font: "Segoe UI Semilight"
+          })
+        ]
+      });
+      paragraphs.push(objectiveTitle);
+
+      const objectiveContent = new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({
+            text: testCaseData.testCaseObjective,
+            size: 22,
+            font: "Segoe UI Semilight"
+          })
+        ]
+      });
+      paragraphs.push(objectiveContent);
+    }
+
+    // Add preconditions if provided
+    if (testCaseData.testCasePreconditions) {
+      const preconditionsTitle = new Paragraph({
+        spacing: { before: 200, after: 100 },
+        children: [
+          new TextRun({
+            text: "Precondiciones:",
+            bold: true,
+            size: 22,
+            font: "Segoe UI Semilight"
+          })
+        ]
+      });
+      paragraphs.push(preconditionsTitle);
+
+      const preconditionsContent = new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({
+            text: testCaseData.testCasePreconditions,
+            size: 22,
+            font: "Segoe UI Semilight"
+          })
+        ]
+      });
+      paragraphs.push(preconditionsContent);
+    }
+
+    // Add test steps table if provided
+    if (testCaseData.testSteps && testCaseData.testSteps.length > 0) {
+      const testStepsTitle = new Paragraph({
+        spacing: { before: 200, after: 100 },
+        children: [
+          new TextRun({
+            text: "Pasos de Prueba:",
+            bold: true,
+            size: 22,
+            font: "Segoe UI Semilight"
+          })
+        ]
+      });
+      paragraphs.push(testStepsTitle);
+
+      // Create test steps table
+      const testStepsTable = this.createTestCaseTable(testCaseData.testSteps);
+      paragraphs.push(testStepsTable);
+    }
+  }
+
+  private static createTestCaseTable(testSteps: any[]): Table {
+    const headerRow = new TableRow({
+      children: [
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "#", 
+              bold: true, 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 8, type: WidthType.PERCENTAGE },
+          shading: { fill: "F2F2F2" },
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Acción", 
+              bold: true, 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 25, type: WidthType.PERCENTAGE },
+          shading: { fill: "F2F2F2" },
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Datos de Entrada", 
+              bold: true, 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 22, type: WidthType.PERCENTAGE },
+          shading: { fill: "F2F2F2" },
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Resultado Esperado", 
+              bold: true, 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 25, type: WidthType.PERCENTAGE },
+          shading: { fill: "F2F2F2" },
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Observaciones", 
+              bold: true, 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 20, type: WidthType.PERCENTAGE },
+          shading: { fill: "F2F2F2" },
+          borders: this.getTableBorders()
+        })
+      ]
+    });
+
+    const dataRows = testSteps.map(step => new TableRow({
+      children: [
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: step.number?.toString() || "", 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: step.action || "", 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: step.inputData || "", 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: step.expectedResult || "", 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: step.observations || "", 
+              size: 20, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          borders: this.getTableBorders()
+        })
+      ]
+    }));
+
+    return new Table({
+      rows: [headerRow, ...dataRows],
+      width: { size: 100, type: WidthType.PERCENTAGE }
+    });
+  }
+
+  private static getTableBorders() {
+    return {
+      top: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
+      bottom: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
+      left: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" },
+      right: { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" }
+    };
   }
 }
