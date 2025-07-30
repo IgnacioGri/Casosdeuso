@@ -956,21 +956,10 @@ export default function FormSteps({
               </div>
             </div>
 
-            <div>
-              <label className="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  checked={formData.generateTestCase}
-                  onChange={(e) => handleInputChange('generateTestCase', e.target.checked)}
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium text-gray-700">
-                  Generar casos de prueba
-                </span>
-              </label>
-              <div className="text-xs text-gray-500 mt-1 ml-6">
-                Incluye casos de prueba según minuta ING con objetivo, precondiciones y pasos estructurados
-              </div>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Una vez completado el caso de uso, podrás elegir si agregar casos de prueba en el siguiente paso.
+              </p>
             </div>
 
             {formData.generateWireframes && (
@@ -1200,14 +1189,13 @@ export default function FormSteps({
     );
   }
 
-  // Step 9/10: Review and Generation (adjusted step number based on options)
-  const getReviewStepNumber = () => {
-    const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
-    return formData.generateTestCase ? baseStep + 1 : baseStep;
+  // Step 9/7: Pre-Final Step with Test Case Decision
+  const getPreFinalStepNumber = () => {
+    return formData.useCaseType === 'entity' ? 9 : 7;
   };
 
-  const isReviewStep = currentStep === getReviewStepNumber();
-  if (isReviewStep) {
+  const isPreFinalStep = currentStep === getPreFinalStepNumber() && !formData.generateTestCase;
+  if (isPreFinalStep) {
     const getSummaryData = () => {
       const summary = [];
       if (formData.clientName) summary.push(`Cliente: ${formData.clientName}`);
@@ -1239,7 +1227,7 @@ export default function FormSteps({
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center">
               <Settings className="mr-2 text-ms-blue" size={20} />
-              Revisión y Generación
+              Decisión sobre Casos de Prueba
             </h3>
             <HelpButton step={9} useCaseType={formData.useCaseType} />
           </div>
@@ -1253,6 +1241,121 @@ export default function FormSteps({
                 ))}
               </div>
             </div>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <h4 className="font-medium text-blue-900 mb-2">¿Deseas incluir casos de prueba?</h4>
+              <p className="text-sm text-blue-700 mb-4">
+                Los casos de prueba te permiten validar el funcionamiento del caso de uso con objetivos, precondiciones y pasos estructurados según estándares ING.
+              </p>
+              <div className="flex space-x-4">
+                <Button 
+                  type="button" 
+                  onClick={() => {
+                    handleInputChange('generateTestCase', true);
+                    if (onNextStep) onNextStep();
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Sí, agregar casos de prueba
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={() => {
+                    handleInputChange('generateTestCase', false);
+                    // Skip to final review step
+                    if (onNextStep) onNextStep();
+                  }}
+                  variant="outline"
+                  className="border-gray-300"
+                >
+                  No, finalizar sin casos de prueba
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex space-x-4">
+              <Button 
+                type="button" 
+                onClick={onLoadDemoData}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Cargar Datos Demo
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Final Review Step (after test cases or after decision)
+  const getFinalReviewStepNumber = () => {
+    const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
+    return formData.generateTestCase ? baseStep + 1 : baseStep;
+  };
+
+  const isFinalReviewStep = currentStep === getFinalReviewStepNumber() && 
+    (formData.generateTestCase || currentStep > getPreFinalStepNumber());
+  
+  if (isFinalReviewStep) {
+    const getSummaryData = () => {
+      const summary = [];
+      if (formData.clientName) summary.push(`Cliente: ${formData.clientName}`);
+      if (formData.projectName) summary.push(`Proyecto: ${formData.projectName}`);
+      if (formData.useCaseCode) summary.push(`Código: ${formData.useCaseCode}`);
+      if (formData.useCaseName) summary.push(`Nombre: ${formData.useCaseName}`);
+      if (formData.fileName) summary.push(`Archivo: ${formData.fileName}`);
+      summary.push(`Tipo: ${formData.useCaseType}`);
+      summary.push(`Modelo de IA: ${formData.aiModel}`);
+      
+      if (formData.useCaseType === 'entity') {
+        if (formData.searchFilters?.length) {
+          summary.push(`Filtros: ${formData.searchFilters.filter(f => f.trim()).length} configurados`);
+        }
+        if (formData.resultColumns?.length) {
+          summary.push(`Columnas: ${formData.resultColumns.filter(c => c.trim()).length} configuradas`);
+        }
+        if (formData.entityFields?.length) {
+          summary.push(`Campos: ${formData.entityFields.filter(f => f.name.trim()).length} configurados`);
+        }
+      }
+      
+      if (formData.generateTestCase) {
+        summary.push(`Casos de prueba: ${formData.testSteps?.length || 0} pasos configurados`);
+      }
+      
+      return summary;
+    };
+
+    return (
+      <Card className="shadow-sm border border-ms-border">
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <Settings className="mr-2 text-ms-blue" size={20} />
+              Revisión Final y Generación
+            </h3>
+            <HelpButton step={9} useCaseType={formData.useCaseType} />
+          </div>
+          
+          <div className="space-y-4">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-3">Resumen completo de la configuración:</h4>
+              <div className="space-y-2 text-sm">
+                {getSummaryData().map((item, index) => (
+                  <div key={index} className="text-gray-700">{item}</div>
+                ))}
+              </div>
+            </div>
+            
+            {formData.generateTestCase && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 className="font-medium text-green-900 mb-2">Casos de prueba incluidos</h4>
+                <p className="text-sm text-green-700">
+                  Los casos de prueba se agregarán automáticamente al documento final con el formato profesional ING.
+                </p>
+              </div>
+            )}
             
             <div className="flex space-x-4">
               <Button 

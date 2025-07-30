@@ -48,11 +48,11 @@ export default function UseCaseGenerator() {
     resetForm
   } = useUseCaseForm();
 
-  // Calculate total steps based on use case type
+  // Calculate total steps based on use case type and test case decision
   const getTotalSteps = () => {
-    // Add 2 for the new type selection (step 1) and minute analysis (step 2)
     const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
-    return formData.generateTestCase ? baseSteps + 1 : baseSteps;
+    // Always show one more step for test case decision or final review
+    return baseSteps + (formData.generateTestCase ? 1 : 0);
   };
 
   const generateUseCaseMutation = useMutation({
@@ -162,7 +162,13 @@ export default function UseCaseGenerator() {
   };
 
   const isReviewStep = () => {
-    return currentStep === getTotalSteps();
+    // Final review step happens after test cases (if enabled) or after decision step
+    const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
+    if (formData.generateTestCase) {
+      return currentStep === baseStep + 1; // Step after test cases
+    } else {
+      return currentStep === baseStep; // Decision step becomes review when user selects "finish without test cases"
+    }
   };
 
   // Navigation buttons component for reuse
@@ -300,9 +306,7 @@ export default function UseCaseGenerator() {
                   exportUseCaseMutation.mutate();
                 }
               }}
-              onTestCaseUpdate={(testData) => {
-                updateFormData(testData);
-              }}
+
             />
           </div>
         </div>

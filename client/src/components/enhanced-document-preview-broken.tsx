@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Eye, EyeOff, FileText, Download, RefreshCw } from "lucide-react";
-import { UseCaseFormData } from "@/types/use-case";
+import { UseCaseFormData, TestStep } from "@/types/use-case";
+import { TestCaseStep } from "./steps/test-case-step";
 
 interface EnhancedDocumentPreviewProps {
   formData: UseCaseFormData;
@@ -11,6 +13,7 @@ interface EnhancedDocumentPreviewProps {
   generatedContent?: string;
   onRefresh?: () => void;
   onDownload?: () => void;
+  onTestCaseUpdate?: (testData: { generateTestCase: boolean; testCaseObjective: string; testCasePreconditions: string; testSteps: any[] }) => void;
 }
 
 export default function EnhancedDocumentPreview({ 
@@ -18,10 +21,12 @@ export default function EnhancedDocumentPreview({
   currentStep, 
   generatedContent,
   onRefresh,
-  onDownload
+  onDownload,
+  onTestCaseUpdate
 }: EnhancedDocumentPreviewProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [previewSections, setPreviewSections] = useState<string[]>([]);
+
 
   // Generate dynamic preview based on current form state
   useEffect(() => {
@@ -68,22 +73,20 @@ export default function EnhancedDocumentPreview({
         sections.push(`
           <h2>Filtros de Búsqueda</h2>
           <ul>
-            ${formData.searchFilters
-              .filter(f => typeof f === 'string' && f.trim())
-              .map(filter => `<li>${filter}</li>`)
-              .join('')}
+            ${formData.searchFilters.filter(f => typeof f === 'string' && f.trim()).map(filter => 
+              `<li>${filter}</li>`
+            ).join('')}
           </ul>
         `);
       }
 
       if (formData.resultColumns?.some(c => typeof c === 'string' && c.trim())) {
         sections.push(`
-          <h2>Columnas del Resultado</h2>
+          <h2>Columnas de Resultado</h2>
           <ul>
-            ${formData.resultColumns
-              .filter(c => typeof c === 'string' && c.trim())
-              .map(column => `<li>${column}</li>`)
-              .join('')}
+            ${formData.resultColumns.filter(c => typeof c === 'string' && c.trim()).map(column => 
+              `<li>${column}</li>`
+            ).join('')}
           </ul>
         `);
       }
@@ -92,27 +95,50 @@ export default function EnhancedDocumentPreview({
         sections.push(`
           <h2>Campos de la Entidad</h2>
           <ul>
-            ${formData.entityFields
-              .filter(f => f && f.name && typeof f.name === 'string' && f.name.trim())
-              .map(field => `
-                <li>
-                  <strong>${field.name}</strong>: ${field.type}${field.length ? `(${field.length})` : ''} 
-                  - ${field.mandatory ? 'Obligatorio' : 'Opcional'}
-                  ${field.description ? `<br><em>Descripción: ${field.description}</em>` : ''}
-                  ${field.validationRules ? `<br><em>Validación: ${field.validationRules}</em>` : ''}
-                </li>
-              `).join('')}
+            ${formData.entityFields.filter(f => f && f.name && typeof f.name === 'string' && f.name.trim()).map(field => 
+              `<li><strong>${field.name}</strong>: ${field.type}${field.length ? `(${field.length})` : ''} ${field.mandatory ? '- Obligatorio' : '- Opcional'}${field.description ? `<br><em>Descripción: ${field.description}</em>` : ''}${field.validationRules ? `<br><em>Validación: ${field.validationRules}</em>` : ''}</li>`
+            ).join('')}
           </ul>
         `);
       }
     }
 
-    // ✨ CASOS DE PRUEBA - Mostrar solo si están configurados y generateTestCase es true
-    if (formData.generateTestCase && (formData.testCaseObjective || formData.testCasePreconditions || formData.testSteps?.length)) {
+    if (formData.useCaseType === 'api') {
+      if (formData.apiEndpoint || formData.requestFormat) {
+        sections.push(`
+          <h2>Configuración de API</h2>
+          ${formData.apiEndpoint ? `<p><strong>Endpoint:</strong> ${formData.apiEndpoint}</p>` : ''}
+          ${formData.requestFormat ? `<p><strong>Formato de Petición:</strong></p><pre>${formData.requestFormat}</pre>` : ''}
+          ${formData.responseFormat ? `<p><strong>Formato de Respuesta:</strong></p><pre>${formData.responseFormat}</pre>` : ''}
+        `);
+      }
+    }
+
+    if (formData.useCaseType === 'service') {
+      if (formData.serviceFrequency || formData.executionTime) {
+        sections.push(`
+          <h2>Configuración del Servicio</h2>
+          ${formData.serviceFrequency ? `<p><strong>Frecuencia:</strong> ${formData.serviceFrequency}</p>` : ''}
+          ${formData.executionTime ? `<p><strong>Tiempo de Ejecución:</strong> ${formData.executionTime}</p>` : ''}
+          ${formData.configurationPaths ? `<p><strong>Rutas de Configuración:</strong> ${formData.configurationPaths}</p>` : ''}
+        `);
+      }
+    }
+
+    if (formData.specialRequirements) {
+      sections.push(`
+        <h2>Requerimientos Especiales</h2>
+        <p>${formData.specialRequirements}</p>
+      `);
+    }
+
+    // Add test cases section if test case generation is enabled
+    if (formData.generateTestCase && (formData.testCaseObjective || formData.testCasePreconditions || (formData.testSteps && formData.testSteps.length > 0))) {
       let testCaseSection = `
         <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0;">CASOS DE PRUEBA</h2>
       `;
 
+      // Add objective if provided
       if (formData.testCaseObjective) {
         testCaseSection += `
           <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Objetivo:</h3>
@@ -120,6 +146,7 @@ export default function EnhancedDocumentPreview({
         `;
       }
 
+      // Add preconditions if provided
       if (formData.testCasePreconditions) {
         testCaseSection += `
           <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Precondiciones:</h3>
@@ -127,7 +154,8 @@ export default function EnhancedDocumentPreview({
         `;
       }
 
-      if (formData.testSteps?.length) {
+      // Add test steps table if provided
+      if (formData.testSteps && formData.testSteps.length > 0) {
         testCaseSection += `
           <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Pasos de Prueba:</h3>
           <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
@@ -283,19 +311,47 @@ export default function EnhancedDocumentPreview({
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Actualizar
                 </Button>
-                <Button size="sm" variant="outline" onClick={handleDownloadHtml}>
+                        );
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({ 
+                            generateTestCase: true, 
+                            testCaseObjective: formData.testCaseObjective || '', 
+                            testCasePreconditions: formData.testCasePreconditions || '', 
+                            testSteps: newTestSteps 
+                          });
+                        }
+                      }}
+                      clientName={formData.clientName}
+                      projectName={formData.projectName}
+                      useCaseName={formData.useCaseName}
+                      aiModel={formData.aiModel}
+                      formData={formData}
+                      onReplaceAllTestData={(data) => {
+                        if (onTestCaseUpdate) {
+                          onTestCaseUpdate({
+                            generateTestCase: true,
+                            testCaseObjective: data.objective,
+                            testCasePreconditions: data.preconditions,
+                            testSteps: data.testSteps
+                          });
+                        }
+                      }}
+                    />
+                  </DialogContent>
+                </Dialog>
+                <Button size="sm" onClick={onDownload} disabled={!generatedContent}>
                   <Download className="w-4 h-4 mr-2" />
-                  Descargar HTML
+                  .docx
                 </Button>
-                <Button size="sm" variant="outline" onClick={onDownload}>
+                <Button size="sm" variant="outline" onClick={handleDownloadHtml} disabled={!generatedContent}>
                   <Download className="w-4 h-4 mr-2" />
-                  Descargar DOCX
+                  .html
                 </Button>
               </div>
             </div>
-            
-            <div className="prose prose-sm max-w-none dark:prose-invert" 
-              dangerouslySetInnerHTML={{ __html: generatedContent || '' }} 
+            <div 
+              className="prose dark:prose-invert max-w-none text-sm"
+              dangerouslySetInnerHTML={{ __html: generatedContent }}
             />
           </div>
         ) : (
