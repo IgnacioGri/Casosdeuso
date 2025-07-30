@@ -73,6 +73,18 @@
                     </div>
                 </div>
             </MudRadio>
+            
+            <MudRadio Option="@("copilot")" Color="Color.Primary" T="string">
+                <div class="d-flex align-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Computer" Color="Color.Info" Class="mr-3" />
+                    <div>
+                        <MudText Typo="Typo.h6">Microsoft Copilot</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Default">
+                            Modelo empresarial de Microsoft optimizado para productividad.
+                        </MudText>
+                    </div>
+                </div>
+            </MudRadio>
         </MudRadioGroup>
     </MudItem>
     
@@ -110,6 +122,7 @@
                 "claude" => AIModel.Claude,
                 "gemini" => AIModel.Gemini,
                 "grok" => AIModel.Grok,
+                "copilot" => AIModel.Copilot,
                 _ => AIModel.Demo
             };
 
