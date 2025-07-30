@@ -323,10 +323,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      // ✨ CRITICAL FIX: Combine generated content with test cases if they exist
+      let finalContent = response.content;
+      
+      if (validatedData.generateTestCase && (validatedData.testSteps?.length > 0 || validatedData.testCaseObjective || validatedData.testCasePreconditions)) {
+        console.log('Adding test cases to generated document...');
+        
+        // Build test cases section HTML
+        let testCaseSection = `
+          <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">CASOS DE PRUEBA</h2>
+        `;
+
+        if (validatedData.testCaseObjective) {
+          testCaseSection += `
+            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Objetivo:</h3>
+            <p style="margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;">${validatedData.testCaseObjective}</p>
+          `;
+        }
+
+        if (validatedData.testCasePreconditions) {
+          testCaseSection += `
+            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Precondiciones:</h3>
+            <p style="margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;">${validatedData.testCasePreconditions}</p>
+          `;
+        }
+
+        if (validatedData.testSteps?.length) {
+          testCaseSection += `
+            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Pasos de Prueba:</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
+              <thead>
+                <tr style="background-color: #f8f9fa;">
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 50px;">#</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Datos de Entrada</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Resultado Esperado</th>
+                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          validatedData.testSteps.forEach((step) => {
+            testCaseSection += `
+              <tr>
+                <td style="border: 1px solid #666; padding: 8px; text-align: center;">${step.number}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.action || ''}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.inputData || ''}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.expectedResult || ''}</td>
+                <td style="border: 1px solid #666; padding: 8px;">${step.observations || ''}</td>
+              </tr>
+            `;
+          });
+
+          testCaseSection += `
+              </tbody>
+            </table>
+          `;
+        }
+
+        // Insert test cases before closing tags but after main content
+        finalContent = response.content + testCaseSection;
+        console.log('Test cases successfully added to final content');
+      }
+
       // Save to storage
       const insertData = insertUseCaseSchema.parse({
         ...validatedData,
-        generatedContent: response.content,
+        generatedContent: finalContent,
         searchFilters: validatedData.searchFilters,
         resultColumns: validatedData.resultColumns,
         entityFields: validatedData.entityFields,
@@ -336,7 +400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         useCase,
-        content: response.content
+        content: finalContent
       });
     } catch (error) {
       console.error("Error generating use case:", error);

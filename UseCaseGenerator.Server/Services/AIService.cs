@@ -78,9 +78,81 @@ public class AIService : IAIService
             var content = await GenerateWithAI(prompt, request.FormData.AiModel);
             var cleanedContent = CleanAIResponse(content);
 
+            // ✨ CRITICAL FIX: Combine generated content with test cases if they exist
+            var finalContent = cleanedContent;
+            
+            if (request.FormData.GenerateTestCase && 
+                (request.FormData.TestSteps?.Count > 0 || 
+                 !string.IsNullOrEmpty(request.FormData.TestCaseObjective) || 
+                 !string.IsNullOrEmpty(request.FormData.TestCasePreconditions)))
+            {
+                _logger.LogInformation("Adding test cases to generated document...");
+                
+                // Build test cases section HTML
+                var testCaseSection = @"
+          <h2 style=""color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;"">CASOS DE PRUEBA</h2>
+        ";
+
+                if (!string.IsNullOrEmpty(request.FormData.TestCaseObjective))
+                {
+                    testCaseSection += $@"
+            <h3 style=""color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;"">Objetivo:</h3>
+            <p style=""margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;"">{request.FormData.TestCaseObjective}</p>
+          ";
+                }
+
+                if (!string.IsNullOrEmpty(request.FormData.TestCasePreconditions))
+                {
+                    testCaseSection += $@"
+            <h3 style=""color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;"">Precondiciones:</h3>
+            <p style=""margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;"">{request.FormData.TestCasePreconditions}</p>
+          ";
+                }
+
+                if (request.FormData.TestSteps?.Count > 0)
+                {
+                    testCaseSection += @"
+            <h3 style=""color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;"">Pasos de Prueba:</h3>
+            <table style=""width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;"">
+              <thead>
+                <tr style=""background-color: #f8f9fa;"">
+                  <th style=""border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 50px;"">#</th>
+                  <th style=""border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;"">Acción</th>
+                  <th style=""border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;"">Datos de Entrada</th>
+                  <th style=""border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;"">Resultado Esperado</th>
+                  <th style=""border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;"">Observaciones</th>
+                </tr>
+              </thead>
+              <tbody>
+          ";
+
+                    foreach (var step in request.FormData.TestSteps)
+                    {
+                        testCaseSection += $@"
+              <tr>
+                <td style=""border: 1px solid #666; padding: 8px; text-align: center;"">{step.Number}</td>
+                <td style=""border: 1px solid #666; padding: 8px;"">{step.Action ?? ""}</td>
+                <td style=""border: 1px solid #666; padding: 8px;"">{step.InputData ?? ""}</td>
+                <td style=""border: 1px solid #666; padding: 8px;"">{step.ExpectedResult ?? ""}</td>
+                <td style=""border: 1px solid #666; padding: 8px;"">{step.Observations ?? ""}</td>
+              </tr>
+            ";
+                    }
+
+                    testCaseSection += @"
+              </tbody>
+            </table>
+          ";
+                }
+
+                // Insert test cases before closing tags but after main content
+                finalContent = cleanedContent + testCaseSection;
+                _logger.LogInformation("Test cases successfully added to final content");
+            }
+
             return new GenerateUseCaseResponse
             {
-                Content = cleanedContent,
+                Content = finalContent,
                 Success = true
             };
         }
