@@ -17,6 +17,13 @@ public class DocumentService : IDocumentService
 
     public byte[] GenerateDocx(string htmlContent, UseCase useCase)
     {
+        // If we have form data, generate directly from it
+        if (useCase.FormData != null)
+        {
+            return GenerateDocxFromFormData(useCase);
+        }
+        
+        // Otherwise fall back to HTML conversion
         try
         {
             using var ms = new MemoryStream();
@@ -46,6 +53,54 @@ public class DocumentService : IDocumentService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating DOCX document");
+            throw;
+        }
+    }
+    
+    private byte[] GenerateDocxFromFormData(UseCase useCase)
+    {
+        try
+        {
+            using var ms = new MemoryStream();
+            using (var document = WordprocessingDocument.Create(ms, WordprocessingDocumentType.Document))
+            {
+                var mainPart = document.AddMainDocumentPart();
+                mainPart.Document = new Document();
+                var body = mainPart.Document.AppendChild(new Body());
+
+                // Title
+                var titlePara = body.AppendChild(new Paragraph());
+                var titleRun = titlePara.AppendChild(new Run());
+                titleRun.AppendChild(new Text("ESPECIFICACIÓN DE CASO DE USO"));
+                ApplyHeadingStyle(titleRun, 48, true);
+
+                // Project Information Section
+                AddSectionHeading(body, "Información del Proyecto");
+                AddBulletPoint(body, "Cliente", useCase.ClientName);
+                AddBulletPoint(body, "Proyecto", useCase.ProjectName);
+                AddBulletPoint(body, "Código", useCase.UseCaseCode);
+                AddBulletPoint(body, "Archivo", useCase.FileName);
+
+                // Use Case Description Section
+                AddSectionHeading(body, "Descripción del Caso de Uso");
+                AddBulletPoint(body, "Nombre", useCase.UseCaseName);
+                AddBulletPoint(body, "Tipo", useCase.UseCaseType == "entity" ? "Gestión de Entidades" : useCase.UseCaseType);
+                AddBulletPoint(body, "Descripción", useCase.Description);
+
+                // Add remaining sections based on form data
+                AddFormDataSections(body, useCase);
+
+                // Add revision history table
+                AddRevisionHistoryTable(body, useCase);
+
+                mainPart.Document.Save();
+            }
+
+            return ms.ToArray();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating DOCX from form data");
             throw;
         }
     }
@@ -90,7 +145,218 @@ public class DocumentService : IDocumentService
         }
     }
 
+    private void AddFormDataSections(Body body, UseCase useCase)
+    {
+        var formData = useCase.FormData;
+        if (formData == null) return;
+
+        // Business Rules
+        if (!string.IsNullOrEmpty(useCase.BusinessRules))
+        {
+            AddSectionHeading(body, "Reglas de Negocio");
+            var rules = useCase.BusinessRules.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < rules.Length; i++)
+            {
+                AddNumberedItem(body, $"{i + 1}. {rules[i].Trim()}");
+            }
+        }
+
+        // Search Filters (for entity use cases)
+        if (useCase.SearchFilters?.Any() == true)
+        {
+            AddSectionHeading(body, "Filtros de Búsqueda");
+            foreach (var filter in useCase.SearchFilters)
+            {
+                AddBulletItem(body, filter);
+            }
+        }
+
+        // Result Columns (for entity use cases)
+        if (useCase.ResultColumns?.Any() == true)
+        {
+            AddSectionHeading(body, "Columnas de Resultado");
+            foreach (var column in useCase.ResultColumns)
+            {
+                AddBulletItem(body, column);
+            }
+        }
+
+        // Entity Fields (for entity use cases)
+        if (useCase.EntityFields?.Any() == true)
+        {
+            AddSectionHeading(body, "Campos de Entidad");
+            foreach (var field in useCase.EntityFields)
+            {
+                var fieldText = $"{field.Name} ({field.Type})";
+                if (!string.IsNullOrEmpty(field.Length)) fieldText += $" - Longitud: {field.Length}";
+                if (field.Mandatory) fieldText += " - Obligatorio";
+                if (!string.IsNullOrEmpty(field.Description)) fieldText += $" - {field.Description}";
+                AddBulletItem(body, fieldText);
+            }
+        }
+
+        // Test Cases Section
+        if (useCase.GenerateTestCase && useCase.TestSteps?.Any() == true)
+        {
+            AddSectionHeading(body, "CASOS DE PRUEBA", true);
+
+            // Objective
+            if (!string.IsNullOrEmpty(useCase.TestCaseObjective))
+            {
+                AddSubHeading(body, "Objetivo:");
+                AddParagraph(body, useCase.TestCaseObjective);
+            }
+
+            // Preconditions
+            if (!string.IsNullOrEmpty(useCase.TestCasePreconditions))
+            {
+                AddSubHeading(body, "Precondiciones:");
+                var preconditions = useCase.TestCasePreconditions.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var condition in preconditions)
+                {
+                    AddBulletItem(body, condition.Trim());
+                }
+            }
+
+            // Test Steps
+            AddSubHeading(body, "Pasos de Prueba:");
+            for (int i = 0; i < useCase.TestSteps.Count; i++)
+            {
+                var step = useCase.TestSteps[i];
+                AddNumberedItem(body, $"{step.Number ?? (i + 1)}. {step.Action}", true);
+                
+                if (!string.IsNullOrEmpty(step.InputData))
+                    AddIndentedBullet(body, "Datos de Entrada", step.InputData);
+                    
+                if (!string.IsNullOrEmpty(step.ExpectedResult))
+                    AddIndentedBullet(body, "Resultado Esperado", step.ExpectedResult);
+                    
+                if (!string.IsNullOrEmpty(step.Observations))
+                    AddIndentedBullet(body, "Observaciones", step.Observations);
+            }
+        }
+    }
+
+    private void AddSectionHeading(Body body, string text, bool isLarge = false)
+    {
+        var para = body.AppendChild(new Paragraph());
+        para.AppendChild(new ParagraphProperties()).AppendChild(new SpacingBetweenLines() 
+        { 
+            Before = isLarge ? "400" : "240", 
+            After = "120" 
+        });
+        
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text(text));
+        ApplyHeadingStyle(run, isLarge ? 28 : 28, true);
+    }
+
+    private void AddSubHeading(Body body, string text)
+    {
+        var para = body.AppendChild(new Paragraph());
+        para.AppendChild(new ParagraphProperties()).AppendChild(new SpacingBetweenLines() 
+        { 
+            Before = "120", 
+            After = "80" 
+        });
+        
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text(text));
+        ApplyHeadingStyle(run, 24, true);
+    }
+
+    private void AddBulletPoint(Body body, string label, string value)
+    {
+        var para = body.AppendChild(new Paragraph());
+        para.AppendChild(new ParagraphProperties()).AppendChild(new SpacingBetweenLines() { After = "120" });
+        
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text("• "));
+        
+        var boldRun = para.AppendChild(new Run());
+        boldRun.AppendChild(new Text($"{label}: "));
+        boldRun.AppendChild(new RunProperties()).AppendChild(new Bold());
+        
+        var valueRun = para.AppendChild(new Run());
+        valueRun.AppendChild(new Text(value ?? ""));
+    }
+
+    private void AddBulletItem(Body body, string text)
+    {
+        var para = body.AppendChild(new Paragraph());
+        var paraProps = para.AppendChild(new ParagraphProperties());
+        paraProps.AppendChild(new SpacingBetweenLines() { After = "80" });
+        paraProps.AppendChild(new Indentation() { Left = "720" });
+        
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text($"• {text}"));
+    }
+
+    private void AddNumberedItem(Body body, string text, bool bold = false)
+    {
+        var para = body.AppendChild(new Paragraph());
+        var paraProps = para.AppendChild(new ParagraphProperties());
+        paraProps.AppendChild(new SpacingBetweenLines() { Before = bold ? "80" : "0", After = bold ? "120" : "80" });
+        paraProps.AppendChild(new Indentation() { Left = "720" });
+        
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text(text));
+        if (bold)
+        {
+            run.AppendChild(new RunProperties()).AppendChild(new Bold());
+        }
+    }
+
+    private void AddIndentedBullet(Body body, string label, string value)
+    {
+        var para = body.AppendChild(new Paragraph());
+        var paraProps = para.AppendChild(new ParagraphProperties());
+        paraProps.AppendChild(new SpacingBetweenLines() { After = "80" });
+        paraProps.AppendChild(new Indentation() { Left = "1440" }); // Double indent
+        
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text("• "));
+        
+        var boldRun = para.AppendChild(new Run());
+        boldRun.AppendChild(new Text($"{label}: "));
+        boldRun.AppendChild(new RunProperties()).AppendChild(new Bold());
+        
+        var valueRun = para.AppendChild(new Run());
+        valueRun.AppendChild(new Text(value));
+    }
+
+    private void AddParagraph(Body body, string text)
+    {
+        var para = body.AppendChild(new Paragraph());
+        para.AppendChild(new ParagraphProperties()).AppendChild(new SpacingBetweenLines() { After = "120" });
+        var run = para.AppendChild(new Run());
+        run.AppendChild(new Text(text));
+    }
+
+    private void ApplyHeadingStyle(Run run, int fontSize, bool bold)
+    {
+        var runProps = run.AppendChild(new RunProperties());
+        if (bold) runProps.AppendChild(new Bold());
+        runProps.AppendChild(new FontSize() { Val = fontSize.ToString() });
+        runProps.AppendChild(new Color() { Val = "0070C0" }); // ING Blue
+        runProps.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+    }
+
     private void AddRevisionHistoryTable(Body body, UseCase useCase)
+    {
+        // Add revision history section with bullet format
+        AddSectionHeading(body, "HISTORIA DE REVISIONES Y APROBACIONES", true);
+        
+        var today = DateTime.Now;
+        var formattedDate = $"{today.Day}/{today.Month}/{today.Year}";
+        
+        AddBulletPoint(body, "Fecha", formattedDate);
+        AddBulletPoint(body, "Acción", "Versión original");
+        AddBulletPoint(body, "Responsable", "Sistema");
+        AddBulletPoint(body, "Comentario", "Documento generado automáticamente");
+    }
+    
+    private void AddRevisionHistoryTableOld(Body body, UseCase useCase)
     {
         // Add the mandatory revision history table
         var table = new Table();

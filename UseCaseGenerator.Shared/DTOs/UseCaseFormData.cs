@@ -68,6 +68,8 @@ public class GenerateDocxRequest
 {
     public string Content { get; set; } = string.Empty;
     public string FileName { get; set; } = string.Empty;
+    public string? UseCaseName { get; set; }
+    public UseCaseFormData? FormData { get; set; }
 }
 
 public class ConvertToHtmlRequest

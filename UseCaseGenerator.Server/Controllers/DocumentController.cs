@@ -27,13 +27,26 @@ public class DocumentController : ControllerBase
     {
         try
         {
-            // Create a mock UseCase for document generation
+            // Create UseCase from request data
             var useCase = new UseCase
             {
                 Id = Guid.NewGuid().ToString(),
-                ClientName = "Cliente",
-                ProjectName = "Proyecto",
-                UseCaseName = request.FileName,
+                ClientName = request.FormData?.ClientName ?? "Cliente",
+                ProjectName = request.FormData?.ProjectName ?? "Proyecto",
+                UseCaseName = request.FormData?.UseCaseName ?? request.FileName,
+                UseCaseCode = request.FormData?.UseCaseCode,
+                FileName = request.FormData?.FileName ?? request.FileName,
+                Description = request.FormData?.Description,
+                UseCaseType = request.FormData?.UseCaseType,
+                BusinessRules = request.FormData?.BusinessRules,
+                SearchFilters = request.FormData?.SearchFilters,
+                ResultColumns = request.FormData?.ResultColumns,
+                EntityFields = request.FormData?.EntityFields,
+                GenerateTestCase = request.FormData?.GenerateTestCase ?? false,
+                TestCaseObjective = request.FormData?.TestCaseObjective,
+                TestCasePreconditions = request.FormData?.TestCasePreconditions,
+                TestSteps = request.FormData?.TestSteps,
+                FormData = request.FormData,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -97,11 +110,7 @@ public class DocumentController : ControllerBase
     }
 }
 
-public class GenerateDocxRequest
-{
-    public string Content { get; set; } = string.Empty;
-    public string FileName { get; set; } = string.Empty;
-}
+
 
 public class ConvertToHtmlRequest
 {
