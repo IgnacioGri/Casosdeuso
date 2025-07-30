@@ -1,0 +1,274 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Trash2, Sparkles, Brain, RefreshCw } from "lucide-react";
+import { TestStep } from "@/types/use-case";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HelpButton } from "@/components/help-button";
+import { AIAssistButton } from "@/components/ai-assist-button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+
+interface TestCaseStepProps {
+  testCaseObjective: string;
+  testCasePreconditions: string;
+  testSteps: TestStep[];
+  onUpdateObjective: (value: string) => void;
+  onUpdatePreconditions: (value: string) => void;
+  onAddTestStep: () => void;
+  onRemoveTestStep: (index: number) => void;
+  onUpdateTestStep: (index: number, field: keyof TestStep, value: string | number) => void;
+  clientName: string;
+  projectName: string;
+  useCaseName: string;
+  aiModel: string;
+  // Add the complete form data for intelligent test generation
+  formData?: any;
+  onReplaceAllTestData?: (data: { objective: string; preconditions: string; testSteps: TestStep[] }) => void;
+}
+
+export function TestCaseStep({
+  testCaseObjective,
+  testCasePreconditions,
+  testSteps,
+  onUpdateObjective,
+  onUpdatePreconditions,
+  onAddTestStep,
+  onRemoveTestStep,
+  onUpdateTestStep,
+  clientName,
+  projectName,
+  useCaseName,
+  aiModel,
+  formData,
+  onReplaceAllTestData
+}: TestCaseStepProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleIntelligentGeneration = async () => {
+    if (!formData || !onReplaceAllTestData) return;
+    
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-intelligent-tests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData,
+          aiModel
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        onReplaceAllTestData({
+          objective: result.objective,
+          preconditions: result.preconditions,
+          testSteps: result.testSteps
+        });
+      }
+    } catch (error) {
+      console.error('Error generating intelligent tests:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">Casos de Prueba</h3>
+          <HelpButton step={10} useCaseType="entity" />
+        </div>
+        
+        {formData && onReplaceAllTestData && (
+          <Card className="border-purple-200 bg-purple-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-purple-600" />
+                  <div>
+                    <p className="font-medium text-purple-900">Generación Inteligente</p>
+                    <p className="text-sm text-purple-700">Analiza todo el caso de uso y crea pruebas completas</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleIntelligentGeneration} 
+                  disabled={isGenerating}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Generar Casos Inteligentes
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Label htmlFor="testCaseObjective">Objetivo del Caso de Prueba</Label>
+            <AIAssistButton
+              fieldName="testCaseObjective"
+              fieldValue={testCaseObjective}
+              fieldType="testCaseObjective"
+              context={{ 
+                clientName,
+                projectName,
+                useCaseName,
+                useCaseType: 'entity'
+              }}
+              aiModel={aiModel}
+              onImprovement={onUpdateObjective}
+            />
+          </div>
+          <Textarea
+            id="testCaseObjective"
+            value={testCaseObjective}
+            onChange={(e) => onUpdateObjective(e.target.value)}
+            placeholder="Ej: Validar que el sistema permita realizar la búsqueda, alta, modificación y eliminación de usuarios con los controles de seguridad apropiados..."
+            className="min-h-20 resize-y"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Label htmlFor="testCasePreconditions">Precondiciones</Label>
+            <AIAssistButton
+              fieldName="testCasePreconditions"
+              fieldValue={testCasePreconditions}
+              fieldType="testCasePreconditions"
+              context={{
+                clientName,
+                projectName,
+                useCaseName,
+                useCaseType: 'entity'
+              }}
+              aiModel={aiModel}
+              onImprovement={onUpdatePreconditions}
+            />
+          </div>
+          <Textarea
+            id="testCasePreconditions"
+            value={testCasePreconditions}
+            onChange={(e) => onUpdatePreconditions(e.target.value)}
+            placeholder="Ej: Usuario autenticado con permisos de administrador, sistema disponible, base de datos operativa..."
+            className="min-h-20 resize-y"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <Label>Pasos de la Prueba</Label>
+            <Button onClick={onAddTestStep} variant="outline" size="sm">
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar Paso
+            </Button>
+          </div>
+
+          {testSteps.length === 0 && (
+            <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+              <p>No hay pasos de prueba definidos</p>
+              <p className="text-sm">Haga clic en "Agregar Paso" para comenzar</p>
+            </div>
+          )}
+
+          {testSteps.map((step, index) => (
+            <div key={index} className="border rounded-lg p-4 mb-4 bg-gray-50">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-medium">Paso #{step.number}</h4>
+                <Button
+                  onClick={() => onRemoveTestStep(index)}
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`action-${index}`}>Acción</Label>
+                  <Textarea
+                    id={`action-${index}`}
+                    value={step.action}
+                    onChange={(e) => onUpdateTestStep(index, 'action', e.target.value)}
+                    placeholder="Describir la acción a realizar..."
+                    className="mt-1 min-h-16 resize-y"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`inputData-${index}`}>Datos de Entrada</Label>
+                  <Textarea
+                    id={`inputData-${index}`}
+                    value={step.inputData}
+                    onChange={(e) => onUpdateTestStep(index, 'inputData', e.target.value)}
+                    placeholder="Datos o información necesaria..."
+                    className="mt-1 min-h-16 resize-y"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`expectedResult-${index}`}>Resultado Esperado</Label>
+                  <Textarea
+                    id={`expectedResult-${index}`}
+                    value={step.expectedResult}
+                    onChange={(e) => onUpdateTestStep(index, 'expectedResult', e.target.value)}
+                    placeholder="Resultado que se espera obtener..."
+                    className="mt-1 min-h-16 resize-y"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor={`observations-${index}`}>Observaciones</Label>
+                  <Textarea
+                    id={`observations-${index}`}
+                    value={step.observations}
+                    onChange={(e) => onUpdateTestStep(index, 'observations', e.target.value)}
+                    placeholder="Notas adicionales o consideraciones..."
+                    className="mt-1 min-h-16 resize-y"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <Label htmlFor={`status-${index}`}>Estado (P/F)</Label>
+                <Select
+                  value={step.status}
+                  onValueChange={(value) => onUpdateTestStep(index, 'status', value)}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Seleccionar estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Sin ejecutar</SelectItem>
+                    <SelectItem value="P">P - Pass (Aprobado)</SelectItem>
+                    <SelectItem value="F">F - Fail (Falló)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
