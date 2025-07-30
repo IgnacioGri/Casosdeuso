@@ -122,6 +122,7 @@
 - [ ] UseCaseGenerator.Client/ (carpeta completa CON wwwroot/css/)
 - [ ] UseCaseGenerator.Shared/ (carpeta completa)
 - [ ] INSTALACION_LOCAL.md (esta guía)
+- [ ] ARCHIVOS_A_COPIAR.md (lista de archivos)
 
 ### ✅ Total de archivos principales:
 - **30+ archivos .cs** (código C#)
