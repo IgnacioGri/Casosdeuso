@@ -93,7 +93,7 @@ Requerimientos Especiales: {formData.SpecialRequirements ?? "N/A"}
         var specificInstructions = useCaseType switch
         {
             UseCaseType.Entity => "Incluir pruebas de CRUD (crear, consultar, actualizar, eliminar), validaciones de campos, y búsquedas con filtros.",
-            UseCaseType.Api => "Incluir pruebas de endpoints, formatos de request/response, códigos de estado HTTP, y manejo de errores.",
+            UseCaseType.API => "Incluir pruebas de endpoints, formatos de request/response, códigos de estado HTTP, y manejo de errores.",
             UseCaseType.Service => "Incluir pruebas de ejecución programada, configuración, logs, y dependencias externas.",
             _ => "Incluir pruebas funcionales completas según el tipo de caso de uso."
         };
@@ -141,19 +141,28 @@ Responde ÚNICAMENTE con el JSON válido.
 
             var response = new IntelligentTestCaseResponse
             {
+                Success = true
+            };
+
+            // Create a TestCase object with the parsed data
+            var testCase = new TestCase
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Caso de prueba generado",
                 Objective = GetStringProperty(root, "objective", ""),
                 Preconditions = GetStringProperty(root, "preconditions", ""),
-                AnalysisNotes = GetStringProperty(root, "analysisNotes", ""),
-                Success = true
+                Description = GetStringProperty(root, "analysisNotes", "")
             };
 
             // Parse test steps
             if (root.TryGetProperty("testSteps", out var stepsElement) && stepsElement.ValueKind == JsonValueKind.Array)
             {
-                response.TestSteps = stepsElement.EnumerateArray()
+                testCase.Steps = stepsElement.EnumerateArray()
                     .Select(ParseTestStep)
                     .ToList();
             }
+
+            response.TestCases.Add(testCase);
 
             return response;
         }

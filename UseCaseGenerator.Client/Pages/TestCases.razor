@@ -36,14 +36,17 @@
                     </MudSelect>
                     
                     <MudCheckBox @bind-Checked="includeSecurityTests"
+                                 T="bool"
                                  Label="Incluir pruebas de seguridad"
                                  Class="mb-2" />
                     
                     <MudCheckBox @bind-Checked="includePerformanceTests"
+                                 T="bool"
                                  Label="Incluir pruebas de rendimiento"
                                  Class="mb-2" />
                     
                     <MudCheckBox @bind-Checked="includeErrorHandling"
+                                 T="bool"
                                  Label="Incluir manejo de errores"
                                  Class="mb-3" />
                     
@@ -56,11 +59,11 @@
                         @if (isGenerating)
                         {
                             <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                            <text class="ml-2">Generando...</text>
+                            <span class="ml-2">Generando...</span>
                         }
                         else
                         {
-                            <text>Generar Casos de Prueba</text>
+                            <span>Generar Casos de Prueba</span>
                         }
                     </MudButton>
                 </MudCard>

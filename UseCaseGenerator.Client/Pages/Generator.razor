@@ -1,197 +1,169 @@
+@page "/"
 @page "/generator"
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
 @using UseCaseGenerator.Client.Services
+@using UseCaseGenerator.Client.Components
+@using Microsoft.JSInterop
 @inject IUseCaseService UseCaseService
-@inject IFormStateService FormStateService
-@inject IAIAssistService AIAssistService
+@inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
-@inject NavigationManager Navigation
 
-<PageTitle>Generador de Casos de Uso</PageTitle>
+<PageTitle>Generador de Casos de Uso - ING</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Large">
-    <MudPaper Elevation="2" Class="pa-6">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-4">
+    <MudPaper Class="pa-6" Elevation="3">
+        
         <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
             Generador de Casos de Uso
         </MudText>
         
-        <MudStepper @ref="stepper" Color="Color.Primary" Variant="Variant.Filled" DisableSkipStepIcon="false">
-            
-            <!-- Step 1: AI Configuration -->
-            <MudStep Title="Configuración IA" Icon="@Icons.Material.Filled.Psychology">
-                <ChildContent>
-                    <AIConfigurationStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Step 2: Use Case Type -->
-            <MudStep Title="Tipo de Caso" Icon="@Icons.Material.Filled.Category">
-                <ChildContent>
-                    <UseCaseTypeStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Step 3: Basic Information -->
-            <MudStep Title="Información Básica" Icon="@Icons.Material.Filled.Info">
-                <ChildContent>
-                    <BasicInfoStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Step 4: Description -->
-            <MudStep Title="Descripción" Icon="@Icons.Material.Filled.Description">
-                <ChildContent>
-                    <DescriptionStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Step 5: Entity Fields (if Entity type) -->
-            @if (formData.UseCaseType == UseCaseType.Entity)
-            {
-                <MudStep Title="Campos de Entidad" Icon="@Icons.Material.Filled.TableRows">
-                    <ChildContent>
-                        <EntityFieldsStep @bind-FormData="formData" />
-                    </ChildContent>
-                </MudStep>
-                
-                <MudStep Title="Filtros y Columnas" Icon="@Icons.Material.Filled.FilterList">
-                    <ChildContent>
-                        <FiltersColumnsStep @bind-FormData="formData" />
-                    </ChildContent>
-                </MudStep>
-            }
-            
-            <!-- Step 6/7: Business Rules -->
-            <MudStep Title="Reglas de Negocio" Icon="@Icons.Material.Filled.Rule">
-                <ChildContent>
-                    <BusinessRulesStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Step 7/8: Wireframes and Flows -->
-            <MudStep Title="Wireframes y Flujos" Icon="@Icons.Material.Filled.AccountTree">
-                <ChildContent>
-                    <WireframesFlowsStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Step 8/9: Test Cases -->
-            <MudStep Title="Casos de Prueba" Icon="@Icons.Material.Filled.BugReport">
-                <ChildContent>
-                    <TestCasesStep @bind-FormData="formData" />
-                </ChildContent>
-            </MudStep>
-            
-            <!-- Final Step: Review and Generate -->
-            <MudStep Title="Revisar y Generar" Icon="@Icons.Material.Filled.CheckCircle">
-                <ChildContent>
-                    <ReviewGenerateStep @bind-FormData="formData" OnGenerate="GenerateUseCase" />
-                </ChildContent>
-            </MudStep>
-            
-        </MudStepper>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudPaper Class="pa-4" Elevation="2">
+                        <MudText Typo="Typo.h4" Class="mb-4">Paso @currentStep de @maxSteps</MudText>
+                        <MudProgressLinear Color="Color.Primary" Value="@progressValue" Size="Size.Large" Class="mb-4" />
+                        
+                        @if (currentStep == 1)
+                        {
+                            <AIConfigurationStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if (currentStep == 2)
+                        {
+                            <UseCaseTypeStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if (currentStep == 3)
+                        {
+                            <BasicInfoStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if (currentStep == 4)
+                        {
+                            <DescriptionStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if (currentStep == 5 && formData.UseCaseType == UseCaseType.Entity)
+                        {
+                            <EntityFieldsStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if (currentStep == 6 && formData.UseCaseType == UseCaseType.Entity)
+                        {
+                            <FiltersColumnsStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if ((currentStep == 5 && formData.UseCaseType != UseCaseType.Entity) || (currentStep == 7 && formData.UseCaseType == UseCaseType.Entity))
+                        {
+                            <BusinessRulesStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if ((currentStep == 6 && formData.UseCaseType != UseCaseType.Entity) || (currentStep == 8 && formData.UseCaseType == UseCaseType.Entity))
+                        {
+                            <WireframesFlowsStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if ((currentStep == 7 && formData.UseCaseType != UseCaseType.Entity) || (currentStep == 9 && formData.UseCaseType == UseCaseType.Entity))
+                        {
+                            <TestCasesStep FormData="formData" OnUpdate="UpdateFormData" />
+                        }
+                        else if ((currentStep == maxSteps && formData.UseCaseType != UseCaseType.Entity) || (currentStep == maxSteps && formData.UseCaseType == UseCaseType.Entity))
+                        {
+                            <ReviewGenerateStep FormData="formData" OnGenerate="GenerateUseCase" />
+                        }
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
         
         <!-- Navigation Buttons -->
         <MudCardActions Class="pa-4">
             <MudButton Variant="Variant.Outlined" 
-                       OnClick="PreviousStep" 
-                       Disabled="@(stepper?.GetActiveIndex() == 0)"
-                       StartIcon="@Icons.Material.Filled.NavigateBefore">
+                       StartIcon="@Icons.Material.Filled.ArrowBack"
+                       OnClick="PreviousStep"
+                       Disabled="@(currentStep <= 1)">
                 Anterior
             </MudButton>
             
             <MudSpacer />
             
-            @if (stepper?.GetActiveIndex() < stepper?.Steps.Count - 1)
+            @if (currentStep < maxSteps)
             {
                 <MudButton Variant="Variant.Filled" 
-                           Color="Color.Primary" 
-                           OnClick="NextStep"
-                           EndIcon="@Icons.Material.Filled.NavigateNext">
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.ArrowForward"
+                           OnClick="NextStep">
                     Siguiente
                 </MudButton>
             }
             else
             {
                 <MudButton Variant="Variant.Filled" 
-                           Color="Color.Success" 
+                           Color="Color.Success"
+                           StartIcon="@Icons.Material.Filled.Send"
                            OnClick="GenerateUseCase"
-                           StartIcon="@Icons.Material.Filled.AutoAwesome"
                            Disabled="isGenerating">
                     @if (isGenerating)
                     {
-                        <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
-                        <MudText Class="ml-2">Generando...</MudText>
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <span style="margin-left: 8px;">Generando...</span>
                     }
                     else
                     {
-                        <text>Generar Caso de Uso</text>
+                        <span>Generar Caso de Uso</span>
                     }
                 </MudButton>
             }
         </MudCardActions>
         
-        <!-- Auto-save indicator -->
-        <MudAlert Severity="Severity.Info" Class="mt-4" Dense="true">
-            <MudIcon Icon="@Icons.Material.Filled.CloudSync" Class="mr-2" />
-            Los cambios se guardan automáticamente
-        </MudAlert>
-        
     </MudPaper>
 </MudContainer>
 
 @code {
-    private MudStepper? stepper;
+    private int currentStep = 1;
+    private int maxSteps => formData.UseCaseType == UseCaseType.Entity ? 9 : 6;
+    private double progressValue => (double)currentStep / maxSteps * 100;
     private UseCaseFormData formData = new();
     private bool isGenerating = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // Load saved form state
-        var savedFormData = await FormStateService.LoadFormStateAsync();
-        if (savedFormData != null)
-        {
-            formData = savedFormData;
-        }
-        
-        // Auto-save on form changes
-        FormStateService.OnFormStateChanged += StateHasChanged;
+        // Load saved form data from local storage if available
+        await LoadFormData();
     }
 
-    private async Task NextStep()
+    private void UpdateFormData(UseCaseFormData updatedData)
     {
-        if (stepper != null)
-        {
-            stepper.NextStep();
-            await SaveFormState();
-        }
+        formData = updatedData;
+        // Save to local storage
+        _ = SaveFormData();
+        StateHasChanged();
     }
 
-    private async Task PreviousStep()
+    private void NextStep()
     {
-        if (stepper != null)
+        if (currentStep < maxSteps)
         {
-            stepper.PreviousStep();
-            await SaveFormState();
+            currentStep++;
+            StateHasChanged();
         }
     }
 
-    private async Task SaveFormState()
+    private void PreviousStep()
     {
-        await FormStateService.SaveFormStateAsync(formData);
+        if (currentStep > 1)
+        {
+            currentStep--;
+            StateHasChanged();
+        }
     }
 
     private async Task GenerateUseCase()
     {
         isGenerating = true;
+        StateHasChanged();
+
         try
         {
             var request = new GenerateUseCaseRequest
             {
                 FormData = formData,
-                Rules = GetINGRules()
+                Rules = "Generar caso de uso siguiendo estándares ING"
             };
 
             var response = await UseCaseService.GenerateUseCaseAsync(request);
@@ -199,62 +171,55 @@
             if (response.Success)
             {
                 Snackbar.Add("Caso de uso generado exitosamente", Severity.Success);
-                
-                // Clear form state and navigate to result
-                await FormStateService.ClearFormStateAsync();
-                Navigation.NavigateTo($"/result/{response.UseCase?.Id}");
+                // Navigate to result page or show result
             }
             else
             {
-                Snackbar.Add($"Error al generar: {response.Error}", Severity.Error);
+                Snackbar.Add($"Error al generar caso de uso: {response.Error}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
-            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            Snackbar.Add($"Error inesperado: {ex.Message}", Severity.Error);
         }
         finally
         {
             isGenerating = false;
+            StateHasChanged();
         }
     }
 
-    private string GetINGRules()
+    private async Task LoadFormData()
     {
-        return @"
-REGLAS ING PARA CASOS DE USO:
-
-1. FORMATO DE DOCUMENTO:
-   - Encabezado corporativo ING con logo y colores (#0070C0)
-   - Tipografía: Segoe UI Semilight
-   - Estructura jerárquica clara (h1, h2, h3)
-
-2. CONTENIDO OBLIGATORIO:
-   - Información general (cliente, proyecto, código)
-   - Descripción detallada del caso de uso
-   - Historia de revisiones y aprobaciones (tabla mandatory)
-   - Actores y precondiciones
-   - Flujo normal paso a paso
-   - Flujos alternativos (mínimo 2)
-   - Reglas de negocio numeradas
-   - Requerimientos especiales
-
-3. ESTÁNDARES TÉCNICOS:
-   - Código formato: 2 letras + 3 números + nombre
-   - Verbos en infinitivo para nombres de casos de uso
-   - Listas numeradas multi-nivel (1., a., i.)
-   - Campos de auditoría estándar para entidades
-
-4. CALIDAD DE CONTENIDO:
-   - Terminología bancaria profesional
-   - Descripción clara y sin ambigüedades
-   - Validaciones específicas por tipo de dato
-   - Manejo de errores y excepciones detallado
-";
+        try
+        {
+            var savedData = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "useCaseFormData");
+            if (!string.IsNullOrEmpty(savedData))
+            {
+                var data = System.Text.Json.JsonSerializer.Deserialize<UseCaseFormData>(savedData);
+                if (data != null)
+                {
+                    formData = data;
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Ignore errors loading from localStorage
+        }
     }
 
-    public void Dispose()
+    private async Task SaveFormData()
     {
-        FormStateService.OnFormStateChanged -= StateHasChanged;
+        try
+        {
+            var json = System.Text.Json.JsonSerializer.Serialize(formData);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "useCaseFormData", json);
+        }
+        catch (Exception)
+        {
+            // Ignore errors saving to localStorage
+        }
     }
 }

@@ -114,11 +114,11 @@
                         <Columns>
                             <PropertyColumn Property="x => x.Name" Title="Nombre" />
                             <PropertyColumn Property="x => x.Type" Title="Tipo" />
-                            <PropertyColumn Property="x => x.Length" Title="Longitud" />
-                            <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
+                            <PropertyColumn Property="x => x.MaxLength" Title="Longitud" />
+                            <PropertyColumn Property="x => x.IsMandatory" Title="Obligatorio">
                                 <CellTemplate>
-                                    <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
-                                             Color="@(context.Item.Mandatory ? Color.Success : Color.Default)" />
+                                    <MudIcon Icon="@(context.Item.IsMandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
+                                             Color="@(context.Item.IsMandatory ? Color.Success : Color.Default)" />
                                 </CellTemplate>
                             </PropertyColumn>
                         </Columns>
@@ -167,10 +167,10 @@
             @if (FormData.GenerateWireframes && FormData.WireframeDescriptions.Any())
             {
                 <MudExpansionPanel Text="@($"Wireframes ({FormData.WireframeDescriptions.Count})")">
-                    <MudList Dense="true">
+                    <MudList T="string" Dense="true">
                         @foreach (var wireframe in FormData.WireframeDescriptions)
                         {
-                            <MudListItem Icon="@Icons.Material.Filled.Web" Text="@wireframe" />
+                            <MudListItem T="string" Icon="@Icons.Material.Filled.Web" Text="@wireframe" />
                         }
                     </MudList>
                 </MudExpansionPanel>
@@ -179,10 +179,10 @@
             @if (FormData.AlternativeFlows.Any())
             {
                 <MudExpansionPanel Text="@($"Flujos Alternativos ({FormData.AlternativeFlows.Count})")">
-                    <MudList Dense="true">
+                    <MudList T="string" Dense="true">
                         @foreach (var flow in FormData.AlternativeFlows)
                         {
-                            <MudListItem Icon="@Icons.Material.Filled.AccountTree" Text="@flow" />
+                            <MudListItem T="string" Icon="@Icons.Material.Filled.AccountTree" Text="@flow" />
                         }
                     </MudList>
                 </MudExpansionPanel>

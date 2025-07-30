@@ -65,7 +65,8 @@ public enum UseCaseType
 {
     Entity,
     API,
-    Process
+    Process,
+    Service
 }
 
 public enum AIModel

@@ -3,6 +3,7 @@
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
 @using UseCaseGenerator.Client.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
@@ -100,11 +101,11 @@
                         @if (isAnalyzing)
                         {
                             <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                            <text class="ml-2">Analizando...</text>
+                            <span class="ml-2">Analizando...</span>
                         }
                         else
                         {
-                            <text>Analizar Minuta</text>
+                            <span>Analizar Minuta</span>
                         }
                     </MudButton>
                 </MudCard>

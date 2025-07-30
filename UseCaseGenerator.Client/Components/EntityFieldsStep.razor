@@ -37,11 +37,11 @@
                             @if (isGeneratingFields)
                             {
                                 <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                                <text class="ml-2">Generando campos...</text>
+                                <span class="ml-2">Generando campos...</span>
                             }
                             else
                             {
-                                <text>Generar Campos con IA</text>
+                                <span>Generar Campos con IA</span>
                             }
                         </MudButton>
                     </MudItem>
@@ -72,11 +72,11 @@
                 <Columns>
                     <PropertyColumn Property="x => x.Name" Title="Nombre" />
                     <PropertyColumn Property="x => x.Type" Title="Tipo" />
-                    <PropertyColumn Property="x => x.Length" Title="Longitud" />
-                    <PropertyColumn Property="x => x.Mandatory" Title="Obligatorio">
+                    <PropertyColumn Property="x => x.MaxLength" Title="Longitud" />
+                    <PropertyColumn Property="x => x.IsMandatory" Title="Obligatorio">
                         <CellTemplate>
-                            <MudIcon Icon="@(context.Item.Mandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
-                                     Color="@(context.Item.Mandatory ? Color.Success : Color.Default)" />
+                            <MudIcon Icon="@(context.Item.IsMandatory ? Icons.Material.Filled.CheckCircle : Icons.Material.Filled.RadioButtonUnchecked)" 
+                                     Color="@(context.Item.IsMandatory ? Color.Success : Color.Default)" />
                         </CellTemplate>
                     </PropertyColumn>
                     <TemplateColumn Title="Acciones">
@@ -129,18 +129,19 @@
                    Label="Tipo de Dato"
                    Variant="Variant.Outlined"
                    Class="mb-3">
-            @foreach (EntityFieldType type in Enum.GetValues<EntityFieldType>())
-            {
-                <MudSelectItem Value="type">@type</MudSelectItem>
-            }
+            <MudSelectItem Value="Text">Texto</MudSelectItem>
+            <MudSelectItem Value="Number">Número</MudSelectItem>
+            <MudSelectItem Value="Date">Fecha</MudSelectItem>
+            <MudSelectItem Value="Boolean">Booleano</MudSelectItem>
+            <MudSelectItem Value="Email">Email</MudSelectItem>
         </MudSelect>
         
-        <MudNumericField @bind-Value="editingField.Length"
+        <MudNumericField @bind-Value="editingField.MaxLength"
                          Label="Longitud (opcional)"
                          Variant="Variant.Outlined"
                          Class="mb-3" />
         
-        <MudCheckBox @bind-Checked="editingField.Mandatory"
+        <MudCheckBox @bind-Value="editingField.IsMandatory"
                      Label="Campo obligatorio" />
     </DialogContent>
     <DialogActions>
@@ -216,8 +217,8 @@
         { 
             Name = field.Name, 
             Type = field.Type, 
-            Length = field.Length, 
-            Mandatory = field.Mandatory 
+            MaxLength = field.MaxLength, 
+            IsMandatory = field.IsMandatory 
         };
         isEditingExisting = true;
         showEditDialog = true;
@@ -240,8 +241,8 @@
             if (existingField != null)
             {
                 existingField.Type = editingField.Type;
-                existingField.Length = editingField.Length;
-                existingField.Mandatory = editingField.Mandatory;
+                existingField.MaxLength = editingField.MaxLength;
+                existingField.IsMandatory = editingField.IsMandatory;
             }
         }
         else
@@ -250,8 +251,8 @@
             {
                 Name = editingField.Name,
                 Type = editingField.Type,
-                Length = editingField.Length,
-                Mandatory = editingField.Mandatory
+                MaxLength = editingField.MaxLength,
+                IsMandatory = editingField.IsMandatory
             });
         }
 
@@ -268,10 +269,10 @@
     {
         var standardFields = new[]
         {
-            new EntityField { Name = "fechaAlta", Type = EntityFieldType.Date, Mandatory = true },
-            new EntityField { Name = "usuarioAlta", Type = EntityFieldType.Text, Length = 50, Mandatory = true },
-            new EntityField { Name = "fechaModificacion", Type = EntityFieldType.Date, Mandatory = false },
-            new EntityField { Name = "usuarioModificacion", Type = EntityFieldType.Text, Length = 50, Mandatory = false }
+            new EntityField { Name = "fechaAlta", Type = "Date", IsMandatory = true },
+            new EntityField { Name = "usuarioAlta", Type = "Text", MaxLength = 50, IsMandatory = true },
+            new EntityField { Name = "fechaModificacion", Type = "Date", IsMandatory = false },
+            new EntityField { Name = "usuarioModificacion", Type = "Text", MaxLength = 50, IsMandatory = false }
         };
 
         foreach (var field in standardFields)

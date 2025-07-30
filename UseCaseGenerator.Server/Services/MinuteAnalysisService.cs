@@ -21,13 +21,13 @@ public class MinuteAnalysisService : IMinuteAnalysisService
         try
         {
             var prompt = BuildAnalysisPrompt();
-            var analysisResult = await _aiService.ProcessFieldWithAIAsync(prompt, request.MinuteContent, request.AiModel);
+            var analysisResult = await _aiService.ProcessFieldWithAIAsync(prompt, request.Content, request.AiModel);
             
             var formData = ParseAnalysisResult(analysisResult);
             
             return new MinuteAnalysisResponse
             {
-                FormData = formData,
+                ExtractedData = formData,
                 Success = true
             };
         }
@@ -153,20 +153,17 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
         var field = new EntityField
         {
             Name = GetStringProperty(fieldElement, "name", ""),
-            Mandatory = GetBoolProperty(fieldElement, "mandatory", false)
+            IsMandatory = GetBoolProperty(fieldElement, "mandatory", false)
         };
 
         // Parse field type
         var typeString = GetStringProperty(fieldElement, "type", "text");
-        if (Enum.TryParse<EntityFieldType>(typeString, true, out var fieldType))
-        {
-            field.Type = fieldType;
-        }
+        field.Type = typeString;
 
         // Parse length
         if (fieldElement.TryGetProperty("length", out var lengthElement) && lengthElement.ValueKind == JsonValueKind.Number)
         {
-            field.Length = lengthElement.GetInt32();
+            field.MaxLength = lengthElement.GetInt32();
         }
 
         return field;

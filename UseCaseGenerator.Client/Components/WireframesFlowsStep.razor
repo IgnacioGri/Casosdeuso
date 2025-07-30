@@ -16,6 +16,7 @@
         <MudText Typo="Typo.h6" Class="mb-3">Wireframes</MudText>
         
         <MudCheckBox @bind-Checked="FormData.GenerateWireframes"
+                     T="bool"
                      Label="Generar wireframes automáticamente"
                      Class="mb-3" />
         
@@ -38,10 +39,10 @@
             
             @if (FormData.WireframeDescriptions.Any())
             {
-                <MudList Dense="true">
+                <MudList T="string" Dense="true">
                     @foreach (var wireframe in FormData.WireframeDescriptions.ToList())
                     {
-                        <MudListItem>
+                        <MudListItem T="string">
                             <div class="d-flex justify-space-between align-center">
                                 <MudText>@wireframe</MudText>
                                 <MudIconButton Icon="@Icons.Material.Filled.Delete" 
@@ -96,10 +97,10 @@
         
         @if (FormData.AlternativeFlows.Any())
         {
-            <MudList Dense="true">
+            <MudList T="string" Dense="true">
                 @foreach (var flow in FormData.AlternativeFlows.ToList())
                 {
-                    <MudListItem>
+                    <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
                             <MudText>@flow</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Delete" 

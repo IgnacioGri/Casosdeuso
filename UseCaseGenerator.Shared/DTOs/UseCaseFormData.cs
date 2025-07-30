@@ -107,3 +107,32 @@ public class MinuteAnalysisResponse
     public UseCaseFormData? ExtractedData { get; set; }
 }
 
+public class GenerateUseCaseRequest
+{
+    public UseCaseFormData FormData { get; set; } = new();
+    public string Rules { get; set; } = string.Empty;
+}
+
+public class GenerateUseCaseResponse
+{
+    public bool Success { get; set; }
+    public string? Error { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public UseCase? UseCase { get; set; }
+}
+
+public class AIAssistRequest
+{
+    public string FieldName { get; set; } = string.Empty;
+    public string CurrentValue { get; set; } = string.Empty;
+    public string Context { get; set; } = string.Empty;
+    public AIModel AiModel { get; set; } = AIModel.Demo;
+}
+
+public class AIAssistResponse
+{
+    public bool Success { get; set; }
+    public string? Error { get; set; }
+    public string ImprovedValue { get; set; } = string.Empty;
+}
+
