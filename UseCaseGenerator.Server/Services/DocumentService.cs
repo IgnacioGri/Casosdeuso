@@ -41,18 +41,6 @@ public class DocumentService : IDocumentService
                 AddFooterWithPageNumbers(mainPart, useCase);
                 
                 var body = mainPart.Document.AppendChild(new Body());
-                
-                // Add section properties to link header and footer
-                var sectionProps = new SectionProperties();
-                var headerReference = new HeaderReference() { Type = HeaderFooterValues.Default, Id = "headerId1" };
-                var footerReference = new FooterReference() { Type = HeaderFooterValues.Default, Id = "footerId1" };
-                sectionProps.Append(headerReference);
-                sectionProps.Append(footerReference);
-                
-                // Add page margins
-                sectionProps.Append(new PageMargin() { Top = 1440, Right = 1440, Bottom = 1440, Left = 1440 });
-                
-                body.Append(sectionProps);
 
                 // Title
                 var titlePara = body.AppendChild(new Paragraph());
@@ -78,6 +66,19 @@ public class DocumentService : IDocumentService
 
                 // Add revision history table
                 AddRevisionHistoryTable(body, useCase);
+                
+                // Add section properties at the END to link header and footer
+                var sectionProps = new SectionProperties();
+                var headerReference = new HeaderReference() { Type = HeaderFooterValues.Default, Id = "headerId1" };
+                var footerReference = new FooterReference() { Type = HeaderFooterValues.Default, Id = "footerId1" };
+                sectionProps.Append(headerReference);
+                sectionProps.Append(footerReference);
+                
+                // Add page margins
+                sectionProps.Append(new PageMargin() { Top = 1440, Right = 1440, Bottom = 1440, Left = 1440 });
+                
+                // IMPORTANT: Section properties must be the last element in the body
+                body.Append(sectionProps);
 
                 mainPart.Document.Save();
             }
