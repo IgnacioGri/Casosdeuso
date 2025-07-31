@@ -289,7 +289,7 @@ export class DocumentService {
         sections.push(new Paragraph({
           spacing: { after: 120 },
           children: [new TextRun({
-            text: formData.testCaseObjective,
+            text: String(formData.testCaseObjective || ''),
             font: "Segoe UI Semilight"
           })]
         }));
@@ -309,17 +309,28 @@ export class DocumentService {
           })]
         }));
         
-        const preconditions = formData.testCasePreconditions.split('\n').filter((p: string) => p.trim());
-        preconditions.forEach((condition: string) => {
+        const preconditionsText = String(formData.testCasePreconditions || '');
+        const preconditions = preconditionsText.split('\n').filter((p: string) => p.trim());
+        if (preconditions.length > 0) {
+          preconditions.forEach((condition: string) => {
+            sections.push(new Paragraph({
+              spacing: { after: 80 },
+              indent: { left: 720 },
+              children: [
+                new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+                new TextRun({ text: condition.trim(), font: "Segoe UI Semilight" })
+              ]
+            }));
+          });
+        } else {
           sections.push(new Paragraph({
             spacing: { after: 80 },
-            indent: { left: 720 },
-            children: [
-              new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
-              new TextRun({ text: condition.trim(), font: "Segoe UI Semilight" })
-            ]
+            children: [new TextRun({
+              text: preconditionsText,
+              font: "Segoe UI Semilight"
+            })]
           }));
-        });
+        }
       }
       
       // Test Steps
