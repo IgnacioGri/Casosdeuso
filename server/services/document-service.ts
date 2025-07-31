@@ -120,7 +120,7 @@ export class DocumentService {
                   new ImageRun({
                     type: "png",
                     data: fs.readFileSync(headerImagePath),
-                    transformation: { width: 580, height: 58 }  // Mantener proporción original
+                    transformation: { width: 600, height: 100 }  // Ajustado para nueva imagen ING
                   })
                 ]
               }) : new Paragraph({
@@ -601,12 +601,17 @@ export class DocumentService {
     
     try {
       // Try to use the new uploaded header image first
-      const newImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
-      const fallbackImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_caso_de_uso.png');
+      const newImagePath = path.join(process.cwd(), 'attached_assets', 'image_1754002431086.png');
+      const fallbackImagePath1 = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+      const fallbackImagePath2 = path.join(process.cwd(), 'attached_assets', 'Encabezado_caso_de_uso.png');
       
       let imagePath = newImagePath;
-      if (!fs.existsSync(newImagePath) && fs.existsSync(fallbackImagePath)) {
-        imagePath = fallbackImagePath;
+      if (!fs.existsSync(newImagePath)) {
+        if (fs.existsSync(fallbackImagePath1)) {
+          imagePath = fallbackImagePath1;
+        } else if (fs.existsSync(fallbackImagePath2)) {
+          imagePath = fallbackImagePath2;
+        }
       }
       
       if (fs.existsSync(imagePath)) {
@@ -617,8 +622,8 @@ export class DocumentService {
             type: "png",
             data: imageBuffer,
             transformation: {
-              width: 600,  // Adjusted width for header  
-              height: 60   // Corrected height to maintain original aspect ratio
+              width: 600,  // Ancho estándar
+              height: 100  // Alto proporcional para nueva imagen ING
             }
           });
         } catch (imageError) {
@@ -673,7 +678,6 @@ export class DocumentService {
             default: new Footer({
               children: [
                 new Paragraph({
-                  alignment: AlignmentType.CENTER,
                   children: [
                     new TextRun({
                       text: "Página ",
@@ -692,6 +696,11 @@ export class DocumentService {
                     }),
                     new TextRun({
                       children: [PageNumber.TOTAL_PAGES],
+                      font: "Segoe UI",
+                      size: 20
+                    }),
+                    new TextRun({
+                      text: "                                                " + (useCaseName || 'Caso de Uso'),
                       font: "Segoe UI",
                       size: 20
                     })
@@ -842,7 +851,7 @@ export class DocumentService {
   private static createHeading(htmlContent: string, level: number): Paragraph {
     const text = this.extractTextContent(htmlContent);
     
-    let headingLevel: typeof HeadingLevel.HEADING_1;
+    let headingLevel: any;
     let fontSize: number;
     let spacingBefore: number;
     let spacingAfter: number;

@@ -38,7 +38,7 @@ public class DocumentService : IDocumentService
                 AddHeaderWithImage(mainPart);
                 
                 // Add footer with page numbering
-                AddFooterWithPageNumbers(mainPart);
+                AddFooterWithPageNumbers(mainPart, useCase);
                 
                 var body = mainPart.Document.AppendChild(new Body());
                 
@@ -505,7 +505,17 @@ public class DocumentService : IDocumentService
         paragraph.Append(paragraphProperties);
         
         // Try to add image, fallback to text if not available
-        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_caso_de_uso.png");
+        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "image_1754002431086.png");
+        var fallbackPath1 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_1753600608270.png");
+        var fallbackPath2 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_caso_de_uso.png");
+        
+        if (!File.Exists(imagePath))
+        {
+            if (File.Exists(fallbackPath1))
+                imagePath = fallbackPath1;
+            else if (File.Exists(fallbackPath2))
+                imagePath = fallbackPath2;
+        }
         
         if (File.Exists(imagePath))
         {
@@ -518,7 +528,7 @@ public class DocumentService : IDocumentService
                 }
                 
                 var run = new Run();
-                var drawing = CreateImageDrawing(headerPart.GetIdOfPart(imagePart), 6000000L, 600000L); // Mantener proporción original
+                var drawing = CreateImageDrawing(headerPart.GetIdOfPart(imagePart), 6000000L, 1000000L); // Proporción 6:1 para nueva imagen ING
                 run.Append(drawing);
                 paragraph.Append(run);
             }
@@ -577,16 +587,21 @@ public class DocumentService : IDocumentService
             ) { DistanceFromTop = 0U, DistanceFromBottom = 0U, DistanceFromLeft = 0U, DistanceFromRight = 0U });
     }
     
-    private void AddFooterWithPageNumbers(MainDocumentPart mainPart)
+    private void AddFooterWithPageNumbers(MainDocumentPart mainPart, UseCase useCase)
     {
         var footerPart = mainPart.AddNewPart<FooterPart>("footerId1");
         
         var footer = new Footer();
         var paragraph = new Paragraph();
         var paragraphProperties = new ParagraphProperties();
-        paragraphProperties.Append(new Justification() { Val = JustificationValues.Center });
+        
+        // Usar tabulación para alinear a derecha el nombre del caso de uso
+        var tabs = new Tabs();
+        tabs.Append(new TabStop() { Val = TabStopValues.Right, Position = 9360 }); // Margen derecho
+        paragraphProperties.Append(tabs);
         paragraph.Append(paragraphProperties);
         
+        // Número de página a la izquierda
         var run1 = new Run();
         run1.Append(new Text("Página "));
         paragraph.Append(run1);
@@ -618,6 +633,15 @@ public class DocumentService : IDocumentService
         var run8 = new Run();
         run8.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
         paragraph.Append(run8);
+        
+        // Tabulación y nombre del caso de uso a la derecha
+        var run9 = new Run();
+        run9.Append(new TabChar());
+        paragraph.Append(run9);
+        
+        var run10 = new Run();
+        run10.Append(new Text(useCase?.UseCaseName ?? "Caso de Uso"));
+        paragraph.Append(run10);
         
         footer.Append(paragraph);
         footerPart.Footer = footer;
