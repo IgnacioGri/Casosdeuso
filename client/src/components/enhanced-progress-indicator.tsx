@@ -7,36 +7,49 @@ interface EnhancedProgressIndicatorProps {
 }
 
 const getStepInfo = (stepNumber: number, useCaseType: string) => {
-  if (useCaseType === 'entity') {
-    const entitySteps = [
-      { name: "Modelo IA", icon: Bot },
-      { name: "Tipo", icon: FileSearch },
-      { name: "Info Básica", icon: FileText },
-      { name: "Descripción", icon: Info },
-      { name: "Filtros", icon: Search },
-      { name: "Columnas", icon: Table },
-      { name: "Campos", icon: Database },
-      { name: "Reglas", icon: Shield },
-      { name: "Pruebas", icon: TestTube },
-      { name: "Revisión", icon: Zap }
-    ];
-    return entitySteps[stepNumber - 1] || { name: `Paso ${stepNumber}`, icon: FileText };
-  } else if (useCaseType === 'api' || useCaseType === 'service') {
-    const apiServiceSteps = [
-      { name: "Modelo IA", icon: Bot },
-      { name: "Tipo", icon: FileSearch },
-      { name: "Info Básica", icon: FileText },
-      { name: "Descripción", icon: Info },
-      { name: "Detalles", icon: Globe },
-      { name: "Reglas", icon: Shield },
-      { name: "Pruebas", icon: TestTube },
-      { name: "Revisión", icon: Zap }
-    ];
-    return apiServiceSteps[stepNumber - 1] || { name: `Paso ${stepNumber}`, icon: FileText };
-  } else {
-    // Default steps while type is not selected
-    return { name: `Paso ${stepNumber}`, icon: FileText };
-  }
+  // Step names for display in the main area
+  const stepNames = [
+    "Tipo de Caso de Uso",
+    "Análisis Inteligente de Minutas", 
+    "Información Básica",
+    "Detalles del Caso de Uso",
+    "Filtros de Búsqueda",
+    "Columnas de Resultado",
+    "Datos de la Entidad",
+    "Opciones Adicionales",
+    "Decisión sobre Casos de Prueba",
+    "Casos de Prueba",
+    "Revisión Final y Generación"
+  ];
+
+  // Icons based on step number and type
+  const getIcon = () => {
+    if (stepNumber === 1) return FileSearch;
+    if (stepNumber === 2) return Bot;
+    if (stepNumber === 3) return FileText;
+    if (stepNumber === 4) return Info;
+    
+    if (useCaseType === 'entity') {
+      if (stepNumber === 5) return Search;
+      if (stepNumber === 6) return Table;
+      if (stepNumber === 7) return Database;
+      if (stepNumber === 8) return Shield;
+      if (stepNumber === 9) return TestTube;
+      if (stepNumber === 10) return TestTube;
+      if (stepNumber === 11) return Zap;
+    } else if (useCaseType === 'api' || useCaseType === 'service') {
+      if (stepNumber === 5) return Globe;
+      if (stepNumber === 6) return Shield;
+      if (stepNumber === 7) return TestTube;
+      if (stepNumber === 8) return Zap;
+    }
+    return FileText;
+  };
+
+  return {
+    name: stepNames[stepNumber - 1] || `Paso ${stepNumber}`,
+    icon: getIcon()
+  };
 };
 
 export default function EnhancedProgressIndicator({ currentStep, totalSteps, useCaseType }: EnhancedProgressIndicatorProps) {
@@ -66,12 +79,12 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
                 >
                   {isCompleted ? <Check className="w-4 h-4" /> : isCurrent ? <Clock className="w-4 h-4" /> : <StepIcon className="w-3 h-3" />}
                 </div>
-                <div className={`text-[10px] font-medium text-center max-w-16 leading-tight ${
+                <div className={`text-[10px] font-medium text-center ${
                   isCurrent ? 'text-blue-600 dark:text-blue-400' : 
                   isCompleted ? 'text-green-600 dark:text-green-400' : 
                   'text-gray-500 dark:text-gray-400'
                 }`}>
-                  {stepInfo.name}
+                  {stepNumber}
                 </div>
               </div>
             );
