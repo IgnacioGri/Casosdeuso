@@ -6,63 +6,68 @@ using System.Text.RegularExpressions;
 
 namespace UseCaseGenerator.Server.Services;
 
-public class AIService : IAIService
+public class AIService : IAIService, IDisposable
 {
     private readonly ILogger<AIService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly IHttpClientFactory _httpClientFactory;
     private OpenAIClient? _openAIClient;
-    private HttpClient? _anthropicClient;
-    private HttpClient? _grokClient;
-    private HttpClient? _geminiClient;
-    private HttpClient? _copilotClient;
+    private bool _disposed;
 
-    public AIService(ILogger<AIService> logger, IConfiguration configuration)
+    public AIService(ILogger<AIService> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _configuration = configuration;
-        InitializeClients();
+        _httpClientFactory = httpClientFactory;
+        InitializeOpenAIClient();
     }
 
-    private void InitializeClients()
+    private void InitializeOpenAIClient()
     {
         var openAIKey = _configuration["OpenAI:ApiKey"];
         if (!string.IsNullOrEmpty(openAIKey))
         {
             _openAIClient = new OpenAIClient(openAIKey);
         }
-
-        var anthropicKey = _configuration["Anthropic:ApiKey"];
-        if (!string.IsNullOrEmpty(anthropicKey))
+    }
+    
+    private HttpClient GetHttpClient(string clientName)
+    {
+        var client = _httpClientFactory.CreateClient(clientName);
+        
+        // Add API keys based on client type
+        switch (clientName)
         {
-            _anthropicClient = new HttpClient();
-            _anthropicClient.DefaultRequestHeaders.Add("x-api-key", anthropicKey);
-            _anthropicClient.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+            case "Anthropic":
+                var anthropicKey = _configuration["Anthropic:ApiKey"];
+                if (!string.IsNullOrEmpty(anthropicKey))
+                {
+                    client.DefaultRequestHeaders.Add("x-api-key", anthropicKey);
+                }
+                break;
+                
+            case "Grok":
+                var grokKey = _configuration["Grok:ApiKey"];
+                if (!string.IsNullOrEmpty(grokKey))
+                {
+                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {grokKey}");
+                }
+                break;
+                
+            case "Gemini":
+                // Gemini key is usually passed in URL params
+                break;
+                
+            case "Copilot":
+                var copilotKey = _configuration["Copilot:ApiKey"];
+                if (!string.IsNullOrEmpty(copilotKey))
+                {
+                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {copilotKey}");
+                }
+                break;
         }
-
-        var grokKey = _configuration["Grok:ApiKey"];
-        if (!string.IsNullOrEmpty(grokKey))
-        {
-            _grokClient = new HttpClient();
-            _grokClient.BaseAddress = new Uri("https://api.x.ai/v1/");
-            _grokClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {grokKey}");
-        }
-
-        var geminiKey = _configuration["Gemini:ApiKey"];
-        if (!string.IsNullOrEmpty(geminiKey))
-        {
-            _geminiClient = new HttpClient();
-            _geminiClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
-        }
-
-        var copilotKey = _configuration["Copilot:ApiKey"];
-        if (!string.IsNullOrEmpty(copilotKey))
-        {
-            _copilotClient = new HttpClient();
-            _copilotClient.BaseAddress = new Uri("https://api.copilot.microsoft.com/v1/");
-            _copilotClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {copilotKey}");
-            _copilotClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            _copilotClient.DefaultRequestHeaders.Add("User-Agent", "UseCaseGenerator");
-        }
+        
+        return client;
     }
 
     public async Task<GenerateUseCaseResponse> GenerateUseCaseAsync(GenerateUseCaseRequest request)
@@ -395,14 +400,50 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
     private async Task<string> GenerateWithClaude(string prompt)
     {
-        // Implementation for Claude API
-        throw new NotImplementedException("Claude integration pending");
+        var client = GetHttpClient("Anthropic");
+        
+        var requestBody = new
+        {
+            model = "claude-3-sonnet-20240229",
+            messages = new[]
+            {
+                new { role = "user", content = prompt }
+            },
+            max_tokens = 4000
+        };
+        
+        using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("v1/messages", httpContent);
+        response.EnsureSuccessStatusCode();
+        
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+        
+        return responseObj.GetProperty("content")[0].GetProperty("text").GetString() ?? "";
     }
 
     private async Task<string> GenerateWithGrok(string prompt)
     {
-        // Implementation for Grok API
-        throw new NotImplementedException("Grok integration pending");
+        var client = GetHttpClient("Grok");
+        
+        var requestBody = new
+        {
+            model = "grok-beta",
+            messages = new[]
+            {
+                new { role = "user", content = prompt }
+            },
+            max_tokens = 4000
+        };
+        
+        using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("chat/completions", httpContent);
+        response.EnsureSuccessStatusCode();
+        
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+        
+        return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
     private async Task<string> GenerateWithGemini(string prompt)
@@ -413,49 +454,26 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
     private async Task<string> GenerateWithCopilot(string prompt)
     {
-        if (_copilotClient == null)
+        var client = GetHttpClient("Copilot");
+        
+        var requestBody = new
         {
-            throw new InvalidOperationException("Microsoft Copilot API key not configured");
-        }
-
-        try
-        {
-            var requestBody = new
+            model = "copilot-latest",
+            messages = new[]
             {
-                messages = new[]
-                {
-                    new { role = "system", content = "Eres un experto en análisis de negocio que genera casos de uso siguiendo los estándares corporativos de ING." },
-                    new { role = "user", content = prompt }
-                },
-                model = "gpt-4", // Copilot uses GPT models
-                max_tokens = 4000,
-                temperature = 0.3
-            };
-
-            var jsonContent = JsonSerializer.Serialize(requestBody);
-            var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-
-            var response = await _copilotClient.PostAsync("chat/completions", httpContent);
-            
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError($"Copilot API error: {response.StatusCode}");
-                return GenerateDemoContent(new UseCaseFormData()).Content;
-            }
-
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
-            
-            return responseObj.GetProperty("choices")[0]
-                .GetProperty("message")
-                .GetProperty("content")
-                .GetString() ?? "";
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error calling Microsoft Copilot API");
-            return GenerateDemoContent(new UseCaseFormData()).Content;
-        }
+                new { role = "user", content = prompt }
+            },
+            max_tokens = 4000
+        };
+        
+        using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("chat/completions", httpContent);
+        response.EnsureSuccessStatusCode();
+        
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+        
+        return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
     private async Task<string> ProcessWithClaude(string systemPrompt, string fieldValue)
@@ -475,15 +493,10 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
     private async Task<string> ProcessWithCopilot(string systemPrompt, string fieldValue)
     {
-        if (_copilotClient == null)
-        {
-            throw new InvalidOperationException("Microsoft Copilot API key not configured");
-        }
-
+        var client = GetHttpClient("Copilot");
+        
         try
         {
-            var prompt = $"{systemPrompt}\n\nCampo actual: {fieldValue}\n\nMejora el campo siguiendo las mejores prácticas.";
-            
             var requestBody = new
             {
                 messages = new[]
@@ -491,15 +504,13 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
                     new { role = "system", content = systemPrompt },
                     new { role = "user", content = $"Mejora este campo: {fieldValue}" }
                 },
-                model = "gpt-4",
+                model = "copilot-latest",
                 max_tokens = 500,
                 temperature = 0.2
             };
 
-            var jsonContent = JsonSerializer.Serialize(requestBody);
-            var httpContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
-
-            var response = await _copilotClient.PostAsync("chat/completions", httpContent);
+            using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("chat/completions", httpContent);
             
             if (!response.IsSuccessStatusCode)
             {
@@ -585,5 +596,24 @@ REGLAS: {rules}";
             AIModel.Gemini => $"{contextPrompt}\n\n{baseTask}\n\nINSTRUCCIONES JSON:\n{{\n  \"accion\": \"mejorar_campo\",\n  \"formato\": \"solo_contenido\"\n}}\n\nCONTENIDO:",
             _ => $"{contextPrompt}\n\n{baseTask}\n\nMejora el contenido siguiendo las reglas. Responde solo con el contenido mejorado."
         };
+    }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // OpenAIClient doesn't implement IDisposable, so nothing to dispose
+                // HttpClient instances are managed by IHttpClientFactory
+            }
+            _disposed = true;
+        }
     }
 }

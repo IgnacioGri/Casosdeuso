@@ -17,44 +17,8 @@ public class DocumentService : IDocumentService
 
     public byte[] GenerateDocx(string htmlContent, UseCase useCase)
     {
-        // If we have form data, generate directly from it
-        if (useCase.FormData != null)
-        {
-            return GenerateDocxFromFormData(useCase);
-        }
-        
-        // Otherwise fall back to HTML conversion
-        try
-        {
-            using var ms = new MemoryStream();
-            using (var document = WordprocessingDocument.Create(ms, WordprocessingDocumentType.Document))
-            {
-                var mainPart = document.AddMainDocumentPart();
-                mainPart.Document = new Document();
-                var body = mainPart.Document.AppendChild(new Body());
-
-                // Add header with ING branding
-                AddHeader(body, useCase);
-
-                // Convert HTML to Word paragraphs
-                ConvertHtmlToWord(htmlContent, body);
-
-                // Add test cases if they exist (before revision history)
-                AddTestCasesToDocument(body, useCase);
-
-                // Add revision history table
-                AddRevisionHistoryTable(body, useCase);
-
-                mainPart.Document.Save();
-            }
-
-            return ms.ToArray();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error generating DOCX document");
-            throw;
-        }
+        // Generate directly from UseCase properties
+        return GenerateDocxFromFormData(useCase);
     }
     
     private byte[] GenerateDocxFromFormData(UseCase useCase)
@@ -84,7 +48,7 @@ public class DocumentService : IDocumentService
                 // Use Case Description Section
                 AddSectionHeading(body, "Descripción del Caso de Uso");
                 AddBulletPoint(body, "Nombre", useCase.UseCaseName);
-                AddBulletPoint(body, "Tipo", useCase.UseCaseType == "entity" ? "Gestión de Entidades" : useCase.UseCaseType);
+                AddBulletPoint(body, "Tipo", useCase.UseCaseType == UseCaseType.Entity ? "Gestión de Entidades" : useCase.UseCaseType.ToString());
                 AddBulletPoint(body, "Descripción", useCase.Description);
 
                 // Add remaining sections based on form data
@@ -147,8 +111,7 @@ public class DocumentService : IDocumentService
 
     private void AddFormDataSections(Body body, UseCase useCase)
     {
-        var formData = useCase.FormData;
-        if (formData == null) return;
+        // Use properties directly from UseCase model
 
         // Business Rules
         if (!string.IsNullOrEmpty(useCase.BusinessRules))
@@ -188,7 +151,7 @@ public class DocumentService : IDocumentService
             foreach (var field in useCase.EntityFields)
             {
                 var fieldText = $"{field.Name} ({field.Type})";
-                if (!string.IsNullOrEmpty(field.Length)) fieldText += $" - Longitud: {field.Length}";
+                if (field.Length.HasValue) fieldText += $" - Longitud: {field.Length}";
                 if (field.Mandatory) fieldText += " - Obligatorio";
                 if (!string.IsNullOrEmpty(field.Description)) fieldText += $" - {field.Description}";
                 AddBulletItem(body, fieldText);
@@ -223,7 +186,7 @@ public class DocumentService : IDocumentService
             for (int i = 0; i < useCase.TestSteps.Count; i++)
             {
                 var step = useCase.TestSteps[i];
-                AddNumberedItem(body, $"{step.Number ?? (i + 1)}. {step.Action}", true);
+                AddNumberedItem(body, $"{step.Number}. {step.Action}", true);
                 
                 if (!string.IsNullOrEmpty(step.InputData))
                     AddIndentedBullet(body, "Datos de Entrada", step.InputData);

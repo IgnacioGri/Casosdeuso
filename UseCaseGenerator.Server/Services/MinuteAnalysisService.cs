@@ -153,7 +153,7 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
         var field = new EntityField
         {
             Name = GetStringProperty(fieldElement, "name", ""),
-            IsMandatory = GetBoolProperty(fieldElement, "mandatory", false)
+            Mandatory = GetBoolProperty(fieldElement, "mandatory", false)
         };
 
         // Parse field type
@@ -163,7 +163,7 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
         // Parse length
         if (fieldElement.TryGetProperty("length", out var lengthElement) && lengthElement.ValueKind == JsonValueKind.Number)
         {
-            field.MaxLength = lengthElement.GetInt32();
+            field.Length = lengthElement.GetInt32();
         }
 
         return field;

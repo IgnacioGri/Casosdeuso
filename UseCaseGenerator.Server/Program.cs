@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using UseCaseGenerator.Server.Data;
 using UseCaseGenerator.Server.Services;
+using UseCaseGenerator.Server.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,34 @@ if (useInMemoryDb)
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseInMemoryDatabase("UseCaseGeneratorDb"));
 }
+
+// HttpClient Factory configuration with timeouts
+builder.Services.AddHttpClient("Anthropic", client =>
+{
+    client.BaseAddress = new Uri("https://api.anthropic.com/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+});
+
+builder.Services.AddHttpClient("Grok", client =>
+{
+    client.BaseAddress = new Uri("https://api.x.ai/v1/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.AddHttpClient("Gemini", client =>
+{
+    client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+builder.Services.AddHttpClient("Copilot", client =>
+{
+    client.BaseAddress = new Uri("https://api.copilot.microsoft.com/v1/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.DefaultRequestHeaders.Add("User-Agent", "UseCaseGenerator");
+});
 
 // Custom Services
 builder.Services.AddScoped<IAIService, AIService>();
@@ -45,6 +74,9 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 app.UseStaticFiles();
+
+// Add rate limiting middleware
+app.UseRateLimiting();
 
 app.UseRouting();
 app.UseCors("BlazorWasmPolicy");

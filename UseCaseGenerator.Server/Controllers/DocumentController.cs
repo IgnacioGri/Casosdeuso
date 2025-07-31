@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using UseCaseGenerator.Server.Services;
+using UseCaseGenerator.Server.Security;
 using UseCaseGenerator.Shared.Models;
+using UseCaseGenerator.Shared.DTOs;
 
 namespace UseCaseGenerator.Server.Controllers;
 
@@ -23,30 +25,43 @@ public class DocumentController : ControllerBase
     }
 
     [HttpPost("docx")]
+    [RequestSizeLimit(10_485_760)] // 10MB limit
     public async Task<IActionResult> GenerateDocx([FromBody] GenerateDocxRequest request)
     {
         try
         {
-            // Create UseCase from request data
+            // Validate request
+            if (request == null)
+            {
+                return BadRequest("Request cannot be null");
+            }
+            
+            // Validate content size
+            InputValidator.ValidateContentSize(request.Content, 100000);
+            
+            // Sanitize file name to prevent path traversal
+            var sanitizedFileName = InputValidator.SanitizeFileName(request.FileName);
+            
+            // Create UseCase from request data with sanitized values
             var useCase = new UseCase
             {
                 Id = Guid.NewGuid().ToString(),
-                ClientName = request.FormData?.ClientName ?? "Cliente",
-                ProjectName = request.FormData?.ProjectName ?? "Proyecto",
-                UseCaseName = request.FormData?.UseCaseName ?? request.FileName,
-                UseCaseCode = request.FormData?.UseCaseCode,
-                FileName = request.FormData?.FileName ?? request.FileName,
-                Description = request.FormData?.Description,
-                UseCaseType = request.FormData?.UseCaseType,
-                BusinessRules = request.FormData?.BusinessRules,
+                ClientName = InputValidator.SanitizeText(request.FormData?.ClientName ?? "Cliente"),
+                ProjectName = InputValidator.SanitizeText(request.FormData?.ProjectName ?? "Proyecto"),
+                UseCaseName = InputValidator.SanitizeText(request.FormData?.UseCaseName ?? sanitizedFileName),
+                UseCaseCode = InputValidator.SanitizeText(request.FormData?.UseCaseCode, 50),
+                FileName = sanitizedFileName,
+                Description = InputValidator.SanitizeText(request.FormData?.Description, 1000),
+                UseCaseType = request.FormData?.UseCaseType ?? UseCaseType.Entity,
+                BusinessRules = InputValidator.SanitizeText(request.FormData?.BusinessRules, 2000),
                 SearchFilters = request.FormData?.SearchFilters,
                 ResultColumns = request.FormData?.ResultColumns,
                 EntityFields = request.FormData?.EntityFields,
                 GenerateTestCase = request.FormData?.GenerateTestCase ?? false,
-                TestCaseObjective = request.FormData?.TestCaseObjective,
-                TestCasePreconditions = request.FormData?.TestCasePreconditions,
+                TestCaseObjective = InputValidator.SanitizeText(request.FormData?.TestCaseObjective, 500),
+                TestCasePreconditions = InputValidator.SanitizeText(request.FormData?.TestCasePreconditions, 500),
                 TestSteps = request.FormData?.TestSteps,
-                FormData = request.FormData,
+                // FormData not stored in UseCase model
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -54,7 +69,12 @@ public class DocumentController : ControllerBase
             
             return File(docxBytes, 
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                $"{request.FileName}.docx");
+                $"{sanitizedFileName}.docx");
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid input provided");
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using UseCaseGenerator.Server.Services;
+using UseCaseGenerator.Server.Security;
 using UseCaseGenerator.Shared.DTOs;
 using UseCaseGenerator.Shared.Models;
 
@@ -21,11 +22,30 @@ public class UseCaseController : ControllerBase
     }
 
     [HttpPost("generate")]
+    [RequestSizeLimit(10_485_760)] // 10MB limit
     public async Task<ActionResult<GenerateUseCaseResponse>> GenerateUseCase([FromBody] GenerateUseCaseRequest request)
     {
         try
         {
-
+            // Validate request
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            
+            if (request?.FormData == null)
+            {
+                return BadRequest("FormData is required");
+            }
+            
+            // Sanitize input data
+            request.FormData.ClientName = InputValidator.SanitizeText(request.FormData.ClientName);
+            request.FormData.ProjectName = InputValidator.SanitizeText(request.FormData.ProjectName);
+            request.FormData.UseCaseName = InputValidator.SanitizeText(request.FormData.UseCaseName);
+            request.FormData.UseCaseCode = InputValidator.SanitizeText(request.FormData.UseCaseCode, 50);
+            request.FormData.Description = InputValidator.SanitizeText(request.FormData.Description, 2000);
+            request.FormData.BusinessRules = InputValidator.SanitizeText(request.FormData.BusinessRules, 5000);
+            request.FormData.SpecialRequirements = InputValidator.SanitizeText(request.FormData.SpecialRequirements, 2000);
             
             var response = await _aiService.GenerateUseCaseAsync(request);
             
@@ -35,6 +55,15 @@ public class UseCaseController : ControllerBase
             }
 
             return Ok(response);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid input provided");
+            return BadRequest(new GenerateUseCaseResponse
+            {
+                Success = false,
+                Error = ex.Message
+            });
         }
         catch (Exception ex)
         {
