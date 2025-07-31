@@ -3,6 +3,9 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using UseCaseGenerator.Shared.Models;
 using System.Text.RegularExpressions;
+using A = DocumentFormat.OpenXml.Drawing;
+using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 
 namespace UseCaseGenerator.Server.Services;
 
@@ -30,7 +33,26 @@ public class DocumentService : IDocumentService
             {
                 var mainPart = document.AddMainDocumentPart();
                 mainPart.Document = new Document();
+                
+                // Add header with ING logo
+                AddHeaderWithImage(mainPart);
+                
+                // Add footer with page numbering
+                AddFooterWithPageNumbers(mainPart);
+                
                 var body = mainPart.Document.AppendChild(new Body());
+                
+                // Add section properties to link header and footer
+                var sectionProps = new SectionProperties();
+                var headerReference = new HeaderReference() { Type = HeaderFooterValues.Default, Id = "headerId1" };
+                var footerReference = new FooterReference() { Type = HeaderFooterValues.Default, Id = "footerId1" };
+                sectionProps.Append(headerReference);
+                sectionProps.Append(footerReference);
+                
+                // Add page margins
+                sectionProps.Append(new PageMargin() { Top = 1440, Right = 1440, Bottom = 1440, Left = 1440 });
+                
+                body.Append(sectionProps);
 
                 // Title
                 var titlePara = body.AppendChild(new Paragraph());
@@ -470,5 +492,135 @@ public class DocumentService : IDocumentService
         // Add spacing before revision history
         var spacingPara = new Paragraph();
         body.AppendChild(spacingPara);
+    }
+    
+    private void AddHeaderWithImage(MainDocumentPart mainPart)
+    {
+        var headerPart = mainPart.AddNewPart<HeaderPart>("headerId1");
+        
+        var header = new Header();
+        var paragraph = new Paragraph();
+        var paragraphProperties = new ParagraphProperties();
+        paragraphProperties.Append(new Justification() { Val = JustificationValues.Center });
+        paragraph.Append(paragraphProperties);
+        
+        // Try to add image, fallback to text if not available
+        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_caso_de_uso.png");
+        
+        if (File.Exists(imagePath))
+        {
+            try
+            {
+                var imagePart = headerPart.AddImagePart(ImagePartType.Png);
+                using (var stream = new FileStream(imagePath, FileMode.Open))
+                {
+                    imagePart.FeedData(stream);
+                }
+                
+                var run = new Run();
+                var drawing = CreateImageDrawing(headerPart.GetIdOfPart(imagePart), 6000000L, 600000L); // Mantener proporción original
+                run.Append(drawing);
+                paragraph.Append(run);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not add header image, using text fallback");
+                AddTextHeader(paragraph);
+            }
+        }
+        else
+        {
+            AddTextHeader(paragraph);
+        }
+        
+        header.Append(paragraph);
+        headerPart.Header = header;
+        headerPart.Header.Save();
+    }
+    
+    private void AddTextHeader(Paragraph paragraph)
+    {
+        var run = new Run();
+        var runProperties = new RunProperties();
+        runProperties.Append(new Bold());
+        runProperties.Append(new FontSize() { Val = "24" });
+        runProperties.Append(new Color() { Val = "0070C0" });
+        run.Append(runProperties);
+        run.Append(new Text("INGEMATICA - Documentación de casos de uso"));
+        paragraph.Append(run);
+    }
+    
+    private Drawing CreateImageDrawing(string relationshipId, long width, long height)
+    {
+        return new Drawing(
+            new DW.Inline(
+                new DW.Extent() { Cx = width, Cy = height },
+                new DW.EffectExtent() { LeftEdge = 0L, TopEdge = 0L, RightEdge = 0L, BottomEdge = 0L },
+                new DW.DocProperties() { Id = 1U, Name = "Header Image" },
+                new DW.NonVisualGraphicFrameDrawingProperties(
+                    new A.GraphicFrameLocks() { NoChangeAspect = true }),
+                new A.Graphic(
+                    new A.GraphicData(
+                        new PIC.Picture(
+                            new PIC.NonVisualPictureProperties(
+                                new PIC.NonVisualDrawingProperties() { Id = 0U, Name = "Header.png" },
+                                new PIC.NonVisualPictureDrawingProperties()),
+                            new PIC.BlipFill(
+                                new A.Blip() { Embed = relationshipId },
+                                new A.Stretch(new A.FillRectangle())),
+                            new PIC.ShapeProperties(
+                                new A.Transform2D(
+                                    new A.Offset() { X = 0L, Y = 0L },
+                                    new A.Extents() { Cx = width, Cy = height }),
+                                new A.PresetGeometry(new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle }))
+                    ) { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" })
+            ) { DistanceFromTop = 0U, DistanceFromBottom = 0U, DistanceFromLeft = 0U, DistanceFromRight = 0U });
+    }
+    
+    private void AddFooterWithPageNumbers(MainDocumentPart mainPart)
+    {
+        var footerPart = mainPart.AddNewPart<FooterPart>("footerId1");
+        
+        var footer = new Footer();
+        var paragraph = new Paragraph();
+        var paragraphProperties = new ParagraphProperties();
+        paragraphProperties.Append(new Justification() { Val = JustificationValues.Center });
+        paragraph.Append(paragraphProperties);
+        
+        var run1 = new Run();
+        run1.Append(new Text("Página "));
+        paragraph.Append(run1);
+        
+        var run2 = new Run();
+        run2.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
+        paragraph.Append(run2);
+        
+        var run3 = new Run();
+        run3.Append(new FieldCode(" PAGE "));
+        paragraph.Append(run3);
+        
+        var run4 = new Run();
+        run4.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
+        paragraph.Append(run4);
+        
+        var run5 = new Run();
+        run5.Append(new Text(" de "));
+        paragraph.Append(run5);
+        
+        var run6 = new Run();
+        run6.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
+        paragraph.Append(run6);
+        
+        var run7 = new Run();
+        run7.Append(new FieldCode(" NUMPAGES "));
+        paragraph.Append(run7);
+        
+        var run8 = new Run();
+        run8.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
+        paragraph.Append(run8);
+        
+        footer.Append(paragraph);
+        footerPart.Footer = footer;
+        footerPart.Footer.Save();
     }
 }

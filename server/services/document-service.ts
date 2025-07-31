@@ -118,8 +118,9 @@ export class DocumentService {
               fs.existsSync(headerImagePath) ? new Paragraph({
                 children: [
                   new ImageRun({
+                    type: "png",
                     data: fs.readFileSync(headerImagePath),
-                    transformation: { width: 580, height: 120 }
+                    transformation: { width: 580, height: 58 }  // Mantener proporción original
                   })
                 ]
               }) : new Paragraph({
@@ -613,12 +614,12 @@ export class DocumentService {
         const imageBuffer = fs.readFileSync(imagePath);
         try {
           headerImage = new ImageRun({
+            type: "png",
             data: imageBuffer,
             transformation: {
               width: 600,  // Adjusted width for header  
-              height: 80   // Adjusted height for header
-            },
-            type: "png"
+              height: 60   // Corrected height to maintain original aspect ratio
+            }
           });
         } catch (imageError) {
           console.error('Error creating ImageRun:', imageError);
@@ -664,6 +665,37 @@ export class DocumentService {
                 new Paragraph({
                   alignment: AlignmentType.CENTER,
                   children: headerParagraphChildren
+                })
+              ]
+            })
+          },
+          footers: {
+            default: new Footer({
+              children: [
+                new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [
+                    new TextRun({
+                      text: "Página ",
+                      font: "Segoe UI",
+                      size: 20
+                    }),
+                    new TextRun({
+                      children: [PageNumber.CURRENT],
+                      font: "Segoe UI",
+                      size: 20
+                    }),
+                    new TextRun({
+                      text: " de ",
+                      font: "Segoe UI",
+                      size: 20
+                    }),
+                    new TextRun({
+                      children: [PageNumber.TOTAL_PAGES],
+                      font: "Segoe UI",
+                      size: 20
+                    })
+                  ]
                 })
               ]
             })
@@ -810,7 +842,7 @@ export class DocumentService {
   private static createHeading(htmlContent: string, level: number): Paragraph {
     const text = this.extractTextContent(htmlContent);
     
-    let headingLevel: HeadingLevel;
+    let headingLevel: typeof HeadingLevel.HEADING_1;
     let fontSize: number;
     let spacingBefore: number;
     let spacingAfter: number;

@@ -46,6 +46,8 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Help Content Updates**: Refreshed help button content to match current form structure with accurate step descriptions and AI Assist availability
 - **Progress Indicator Corrections**: Fixed step naming confusion - Step 9 is now "Config Pruebas" (decision), Step 10 is "Pruebas" (test cases), Step 11 is "Generar" (final generation)
 - **C# Blazor Sync**: Created EnhancedProgressIndicator.razor and HelpButton.razor components to match React functionality exactly
+- **DOCX Header Fix**: Corrected header image aspect ratio (height from 80 to 60 pixels) to prevent vertical stretching in both React and C# systems
+- **Page Numbering**: Added "Página X de Y" footer to DOCX exports following ING minute standards in both systems
 
 ## External Dependencies
 
