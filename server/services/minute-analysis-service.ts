@@ -7,6 +7,11 @@ export class MinuteAnalysisService {
   constructor(private aiService: AIService) {}
 
   async analyzeMinute(text: string, useCaseType: UseCaseType, aiModel: string): Promise<Partial<UseCaseFormData>> {
+    // If demo mode is selected, return demo data immediately
+    if (aiModel === 'demo') {
+      return this.generateDemoAnalysis(useCaseType);
+    }
+    
     const prompts = this.buildAnalysisPrompts(useCaseType);
     
     try {

@@ -34,37 +34,36 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
     switch (step) {
       case 1:
         return {
-          title: "Configuración del Motor de IA",
-          description: "En este paso seleccionas qué modelo de inteligencia artificial te ayudará a mejorar los campos del formulario.",
+          title: "Tipo de Caso de Uso",
+          description: "Selecciona el tipo de caso de uso que deseas generar según las normas ING.",
           instructions: [
-            "Elige el modelo que tengas disponible con API keys configuradas",
-            "Si no tienes API keys, usa 'Modo Demo' - funciona perfectamente",
-            "OpenAI GPT-4: Recomendado para mejores resultados profesionales",
-            "Claude: Excelente para análisis detallado y contexto",
-            "Gemini: Multimodal con buena capacidad de estructuración",
-            "Grok: Rápido y eficiente para mejoras directas"
+            "ENTIDAD: Para casos que gestionan datos (ABM/CRUD)",
+            "API: Para casos que exponen servicios web o integran sistemas externos",
+            "SERVICIO/PROCESO: Para casos que implementan flujos de negocio automáticos",
+            "Cada tipo genera campos específicos en los pasos siguientes",
+            "La elección determina la estructura completa del documento"
           ],
           aiAssistInfo: {
             available: false,
-            explanation: "Este paso no tiene AI Assist porque aquí configuras el modelo que se usará en los siguientes pasos.",
+            explanation: "Este paso no tiene AI Assist porque la selección del tipo es una decisión arquitectónica.",
             usage: []
           }
         };
 
       case 2:
         return {
-          title: "Selección del Tipo de Caso de Uso",
-          description: "Según las normas ING, debes elegir el tipo correcto para que el documento siga la estructura apropiada.",
+          title: "Análisis Inteligente de Minutas",
+          description: "Carga una minuta de reunión o documento para que la IA extraiga automáticamente la información y complete el formulario.",
           instructions: [
-            "ENTIDAD: Para casos que gestionan datos (alta, baja, modificación, consulta)",
-            "API: Para casos que exponen servicios web o integran sistemas externos",
-            "PROCESO: Para casos que implementan flujos de negocio o validaciones",
-            "Cada tipo genera campos específicos en los pasos siguientes",
-            "La elección determina la estructura del documento final"
+            "Pega el texto de la minuta o documento en el área de texto",
+            "La IA identificará cliente, proyecto, código y requisitos automáticamente",
+            "Puedes cargar un ejemplo completo con el botón 'Cargar Minuta Demo'",
+            "El análisis toma aproximadamente 10-30 segundos",
+            "Todos los campos se completarán basándose en el contenido analizado"
           ],
           aiAssistInfo: {
             available: false,
-            explanation: "Este paso no tiene AI Assist porque la selección del tipo debe ser una decisión técnica del usuario.",
+            explanation: "Este paso usa IA para analizar el documento completo, no requiere AI Assist individual.",
             usage: []
           }
         };

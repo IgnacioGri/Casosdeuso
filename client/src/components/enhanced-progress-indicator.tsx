@@ -52,6 +52,33 @@ const getStepInfo = (stepNumber: number, useCaseType: string) => {
   };
 };
 
+const getStepShortName = (stepNumber: number, useCaseType: string) => {
+  // Short names for display under icons
+  const shortNames = [
+    "Tipo",
+    "Análisis",
+    "Info Básica",
+    "Detalles",
+    "Filtros",
+    "Columnas",
+    "Campos",
+    "Opciones",
+    "Decisión",
+    "Pruebas",
+    "Generar"
+  ];
+  
+  // Adjust short names based on use case type
+  if (useCaseType === 'api' || useCaseType === 'service') {
+    if (stepNumber === 5) return "Config";
+    if (stepNumber === 6) return "Reglas";
+    if (stepNumber === 7) return "Pruebas";
+    if (stepNumber === 8) return "Generar";
+  }
+  
+  return shortNames[stepNumber - 1] || `${stepNumber}`;
+};
+
 export default function EnhancedProgressIndicator({ currentStep, totalSteps, useCaseType }: EnhancedProgressIndicatorProps) {
   return (
     <div className="mb-8 bg-white dark:bg-gray-900 p-6 rounded-lg border shadow-sm">
@@ -79,12 +106,12 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
                 >
                   {isCompleted ? <Check className="w-4 h-4" /> : isCurrent ? <Clock className="w-4 h-4" /> : <StepIcon className="w-3 h-3" />}
                 </div>
-                <div className={`text-[10px] font-medium text-center ${
+                <div className={`text-[10px] font-medium text-center max-w-16 leading-tight ${
                   isCurrent ? 'text-blue-600 dark:text-blue-400' : 
                   isCompleted ? 'text-green-600 dark:text-green-400' : 
                   'text-gray-500 dark:text-gray-400'
                 }`}>
-                  {stepNumber}
+                  {getStepShortName(stepNumber, useCaseType)}
                 </div>
               </div>
             );
@@ -103,9 +130,6 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
         />
       </div>
       <div className="text-center">
-        <div className="text-lg font-semibold text-gray-900 dark:text-white">
-          {getStepInfo(currentStep, useCaseType).name}
-        </div>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           Paso {currentStep} de {totalSteps}
         </div>

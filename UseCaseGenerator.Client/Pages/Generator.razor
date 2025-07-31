@@ -118,7 +118,7 @@
 
 @code {
     private int currentStep = 1;
-    private int maxSteps => formData.UseCaseType == UseCaseType.Entity ? 9 : 6;
+    private int maxSteps => formData.UseCaseType == UseCaseType.Entity ? 11 : 8;
     private double progressValue => (double)currentStep / maxSteps * 100;
     private UseCaseFormData formData = new();
     private bool isGenerating = false;

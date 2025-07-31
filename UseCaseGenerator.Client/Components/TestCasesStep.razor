@@ -18,34 +18,23 @@
             
             @if (FormData.GenerateTestCase)
             {
-                <MudCard Class="pa-4" Style="background-color: #f3e5f5; border: 1px solid #ce93d8;">
-                    <MudCardContent Class="pa-0">
-                        <div class="d-flex align-center justify-space-between">
-                            <div class="d-flex align-center">
-                                <MudIcon Icon="@Icons.Material.Filled.Psychology" Color="Color.Secondary" Class="mr-2" />
-                                <div>
-                                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Generación Inteligente</MudText>
-                                    <MudText Typo="Typo.caption">Analiza todo el caso de uso y crea pruebas completas</MudText>
-                                </div>
-                            </div>
-                            <MudButton Variant="Variant.Filled" 
-                                       Color="Color.Secondary"
-                                       StartIcon="@Icons.Material.Filled.AutoAwesome"
-                                       OnClick="GenerateIntelligentTestCases"
-                                       Disabled="@isGenerating">
-                                @if (isGenerating)
-                                {
-                                    <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
-                                    <span>Generando...</span>
-                                }
-                                else
-                                {
-                                    <span>Generar Casos Inteligentes</span>
-                                }
-                            </MudButton>
-                        </div>
-                    </MudCardContent>
-                </MudCard>
+                <MudButton Variant="Variant.Outlined" 
+                           Color="Color.Secondary"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.AutoAwesome"
+                           OnClick="GenerateIntelligentTestCases"
+                           Disabled="@isGenerating"
+                           Style="border-color: #9c27b0; color: #9c27b0;">
+                    @if (isGenerating)
+                    {
+                        <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                        <span>Generando...</span>
+                    }
+                    else
+                    {
+                        <span>Generar con IA</span>
+                    }
+                </MudButton>
             }
         </div>
     </MudItem>

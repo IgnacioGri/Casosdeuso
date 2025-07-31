@@ -87,36 +87,25 @@ export function TestCaseStep({
         </div>
         
         {formData && onReplaceAllTestData && (
-          <Card className="border-purple-200 bg-purple-50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-purple-600" />
-                  <div>
-                    <p className="font-medium text-purple-900">Generación Inteligente</p>
-                    <p className="text-sm text-purple-700">Analiza todo el caso de uso y crea pruebas completas</p>
-                  </div>
-                </div>
-                <Button 
-                  onClick={handleIntelligentGeneration} 
-                  disabled={isGenerating}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  {isGenerating ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                      Generando...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Generar Casos Inteligentes
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <Button 
+            onClick={handleIntelligentGeneration} 
+            disabled={isGenerating}
+            size="sm"
+            variant="outline"
+            className="border-purple-500 text-purple-600 hover:bg-purple-50"
+          >
+            {isGenerating ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Generando...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generar con IA
+              </>
+            )}
+          </Button>
         )}
       </div>
 
