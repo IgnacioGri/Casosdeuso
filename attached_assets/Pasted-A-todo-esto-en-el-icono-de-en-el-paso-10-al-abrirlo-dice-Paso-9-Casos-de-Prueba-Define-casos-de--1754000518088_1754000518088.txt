@@ -1,0 +1,52 @@
+A todo esto en el icono de ? en el paso 10 al abrirlo dice:
+Paso 9: Casos de Prueba
+Define casos de prueba según especificaciones de la minuta ING para validar el funcionamiento del caso de uso.
+
+📋 Cómo completar este paso:
+•
+Objetivo: Describe qué se pretende validar con las pruebas
+•
+Precondiciones: Lista los requisitos previos para ejecutar las pruebas
+•
+Pasos de Prueba: Crea una tabla estructurada con cada acción
+•
+Cada paso debe tener: Acción, Datos de entrada, Resultado esperado, Observaciones, Estado P/F
+•
+Usa el botón 'Generar Casos de Prueba Inteligentes' para crear casos completos automáticamente
+🤖 AI Assist en este paso:
+✅ Disponible
+AI Assist genera casos de prueba completos y profesionales automáticamente.
+Cómo usar AI Assist:
+1.
+Completa objetivo y precondiciones con información básica
+2.
+Presiona 'Generar Casos de Prueba Inteligentes'
+3.
+El AI creará múltiples casos de prueba realistas
+4.
+Incluirá flujos principales y alternativos
+5.
+Agregará datos de prueba específicos del contexto
+📖 Normas ING:
+Todos los pasos siguen la minuta ING vr19 para generar documentación profesional con formato corporativo, numeración multi-nivel y estructura técnica apropiada.
+
+y en el 9 dice:
+Paso 10: Generación del Documento Final
+Crea el documento de caso de uso con formato profesional ING para entregar al cliente.
+
+📋 Cómo completar este paso:
+•
+Revisa que todos los campos estén completos antes de generar
+•
+El documento seguirá automáticamente el formato de la minuta ING vr19
+•
+Incluirá numeración multi-nivel, colores corporativos y tipografía Segoe UI
+•
+Se agregará automáticamente la tabla de 'Historia de Revisiones'
+•
+Puedes exportar en formato HTML (para web) o DOCX (para Word)
+🤖 AI Assist en este paso:
+❌ No disponible
+En este paso NO se usa AI. El documento se genera aplicando solo formato y estructura ING sin procesamiento de inteligencia artificial.
+📖 Normas ING:
+Todos los pasos siguen la minuta ING vr19 para generar documentación profesional con formato corporativo, numeración multi-nivel y estructura técnica apropiada.

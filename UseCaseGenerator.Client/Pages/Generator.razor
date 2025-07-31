@@ -24,9 +24,8 @@
         <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
             <MudGrid>
                 <MudItem xs="12">
+                    <EnhancedProgressIndicator CurrentStep="@currentStep" TotalSteps="@maxSteps" UseCaseType="@formData.UseCaseType" />
                     <MudPaper Class="pa-4" Elevation="2">
-                        <MudText Typo="Typo.h4" Class="mb-4">Paso @currentStep de @maxSteps</MudText>
-                        <MudProgressLinear Color="Color.Primary" Value="@progressValue" Size="Size.Large" Class="mb-4" />
                         
                         @if (currentStep == 1)
                         {

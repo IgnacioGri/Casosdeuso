@@ -302,25 +302,19 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
       case 9:  
         if (useCaseType === 'entity') {
           return {
-            title: "Casos de Prueba",
-            description: "Define casos de prueba según especificaciones de la minuta ING para validar el funcionamiento del caso de uso.",
+            title: "Decisión sobre Casos de Prueba",
+            description: "Decide si deseas generar casos de prueba para validar el funcionamiento del caso de uso.",
             instructions: [
-              "Objetivo: Describe qué se pretende validar con las pruebas",
-              "Precondiciones: Lista los requisitos previos para ejecutar las pruebas",
-              "Pasos de Prueba: Crea una tabla estructurada con cada acción",
-              "Cada paso debe tener: Acción, Datos de entrada, Resultado esperado, Observaciones, Estado P/F",
-              "Usa el botón 'Generar Casos de Prueba Inteligentes' para crear casos completos automáticamente"
+              "Selecciona 'Sí' para incluir casos de prueba en el documento",
+              "Selecciona 'No' para ir directamente a la generación del documento",
+              "Los casos de prueba agregan valor al documento final",
+              "Recomendado incluirlos para casos de uso críticos",
+              "Si eliges 'Sí', pasarás al paso de definición de casos de prueba"
             ],
             aiAssistInfo: {
-              available: true,
-              explanation: "AI Assist genera casos de prueba completos y profesionales automáticamente.",
-              usage: [
-                "Completa objetivo y precondiciones con información básica",
-                "Presiona 'Generar Casos de Prueba Inteligentes'",
-                "El AI creará múltiples casos de prueba realistas",
-                "Incluirá flujos principales y alternativos",
-                "Agregará datos de prueba específicos del contexto"
-              ]
+              available: false,
+              explanation: "Este paso es una decisión simple, no requiere asistencia de IA.",
+              usage: []
             }
           };
         } else {
@@ -344,13 +338,37 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
 
       case 10:
         return {
-          title: "Generación del Documento Final",
-          description: "Crea el documento de caso de uso con formato profesional ING para entregar al cliente.",
+          title: "Casos de Prueba",
+          description: "Define casos de prueba según especificaciones de la minuta ING para validar el funcionamiento del caso de uso.",
           instructions: [
-            "Revisa que todos los campos estén completos antes de generar",
+            "Objetivo: Describe qué se pretende validar con las pruebas",
+            "Precondiciones: Lista los requisitos previos para ejecutar las pruebas",
+            "Pasos de Prueba: Crea una tabla estructurada con cada acción",
+            "Cada paso debe tener: Acción, Datos de entrada, Resultado esperado, Observaciones, Estado P/F",
+            "Usa el botón 'Generar con IA' para crear casos completos automáticamente"
+          ],
+          aiAssistInfo: {
+            available: true,
+            explanation: "AI Assist genera casos de prueba completos y profesionales automáticamente.",
+            usage: [
+              "Completa objetivo y precondiciones con información básica",
+              "Presiona 'Generar con IA'",
+              "El AI creará múltiples casos de prueba realistas",
+              "Incluirá flujos principales y alternativos",
+              "Agregará datos de prueba específicos del contexto"
+            ]
+          }
+        };
+
+      case 11:
+        return {
+          title: "Revisión Final y Generación",
+          description: "Revisa toda la información ingresada y genera el documento de caso de uso final.",
+          instructions: [
+            "Verifica que todos los campos estén completos y correctos",
+            "Revisa que la información sea coherente y profesional",
             "El documento seguirá automáticamente el formato de la minuta ING vr19",
-            "Incluirá numeración multi-nivel, colores corporativos y tipografía Segoe UI",
-            "Se agregará automáticamente la tabla de 'Historia de Revisiones'",
+            "Se incluirá numeración multi-nivel, colores corporativos y tipografía Segoe UI",
             "Puedes exportar en formato HTML (para web) o DOCX (para Word)"
           ],
           aiAssistInfo: {

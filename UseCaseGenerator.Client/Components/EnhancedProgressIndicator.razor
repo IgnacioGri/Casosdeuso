@@ -1,0 +1,141 @@
+@using MudBlazor
+@using UseCaseGenerator.Shared.Models
+@using MudBlazor.Extensions
+
+<div class="mb-8 mud-paper pa-6 rounded-lg">
+    <div class="d-flex justify-space-between align-start mb-6">
+        @for (int i = 1; i <= TotalSteps; i++)
+        {
+            var stepNumber = i;
+            var isCompleted = stepNumber < CurrentStep;
+            var isCurrent = stepNumber == CurrentStep;
+            var stepInfo = GetStepInfo(stepNumber);
+            var iconClass = isCompleted ? "mud-success-text" : isCurrent ? "mud-info-text" : "mud-text-secondary";
+            
+            <div class="d-flex flex-column align-center" style="position: relative; z-index: 10;">
+                <MudPaper Class="@($"pa-2 {(isCompleted ? "mud-background-success" : isCurrent ? "mud-background-info" : "")} rounded-circle")" 
+                          Elevation="@(isCurrent ? 3 : 1)" 
+                          Style="@($"border: 2px solid {(isCompleted ? "var(--mud-palette-success)" : isCurrent ? "var(--mud-palette-info)" : "var(--mud-palette-lines-default)")}; width: 32px; height: 32px;")">
+                    <div class="d-flex align-center justify-center" style="height: 100%;">
+                        @if (isCompleted)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Check" Size="Size.Small" Color="Color.Success" />
+                        }
+                        else if (isCurrent)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.AccessTime" Size="Size.Small" Color="Color.Info" />
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@stepInfo.Icon" Size="Size.Small" Class="mud-text-secondary" />
+                        }
+                    </div>
+                </MudPaper>
+                <MudText Typo="Typo.caption" Class="@($"text-center mt-1 {iconClass}")" Style="max-width: 64px; line-height: 1.2;">
+                    @stepInfo.ShortName
+                </MudText>
+            </div>
+        }
+    </div>
+    
+    <!-- Background progress line -->
+    <div style="position: absolute; top: 36px; left: 32px; right: 32px; height: 2px; background-color: var(--mud-palette-lines-default); z-index: 0;"></div>
+    
+    <!-- Completed progress line -->
+    <div style="position: absolute; top: 36px; left: 32px; height: 2px; background-color: var(--mud-palette-success); transition: width 0.5s ease-out; z-index: 0; width: @($"{Math.Max(0, ((CurrentStep - 1.0) / (TotalSteps - 1)) * 100)}%");"></div>
+    
+    <div class="text-center mt-4">
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            Paso @CurrentStep de @TotalSteps
+        </MudText>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int CurrentStep { get; set; }
+    [Parameter] public int TotalSteps { get; set; }
+    [Parameter] public UseCaseType UseCaseType { get; set; }
+
+    private class StepInfo
+    {
+        public string Name { get; set; } = "";
+        public string ShortName { get; set; } = "";
+        public string Icon { get; set; } = Icons.Material.Filled.Description;
+    }
+
+    private StepInfo GetStepInfo(int stepNumber)
+    {
+        var stepInfo = new StepInfo();
+        
+        // Step names
+        var stepNames = new[]
+        {
+            "Tipo de Caso de Uso",
+            "Análisis Inteligente de Minutas",
+            "Información Básica",
+            "Detalles del Caso de Uso",
+            "Filtros de Búsqueda",
+            "Columnas de Resultado",
+            "Datos de la Entidad",
+            "Opciones Adicionales",
+            "Decisión sobre Casos de Prueba",
+            "Casos de Prueba",
+            "Revisión Final y Generación"
+        };
+        
+        // Short names for display under icons
+        var shortNames = new[]
+        {
+            "Tipo",
+            "Análisis",
+            "Info Básica",
+            "Detalles",
+            "Filtros",
+            "Columnas",
+            "Campos",
+            "Opciones",
+            "Config Pruebas",
+            "Pruebas",
+            "Generar"
+        };
+        
+        stepInfo.Name = stepNumber <= stepNames.Length ? stepNames[stepNumber - 1] : $"Paso {stepNumber}";
+        
+        // Adjust short names based on use case type
+        if (UseCaseType == UseCaseType.Api || UseCaseType == UseCaseType.Service)
+        {
+            if (stepNumber == 5) stepInfo.ShortName = "Config";
+            else if (stepNumber == 6) stepInfo.ShortName = "Reglas";
+            else if (stepNumber == 7) stepInfo.ShortName = "Config Pruebas";
+            else if (stepNumber == 8) stepInfo.ShortName = "Generar";
+            else stepInfo.ShortName = stepNumber <= shortNames.Length ? shortNames[stepNumber - 1] : $"{stepNumber}";
+        }
+        else
+        {
+            stepInfo.ShortName = stepNumber <= shortNames.Length ? shortNames[stepNumber - 1] : $"{stepNumber}";
+        }
+        
+        // Icons based on step number and type
+        stepInfo.Icon = stepNumber switch
+        {
+            1 => Icons.Material.Filled.Search,
+            2 => Icons.Material.Filled.SmartToy,
+            3 => Icons.Material.Filled.Description,
+            4 => Icons.Material.Filled.Info,
+            5 when UseCaseType == UseCaseType.Entity => Icons.Material.Filled.Search,
+            5 => Icons.Material.Filled.Language,
+            6 when UseCaseType == UseCaseType.Entity => Icons.Material.Filled.TableChart,
+            6 => Icons.Material.Filled.Security,
+            7 when UseCaseType == UseCaseType.Entity => Icons.Material.Filled.Storage,
+            7 => Icons.Material.Filled.Science,
+            8 when UseCaseType == UseCaseType.Entity => Icons.Material.Filled.Security,
+            8 => Icons.Material.Filled.Bolt,
+            9 => Icons.Material.Filled.Science,
+            10 => Icons.Material.Filled.Science,
+            11 => Icons.Material.Filled.Bolt,
+            _ => Icons.Material.Filled.Description
+        };
+        
+        return stepInfo;
+    }
+}

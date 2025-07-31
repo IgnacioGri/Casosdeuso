@@ -63,7 +63,7 @@ const getStepShortName = (stepNumber: number, useCaseType: string) => {
     "Columnas",
     "Campos",
     "Opciones",
-    "Decisión",
+    "Config Pruebas",
     "Pruebas",
     "Generar"
   ];
@@ -72,7 +72,7 @@ const getStepShortName = (stepNumber: number, useCaseType: string) => {
   if (useCaseType === 'api' || useCaseType === 'service') {
     if (stepNumber === 5) return "Config";
     if (stepNumber === 6) return "Reglas";
-    if (stepNumber === 7) return "Pruebas";
+    if (stepNumber === 7) return "Config Pruebas";
     if (stepNumber === 8) return "Generar";
   }
   

@@ -42,8 +42,10 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Removed Demo Mode**: Eliminated demo data fallbacks - system now shows proper error messages when all AI providers fail
 - **Consistent Error Handling**: Both TypeScript and C# systems now have identical cascading fallback logic and error messages in Spanish
 - **DOCX Export Fix**: Fixed type validation error in DOCX export where testCasePreconditions could be non-string values (arrays/objects from AI responses)
-- **UI Improvements**: Updated progress indicator with correct step names and smaller icons (w-8 h-8) for better visual balance with 10 steps
+- **UI Improvements**: Updated progress indicator with correct step names and smaller icons (w-8 h-8) for better visual balance with 11 steps
 - **Help Content Updates**: Refreshed help button content to match current form structure with accurate step descriptions and AI Assist availability
+- **Progress Indicator Corrections**: Fixed step naming confusion - Step 9 is now "Config Pruebas" (decision), Step 10 is "Pruebas" (test cases), Step 11 is "Generar" (final generation)
+- **C# Blazor Sync**: Created EnhancedProgressIndicator.razor and HelpButton.razor components to match React functionality exactly
 
 ## External Dependencies
 
