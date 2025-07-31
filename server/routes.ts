@@ -552,7 +552,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         useCase.generatedContent || '',
         useCase.fileName || 'caso-de-uso',
         useCase.useCaseName || '',
-        useCase.formData || null
+        useCase || null
       );
 
       res.set({

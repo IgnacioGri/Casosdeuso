@@ -193,6 +193,7 @@ INSTRUCCIONES CRÍTICAS:
 2. Genera casos de prueba COMPLETOS que cubran: flujo principal, validaciones, errores, seguridad y rendimiento
 3. Responde ÚNICAMENTE con JSON válido sin explicaciones adicionales
 4. Cada paso debe ser específico, actionable y verificable
+5. DEBES incluir mínimo 5-10 pasos de prueba para cubrir todos los escenarios
 
 ESTRUCTURA REQUERIDA:
 {
@@ -205,7 +206,15 @@ ESTRUCTURA REQUERIDA:
       "inputData": "Datos de entrada exactos",
       "expectedResult": "Resultado esperado específico",
       "observations": "Observaciones técnicas importantes",
-      "status": ""
+      "status": "pending"
+    },
+    {
+      "number": 2,
+      "action": "Segunda acción a realizar",
+      "inputData": "Datos de entrada para el segundo paso",
+      "expectedResult": "Resultado esperado del segundo paso",
+      "observations": "Observaciones del segundo paso",
+      "status": "pending"
     }
   ],
   "analysisNotes": "Análisis del contexto y cobertura de pruebas"
@@ -282,24 +291,41 @@ CONTEXTO BANCARIO ING:
 
   private parseIntelligentTestResult(aiResult: string, formData: UseCaseFormData): IntelligentTestCaseResult {
     try {
-      console.log('Raw intelligent test result:', aiResult.substring(0, 200) + '...');
+      console.log('Raw intelligent test result:', aiResult.substring(0, 500) + '...');
       
       // Only check for demo content if it's explicitly demo mode response
-      if (aiResult.includes('Demo Analysis Result:') && aiResult.includes('using system prompt')) {
+      if (aiResult.startsWith('Demo Analysis Result:')) {
         console.log('Detected demo content in intelligent test response, using fallback');
         throw new Error('Demo content detected');
       }
 
-      // Clean the AI response
-      const cleanedResult = aiResult
-        .replace(/```json\s*/g, '')
-        .replace(/```\s*/g, '')
-        .replace(/^[^{]*(\{.*\})[^}]*$/, '$1')
-        .trim();
+      // Clean the AI response more aggressively
+      let cleanedResult = aiResult;
+      
+      // Remove markdown code blocks
+      cleanedResult = cleanedResult.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      
+      // Extract JSON object - find first { and last }
+      const firstBrace = cleanedResult.indexOf('{');
+      const lastBrace = cleanedResult.lastIndexOf('}');
+      
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanedResult = cleanedResult.substring(firstBrace, lastBrace + 1);
+      }
+      
+      cleanedResult = cleanedResult.trim();
 
-      console.log('Cleaned intelligent test result for JSON parsing:', cleanedResult.substring(0, 200) + '...');
+      console.log('Cleaned intelligent test result for JSON parsing:', cleanedResult);
 
       const parsed = JSON.parse(cleanedResult);
+      console.log('Parsed intelligent test result:', parsed);
+
+      // Validate the parsed result has required fields
+      if (!parsed.testSteps || !Array.isArray(parsed.testSteps) || parsed.testSteps.length === 0) {
+        console.warn('AI response missing testSteps array or empty, generating fallback test steps');
+        // Generate fallback test steps based on use case type
+        parsed.testSteps = this.generateFallbackTestSteps(formData);
+      }
 
       // Ensure test steps have proper numbering and required fields
       const testSteps = (parsed.testSteps || []).map((step: any, index: number) => ({
@@ -308,7 +334,7 @@ CONTEXTO BANCARIO ING:
         inputData: step.inputData || 'Datos de entrada',
         expectedResult: step.expectedResult || 'Resultado esperado',
         observations: step.observations || '',
-        status: 'pending'
+        status: 'pending' as const
       }));
 
       return {
@@ -319,7 +345,96 @@ CONTEXTO BANCARIO ING:
       };
     } catch (error) {
       console.error('Error parsing intelligent test result:', error);
+      console.error('AI Result that failed to parse:', aiResult);
       return this.generateDemoIntelligentTests(formData);
+    }
+  }
+
+  private generateFallbackTestSteps(formData: UseCaseFormData): any[] {
+    const baseSteps = [
+      {
+        action: 'Acceder al sistema con credenciales válidas',
+        inputData: 'Usuario y contraseña correctos',
+        expectedResult: 'Acceso exitoso al sistema',
+        observations: 'Verificar logs de auditoría',
+        status: 'pending'
+      },
+      {
+        action: `Navegar a la funcionalidad ${formData.useCaseName}`,
+        inputData: 'Menú principal o acceso directo',
+        expectedResult: 'Pantalla de la funcionalidad desplegada correctamente',
+        observations: 'Verificar tiempo de carga',
+        status: 'pending'
+      }
+    ];
+
+    switch (formData.useCaseType) {
+      case 'entity':
+        return [
+          ...baseSteps,
+          {
+            action: 'Realizar búsqueda con filtros válidos',
+            inputData: formData.searchFilters?.join(', ') || 'Filtros de búsqueda',
+            expectedResult: 'Resultados mostrados correctamente',
+            observations: 'Verificar paginación',
+            status: 'pending'
+          },
+          {
+            action: 'Validar campos obligatorios',
+            inputData: 'Dejar campos obligatorios vacíos',
+            expectedResult: 'Mensaje de error correspondiente',
+            observations: 'Verificar mensajes de validación',
+            status: 'pending'
+          },
+          {
+            action: 'Crear nuevo registro',
+            inputData: 'Datos válidos en todos los campos',
+            expectedResult: 'Registro creado exitosamente',
+            observations: 'Verificar auditoría',
+            status: 'pending'
+          }
+        ];
+      
+      case 'api':
+        return [
+          ...baseSteps,
+          {
+            action: 'Enviar petición con datos válidos',
+            inputData: 'JSON con estructura correcta',
+            expectedResult: 'Respuesta HTTP 200/201',
+            observations: 'Verificar headers y body',
+            status: 'pending'
+          },
+          {
+            action: 'Enviar petición con datos inválidos',
+            inputData: 'JSON con campos faltantes',
+            expectedResult: 'Respuesta HTTP 400 con mensaje de error',
+            observations: 'Verificar estructura del error',
+            status: 'pending'
+          }
+        ];
+      
+      case 'service':
+        return [
+          ...baseSteps,
+          {
+            action: 'Ejecutar servicio manualmente',
+            inputData: 'Parámetros de configuración',
+            expectedResult: 'Servicio ejecutado correctamente',
+            observations: 'Verificar logs de ejecución',
+            status: 'pending'
+          },
+          {
+            action: 'Verificar procesamiento de datos',
+            inputData: 'Volumen de datos de prueba',
+            expectedResult: 'Datos procesados correctamente',
+            observations: 'Verificar integridad de datos',
+            status: 'pending'
+          }
+        ];
+      
+      default:
+        return baseSteps;
     }
   }
 

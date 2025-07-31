@@ -30,8 +30,14 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Multi-step Form System**: Progressive form with 9 steps for entity use cases and 6 for others, featuring dynamic fields and client-side validation.
 - **AI Integration Layer**: Supports multiple AI providers (OpenAI, Claude, Grok, Gemini) via an abstracted `AIService`, including a demo mode for testing without API keys.
 - **Document Generation**: AI-powered content generation with support for HTML preview and DOCX export, utilizing predefined templates and live preview with Microsoft-style formatting.
-- **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in both HTML preview and DOCX export with professional table formatting.
+- **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in both HTML preview and DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
+
+### Recent Updates (January 31, 2025)
+- **Enhanced Intelligent Test Case Parsing**: Improved JSON parsing logic to handle various AI response formats more robustly
+- **Fallback Test Step Generation**: Added automatic fallback test step generation when AI doesn't provide complete test steps
+- **Better Error Logging**: Enhanced logging for intelligent test case generation to help diagnose integration issues
+- **Test Case Export Integration**: Ensured intelligent test cases are properly included in DOCX exports
 
 ## External Dependencies
 

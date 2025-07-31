@@ -1103,8 +1103,9 @@ export class DocumentService {
     });
     paragraphs.push(testCaseTitle);
 
-    // Add objective if provided
-    if (testCaseData.testCaseObjective) {
+    // Add objective if provided (handle both formats)
+    const objective = testCaseData.testCaseObjective || testCaseData.objective;
+    if (objective) {
       const objectiveTitle = new Paragraph({
         spacing: { before: 200, after: 100 },
         children: [
@@ -1122,7 +1123,7 @@ export class DocumentService {
         spacing: { after: 120 },
         children: [
           new TextRun({
-            text: testCaseData.testCaseObjective,
+            text: objective,
             size: 22,
             font: "Segoe UI Semilight"
           })
@@ -1131,8 +1132,9 @@ export class DocumentService {
       paragraphs.push(objectiveContent);
     }
 
-    // Add preconditions if provided
-    if (testCaseData.testCasePreconditions) {
+    // Add preconditions if provided (handle both formats)
+    const preconditions = testCaseData.testCasePreconditions || testCaseData.preconditions;
+    if (preconditions) {
       const preconditionsTitle = new Paragraph({
         spacing: { before: 200, after: 100 },
         children: [
@@ -1150,7 +1152,7 @@ export class DocumentService {
         spacing: { after: 120 },
         children: [
           new TextRun({
-            text: testCaseData.testCasePreconditions,
+            text: preconditions,
             size: 22,
             font: "Segoe UI Semilight"
           })
