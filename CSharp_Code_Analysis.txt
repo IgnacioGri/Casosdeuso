@@ -1,0 +1,56 @@
+=== PROYECTO C# BLAZOR - CÓDIGO COMPLETO ===
+
+Este es el código completo del sistema C# Blazor WebAssembly para análisis.
+Sistema de generación automática de casos de uso empresarial.
+
+=== ESTRUCTURA DEL PROYECTO ===
+
+ConceptForge_CSharp/
+├── UseCaseGenerator.sln                    # Solución principal
+├── UseCaseGenerator.Client/                # Frontend Blazor WebAssembly
+├── UseCaseGenerator.Server/                # Backend ASP.NET Core  
+└── UseCaseGenerator.Shared/                # Modelos compartidos
+
+=== FUNCIONALIDADES PRINCIPALES ===
+
+1. Generación de casos de uso con formulario multi-paso
+2. Integración con múltiples servicios de IA (OpenAI, Claude, Gemini, Grok)
+3. Generación de casos de prueba inteligentes
+4. Exportación a documentos DOCX con formato corporativo
+5. Análisis de minutas automático
+6. Asistencia de IA campo por campo
+
+=== PUNTOS A REVISAR ESPECIALMENTE ===
+
+1. DocumentService.cs - Generación DOCX directa desde form data
+2. AIService.cs - Manejo de múltiples proveedores de IA
+3. Controllers - Validación y manejo de errores
+4. Componentes Blazor - Gestión de estado y navegación
+5. Configuración de CORS y servicios
+6. Manejo de archivos y streams
+7. Serialización JSON de objetos complejos
+
+=== TECNOLOGÍAS USADAS ===
+
+- .NET 8
+- Blazor WebAssembly
+- ASP.NET Core Web API
+- MudBlazor UI Framework
+- Entity Framework Core
+- DocumentFormat.OpenXml
+- Multiple AI SDKs
+
+=== ARCHIVOS INCLUIDOS EN EL ANÁLISIS ===
+
+Ver el archivo ConceptForge_CSharp_Code.tar.gz que contiene todos los archivos .cs, .razor, .csproj y configuraciones necesarias.
+
+El archivo excluye automáticamente:
+- Carpetas obj/ y bin/ (archivos compilados)
+- Carpetas .vs/ (configuración IDE)
+- Packages/ (dependencias NuGet)
+
+Tamaño del archivo: 46KB (perfecto para análisis en ChatGPT)
+
+=== PROMPT SUGERIDO PARA CHATGPT ===
+
+"Por favor analiza este código C# Blazor WebAssembly buscando errores, problemas de seguridad, performance issues, malas prácticas y oportunidades de mejora. Es un sistema de generación de casos de uso empresarial con integración de IA."
