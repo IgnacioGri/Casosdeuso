@@ -39,8 +39,12 @@ export class IntelligentTestCaseService {
       return this.parseIntelligentTestResult(testCaseResult, formData);
     } catch (error) {
       console.error('Error generating intelligent test cases:', error);
-      // Fallback to demo intelligent test cases
-      return this.generateDemoIntelligentTests(formData);
+      // Re-throw the error with detailed information
+      if (error instanceof Error) {
+        throw new Error(`Error al generar casos de prueba inteligentes: ${error.message}`);
+      } else {
+        throw new Error('Error desconocido al generar casos de prueba inteligentes');
+      }
     }
   }
 
@@ -346,7 +350,13 @@ CONTEXTO BANCARIO ING:
     } catch (error) {
       console.error('Error parsing intelligent test result:', error);
       console.error('AI Result that failed to parse:', aiResult);
-      return this.generateDemoIntelligentTests(formData);
+      
+      // Try to provide a helpful error message
+      if (error instanceof SyntaxError) {
+        throw new Error('La respuesta de IA no tiene el formato JSON esperado. Por favor, intente nuevamente.');
+      } else {
+        throw new Error(`Error al procesar la respuesta de IA: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      }
     }
   }
 

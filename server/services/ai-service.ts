@@ -72,7 +72,7 @@ export class AIService {
     const { aiModel, formData, rules } = request;
 
     if (aiModel === 'demo') {
-      return this.generateDemoContent(formData);
+      throw new Error('El modo demo no está disponible. Por favor, configure una clave API válida para usar el generador.');
     }
 
     try {
@@ -566,90 +566,106 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       });
     }
 
-    try {
-      let result: string;
-      
-      switch (aiModel) {
-        case 'openai':
-          result = await AIService.processWithOpenAI(prompt, JSON.stringify(context));
-          break;
-        case 'claude':
-          result = await AIService.processWithClaude(prompt, JSON.stringify(context));
-          break;
-        case 'grok':
-          result = await AIService.processWithGrok(prompt, JSON.stringify(context));
-          break;
-        case 'gemini':
-          result = await AIService.processWithGemini(prompt, JSON.stringify(context));
-          break;
-        case 'copilot':
-          result = await AIService.processWithCopilot(prompt, JSON.stringify(context));
-          break;
-        default:
-          throw new Error(`Modelo de IA no soportado: ${aiModel}`);
+    // Use the same fallback mechanism as processFieldWithAI
+    const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
+    const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel && m !== 'demo')];
+    const errors: Array<{model: string, error: string}> = [];
+    
+    for (const model of modelOrder) {
+      try {
+        console.log(`Attempting to generate test cases with AI model: ${model}`);
+        let result: string;
+        
+        switch (model) {
+          case 'openai':
+            result = await AIService.processWithOpenAI(prompt, JSON.stringify(context));
+            break;
+          case 'claude':
+            result = await AIService.processWithClaude(prompt, JSON.stringify(context));
+            break;
+          case 'grok':
+            result = await AIService.processWithGrok(prompt, JSON.stringify(context));
+            break;
+          case 'gemini':
+            result = await AIService.processWithGemini(prompt, JSON.stringify(context));
+            break;
+          case 'copilot':
+            result = await AIService.processWithCopilot(prompt, JSON.stringify(context));
+            break;
+          case 'demo':
+            continue; // Skip demo mode in fallback
+          default:
+            continue; // Skip unsupported models
+        }
+        
+        console.log(`Successfully generated test cases with ${model}`);
+        return result;
+      } catch (error: any) {
+        console.error(`Failed to generate test cases with ${model}:`, error.message || error);
+        errors.push({
+          model,
+          error: error.message || 'Unknown error'
+        });
+        // Continue to next model
       }
-      
-      return result;
-    } catch (error) {
-      console.error('Error generating test cases:', error);
-      throw error;
     }
+    
+    // All models failed
+    const errorDetails = errors.map(e => `${e.model}: ${e.error}`).join('\n');
+    throw new Error(`No se pudo generar casos de prueba con ningún modelo de IA disponible. Errores:\n${errorDetails}`);
   }
 
   static async processFieldWithAI(systemPrompt: string, fieldValue: string, aiModel: string): Promise<string> {
-    if (aiModel === 'demo') {
-      // For minute analysis, return a structured JSON response in demo mode
-      if (systemPrompt.includes('minute-analysis') || systemPrompt.includes('minuta')) {
-        return JSON.stringify({
-          clientName: "Banco Provincia",
-          projectName: "Sistema de Gestión Integral",
-          useCaseCode: "BP001",
-          useCaseName: "Gestionar información del cliente",
-          fileName: "BP001GestionarInformacionCliente",
-          description: "Permite gestionar la información completa de los clientes del banco incluyendo consulta, actualización y seguimiento de la relación comercial.",
-          searchFilters: ["DNI/CUIT", "Apellido", "Email", "Número de Cliente"],
-          resultColumns: ["ID Cliente", "Apellido y Nombres", "Documento", "Email", "Estado"],
-          entityFields: [
-            { name: "clienteId", type: "number", mandatory: true, length: 10 },
-            { name: "tipoDocumento", type: "text", mandatory: true, length: 10 },
-            { name: "numeroDocumento", type: "text", mandatory: true, length: 20 }
-          ],
-          businessRules: ["1. Solo usuarios autorizados pueden acceder", "2. Se debe validar formato de documentos"],
-          specialRequirements: ["1. Integración con sistema legado", "2. Logging de operaciones críticas"],
-          isAIGenerated: true
+    // Define fallback order - try other models if the primary fails
+    const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
+    
+    // Start with the requested model
+    const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel && m !== 'demo')];
+    
+    const errors: Array<{model: string, error: string}> = [];
+    
+    for (const model of modelOrder) {
+      try {
+        console.log(`Attempting to process with AI model: ${model}`);
+        let result: string;
+        
+        switch (model) {
+          case 'openai':
+            result = await this.processWithOpenAI(systemPrompt, fieldValue);
+            break;
+          case 'claude':
+            result = await this.processWithClaude(systemPrompt, fieldValue);
+            break;
+          case 'grok':
+            result = await this.processWithGrok(systemPrompt, fieldValue);
+            break;
+          case 'gemini':
+            result = await this.processWithGemini(systemPrompt, fieldValue);
+            break;
+          case 'copilot':
+            result = await this.processWithCopilot(systemPrompt, fieldValue);
+            break;
+          case 'demo':
+            continue; // Skip demo mode in fallback
+          default:
+            continue; // Skip unsupported models
+        }
+        
+        console.log(`Successfully processed with ${model}`);
+        return result;
+      } catch (error: any) {
+        console.error(`Failed to process with ${model}:`, error.message || error);
+        errors.push({
+          model,
+          error: error.message || 'Unknown error'
         });
+        // Continue to next model
       }
-      return `Demo Analysis Result: Processed text with ${fieldValue.length} characters using system prompt.`;
     }
-
-    try {
-      let result: string;
-      
-      switch (aiModel) {
-        case 'openai':
-          result = await this.processWithOpenAI(systemPrompt, fieldValue);
-          break;
-        case 'claude':
-          result = await this.processWithClaude(systemPrompt, fieldValue);
-          break;
-        case 'grok':
-          result = await this.processWithGrok(systemPrompt, fieldValue);
-          break;
-        case 'gemini':
-          result = await this.processWithGemini(systemPrompt, fieldValue);
-          break;
-        case 'copilot':
-          result = await this.processWithCopilot(systemPrompt, fieldValue);
-          break;
-        default:
-          throw new Error(`Modelo de IA no soportado: ${aiModel}`);
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error processing field with AI:', error);
-      throw error;
-    }
+    
+    // All models failed
+    const errorDetails = errors.map(e => `${e.model}: ${e.error}`).join('\n');
+    throw new Error(`No se pudo procesar con ningún modelo de IA disponible. Errores:\n${errorDetails}`);
   }
 
   private static async processWithOpenAI(systemPrompt: string, fieldValue: string): Promise<string> {

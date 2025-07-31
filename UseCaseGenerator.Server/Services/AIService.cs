@@ -76,7 +76,7 @@ public class AIService : IAIService, IDisposable
         {
             if (request.FormData.AiModel == AIModel.Demo)
             {
-                return GenerateDemoContent(request.FormData);
+                throw new InvalidOperationException("El modo demo no está disponible. Por favor, configure una clave API válida para usar el generador.");
             }
 
             var prompt = BuildPrompt(request.FormData, request.Rules);
@@ -179,7 +179,7 @@ public class AIService : IAIService, IDisposable
     {
         if (aiModel == AIModel.Demo)
         {
-            return content + $"\n\n<div style=\"background-color: #e6ffe6; padding: 10px; margin-top: 20px; border-left: 4px solid #28a745;\"><strong>Modo Demo:</strong> Se aplicarían los cambios: \"{instructions}\"</div>";
+            throw new InvalidOperationException("El modo demo no está disponible. Por favor, configure una clave API válida para editar casos de uso.");
         }
 
         try
@@ -209,11 +209,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         {
             if (request.AiModel == AIModel.Demo)
             {
-                return new AIAssistResponse
-                {
-                    ImprovedValue = GetDemoFieldImprovement(request.FieldName, request.CurrentValue, "text"),
-                    Success = true
-                };
+                throw new InvalidOperationException("El modo demo no está disponible. Por favor, configure una clave API válida para mejorar campos.");
             }
 
             var rules = GetFieldRules(request.FieldName, "text", request.Context);
@@ -242,56 +238,77 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
     public async Task<string> ProcessFieldWithAIAsync(string systemPrompt, string fieldValue, AIModel aiModel)
     {
-        if (aiModel == AIModel.Demo)
+        // Define fallback order - try other models if the primary fails
+        var aiModels = new[] { AIModel.Copilot, AIModel.Gemini, AIModel.OpenAI, AIModel.Claude, AIModel.Grok };
+        
+        // Start with the requested model
+        var modelOrder = new List<AIModel> { aiModel };
+        modelOrder.AddRange(aiModels.Where(m => m != aiModel && m != AIModel.Demo));
+        
+        var errors = new List<(AIModel model, string error)>();
+        
+        foreach (var model in modelOrder)
         {
-            if (systemPrompt.Contains("minute-analysis") || systemPrompt.Contains("minuta"))
+            try
             {
-                return JsonSerializer.Serialize(new
-                {
-                    clientName = "Banco Provincia",
-                    projectName = "Sistema de Gestión Integral",
-                    useCaseCode = "BP001",
-                    useCaseName = "Gestionar información del cliente",
-                    fileName = "BP001GestionarInformacionCliente",
-                    description = "Permite gestionar la información completa de los clientes del banco incluyendo consulta, actualización y seguimiento de la relación comercial.",
-                    searchFilters = new[] { "DNI/CUIT", "Apellido", "Email", "Número de Cliente" },
-                    resultColumns = new[] { "ID Cliente", "Apellido y Nombres", "Documento", "Email", "Estado" },
-                    entityFields = new[] 
-                    {
-                        new { name = "clienteId", type = "number", mandatory = true, length = 10 },
-                        new { name = "tipoDocumento", type = "text", mandatory = true, length = 10 },
-                        new { name = "numeroDocumento", type = "text", mandatory = true, length = 20 }
-                    },
-                    businessRules = new[] { "1. Solo usuarios autorizados pueden acceder", "2. Se debe validar formato de documentos" },
-                    specialRequirements = new[] { "1. Integración con sistema legado", "2. Logging de operaciones críticas" },
-                    isAIGenerated = true
-                });
+                _logger.LogInformation("Attempting to process with AI model: {Model}", model);
+                var result = await ProcessWithAI(systemPrompt, fieldValue, model);
+                _logger.LogInformation("Successfully processed with {Model}", model);
+                return result;
             }
-            return $"Demo Analysis Result: Processed text with {fieldValue.Length} characters using system prompt.";
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to process with {Model}", model);
+                errors.Add((model, ex.Message));
+                // Continue to next model
+            }
         }
-
-        try
-        {
-            return await ProcessWithAI(systemPrompt, fieldValue, aiModel);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error processing field with AI model {Model}", aiModel);
-            throw;
-        }
+        
+        // All models failed
+        var errorDetails = string.Join("\n", errors.Select(e => $"{e.model}: {e.error}"));
+        throw new InvalidOperationException($"No se pudo procesar con ningún modelo de IA disponible. Errores:\n{errorDetails}");
     }
 
     private async Task<string> GenerateWithAI(string prompt, AIModel aiModel)
     {
-        return aiModel switch
+        // Define fallback order - try other models if the primary fails
+        var aiModels = new[] { AIModel.Copilot, AIModel.Gemini, AIModel.OpenAI, AIModel.Claude, AIModel.Grok };
+        
+        // Start with the requested model
+        var modelOrder = new List<AIModel> { aiModel };
+        modelOrder.AddRange(aiModels.Where(m => m != aiModel && m != AIModel.Demo));
+        
+        var errors = new List<(AIModel model, string error)>();
+        
+        foreach (var model in modelOrder)
         {
-            AIModel.OpenAI => await GenerateWithOpenAI(prompt),
-            AIModel.Claude => await GenerateWithClaude(prompt),
-            AIModel.Grok => await GenerateWithGrok(prompt),
-            AIModel.Gemini => await GenerateWithGemini(prompt),
-            AIModel.Copilot => await GenerateWithCopilot(prompt),
-            _ => throw new ArgumentException($"Unsupported AI model: {aiModel}")
-        };
+            try
+            {
+                _logger.LogInformation("Attempting to generate content with AI model: {Model}", model);
+                var result = model switch
+                {
+                    AIModel.OpenAI => await GenerateWithOpenAI(prompt),
+                    AIModel.Claude => await GenerateWithClaude(prompt),
+                    AIModel.Grok => await GenerateWithGrok(prompt),
+                    AIModel.Gemini => await GenerateWithGemini(prompt),
+                    AIModel.Copilot => await GenerateWithCopilot(prompt),
+                    _ => throw new ArgumentException($"Unsupported AI model: {model}")
+                };
+                
+                _logger.LogInformation("Successfully generated content with {Model}", model);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to generate with {Model}", model);
+                errors.Add((model, ex.Message));
+                // Continue to next model
+            }
+        }
+        
+        // All models failed
+        var errorDetails = string.Join("\n", errors.Select(e => $"{e.model}: {e.error}"));
+        throw new InvalidOperationException($"No se pudo generar contenido con ningún modelo de IA disponible. Errores:\n{errorDetails}");
     }
 
     private async Task<string> ProcessWithAI(string systemPrompt, string fieldValue, AIModel aiModel)
