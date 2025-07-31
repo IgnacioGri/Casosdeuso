@@ -50,9 +50,9 @@
                                    Class="flex-1" 
                                    InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20"
                                    InputStyle="opacity:0"
-                                   @ondragenter="@SetDragClass" 
-                                   @ondragleave="@ClearDragClass" 
-                                   @ondragend="@ClearDragClass">
+                                   @ondragenter="() => SetDragClass()" 
+                                   @ondragleave="() => ClearDragClass()" 
+                                   @ondragend="() => ClearDragClass()">
                         <ChildContent>
                             <MudPaper Height="200px" 
                                       Outlined="true" 
