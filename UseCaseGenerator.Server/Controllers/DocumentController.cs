@@ -26,7 +26,7 @@ public class DocumentController : ControllerBase
 
     [HttpPost("docx")]
     [RequestSizeLimit(10_485_760)] // 10MB limit
-    public async Task<IActionResult> GenerateDocx([FromBody] GenerateDocxRequest request)
+    public IActionResult GenerateDocx([FromBody] GenerateDocxRequest request)
     {
         try
         {
@@ -54,13 +54,13 @@ public class DocumentController : ControllerBase
                 Description = InputValidator.SanitizeText(request.FormData?.Description, 1000),
                 UseCaseType = request.FormData?.UseCaseType ?? UseCaseType.Entity,
                 BusinessRules = InputValidator.SanitizeText(request.FormData?.BusinessRules, 2000),
-                SearchFilters = request.FormData?.SearchFilters,
-                ResultColumns = request.FormData?.ResultColumns,
-                EntityFields = request.FormData?.EntityFields,
+                SearchFilters = request.FormData?.SearchFilters ?? new List<string>(),
+                ResultColumns = request.FormData?.ResultColumns ?? new List<string>(),
+                EntityFields = request.FormData?.EntityFields ?? new List<EntityField>(),
                 GenerateTestCase = request.FormData?.GenerateTestCase ?? false,
                 TestCaseObjective = InputValidator.SanitizeText(request.FormData?.TestCaseObjective, 500),
                 TestCasePreconditions = InputValidator.SanitizeText(request.FormData?.TestCasePreconditions, 500),
-                TestSteps = request.FormData?.TestSteps,
+                TestSteps = request.FormData?.TestSteps ?? new List<TestStep>(),
                 // FormData not stored in UseCase model
                 CreatedAt = DateTime.UtcNow
             };

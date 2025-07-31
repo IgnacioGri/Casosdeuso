@@ -446,7 +446,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
-    private async Task<string> GenerateWithGemini(string prompt)
+    private Task<string> GenerateWithGemini(string prompt)
     {
         // Implementation for Gemini API
         throw new NotImplementedException("Gemini integration pending");
@@ -476,17 +476,17 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
         return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
-    private async Task<string> ProcessWithClaude(string systemPrompt, string fieldValue)
+    private Task<string> ProcessWithClaude(string systemPrompt, string fieldValue)
     {
         throw new NotImplementedException("Claude integration pending");
     }
 
-    private async Task<string> ProcessWithGrok(string systemPrompt, string fieldValue)
+    private Task<string> ProcessWithGrok(string systemPrompt, string fieldValue)
     {
         throw new NotImplementedException("Grok integration pending");
     }
 
-    private async Task<string> ProcessWithGemini(string systemPrompt, string fieldValue)
+    private Task<string> ProcessWithGemini(string systemPrompt, string fieldValue)
     {
         throw new NotImplementedException("Gemini integration pending");
     }
