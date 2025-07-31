@@ -87,7 +87,10 @@ public class IntelligentTestCaseResponse
 {
     public bool Success { get; set; }
     public string? Error { get; set; }
-    public List<TestCase> TestCases { get; set; } = new();
+    public string Objective { get; set; } = string.Empty;
+    public string Preconditions { get; set; } = string.Empty;
+    public List<TestStep> TestSteps { get; set; } = new();
+    public string AnalysisNotes { get; set; } = string.Empty;
 }
 
 public class AnalyzeForTestCasesRequest

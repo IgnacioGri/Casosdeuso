@@ -174,21 +174,6 @@ Responde ÚNICAMENTE con el JSON válido.
             var root = document.RootElement;
             _logger.LogInformation("Parsed intelligent test result successfully");
 
-            var response = new IntelligentTestCaseResponse
-            {
-                Success = true
-            };
-
-            // Create a TestCase object with the parsed data
-            var testCase = new TestCase
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Caso de prueba generado",
-                Objective = GetStringProperty(root, "objective", ""),
-                Preconditions = GetStringProperty(root, "preconditions", ""),
-                Description = GetStringProperty(root, "analysisNotes", "")
-            };
-
             // Parse test steps
             var testSteps = new List<TestStep>();
             if (root.TryGetProperty("testSteps", out var stepsElement) && stepsElement.ValueKind == JsonValueKind.Array)
@@ -202,11 +187,17 @@ Responde ÚNICAMENTE con el JSON válido.
             if (testSteps.Count == 0)
             {
                 _logger.LogWarning("AI response missing testSteps array or empty, generating fallback test steps");
-                testSteps = GenerateFallbackTestSteps(testCase.Name);
+                testSteps = GenerateFallbackTestSteps(formData.UseCaseName);
             }
-            
-            testCase.Steps = testSteps;
-            response.TestCases.Add(testCase);
+
+            var response = new IntelligentTestCaseResponse
+            {
+                Success = true,
+                Objective = GetStringProperty(root, "objective", ""),
+                Preconditions = GetStringProperty(root, "preconditions", ""),
+                TestSteps = testSteps,
+                AnalysisNotes = GetStringProperty(root, "analysisNotes", "")
+            };
 
             return response;
         }

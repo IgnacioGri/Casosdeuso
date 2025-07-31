@@ -1,15 +1,53 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
+@inject HttpClient Http
+@inject ISnackbar Snackbar
 
 <MudGrid>
     <MudItem xs="12">
-        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
-            Casos de Prueba
-        </MudText>
-        <MudText Typo="Typo.body1" Class="mb-4">
-            Configura la generación de casos de prueba automáticos o define casos específicos manualmente.
-        </MudText>
+        <div class="d-flex justify-space-between align-center mb-4">
+            <div>
+                <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+                    Casos de Prueba
+                </MudText>
+                <MudText Typo="Typo.body1">
+                    Configura la generación de casos de prueba automáticos o define casos específicos manualmente.
+                </MudText>
+            </div>
+            
+            @if (FormData.GenerateTestCase)
+            {
+                <MudCard Class="pa-4" Style="background-color: #f3e5f5; border: 1px solid #ce93d8;">
+                    <MudCardContent Class="pa-0">
+                        <div class="d-flex align-center justify-space-between">
+                            <div class="d-flex align-center">
+                                <MudIcon Icon="@Icons.Material.Filled.Psychology" Color="Color.Secondary" Class="mr-2" />
+                                <div>
+                                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Generación Inteligente</MudText>
+                                    <MudText Typo="Typo.caption">Analiza todo el caso de uso y crea pruebas completas</MudText>
+                                </div>
+                            </div>
+                            <MudButton Variant="Variant.Filled" 
+                                       Color="Color.Secondary"
+                                       StartIcon="@Icons.Material.Filled.AutoAwesome"
+                                       OnClick="GenerateIntelligentTestCases"
+                                       Disabled="@isGenerating">
+                                @if (isGenerating)
+                                {
+                                    <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                                    <span>Generando...</span>
+                                }
+                                else
+                                {
+                                    <span>Generar Casos Inteligentes</span>
+                                }
+                            </MudButton>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            }
+        </div>
     </MudItem>
     
     <!-- Test Case Generation Toggle -->
@@ -167,6 +205,55 @@
 @code {
     [Parameter] public UseCaseFormData FormData { get; set; } = new();
     [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+    
+    private bool isGenerating = false;
+
+    private async Task GenerateIntelligentTestCases()
+    {
+        isGenerating = true;
+        try
+        {
+            var request = new IntelligentTestCaseRequest
+            {
+                FormData = FormData,
+                AiModel = FormData.AiModel
+            };
+
+            var response = await Http.PostAsJsonAsync("api/intelligent-test-cases", request);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<IntelligentTestCaseResponse>();
+                
+                if (result != null && result.Success)
+                {
+                    // Update form data with the intelligent test case results
+                    FormData.TestCaseObjective = result.Objective;
+                    FormData.TestCasePreconditions = result.Preconditions;
+                    FormData.TestSteps = result.TestSteps;
+                    
+                    await FormDataChanged.InvokeAsync(FormData);
+                    Snackbar.Add("Casos de prueba generados exitosamente", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add(result?.Error ?? "Error al generar casos de prueba", Severity.Error);
+                }
+            }
+            else
+            {
+                Snackbar.Add("Error al comunicarse con el servidor", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al generar casos de prueba: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
 
     private async Task AddTestStep()
     {
