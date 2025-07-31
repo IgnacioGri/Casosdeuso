@@ -35,11 +35,24 @@ public class IntelligentTestCaseService : IIntelligentTestCaseService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating intelligent test cases");
-            return new IntelligentTestCaseResponse
+            
+            // Re-throw with detailed information
+            if (ex is InvalidOperationException)
             {
-                Success = false,
-                Error = ex.Message
-            };
+                return new IntelligentTestCaseResponse
+                {
+                    Success = false,
+                    Error = ex.Message
+                };
+            }
+            else
+            {
+                return new IntelligentTestCaseResponse
+                {
+                    Success = false,
+                    Error = $"Error al generar casos de prueba inteligentes: {ex.Message}"
+                };
+            }
         }
     }
 
@@ -136,8 +149,30 @@ Responde ÚNICAMENTE con el JSON válido.
     {
         try
         {
-            using var document = JsonDocument.Parse(jsonResult);
+            _logger.LogInformation($"Raw intelligent test result: {jsonResult.Substring(0, Math.Min(500, jsonResult.Length))}...");
+            
+            // Clean the AI response more aggressively
+            var cleanedResult = jsonResult;
+            
+            // Remove markdown code blocks
+            cleanedResult = Regex.Replace(cleanedResult, @"```json\s*", "", RegexOptions.IgnoreCase);
+            cleanedResult = Regex.Replace(cleanedResult, @"```\s*", "", RegexOptions.IgnoreCase);
+            
+            // Extract JSON object - find first { and last }
+            var firstBrace = cleanedResult.IndexOf('{');
+            var lastBrace = cleanedResult.LastIndexOf('}');
+            
+            if (firstBrace != -1 && lastBrace != -1)
+            {
+                cleanedResult = cleanedResult.Substring(firstBrace, lastBrace - firstBrace + 1);
+            }
+            
+            cleanedResult = cleanedResult.Trim();
+            _logger.LogInformation($"Cleaned intelligent test result for JSON parsing: {cleanedResult}");
+
+            using var document = JsonDocument.Parse(cleanedResult);
             var root = document.RootElement;
+            _logger.LogInformation("Parsed intelligent test result successfully");
 
             var response = new IntelligentTestCaseResponse
             {
@@ -155,25 +190,44 @@ Responde ÚNICAMENTE con el JSON válido.
             };
 
             // Parse test steps
+            var testSteps = new List<TestStep>();
             if (root.TryGetProperty("testSteps", out var stepsElement) && stepsElement.ValueKind == JsonValueKind.Array)
             {
-                testCase.Steps = stepsElement.EnumerateArray()
+                testSteps = stepsElement.EnumerateArray()
                     .Select(ParseTestStep)
                     .ToList();
             }
-
+            
+            // Validate the parsed result has required fields
+            if (testSteps.Count == 0)
+            {
+                _logger.LogWarning("AI response missing testSteps array or empty, generating fallback test steps");
+                testSteps = GenerateFallbackTestSteps(testCase.Name);
+            }
+            
+            testCase.Steps = testSteps;
             response.TestCases.Add(testCase);
 
             return response;
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "Error parsing test case result JSON");
-            return new IntelligentTestCaseResponse
+            _logger.LogError(ex, $"Error parsing test case result JSON: {jsonResult}");
+            
+            // Try to provide a helpful error message
+            if (ex.Message.Contains("Unexpected character"))
             {
-                Success = false,
-                Error = "Error al procesar el resultado de los casos de prueba"
-            };
+                throw new InvalidOperationException("La respuesta de IA no tiene el formato JSON esperado. Por favor, intente nuevamente.");
+            }
+            else
+            {
+                throw new InvalidOperationException($"Error al procesar la respuesta de IA: {ex.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error parsing test case result");
+            throw new InvalidOperationException($"Error al procesar la respuesta de IA: {ex.Message}");
         }
     }
 
@@ -202,5 +256,79 @@ Responde ÚNICAMENTE con el JSON válido.
         return element.TryGetProperty(propertyName, out var prop) && prop.ValueKind == JsonValueKind.Number
             ? prop.GetInt32()
             : defaultValue;
+    }
+    
+    private List<TestStep> GenerateFallbackTestSteps(string useCaseName)
+    {
+        var baseSteps = new List<TestStep>
+        {
+            new TestStep
+            {
+                Number = 1,
+                Action = "Acceder al sistema con credenciales válidas",
+                InputData = "Usuario y contraseña correctos",
+                ExpectedResult = "Acceso exitoso al sistema",
+                Observations = "Verificar logs de auditoría",
+                Status = TestStepStatus.Pending
+            },
+            new TestStep
+            {
+                Number = 2,
+                Action = $"Navegar a la funcionalidad {useCaseName}",
+                InputData = "Menú principal o acceso directo",
+                ExpectedResult = "Pantalla de la funcionalidad desplegada correctamente",
+                Observations = "Verificar tiempo de carga",
+                Status = TestStepStatus.Pending
+            }
+        };
+
+        // Add type-specific steps based on use case name
+        if (useCaseName.Contains("Gestionar") || useCaseName.Contains("gestionar"))
+        {
+            baseSteps.AddRange(new[]
+            {
+                new TestStep
+                {
+                    Number = 3,
+                    Action = "Realizar búsqueda con filtros válidos",
+                    InputData = "Filtros de búsqueda configurados",
+                    ExpectedResult = "Resultados mostrados correctamente",
+                    Observations = "Verificar paginación",
+                    Status = TestStepStatus.Pending
+                },
+                new TestStep
+                {
+                    Number = 4,
+                    Action = "Validar campos obligatorios",
+                    InputData = "Dejar campos obligatorios vacíos",
+                    ExpectedResult = "Mensaje de error correspondiente",
+                    Observations = "Verificar mensajes de validación",
+                    Status = TestStepStatus.Pending
+                },
+                new TestStep
+                {
+                    Number = 5,
+                    Action = "Crear nuevo registro",
+                    InputData = "Datos válidos en todos los campos",
+                    ExpectedResult = "Registro creado exitosamente",
+                    Observations = "Verificar auditoría",
+                    Status = TestStepStatus.Pending
+                }
+            });
+        }
+        else
+        {
+            baseSteps.Add(new TestStep
+            {
+                Number = 3,
+                Action = "Ejecutar funcionalidad principal",
+                InputData = "Datos de prueba válidos",
+                ExpectedResult = "Operación completada exitosamente",
+                Observations = "Verificar resultado esperado",
+                Status = TestStepStatus.Pending
+            });
+        }
+
+        return baseSteps;
     }
 }
