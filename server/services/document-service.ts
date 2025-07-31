@@ -660,82 +660,45 @@ export class DocumentService {
       })];
     }
 
-    // Create document
-    const doc = new Document({
-      numbering: {
-        config: []
-      },
-      sections: [
-        {
-          properties: {
-            page: {
-              margin: {
-                top: 1440, // 1 inch = 1440 twips
-                right: 1440,
-                bottom: 1440,
-                left: 1440,
-                header: 720,
-                footer: 720
-              },
-              pageNumbers: {
-                start: 1,
-                formatType: NumberFormat.DECIMAL
-              }
-            }
-          },
-          headers: {
-            default: new Header({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: headerParagraphChildren
-                })
-              ]
-            })
-          },
-          footers: {
-            default: new Footer({
-              children: [
-                new Paragraph({
-                  alignment: AlignmentType.LEFT,
-                  tabStops: [{
-                    type: TabStopType.RIGHT,
-                    position: 9360  // Position in twips for right alignment
-                  }],
-                  children: [
-                    new TextRun({
-                      text: "Página ",
-                      font: "Segoe UI",
-                      size: 20
-                    }),
-                    new TextRun({
-                      children: [PageNumber.CURRENT],
-                      font: "Segoe UI",
-                      size: 20
-                    }),
-                    new TextRun({
-                      text: " de ",
-                      font: "Segoe UI",
-                      size: 20
-                    }),
-                    new TextRun({
-                      children: [PageNumber.TOTAL_PAGES],
-                      font: "Segoe UI",
-                      size: 20
-                    }),
-                    new TextRun({
-                      text: "\t" + (useCaseName || 'Caso de Uso'),
-                      font: "Segoe UI",
-                      size: 20
-                    })
-                  ]
-                })
-              ]
-            })
-          },
-          children: paragraphs
-        }
+    // Create document with static footer text as test
+    const footerParagraph = new Paragraph({
+      children: [
+        new TextRun({
+          text: "Página 1 de 1 - Test Footer",
+          size: 20
+        })
       ]
+    });
+
+    const doc = new Document({
+      sections: [{
+        properties: {
+          page: {
+            margin: {
+              top: 1440,
+              right: 1440,
+              bottom: 1440,
+              left: 1440
+            }
+          }
+        },
+        headers: {
+          default: new Header({
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: headerParagraphChildren
+              })
+            ]
+          })
+        },
+        footers: {
+          default: new Footer({
+            children: [footerParagraph]
+          })
+        },
+        children: paragraphs
+      }]
     });
 
     return await Packer.toBuffer(doc);
