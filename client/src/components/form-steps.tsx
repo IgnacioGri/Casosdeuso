@@ -1335,7 +1335,7 @@ export default function FormSteps({
               <Settings className="mr-2 text-ms-blue" size={20} />
               Revisión Final y Generación
             </h3>
-            <HelpButton step={9} useCaseType={formData.useCaseType} />
+            <HelpButton step={11} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">

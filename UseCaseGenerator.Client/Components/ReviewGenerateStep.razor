@@ -4,9 +4,12 @@
 
 <MudGrid>
     <MudItem xs="12">
-        <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
-            Revisar y Generar Caso de Uso
-        </MudText>
+        <div class="d-flex align-center mb-2">
+            <MudText Typo="Typo.h4" GutterBottom="false" Color="Color.Primary" Class="mr-2">
+                Revisar y Generar Caso de Uso
+            </MudText>
+            <HelpButton Step="11" UseCaseType="@FormData.UseCaseType" />
+        </div>
         <MudText Typo="Typo.body1" Class="mb-6">
             Revisa toda la información del caso de uso antes de generar el documento final.
         </MudText>

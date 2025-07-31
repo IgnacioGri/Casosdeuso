@@ -83,7 +83,7 @@ export function TestCaseStep({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">Casos de Prueba</h3>
-          <HelpButton step={10} useCaseType="entity" />
+          <HelpButton step={9} useCaseType="entity" />
         </div>
         
         {formData && onReplaceAllTestData && (
