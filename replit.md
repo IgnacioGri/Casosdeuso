@@ -41,6 +41,9 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Cascading AI Provider Fallback**: Implemented automatic fallback mechanism that tries multiple AI providers in sequence if one fails (e.g., Copilot → Gemini → OpenAI → Claude → Grok)
 - **Removed Demo Mode**: Eliminated demo data fallbacks - system now shows proper error messages when all AI providers fail
 - **Consistent Error Handling**: Both TypeScript and C# systems now have identical cascading fallback logic and error messages in Spanish
+- **DOCX Export Fix**: Fixed type validation error in DOCX export where testCasePreconditions could be non-string values (arrays/objects from AI responses)
+- **UI Improvements**: Updated progress indicator with correct step names and smaller icons (w-8 h-8) for better visual balance with 10 steps
+- **Help Content Updates**: Refreshed help button content to match current form structure with accurate step descriptions and AI Assist availability
 
 ## External Dependencies
 

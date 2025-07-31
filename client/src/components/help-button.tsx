@@ -112,123 +112,215 @@ export function HelpButton({ step, useCaseType }: HelpButtonProps) {
         };
 
       case 5:
-        return {
-          title: "Filtros de Búsqueda (Solo Entidades)",
-          description: "Define los criterios de búsqueda que tendrá tu sistema según las normas ING para interfaces de consulta.",
-          instructions: [
-            "Los filtros permiten a los usuarios buscar registros específicos",
-            "Incluye filtros básicos: nombre, código, estado, fechas",
-            "Para entidades de personas: DNI, email, teléfono son estándar",
-            "Piensa en los criterios que más usa el negocio para buscar",
-            "Puedes describir en texto libre y usar AI Assist para estructurar"
-          ],
-          aiAssistInfo: {
-            available: true,
-            explanation: "AI Assist convierte texto libre en filtros estructurados automáticamente.",
-            usage: [
-              "Describe en el área superior: 'Los usuarios buscarán por nombre, DNI y estado'",
-              "Presiona el botón AI Assist para convertir automáticamente en filtros individuales",
-              "El AI seguirá estándares bancarios para nombres de filtros",
-              "Generará una lista completa de filtros profesionales y técnicamente correctos",
-              "Luego puedes editar manualmente cada filtro si necesitas ajustes"
-            ]
-          }
-        };
-
-      case 6:
-        return {
-          title: "Columnas de Resultado (Solo Entidades)",
-          description: "Define qué información se mostrará en las tablas de resultados según estándares ING de presentación de datos.",
-          instructions: [
-            "Las columnas muestran la información más relevante de cada registro",
-            "Incluye siempre: código/ID, nombre principal, estado, fecha de alta",
-            "Para personas: nombre completo, DNI, email, teléfono",
-            "Ordena por importancia: datos identificatorios primero",
-            "Máximo 8-10 columnas para no sobrecargar la pantalla"
-          ],
-          aiAssistInfo: {
-            available: true,
-            explanation: "AI Assist transforma descripciones en columnas estructuradas con formato profesional.",
-            usage: [
-              "Describe en texto: 'Mostrar nombre completo, DNI, email y estado del cliente'",
-              "Presiona AI Assist para convertir en columnas automáticamente",
-              "El AI creará nombres técnicos apropiados para cada columna",
-              "Seguirá convenciones ING para etiquetas de interfaz",
-              "Agregará columnas estándar si faltan (estado, fechas)"
-            ]
-          }
-        };
-
-      case 7:
-        return {
-          title: "Campos de la Entidad (Solo Entidades)",
-          description: "Define todos los atributos que tendrá tu entidad de datos según normativas ING de modelado.",
-          instructions: [
-            "Lista todos los campos que almacenará la entidad en base de datos",
-            "Especifica tipo de dato: texto, número, fecha, booleano",
-            "Marca como obligatorios los campos críticos para el negocio",
-            "ING requiere siempre: fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion",
-            "Estos campos de auditoría se agregan automáticamente"
-          ],
-          aiAssistInfo: {
-            available: true,
-            explanation: "AI Assist convierte descripciones en campos JSON estructurados y agrega campos ING automáticamente.",
-            usage: [
-              "Describe campos en lenguaje natural: 'nombre completo texto obligatorio, edad número opcional'",
-              "Presiona AI Assist para generar campos estructurados automáticamente",
-              "El AI agregará automáticamente los 4 campos obligatorios ING de auditoría",
-              "Interpretará tipos de datos y obligatoriedad de tu descripción",
-              "Generará nombres técnicos apropiados para base de datos"
-            ]
-          }
-        };
-
-      case 8:
-        return {
-          title: "Información Adicional del Caso de Uso",
-          description: "Completa los detalles técnicos y de negocio según la estructura completa de la minuta ING.",
-          instructions: [
-            "Descripciones de Wireframes: Explica cómo se verán las pantallas",
-            "Flujos Alternativos: Describe qué pasa cuando algo sale mal",
-            "Reglas de Negocio: Lista las validaciones y restricciones",
-            "Requerimientos Especiales: Incluye integraciones, seguridad, performance",
-            "Usa lenguaje técnico pero comprensible"
-          ],
-          aiAssistInfo: {
-            available: true,
-            explanation: "AI Assist está disponible para cada campo principal para mejorar contenido y crear listas numeradas profesionales.",
-            usage: [
-              "Describe en texto simple tu requerimiento o regla en cada campo",
-              "Presiona AI Assist para obtener formato profesional ING",
-              "El AI creará numeración multi-nivel (1, a, i) automáticamente",
-              "Agregará sub-elementos técnicos relevantes",
-              "Aplicará terminología bancaria y estándares profesionales",
-              "Cada campo tiene reglas específicas de mejora según su tipo"
-            ]
-          }
-        };
-
-      case 9:  
-        // Could be test cases step or final review depending on configuration
         if (useCaseType === 'entity') {
           return {
-            title: "Casos de Prueba (Opcional)",
+            title: "Filtros de Búsqueda",
+            description: "Define los criterios de búsqueda que tendrá tu sistema según las normas ING para interfaces de consulta.",
+            instructions: [
+              "Los filtros permiten a los usuarios buscar registros específicos",
+              "Incluye filtros básicos: nombre, código, estado, fechas",
+              "Para entidades de personas: DNI, email, teléfono son estándar",
+              "Piensa en los criterios que más usa el negocio para buscar",
+              "Puedes describir en texto libre y usar AI Assist para estructurar"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist convierte texto libre en filtros estructurados automáticamente.",
+              usage: [
+                "Describe en el área superior: 'Los usuarios buscarán por nombre, DNI y estado'",
+                "Presiona el botón AI Assist para convertir automáticamente en filtros individuales",
+                "El AI seguirá estándares bancarios para nombres de filtros",
+                "Generará una lista completa de filtros profesionales y técnicamente correctos",
+                "Luego puedes editar manualmente cada filtro si necesitas ajustes"
+              ]
+            }
+          };
+        } else {
+          return {
+            title: "Detalles Técnicos",
+            description: "Define los aspectos técnicos específicos de tu API o servicio.",
+            instructions: [
+              "Para APIs: Especifica métodos HTTP, endpoints, formatos de datos",
+              "Para Servicios: Define parámetros de entrada, salida y procesamiento",
+              "Incluye detalles de autenticación y autorización",
+              "Describe formatos de respuesta y códigos de error",
+              "Especifica timeouts y límites de procesamiento"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist mejora las descripciones técnicas con terminología profesional.",
+              usage: [
+                "Describe tus requerimientos técnicos en lenguaje simple",
+                "Presiona AI Assist para obtener formato técnico profesional",
+                "El AI agregará especificaciones técnicas estándar",
+                "Aplicará convenciones REST o SOAP según corresponda"
+              ]
+            }
+          };
+        }
+
+      case 6:
+        if (useCaseType === 'entity') {
+          return {
+            title: "Columnas de Resultado",
+            description: "Define qué información se mostrará en las tablas de resultados según estándares ING de presentación de datos.",
+            instructions: [
+              "Las columnas muestran la información más relevante de cada registro",
+              "Incluye siempre: código/ID, nombre principal, estado, fecha de alta",
+              "Para personas: nombre completo, DNI, email, teléfono",
+              "Ordena por importancia: datos identificatorios primero",
+              "Máximo 8-10 columnas para no sobrecargar la pantalla"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist transforma descripciones en columnas estructuradas con formato profesional.",
+              usage: [
+                "Describe en texto: 'Mostrar nombre completo, DNI, email y estado del cliente'",
+                "Presiona AI Assist para convertir en columnas automáticamente",
+                "El AI creará nombres técnicos apropiados para cada columna",
+                "Seguirá convenciones ING para etiquetas de interfaz",
+                "Agregará columnas estándar si faltan (estado, fechas)"
+              ]
+            }
+          };
+        } else {
+          return {
+            title: "Reglas de Negocio",
+            description: "Define las validaciones y lógica de negocio para tu API o servicio.",
+            instructions: [
+              "Lista todas las validaciones que debe cumplir el servicio",
+              "Incluye restricciones de negocio y límites operativos",
+              "Define comportamientos ante errores o excepciones",
+              "Especifica reglas de autorización y permisos",
+              "Documenta dependencias con otros sistemas"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist estructura las reglas con formato profesional y numeración.",
+              usage: [
+                "Describe cada regla en lenguaje simple",
+                "Presiona AI Assist para obtener formato técnico",
+                "El AI agregará numeración jerárquica",
+                "Aplicará terminología técnica apropiada"
+              ]
+            }
+          };
+        }
+
+      case 7:
+        if (useCaseType === 'entity') {
+          return {
+            title: "Campos de la Entidad",
+            description: "Define todos los atributos que tendrá tu entidad de datos según normativas ING de modelado.",
+            instructions: [
+              "Lista todos los campos que almacenará la entidad en base de datos",
+              "Especifica tipo de dato: texto, número, fecha, booleano",
+              "Marca como obligatorios los campos críticos para el negocio",
+              "ING requiere siempre: fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion",
+              "Estos campos de auditoría se agregan automáticamente"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist convierte descripciones en campos JSON estructurados y agrega campos ING automáticamente.",
+              usage: [
+                "Describe campos en lenguaje natural: 'nombre completo texto obligatorio, edad número opcional'",
+                "Presiona AI Assist para generar campos estructurados automáticamente",
+                "El AI agregará automáticamente los 4 campos obligatorios ING de auditoría",
+                "Interpretará tipos de datos y obligatoriedad de tu descripción",
+                "Generará nombres técnicos apropiados para base de datos"
+              ]
+            }
+          };
+        } else {
+          return {
+            title: "Casos de Prueba",
+            description: "Define casos de prueba para validar tu API o servicio.",
+            instructions: [
+              "Objetivo: Describe qué se pretende validar",
+              "Precondiciones: Requisitos previos para las pruebas",
+              "Define casos de prueba positivos y negativos",
+              "Incluye pruebas de límites y excepciones",
+              "Especifica datos de entrada y salida esperada"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist genera casos de prueba profesionales y completos.",
+              usage: [
+                "Describe qué quieres probar en lenguaje simple",
+                "Presiona 'Generar Casos de Prueba Inteligentes'",
+                "El AI creará casos de prueba estructurados",
+                "Incluirá escenarios positivos y negativos",
+                "Agregará datos de prueba realistas"
+              ]
+            }
+          };
+        }
+
+      case 8:
+        if (useCaseType === 'entity') {
+          return {
+            title: "Reglas de Negocio y Detalles Adicionales",
+            description: "Completa los detalles técnicos y de negocio según la estructura completa de la minuta ING.",
+            instructions: [
+              "Descripciones de Wireframes: Explica cómo se verán las pantallas",
+              "Flujos Alternativos: Describe qué pasa cuando algo sale mal",
+              "Reglas de Negocio: Lista las validaciones y restricciones",
+              "Requerimientos Especiales: Incluye integraciones, seguridad, performance",
+              "Usa lenguaje técnico pero comprensible"
+            ],
+            aiAssistInfo: {
+              available: true,
+              explanation: "AI Assist está disponible para cada campo principal para mejorar contenido y crear listas numeradas profesionales.",
+              usage: [
+                "Describe en texto simple tu requerimiento o regla en cada campo",
+                "Presiona AI Assist para obtener formato profesional ING",
+                "El AI creará numeración multi-nivel (1, a, i) automáticamente",
+                "Agregará sub-elementos técnicos relevantes",
+                "Aplicará terminología bancaria y estándares profesionales",
+                "Cada campo tiene reglas específicas de mejora según su tipo"
+              ]
+            }
+          };
+        } else {
+          return {
+            title: "Revisión Final",
+            description: "Revisa todos los datos antes de generar el documento.",
+            instructions: [
+              "Verifica que todos los campos obligatorios estén completos",
+              "Revisa que la información sea coherente y profesional",
+              "Confirma que el tipo de caso de uso sea el correcto",
+              "Puedes volver a pasos anteriores si necesitas cambios",
+              "El documento seguirá el formato ING automáticamente"
+            ],
+            aiAssistInfo: {
+              available: false,
+              explanation: "Este es el paso de revisión final antes de generar el documento.",
+              usage: []
+            }
+          };
+        }
+
+      case 9:  
+        if (useCaseType === 'entity') {
+          return {
+            title: "Casos de Prueba",
             description: "Define casos de prueba según especificaciones de la minuta ING para validar el funcionamiento del caso de uso.",
             instructions: [
               "Objetivo: Describe qué se pretende validar con las pruebas",
               "Precondiciones: Lista los requisitos previos para ejecutar las pruebas",
               "Pasos de Prueba: Crea una tabla estructurada con cada acción",
               "Cada paso debe tener: Acción, Datos de entrada, Resultado esperado, Observaciones, Estado P/F",
-              "Sigue el formato exacto de la minuta ING líneas 271-300"
+              "Usa el botón 'Generar Casos de Prueba Inteligentes' para crear casos completos automáticamente"
             ],
             aiAssistInfo: {
               available: true,
-              explanation: "AI Assist mejora el contenido de objetivos y precondiciones con terminología técnica profesional.",
+              explanation: "AI Assist genera casos de prueba completos y profesionales automáticamente.",
               usage: [
-                "Describe en lenguaje simple qué quieres probar",
-                "Presiona AI Assist para obtener formato técnico profesional",
-                "El AI aplicará terminología de testing y estándares bancarios",
-                "Convierte descripciones informales en especificaciones técnicas"
+                "Completa objetivo y precondiciones con información básica",
+                "Presiona 'Generar Casos de Prueba Inteligentes'",
+                "El AI creará múltiples casos de prueba realistas",
+                "Incluirá flujos principales y alternativos",
+                "Agregará datos de prueba específicos del contexto"
               ]
             }
           };
