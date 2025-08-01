@@ -31,6 +31,10 @@ public class UseCase
     public List<string> AlternativeFlows { get; set; } = new();
     public string? AlternativeFlowsDescription { get; set; }
     
+    // Preconditions and Postconditions
+    public string? Preconditions { get; set; }
+    public string? Postconditions { get; set; }
+    
     // API-specific fields
     public string? ApiEndpoint { get; set; }
     public string? RequestFormat { get; set; }

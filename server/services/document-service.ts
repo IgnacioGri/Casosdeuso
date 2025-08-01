@@ -49,13 +49,13 @@ export class DocumentService {
     const doc = new Document({
       sections: [{
         children: [
-          // Title
+          // Title - Use case name in uppercase
           new Paragraph({
             heading: HeadingLevel.TITLE,
             spacing: { after: 400 },
             alignment: AlignmentType.LEFT,
             children: [new TextRun({
-              text: "ESPECIFICACIÓN DE CASO DE USO",
+              text: (formData.useCaseName || "CASO DE USO").toUpperCase(),
               bold: true,
               size: 48,
               color: "0070C0",
@@ -159,7 +159,7 @@ export class DocumentService {
     if (formData.useCaseType === 'entity') {
       sections.push(this.createStyledHeading("Flujo Principal de Eventos"));
       
-      // Add search functionality
+      // 1. Add search functionality
       sections.push(new Paragraph({
         spacing: { after: 80 },
         children: [new TextRun({
@@ -169,29 +169,53 @@ export class DocumentService {
         })]
       }));
       
+      // a. Search filters with roman numerals
       if (formData.searchFilters && formData.searchFilters.length > 0) {
         sections.push(new Paragraph({
           spacing: { after: 60 },
-          indent: { left: 720 },
+          indent: { left: 288 }, // 0.2 inch = 288 twips
           children: [new TextRun({
-            text: `a. Filtros de búsqueda disponibles: ${formData.searchFilters.join(', ')}`,
+            text: "a. Filtros de búsqueda disponibles:",
             font: "Segoe UI Semilight"
           })]
         }));
+        
+        formData.searchFilters.forEach((filter: string, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 40 },
+            indent: { left: 576 }, // 0.4 inch = 576 twips (additional 0.2)
+            children: [new TextRun({
+              text: `${this.toRomanNumeral(index + 1)}. ${filter}`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
       }
       
+      // b. Result columns with roman numerals
       if (formData.resultColumns && formData.resultColumns.length > 0) {
         sections.push(new Paragraph({
-          spacing: { after: 80 },
-          indent: { left: 720 },
+          spacing: { after: 60, before: 60 },
+          indent: { left: 288 },
           children: [new TextRun({
-            text: `b. Columnas del resultado de búsqueda: ${formData.resultColumns.join(', ')}`,
+            text: "b. Columnas del resultado de búsqueda:",
             font: "Segoe UI Semilight"
           })]
         }));
+        
+        formData.resultColumns.forEach((column: string, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 40 },
+            indent: { left: 576 },
+            children: [new TextRun({
+              text: `${this.toRomanNumeral(index + 1)}. ${column}`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
       }
       
-      // Add create functionality
+      // 2. Add create functionality
       sections.push(new Paragraph({
         spacing: { after: 80, before: 80 },
         children: [new TextRun({
@@ -201,26 +225,123 @@ export class DocumentService {
         })]
       }));
       
+      // a. Entity fields with roman numerals
       if (formData.entityFields && formData.entityFields.length > 0) {
-        const fieldsDescription = formData.entityFields.map((f: any) => 
-          `${f.name} (${f.type}${f.length ? `, ${f.length}` : ''}${f.mandatory ? ', obligatorio' : ', opcional'})`
-        ).join(', ');
-        
         sections.push(new Paragraph({
           spacing: { after: 60 },
-          indent: { left: 720 },
+          indent: { left: 288 },
           children: [new TextRun({
-            text: `a. Campos de la entidad: ${fieldsDescription}`,
+            text: "a. Datos de la entidad:",
             font: "Segoe UI Semilight"
           })]
         }));
+        
+        formData.entityFields.forEach((field: any, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 40 },
+            indent: { left: 576 },
+            children: [new TextRun({
+              text: `${this.toRomanNumeral(index + 1)}. ${field.name} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})${field.description ? ` - ${field.description}` : ''}`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
       }
+      
+      // b. Auto-registration
+      sections.push(new Paragraph({
+        spacing: { after: 120, before: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Al agregar se registra automáticamente la fecha y usuario de alta",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+    }
+    
+    
+    // Alternative Flows (Flujos Alternativos) - for entity use cases
+    if (formData.useCaseType === 'entity') {
+      sections.push(this.createStyledHeading("Flujos Alternativos"));
+      
+      // 1. Modify or update entity
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "1. Modificar o actualizar una entidad",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // a. Entity data
+      if (formData.entityFields && formData.entityFields.length > 0) {
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: "a. Datos de la entidad a modificar:",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        formData.entityFields.forEach((field: any, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 40 },
+            indent: { left: 576 },
+            children: [new TextRun({
+              text: `${this.toRomanNumeral(index + 1)}. ${field.name} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
+      }
+      
+      // b. Show identifier
+      sections.push(new Paragraph({
+        spacing: { after: 60, before: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Mostrar el identificador único de la entidad",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // c. Show creation data
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "c. Mostrar la fecha y el usuario de alta originales",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // d. Register modification
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "d. Al modificar se registra automáticamente la fecha y usuario de modificación",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 2. Delete entity
+      sections.push(new Paragraph({
+        spacing: { after: 80, before: 80 },
+        children: [new TextRun({
+          text: "2. Eliminar una entidad",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
       
       sections.push(new Paragraph({
         spacing: { after: 120 },
-        indent: { left: 720 },
+        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Al agregar se registra automáticamente la fecha y usuario de alta",
+          text: "a. Verificar que la entidad no tenga relaciones con otras entidades antes de eliminar",
           font: "Segoe UI Semilight"
         })]
       }));
@@ -241,7 +362,7 @@ export class DocumentService {
       rules.forEach((rule: string, index: number) => {
         sections.push(new Paragraph({
           spacing: { after: 80 },
-          indent: { left: 720 },
+          indent: { left: 288 },
           children: [new TextRun({
             text: `${index + 1}. ${rule.toString().trim()}`,
             font: "Segoe UI Semilight"
@@ -250,105 +371,47 @@ export class DocumentService {
       });
     }
     
-    // Search Filters (for entity use cases)
-    if (formData.searchFilters && formData.searchFilters.length > 0) {
-      sections.push(this.createStyledHeading("Filtros de Búsqueda"));
-      
-      formData.searchFilters.forEach((filter: string) => {
-        sections.push(new Paragraph({
-          spacing: { after: 80 },
-          indent: { left: 720 },
-          children: [
-            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
-            new TextRun({ text: filter, font: "Segoe UI Semilight" })
-          ]
-        }));
-      });
-    }
-    
-    // Result Columns (for entity use cases)
-    if (formData.resultColumns && formData.resultColumns.length > 0) {
-      sections.push(this.createStyledHeading("Columnas de Resultado"));
-      
-      formData.resultColumns.forEach((column: string) => {
-        sections.push(new Paragraph({
-          spacing: { after: 80 },
-          indent: { left: 720 },
-          children: [
-            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
-            new TextRun({ text: column, font: "Segoe UI Semilight" })
-          ]
-        }));
-      });
-    }
-    
-    // Entity Fields (for entity use cases)
-    if (formData.entityFields && formData.entityFields.length > 0) {
-      sections.push(this.createStyledHeading("Campos de Entidad"));
-      
-      formData.entityFields.forEach((field: any) => {
-        sections.push(new Paragraph({
-          spacing: { after: 80 },
-          indent: { left: 720 },
-          children: [
-            new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
-            new TextRun({ text: `${field.name} (${field.type})`, bold: true, font: "Segoe UI Semilight" }),
-            new TextRun({ text: field.length ? ` - Longitud: ${field.length}` : '', font: "Segoe UI Semilight" }),
-            new TextRun({ text: field.mandatory ? ' - Obligatorio' : '', font: "Segoe UI Semilight" }),
-            new TextRun({ text: field.description ? ` - ${field.description}` : '', font: "Segoe UI Semilight" })
-          ]
-        }));
-      });
-    }
-    
-    // Alternative Flows (Flujos Alternativos)
-    if (formData.alternativeFlowsDescription || (formData.alternativeFlows && formData.alternativeFlows.length > 0)) {
-      sections.push(this.createStyledHeading("Flujos Alternativos"));
-      
-      // First add the general description if exists
-      if (formData.alternativeFlowsDescription) {
-        sections.push(new Paragraph({
-          spacing: { after: 120 },
-          children: [new TextRun({
-            text: formData.alternativeFlowsDescription,
-            font: "Segoe UI Semilight"
-          })]
-        }));
-      }
-      
-      // Then add individual alternative flows if they exist
-      if (formData.alternativeFlows && formData.alternativeFlows.length > 0) {
-        formData.alternativeFlows.forEach((flow: string, index: number) => {
-          if (flow && flow.trim()) {
-            sections.push(new Paragraph({
-              spacing: { after: 80 },
-              indent: { left: 720 },
-              children: [
-                new TextRun({ text: `${index + 1}. `, font: "Segoe UI Semilight" }),
-                new TextRun({ text: flow.trim(), font: "Segoe UI Semilight" })
-              ]
-            }));
-          }
-        });
-      }
-    }
-    
     // Special Requirements
     if (formData.specialRequirements) {
       sections.push(this.createStyledHeading("Requerimientos Especiales"));
       
-      sections.push(new Paragraph({
-        spacing: { after: 120 },
-        children: [new TextRun({
-          text: formData.specialRequirements,
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      // Split by newlines if it's a multiline string
+      const requirements = formData.specialRequirements.split('\n').filter((r: string) => r.trim());
+      
+      requirements.forEach((req: string, index: number) => {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: `${index + 1}. ${req.trim()}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      });
     }
     
-    // Test Cases Section - Just another form section
+    // Preconditions
+    sections.push(this.createStyledHeading("Precondiciones"));
+    sections.push(new Paragraph({
+      spacing: { after: 120 },
+      children: [new TextRun({
+        text: formData.preconditions || "El usuario debe estar autenticado en el sistema y tener los permisos necesarios para acceder a este caso de uso.",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    // Postconditions
+    sections.push(this.createStyledHeading("Postcondiciones"));
+    sections.push(new Paragraph({
+      spacing: { after: 120 },
+      children: [new TextRun({
+        text: formData.postconditions || "Los datos de la entidad quedan actualizados en el sistema y se registra la auditoría correspondiente.",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    // Test Cases Section (now at the correct position after preconditions/postconditions)
     if (formData.generateTestCase && formData.testSteps && formData.testSteps.length > 0) {
-      // Test Cases header
       sections.push(this.createStyledHeading("CASOS DE PRUEBA"));
       
       // Objective
@@ -374,7 +437,7 @@ export class DocumentService {
         }));
       }
       
-      // Preconditions
+      // Test Case Preconditions
       if (formData.testCasePreconditions) {
         sections.push(new Paragraph({
           heading: HeadingLevel.HEADING_3,
@@ -389,65 +452,16 @@ export class DocumentService {
         }));
         
         const preconditionsText = String(formData.testCasePreconditions || '');
-        const lines = preconditionsText.split('\n').filter((p: string) => p.trim());
-        
-        if (lines.length > 0) {
-          let currentCategory = '';
-          
-          lines.forEach((line: string) => {
-            const trimmedLine = line.trim();
-            
-            // Check if it's a category header (ends with ':')
-            if (trimmedLine.endsWith(':') && !trimmedLine.startsWith('•') && !trimmedLine.startsWith('-')) {
-              currentCategory = trimmedLine;
-              sections.push(new Paragraph({
-                spacing: { before: 120, after: 60 },
-                children: [new TextRun({
-                  text: currentCategory,
-                  bold: true,
-                  size: 22,
-                  color: "0070C0",
-                  font: "Segoe UI Semilight"
-                })]
-              }));
-            } else if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-')) {
-              // It's a bullet point - remove the bullet and add our own
-              const content = trimmedLine.replace(/^[•\-]\s*/, '').trim();
-              if (content) {
-                sections.push(new Paragraph({
-                  spacing: { after: 60 },
-                  indent: { left: 720 },
-                  children: [
-                    new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
-                    new TextRun({ text: content, font: "Segoe UI Semilight" })
-                  ]
-                }));
-              }
-            } else if (trimmedLine) {
-              // Regular line without bullet - add as a regular paragraph with indent
-              sections.push(new Paragraph({
-                spacing: { after: 60 },
-                indent: { left: currentCategory ? 720 : 0 },
-                children: [
-                  new TextRun({ text: currentCategory ? "• " : "", font: "Segoe UI Semilight" }),
-                  new TextRun({ text: trimmedLine, font: "Segoe UI Semilight" })
-                ]
-              }));
-            }
-          });
-        } else {
-          // Fallback for single line preconditions
-          sections.push(new Paragraph({
-            spacing: { after: 80 },
-            children: [new TextRun({
-              text: preconditionsText,
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
+        sections.push(new Paragraph({
+          spacing: { after: 120 },
+          children: [new TextRun({
+            text: preconditionsText,
+            font: "Segoe UI Semilight"
+          })]
+        }));
       }
       
-      // Test Steps
+      // Test Steps Table
       sections.push(new Paragraph({
         heading: HeadingLevel.HEADING_3,
         spacing: { before: 120, after: 80 },
@@ -460,7 +474,6 @@ export class DocumentService {
         })]
       }));
       
-      // Create test steps table
       const testStepsTable = new Table({
         rows: [
           // Header row
@@ -617,15 +630,15 @@ export class DocumentService {
       });
       
       sections.push(testStepsTable);
-      
-      // Add empty paragraph after table for spacing
-      sections.push(new Paragraph({
-        spacing: { after: 240 },
-        children: []
-      }));
     }
     
     return sections;
+  }
+  
+  private static toRomanNumeral(num: number): string {
+    const romanNumerals = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 
+                           'xi', 'xii', 'xiii', 'xiv', 'xv', 'xvi', 'xvii', 'xviii', 'xix', 'xx'];
+    return romanNumerals[num - 1] || num.toString();
   }
   
   private static createHistorySection(): (Paragraph | Table)[] {

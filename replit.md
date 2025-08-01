@@ -42,6 +42,15 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
   - Updated Blazor DocumentService to pass formData when exporting DOCX
   - Ensures consistent professional ING corporate formatting across both systems
 
+### Recent Updates (February 2, 2025)
+- **Enhanced AI Description Generation**: Improved AI prompts to generate detailed descriptions (1-2 paragraphs minimum) for better use case quality
+- **Hierarchical Flow Format**: Updated C# DocumentService to match TypeScript implementation with proper hierarchical numbering (1/a/i format)
+- **Added Preconditions/Postconditions**: Added preconditions and postconditions sections for entity use cases in C# system with default values
+- **Test Cases Table Format**: Updated C# test cases section to use professional table format matching TypeScript implementation
+- **Added Helper Methods**: Added ToRomanNumeral helper method to C# system for consistent hierarchical numbering
+- **Styled Headings**: Implemented AddStyledHeading method in C# with ING corporate blue borders matching TypeScript design
+- **Consistent Formatting**: Both systems now generate identical DOCX documents with synchronized formatting and structure
+
 ### Recent Updates (January 31, 2025)
 - **Enhanced Intelligent Test Case Parsing**: Improved JSON parsing logic to handle various AI response formats more robustly
 - **Fallback Test Step Generation**: Added automatic fallback test step generation when AI doesn't provide complete test steps

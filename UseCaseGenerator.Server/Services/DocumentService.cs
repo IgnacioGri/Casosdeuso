@@ -132,6 +132,16 @@ public class DocumentService : IDocumentService
         }
     }
 
+    private string ToRomanNumeral(int number)
+    {
+        var romanNumerals = new[] 
+        { 
+            "i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x",
+            "xi", "xii", "xiii", "xiv", "xv", "xvi", "xvii", "xviii", "xix", "xx"
+        };
+        return number > 0 && number <= 20 ? romanNumerals[number - 1] : number.ToString();
+    }
+
     private void AddFormDataSections(Body body, UseCase useCase)
     {
         // Use properties directly from UseCase model
@@ -139,60 +149,87 @@ public class DocumentService : IDocumentService
         // Main Flow (Flujo Principal) - for entity use cases
         if (useCase.UseCaseType == "entity")
         {
-            AddSectionHeading(body, "Flujo Principal de Eventos");
+            // Use styled heading for consistency
+            AddStyledHeading(body, "FLUJO PRINCIPAL DE EVENTOS");
             
-            // Add search functionality
-            AddParagraph(body, "1. Buscar datos de la entidad", true);
+            // 1. Buscar datos de la entidad
+            var searchPara = body.AppendChild(new Paragraph());
+            var searchParaProps = searchPara.AppendChild(new ParagraphProperties());
+            searchParaProps.AppendChild(new SpacingBetweenLines() { After = "80" });
+            var searchRun = searchPara.AppendChild(new Run());
+            searchRun.AppendChild(new Text("1. Buscar datos de la entidad"));
+            var searchRunProps = searchRun.AppendChild(new RunProperties());
+            searchRunProps.AppendChild(new Bold());
+            searchRunProps.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
             
             if (useCase.SearchFilters?.Any() == true)
             {
                 var para = body.AppendChild(new Paragraph());
                 var paraProps = para.AppendChild(new ParagraphProperties());
                 paraProps.AppendChild(new SpacingBetweenLines() { After = "60" });
-                paraProps.AppendChild(new Indentation() { Left = "720" });
+                paraProps.AppendChild(new Indentation() { Left = "288" }); // 0.2 inch = 288 twips
                 var run = para.AppendChild(new Run());
                 run.AppendChild(new Text($"a. Filtros de búsqueda disponibles: {string.Join(", ", useCase.SearchFilters)}"));
+                run.AppendChild(new RunProperties()).AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
             }
             
             if (useCase.ResultColumns?.Any() == true)
             {
                 var para = body.AppendChild(new Paragraph());
                 var paraProps = para.AppendChild(new ParagraphProperties());
-                paraProps.AppendChild(new SpacingBetweenLines() { After = "80" });
-                paraProps.AppendChild(new Indentation() { Left = "720" });
+                paraProps.AppendChild(new SpacingBetweenLines() { After = "120" });
+                paraProps.AppendChild(new Indentation() { Left = "288" }); // 0.2 inch
                 var run = para.AppendChild(new Run());
                 run.AppendChild(new Text($"b. Columnas del resultado de búsqueda: {string.Join(", ", useCase.ResultColumns)}"));
+                run.AppendChild(new RunProperties()).AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
             }
             
-            // Add create functionality
+            // 2. Agregar una nueva entidad
             var createPara = body.AppendChild(new Paragraph());
             var createParaProps = createPara.AppendChild(new ParagraphProperties());
             createParaProps.AppendChild(new SpacingBetweenLines() { Before = "80", After = "80" });
             var createRun = createPara.AppendChild(new Run());
             createRun.AppendChild(new Text("2. Agregar una nueva entidad"));
-            createRun.AppendChild(new RunProperties()).AppendChild(new Bold());
+            var createRunProps = createRun.AppendChild(new RunProperties());
+            createRunProps.AppendChild(new Bold());
+            createRunProps.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
             
             if (useCase.EntityFields?.Any() == true)
             {
-                var fieldsDescription = string.Join(", ", 
-                    useCase.EntityFields.Select(f => 
-                        $"{f.Name} ({f.Type}{(f.Length.HasValue ? $", {f.Length}" : "")}{(f.Mandatory ? ", obligatorio" : ", opcional")})")
-                );
-                
-                var fieldsPara = body.AppendChild(new Paragraph());
-                var fieldsParaProps = fieldsPara.AppendChild(new ParagraphProperties());
-                fieldsParaProps.AppendChild(new SpacingBetweenLines() { After = "60" });
-                fieldsParaProps.AppendChild(new Indentation() { Left = "720" });
-                var fieldsRun = fieldsPara.AppendChild(new Run());
-                fieldsRun.AppendChild(new Text($"a. Campos de la entidad: {fieldsDescription}"));
+                // a. Datos de la entidad
+                var fieldsHeaderPara = body.AppendChild(new Paragraph());
+                var fieldsHeaderProps = fieldsHeaderPara.AppendChild(new ParagraphProperties());
+                fieldsHeaderProps.AppendChild(new SpacingBetweenLines() { After = "60" });
+                fieldsHeaderProps.AppendChild(new Indentation() { Left = "288" });
+                var fieldsHeaderRun = fieldsHeaderPara.AppendChild(new Run());
+                fieldsHeaderRun.AppendChild(new Text("a. Datos de la entidad:"));
+                fieldsHeaderRun.AppendChild(new RunProperties()).AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+
+                // Roman numeral fields listing
+                int fieldIndex = 0;
+                foreach (var field in useCase.EntityFields)
+                {
+                    var fieldPara = body.AppendChild(new Paragraph());
+                    var fieldProps = fieldPara.AppendChild(new ParagraphProperties());
+                    fieldProps.AppendChild(new SpacingBetweenLines() { After = "40" });
+                    fieldProps.AppendChild(new Indentation() { Left = "576" }); // 0.4 inch for roman numerals
+                    var fieldRun = fieldPara.AppendChild(new Run());
+                    var fieldText = $"{ToRomanNumeral(++fieldIndex)}. {field.Name} ({field.Type}{(field.Length.HasValue ? $", {field.Length}" : "")}{(field.Mandatory ? ", obligatorio" : ", opcional")})";
+                    if (!string.IsNullOrEmpty(field.Description))
+                        fieldText += $" - {field.Description}";
+                    fieldRun.AppendChild(new Text(fieldText));
+                    fieldRun.AppendChild(new RunProperties()).AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+                }
             }
             
+            // b. Auto-registration
             var auditPara = body.AppendChild(new Paragraph());
             var auditParaProps = auditPara.AppendChild(new ParagraphProperties());
-            auditParaProps.AppendChild(new SpacingBetweenLines() { After = "120" });
-            auditParaProps.AppendChild(new Indentation() { Left = "720" });
+            auditParaProps.AppendChild(new SpacingBetweenLines() { After = "120", Before = "60" });
+            auditParaProps.AppendChild(new Indentation() { Left = "288" });
             var auditRun = auditPara.AppendChild(new Run());
             auditRun.AppendChild(new Text("b. Al agregar se registra automáticamente la fecha y usuario de alta"));
+            auditRun.AppendChild(new RunProperties()).AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
         }
 
         // Business Rules
@@ -273,10 +310,26 @@ public class DocumentService : IDocumentService
             AddParagraph(body, useCase.SpecialRequirements);
         }
 
+        // Preconditions (for entity use cases)
+        if (useCase.UseCaseType == "entity")
+        {
+            AddStyledHeading(body, "PRECONDICIONES");
+            var preconditionsText = useCase.Preconditions ?? "El usuario debe estar autenticado en el sistema y tener los permisos necesarios para acceder a este caso de uso.";
+            AddParagraph(body, preconditionsText);
+        }
+
+        // Postconditions (for entity use cases)
+        if (useCase.UseCaseType == "entity")
+        {
+            AddStyledHeading(body, "POSTCONDICIONES");
+            var postconditionsText = useCase.Postconditions ?? "Los datos de la entidad quedan actualizados en el sistema y se registra la auditoría correspondiente.";
+            AddParagraph(body, postconditionsText);
+        }
+
         // Test Cases Section
         if (useCase.GenerateTestCase && useCase.TestSteps?.Any() == true)
         {
-            AddSectionHeading(body, "CASOS DE PRUEBA", true);
+            AddStyledHeading(body, "CASOS DE PRUEBA");
 
             // Objective
             if (!string.IsNullOrEmpty(useCase.TestCaseObjective))
@@ -289,32 +342,41 @@ public class DocumentService : IDocumentService
             if (!string.IsNullOrEmpty(useCase.TestCasePreconditions))
             {
                 AddSubHeading(body, "Precondiciones:");
-                var preconditions = useCase.TestCasePreconditions.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var condition in preconditions)
-                {
-                    AddBulletItem(body, condition.Trim());
-                }
+                AddParagraph(body, useCase.TestCasePreconditions);
             }
 
-            // Test Steps
+            // Test Steps Table
             AddSubHeading(body, "Pasos de Prueba:");
-            for (int i = 0; i < useCase.TestSteps.Count; i++)
-            {
-                var step = useCase.TestSteps[i];
-                AddNumberedItem(body, $"{step.Number}. {step.Action}", true);
-                
-                if (!string.IsNullOrEmpty(step.InputData))
-                    AddIndentedBullet(body, "Datos de Entrada", step.InputData);
-                    
-                if (!string.IsNullOrEmpty(step.ExpectedResult))
-                    AddIndentedBullet(body, "Resultado Esperado", step.ExpectedResult);
-                    
-                if (!string.IsNullOrEmpty(step.Observations))
-                    AddIndentedBullet(body, "Observaciones", step.Observations);
-            }
+            AddTestCasesTable(body, useCase.TestSteps);
         }
     }
 
+    private void AddStyledHeading(Body body, string text)
+    {
+        var para = body.AppendChild(new Paragraph());
+        var paraProps = para.AppendChild(new ParagraphProperties());
+        
+        // Add borders - blue bottom and left
+        var paraBorders = new ParagraphBorders();
+        paraBorders.Append(new BottomBorder() { Val = BorderValues.Single, Color = "006BB6", Size = 8, Space = 1 });
+        paraBorders.Append(new LeftBorder() { Val = BorderValues.Single, Color = "006BB6", Size = 8, Space = 1 });
+        paraProps.Append(paraBorders);
+        
+        // Add spacing
+        paraProps.Append(new SpacingBetweenLines() { Before = "240", After = "240" });
+        paraProps.Append(new Indentation() { Left = "120" }); // 0.21 cm
+        paraProps.Append(new KeepNext());
+        paraProps.Append(new KeepLines());
+        
+        var run = para.AppendChild(new Run());
+        var runProps = run.AppendChild(new RunProperties());
+        runProps.Append(new Bold());
+        runProps.Append(new FontSize() { Val = "24" }); // 12pt
+        runProps.Append(new Color() { Val = "006BB6" }); // ING Blue
+        runProps.Append(new RunFonts() { Ascii = "Segoe UI", HighAnsi = "Segoe UI" });
+        run.AppendChild(new Text(text.ToUpper())); // Convert to uppercase
+    }
+    
     private void AddSectionHeading(Body body, string text, bool isLarge = false)
     {
         var para = body.AppendChild(new Paragraph());
@@ -422,6 +484,155 @@ public class DocumentService : IDocumentService
         runProps.AppendChild(new FontSize() { Val = fontSize.ToString() });
         runProps.AppendChild(new Color() { Val = "0070C0" }); // ING Blue
         runProps.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+    }
+
+    private void AddTestCasesTable(Body body, List<TestStep> testSteps)
+    {
+        var table = new Table();
+        
+        // Table properties
+        var tblPr = new TableProperties();
+        tblPr.Append(new TableWidth() { Width = "9800", Type = TableWidthUnitValues.Dxa });
+        tblPr.Append(new TableBorders(
+            new TopBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new BottomBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new LeftBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new RightBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new InsideHorizontalBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new InsideVerticalBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 }
+        ));
+        table.Append(tblPr);
+        
+        // Header row
+        var headerRow = new TableRow();
+        
+        // # column
+        var cell1 = new TableCell();
+        cell1.Append(new TableCellProperties(
+            new TableCellWidth() { Width = "600", Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        var para1 = new Paragraph();
+        var paraProps1 = new ParagraphProperties();
+        paraProps1.Append(new Justification() { Val = JustificationValues.Center });
+        para1.Append(paraProps1);
+        var run1 = new Run();
+        var runProps1 = new RunProperties();
+        runProps1.Append(new Bold());
+        runProps1.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        run1.Append(runProps1);
+        run1.Append(new Text("#"));
+        para1.Append(run1);
+        cell1.Append(para1);
+        headerRow.Append(cell1);
+        
+        // Acción column
+        var cell2 = CreateHeaderCell("Acción", "2500");
+        headerRow.Append(cell2);
+        
+        // Datos de entrada column
+        var cell3 = CreateHeaderCell("Datos de entrada", "2000");
+        headerRow.Append(cell3);
+        
+        // Resultado esperado column
+        var cell4 = CreateHeaderCell("Resultado esperado", "2500");
+        headerRow.Append(cell4);
+        
+        // Observaciones column
+        var cell5 = CreateHeaderCell("Observaciones", "1500");
+        headerRow.Append(cell5);
+        
+        // Estado (P/F) column
+        var cell6 = CreateHeaderCell("Estado\n(P/F)", "700");
+        headerRow.Append(cell6);
+        
+        table.Append(headerRow);
+        
+        // Data rows
+        foreach (var step in testSteps)
+        {
+            var row = new TableRow();
+            
+            // # cell
+            row.Append(CreateDataCell(step.Number.ToString(), "600", true));
+            
+            // Acción cell
+            row.Append(CreateDataCell(step.Action, "2500"));
+            
+            // Datos de entrada cell
+            row.Append(CreateDataCell(step.InputData, "2000"));
+            
+            // Resultado esperado cell
+            row.Append(CreateDataCell(step.ExpectedResult, "2500"));
+            
+            // Observaciones cell
+            row.Append(CreateDataCell(step.Observations, "1500"));
+            
+            // Estado cell
+            row.Append(CreateDataCell("Pendiente", "700", true));
+            
+            table.Append(row);
+        }
+        
+        body.Append(table);
+        
+        // Add spacing after table
+        var spacingPara = new Paragraph();
+        var spacingProps = new ParagraphProperties();
+        spacingProps.Append(new SpacingBetweenLines() { After = "240" });
+        spacingPara.Append(spacingProps);
+        body.Append(spacingPara);
+    }
+    
+    private TableCell CreateHeaderCell(string text, string width)
+    {
+        var cell = new TableCell();
+        cell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = width, Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        
+        var para = new Paragraph();
+        var paraProps = new ParagraphProperties();
+        paraProps.Append(new Justification() { Val = JustificationValues.Center });
+        para.Append(paraProps);
+        
+        var run = new Run();
+        var runProps = new RunProperties();
+        runProps.Append(new Bold());
+        runProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        run.Append(runProps);
+        run.Append(new Text(text));
+        para.Append(run);
+        cell.Append(para);
+        
+        return cell;
+    }
+    
+    private TableCell CreateDataCell(string text, string width, bool center = false)
+    {
+        var cell = new TableCell();
+        cell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = width, Type = TableWidthUnitValues.Dxa }
+        ));
+        
+        var para = new Paragraph();
+        if (center)
+        {
+            var paraProps = new ParagraphProperties();
+            paraProps.Append(new Justification() { Val = JustificationValues.Center });
+            para.Append(paraProps);
+        }
+        
+        var run = new Run();
+        var runProps = new RunProperties();
+        runProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        run.Append(runProps);
+        run.Append(new Text(text ?? ""));
+        para.Append(run);
+        cell.Append(para);
+        
+        return cell;
     }
 
     private void AddRevisionHistoryTable(Body body, UseCase useCase)
