@@ -136,6 +136,65 @@ public class DocumentService : IDocumentService
     {
         // Use properties directly from UseCase model
 
+        // Main Flow (Flujo Principal) - for entity use cases
+        if (useCase.UseCaseType == "entity")
+        {
+            AddSectionHeading(body, "Flujo Principal de Eventos");
+            
+            // Add search functionality
+            AddParagraph(body, "1. Buscar datos de la entidad", true);
+            
+            if (useCase.SearchFilters?.Any() == true)
+            {
+                var para = body.AppendChild(new Paragraph());
+                var paraProps = para.AppendChild(new ParagraphProperties());
+                paraProps.AppendChild(new SpacingBetweenLines() { After = "60" });
+                paraProps.AppendChild(new Indentation() { Left = "720" });
+                var run = para.AppendChild(new Run());
+                run.AppendChild(new Text($"a. Filtros de búsqueda disponibles: {string.Join(", ", useCase.SearchFilters)}"));
+            }
+            
+            if (useCase.ResultColumns?.Any() == true)
+            {
+                var para = body.AppendChild(new Paragraph());
+                var paraProps = para.AppendChild(new ParagraphProperties());
+                paraProps.AppendChild(new SpacingBetweenLines() { After = "80" });
+                paraProps.AppendChild(new Indentation() { Left = "720" });
+                var run = para.AppendChild(new Run());
+                run.AppendChild(new Text($"b. Columnas del resultado de búsqueda: {string.Join(", ", useCase.ResultColumns)}"));
+            }
+            
+            // Add create functionality
+            var createPara = body.AppendChild(new Paragraph());
+            var createParaProps = createPara.AppendChild(new ParagraphProperties());
+            createParaProps.AppendChild(new SpacingBetweenLines() { Before = "80", After = "80" });
+            var createRun = createPara.AppendChild(new Run());
+            createRun.AppendChild(new Text("2. Agregar una nueva entidad"));
+            createRun.AppendChild(new RunProperties()).AppendChild(new Bold());
+            
+            if (useCase.EntityFields?.Any() == true)
+            {
+                var fieldsDescription = string.Join(", ", 
+                    useCase.EntityFields.Select(f => 
+                        $"{f.Name} ({f.Type}{(f.Length.HasValue ? $", {f.Length}" : "")}{(f.Mandatory ? ", obligatorio" : ", opcional")})")
+                );
+                
+                var fieldsPara = body.AppendChild(new Paragraph());
+                var fieldsParaProps = fieldsPara.AppendChild(new ParagraphProperties());
+                fieldsParaProps.AppendChild(new SpacingBetweenLines() { After = "60" });
+                fieldsParaProps.AppendChild(new Indentation() { Left = "720" });
+                var fieldsRun = fieldsPara.AppendChild(new Run());
+                fieldsRun.AppendChild(new Text($"a. Campos de la entidad: {fieldsDescription}"));
+            }
+            
+            var auditPara = body.AppendChild(new Paragraph());
+            var auditParaProps = auditPara.AppendChild(new ParagraphProperties());
+            auditParaProps.AppendChild(new SpacingBetweenLines() { After = "120" });
+            auditParaProps.AppendChild(new Indentation() { Left = "720" });
+            var auditRun = auditPara.AppendChild(new Run());
+            auditRun.AppendChild(new Text("b. Al agregar se registra automáticamente la fecha y usuario de alta"));
+        }
+
         // Business Rules
         if (!string.IsNullOrEmpty(useCase.BusinessRules))
         {
@@ -179,6 +238,39 @@ public class DocumentService : IDocumentService
                 if (!string.IsNullOrEmpty(field.Description)) fieldText += $" - {field.Description}";
                 AddBulletItem(body, fieldText);
             }
+        }
+
+        // Alternative Flows (Flujos Alternativos)
+        if (!string.IsNullOrEmpty(useCase.AlternativeFlowsDescription) || 
+            (useCase.AlternativeFlows?.Any() == true))
+        {
+            AddSectionHeading(body, "Flujos Alternativos");
+            
+            // First add the general description if exists
+            if (!string.IsNullOrEmpty(useCase.AlternativeFlowsDescription))
+            {
+                AddParagraph(body, useCase.AlternativeFlowsDescription);
+            }
+            
+            // Then add individual alternative flows if they exist
+            if (useCase.AlternativeFlows?.Any() == true)
+            {
+                for (int i = 0; i < useCase.AlternativeFlows.Count; i++)
+                {
+                    var flow = useCase.AlternativeFlows[i];
+                    if (!string.IsNullOrWhiteSpace(flow))
+                    {
+                        AddNumberedItem(body, $"{i + 1}. {flow.Trim()}");
+                    }
+                }
+            }
+        }
+        
+        // Special Requirements
+        if (!string.IsNullOrEmpty(useCase.SpecialRequirements))
+        {
+            AddSectionHeading(body, "Requerimientos Especiales");
+            AddParagraph(body, useCase.SpecialRequirements);
         }
 
         // Test Cases Section
@@ -311,12 +403,16 @@ public class DocumentService : IDocumentService
         valueRun.AppendChild(new Text(value));
     }
 
-    private void AddParagraph(Body body, string text)
+    private void AddParagraph(Body body, string text, bool bold = false)
     {
         var para = body.AppendChild(new Paragraph());
         para.AppendChild(new ParagraphProperties()).AppendChild(new SpacingBetweenLines() { After = "120" });
         var run = para.AppendChild(new Run());
         run.AppendChild(new Text(text));
+        if (bold)
+        {
+            run.AppendChild(new RunProperties()).AppendChild(new Bold());
+        }
     }
 
     private void ApplyHeadingStyle(Run run, int fontSize, bool bold)
