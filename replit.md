@@ -48,6 +48,10 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **C# Blazor Sync**: Created EnhancedProgressIndicator.razor and HelpButton.razor components to match React functionality exactly
 - **DOCX Header Fix**: Corrected header image aspect ratio (height from 80 to 60 pixels) to prevent vertical stretching in both React and C# systems
 - **Page Numbering**: Added "Página X de Y" footer to DOCX exports following ING minute standards in both systems
+- **Entity Fields Table Format**: Converted entity fields display from list to table format for better readability based on company owner feedback
+- **Historia de Revisiones Table**: Implemented native DOCX table for revision history with professional ING styling (light blue header #DEEAF6)
+- **Professional Heading Styles**: Added corporate ING heading style with blue borders (bottom and left), uppercase text, and proper spacing
+- **Test Cases Table Format**: Converted test cases from paragraph format to professional table with columns: #, Acción, Datos de entrada, Resultado esperado, Observaciones, Estado (P/F)
 
 ## External Dependencies
 

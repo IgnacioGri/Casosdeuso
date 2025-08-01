@@ -152,8 +152,8 @@ export class DocumentService {
     return await Packer.toBuffer(doc);
   }
   
-  private static addFormDataSections(formData: any): Paragraph[] {
-    const sections: Paragraph[] = [];
+  private static addFormDataSections(formData: any): (Paragraph | Table)[] {
+    const sections: (Paragraph | Table)[] = [];
     
     // Main Flow (Flujo Principal) - for entity use cases
     if (formData.useCaseType === 'entity') {
@@ -425,50 +425,169 @@ export class DocumentService {
         })]
       }));
       
-      // Test steps as a numbered list
-      formData.testSteps.forEach((testStep: any, index: number) => {
-        sections.push(new Paragraph({
-          spacing: { after: 120, before: 80 },
-          children: [new TextRun({
-            text: `${testStep.number || index + 1}. ${testStep.action || ''}`,
-            bold: true,
-            font: "Segoe UI Semilight"
-          })]
-        }));
-        
-        if (testStep.inputData) {
-          sections.push(new Paragraph({
-            spacing: { after: 80 },
-            indent: { left: 720 },
+      // Create test steps table
+      const testStepsTable = new Table({
+        rows: [
+          // Header row
+          new TableRow({
             children: [
-              new TextRun({ text: "• Datos de Entrada: ", bold: true, font: "Segoe UI Semilight" }),
-              new TextRun({ text: testStep.inputData, font: "Segoe UI Semilight" })
+              new TableCell({
+                children: [new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({
+                    text: "#",
+                    bold: true,
+                    font: "Segoe UI Semilight"
+                  })]
+                })],
+                shading: { fill: "DEEAF6" },
+                width: { size: 600, type: WidthType.DXA }
+              }),
+              new TableCell({
+                children: [new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({
+                    text: "Acción",
+                    bold: true,
+                    font: "Segoe UI Semilight"
+                  })]
+                })],
+                shading: { fill: "DEEAF6" },
+                width: { size: 2500, type: WidthType.DXA }
+              }),
+              new TableCell({
+                children: [new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({
+                    text: "Datos de entrada",
+                    bold: true,
+                    font: "Segoe UI Semilight"
+                  })]
+                })],
+                shading: { fill: "DEEAF6" },
+                width: { size: 2000, type: WidthType.DXA }
+              }),
+              new TableCell({
+                children: [new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({
+                    text: "Resultado esperado",
+                    bold: true,
+                    font: "Segoe UI Semilight"
+                  })]
+                })],
+                shading: { fill: "DEEAF6" },
+                width: { size: 2500, type: WidthType.DXA }
+              }),
+              new TableCell({
+                children: [new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({
+                    text: "Observaciones",
+                    bold: true,
+                    font: "Segoe UI Semilight"
+                  })]
+                })],
+                shading: { fill: "DEEAF6" },
+                width: { size: 1500, type: WidthType.DXA }
+              }),
+              new TableCell({
+                children: [new Paragraph({
+                  alignment: AlignmentType.CENTER,
+                  children: [new TextRun({
+                    text: "Estado\n(P/F)",
+                    bold: true,
+                    font: "Segoe UI Semilight"
+                  })]
+                })],
+                shading: { fill: "DEEAF6" },
+                width: { size: 700, type: WidthType.DXA }
+              })
             ]
-          }));
-        }
-        
-        if (testStep.expectedResult) {
-          sections.push(new Paragraph({
-            spacing: { after: 80 },
-            indent: { left: 720 },
-            children: [
-              new TextRun({ text: "• Resultado Esperado: ", bold: true, font: "Segoe UI Semilight" }),
-              new TextRun({ text: testStep.expectedResult, font: "Segoe UI Semilight" })
-            ]
-          }));
-        }
-        
-        if (testStep.observations) {
-          sections.push(new Paragraph({
-            spacing: { after: 80 },
-            indent: { left: 720 },
-            children: [
-              new TextRun({ text: "• Observaciones: ", bold: true, font: "Segoe UI Semilight" }),
-              new TextRun({ text: testStep.observations, font: "Segoe UI Semilight" })
-            ]
-          }));
+          }),
+          // Data rows
+          ...formData.testSteps.map((testStep: any, index: number) => 
+            new TableRow({
+              children: [
+                new TableCell({
+                  children: [new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({
+                      text: String(testStep.number || index + 1),
+                      font: "Segoe UI Semilight"
+                    })]
+                  })],
+                  width: { size: 600, type: WidthType.DXA }
+                }),
+                new TableCell({
+                  children: [new Paragraph({
+                    children: [new TextRun({
+                      text: testStep.action || '',
+                      font: "Segoe UI Semilight"
+                    })]
+                  })],
+                  width: { size: 2500, type: WidthType.DXA }
+                }),
+                new TableCell({
+                  children: [new Paragraph({
+                    children: [new TextRun({
+                      text: testStep.inputData || '',
+                      font: "Segoe UI Semilight"
+                    })]
+                  })],
+                  width: { size: 2000, type: WidthType.DXA }
+                }),
+                new TableCell({
+                  children: [new Paragraph({
+                    children: [new TextRun({
+                      text: testStep.expectedResult || '',
+                      font: "Segoe UI Semilight"
+                    })]
+                  })],
+                  width: { size: 2500, type: WidthType.DXA }
+                }),
+                new TableCell({
+                  children: [new Paragraph({
+                    children: [new TextRun({
+                      text: testStep.observations || '',
+                      font: "Segoe UI Semilight"
+                    })]
+                  })],
+                  width: { size: 1500, type: WidthType.DXA }
+                }),
+                new TableCell({
+                  children: [new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    children: [new TextRun({
+                      text: "Pendiente",
+                      font: "Segoe UI Semilight"
+                    })]
+                  })],
+                  width: { size: 700, type: WidthType.DXA }
+                })
+              ]
+            })
+          )
+        ],
+        width: {
+          size: 9800,
+          type: WidthType.DXA
+        },
+        margins: {
+          top: 72,
+          bottom: 72,
+          right: 72,
+          left: 72
         }
       });
+      
+      sections.push(testStepsTable);
+      
+      // Add empty paragraph after table for spacing
+      sections.push(new Paragraph({
+        spacing: { after: 240 },
+        children: []
+      }));
     }
     
     return sections;
