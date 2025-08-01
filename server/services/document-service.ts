@@ -1277,6 +1277,15 @@ export class DocumentService {
 
   private static parseHtmlTable(htmlTable: string): Table | null {
     try {
+      // Debug: Log the table being parsed
+      console.log('🔍 Parsing HTML table:');
+      
+      // Check if this is the Historia de Revisiones table
+      if (htmlTable.includes('HISTORIA DE REVISIONES')) {
+        console.log('⚠️ Found Historia de Revisiones table in HTML - this should not be parsed, it will be added separately');
+        return null; // Don't parse this table from HTML, it will be added at the end
+      }
+      
       // Extract table rows
       const rowMatches = htmlTable.match(/<tr[^>]*>.*?<\/tr>/gi);
       if (!rowMatches) return null;

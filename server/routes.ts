@@ -588,6 +588,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Content is required for DOCX export" });
       }
 
+      // Debug logging to understand which path is being taken
+      console.log('🔍 DOCX Export Debug Info:');
+      console.log('- formData exists:', !!formData);
+      console.log('- formData keys:', formData ? Object.keys(formData).length : 0);
+      console.log('- Generation method:', formData && Object.keys(formData).length > 0 ? 'generateDirectFromFormData' : 'generateDocx');
+      
       // Use direct generation from form data if available
       const docxBuffer = formData && Object.keys(formData).length > 0
         ? await DocumentService.generateDirectFromFormData(formData, formData.testCases)
@@ -598,9 +604,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             formData || null
           );
 
+      // Add cache control headers to prevent browser caching
       res.set({
         'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="${fileName || 'caso-de-uso'}.docx"`
+        'Content-Disposition': `attachment; filename="${fileName || 'caso-de-uso'}.docx"`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       });
 
       res.send(docxBuffer);
