@@ -545,7 +545,18 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     if (aiModel === 'demo') {
       return JSON.stringify({
         objective: `Verificar el funcionamiento completo del caso de uso: ${context.basicInfo?.useCaseName || 'Gestión de entidades'}`,
-        preconditions: `Usuarios de prueba:\n• Usuario QA_OPERADOR con perfil autorizado para realizar operaciones\n• Usuario QA_SUPERVISOR para validar auditoría\n\nDatos de prueba:\n• Cliente con DNI 25123456, CUIT 20251234561 en estado activo\n• Datos de prueba válidos según reglas de negocio del caso de uso\n\nInfraestructura:\n• Sistema de ${context.basicInfo?.projectName || 'Gestión'} desplegado y accesible\n• Base de datos con datos de prueba disponible\n• Servicios externos simulados o disponibles`,
+        preconditions: `• Usuarios de prueba:
+  - Usuario QA_OPERADOR con perfil autorizado para realizar operaciones
+  - Usuario QA_SUPERVISOR para validar auditoría
+
+• Datos de prueba:
+  - Cliente con DNI 25123456, CUIT 20251234561 en estado activo
+  - Datos de prueba válidos según reglas de negocio del caso de uso
+
+• Infraestructura:
+  - Sistema de ${context.basicInfo?.projectName || 'Gestión'} desplegado y accesible
+  - Base de datos con datos de prueba disponible
+  - Servicios externos simulados o disponibles`,
         testSteps: [
           {
             number: 1,
@@ -1756,6 +1767,22 @@ CONTENIDO MEJORADO:`;
       if (fieldType === 'specialRequirements') {
         return this.generateIntelligentSpecialRequirements(fieldValue);
       }
+      if (fieldType === 'testCasePreconditions') {
+        return `• Usuarios de prueba:
+  - Usuario QA_OPERADOR con perfil de operador autorizado
+  - Usuario QA_SUPERVISOR con perfil de supervisor para validaciones
+  - Usuario QA_ADMIN con permisos administrativos
+
+• Datos de prueba:
+  - Base de datos con datos de prueba precargados
+  - Cliente de prueba con DNI 25123456 en estado activo
+  - Registros históricos para validar consultas y reportes
+
+• Infraestructura:
+  - Sistema ${context?.projectName || 'de gestión'} desplegado en ambiente de pruebas
+  - Servicios externos configurados (validación DNI, servicios bancarios)
+  - Conexión estable a base de datos y servicios`;
+      }
       
       // Fallback for any unhandled empty field
       return 'Ejemplo generado automáticamente según reglas ING';
@@ -1821,6 +1848,58 @@ CONTENIDO MEJORADO:`;
       return filters.join('\n');
     }
 
+    // Process test case preconditions
+    if (fieldType === 'testCasePreconditions' && valueStr.trim()) {
+      // Format existing preconditions into structured format
+      const lines = valueStr.split('\n').filter(line => line.trim());
+      let formatted = '';
+      
+      // Add structured categories if not present
+      const hasUsersSection = lines.some(line => line.toLowerCase().includes('usuario'));
+      const hasDataSection = lines.some(line => line.toLowerCase().includes('dato'));
+      const hasInfraSection = lines.some(line => line.toLowerCase().includes('infraestructura') || line.toLowerCase().includes('sistema'));
+      
+      if (!hasUsersSection) {
+        formatted += '• Usuarios de prueba:\n';
+        formatted += '  - Usuario con permisos necesarios para ejecutar las pruebas\n\n';
+      }
+      
+      if (!hasDataSection) {
+        formatted += '• Datos de prueba:\n';
+        formatted += '  - Datos necesarios precargados en el sistema\n\n';
+      }
+      
+      if (!hasInfraSection) {
+        formatted += '• Infraestructura:\n';
+        formatted += '  - Sistema disponible y accesible\n';
+      }
+      
+      // If already has some structure, improve formatting
+      if (hasUsersSection || hasDataSection || hasInfraSection) {
+        formatted = lines.map(line => {
+          const trimmed = line.trim();
+          // If it's a category header, ensure it starts with •
+          if (trimmed.toLowerCase().includes('usuario') && trimmed.endsWith(':')) {
+            return `• ${trimmed}`;
+          }
+          if (trimmed.toLowerCase().includes('dato') && trimmed.endsWith(':')) {
+            return `• ${trimmed}`;
+          }
+          if ((trimmed.toLowerCase().includes('infraestructura') || trimmed.toLowerCase().includes('sistema')) && trimmed.endsWith(':')) {
+            return `• ${trimmed}`;
+          }
+          // If it's a bullet point, ensure proper formatting
+          if (trimmed.startsWith('-') || trimmed.startsWith('•')) {
+            return `  ${trimmed.replace(/^[-•]\s*/, '- ')}`;
+          }
+          // Regular line - make it a sub-bullet
+          return `  - ${trimmed}`;
+        }).join('\n');
+      }
+      
+      return formatted || valueStr;
+    }
+    
     // Process columns from text description  
     if (fieldType === 'columnsFromText') {
       // Extract column names from natural language description

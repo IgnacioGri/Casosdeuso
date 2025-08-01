@@ -202,7 +202,7 @@ INSTRUCCIONES CRÍTICAS:
 ESTRUCTURA REQUERIDA:
 {
   "objective": "Objetivo claro y específico del caso de prueba",
-  "preconditions": "Usuarios de prueba:\\n• [Lista de usuarios de prueba necesarios]\\n\\nDatos de prueba:\\n• [Lista de datos de prueba requeridos]\\n\\nInfraestructura:\\n• [Lista de requisitos de infraestructura]",
+  "preconditions": "• Usuarios de prueba:\\n  - [Usuario 1 con descripción]\\n  - [Usuario 2 con descripción]\\n\\n• Datos de prueba:\\n  - [Dato de prueba 1]\\n  - [Dato de prueba 2]\\n\\n• Infraestructura:\\n  - [Requisito de infraestructura 1]\\n  - [Requisito de infraestructura 2]",
   "testSteps": [
     {
       "number": 1,

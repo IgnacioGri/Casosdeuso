@@ -10,7 +10,7 @@ import { AIAssistButton } from "@/components/ai-assist-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { StructuredPreconditions } from "@/components/structured-preconditions";
+
 
 interface TestCaseStepProps {
   testCaseObjective: string;
@@ -144,25 +144,32 @@ export function TestCaseStep({
         </div>
 
         <div>
-          <StructuredPreconditions
+          <div className="flex items-center gap-2 mb-2">
+            <Label htmlFor="testCasePreconditions">Precondiciones de Prueba</Label>
+            <AIAssistButton
+              fieldName="testCasePreconditions"
+              fieldValue={testCasePreconditions}
+              fieldType="testCasePreconditions"
+              context={{
+                clientName,
+                projectName,
+                useCaseName,
+                useCaseType: 'entity'
+              }}
+              aiModel={aiModel}
+              onImprovement={onUpdatePreconditions}
+            />
+          </div>
+          <Textarea
+            id="testCasePreconditions"
             value={testCasePreconditions}
-            onChange={onUpdatePreconditions}
-            aiAssistButton={
-              <AIAssistButton
-                fieldName="testCasePreconditions"
-                fieldValue={testCasePreconditions}
-                fieldType="testCasePreconditions"
-                context={{
-                  clientName,
-                  projectName,
-                  useCaseName,
-                  useCaseType: 'entity'
-                }}
-                aiModel={aiModel}
-                onImprovement={onUpdatePreconditions}
-              />
-            }
+            onChange={(e) => onUpdatePreconditions(e.target.value)}
+            placeholder="Ej: • Usuario autenticado con permisos adecuados&#10;• Datos de prueba cargados en el sistema&#10;• Conexión a base de datos disponible"
+            className="min-h-32 resize-y font-mono text-sm"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Use el botón AI para estructurar las precondiciones con formato profesional
+          </p>
         </div>
 
         <div>
