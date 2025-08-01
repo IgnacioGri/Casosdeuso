@@ -202,7 +202,7 @@ INSTRUCCIONES CRÍTICAS:
 ESTRUCTURA REQUERIDA:
 {
   "objective": "Objetivo claro y específico del caso de prueba",
-  "preconditions": "• Usuarios de prueba:\\n  - [Usuario 1 con descripción]\\n  - [Usuario 2 con descripción]\\n\\n• Datos de prueba:\\n  - [Dato de prueba 1]\\n  - [Dato de prueba 2]\\n\\n• Infraestructura:\\n  - [Requisito de infraestructura 1]\\n  - [Requisito de infraestructura 2]",
+  "preconditions": "1. Usuarios de prueba\\n   a. Usuario con perfil autorizado: descripción completa del usuario y sus permisos\\n   b. Usuario sin permisos: descripción del usuario sin acceso\\n\\n2. Datos de prueba\\n   a. Datos válidos: descripción de datos de prueba correctos\\n   b. Datos inválidos: descripción de datos para pruebas negativas\\n\\n3. Infraestructura y configuración\\n   a. Sistema de pruebas configurado y accesible\\n   b. Base de datos con datos de prueba\\n   c. Servicios externos simulados o disponibles",
   "testSteps": [
     {
       "number": 1,
@@ -223,6 +223,16 @@ ESTRUCTURA REQUERIDA:
   ],
   "analysisNotes": "Análisis del contexto y cobertura de pruebas"
 }
+
+FORMATO DE PRECONDICIONES:
+Las precondiciones DEBEN seguir el formato jerárquico (1/a/b) similar a los flujos principales:
+1. Categoría principal
+   a. Subcategoría o elemento específico
+   b. Otro elemento específico
+2. Segunda categoría principal
+   a. Elementos de esta categoría
+   
+NO uses bullets (•) ni guiones (-). Usa numeración jerárquica.
 
 TIPOS DE PRUEBAS A INCLUIR:
 `;

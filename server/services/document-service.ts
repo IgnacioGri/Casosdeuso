@@ -460,80 +460,41 @@ export class DocumentService {
         }));
         
         const preconditionsText = String(formData.testCasePreconditions || '');
+        const lines = preconditionsText.split('\n');
         
-        // First, split by double bullet points which seem to be main categories
-        const mainSections = preconditionsText.split(/•\s*•/);
-        
-        mainSections.forEach((section: string) => {
-          if (section.trim()) {
-            // Split each section by " - " to separate items
-            const items = section.split(/\s+-\s+/);
+        lines.forEach((line: string) => {
+          if (line.trim()) {
+            // Determine the level based on the pattern (1., a., i., etc.)
+            const trimmedLine = line.trim();
+            let indentLevel = 0;
+            let formattedText = trimmedLine;
             
-            if (items.length > 0 && items[0].trim()) {
-              // First item is usually the category name
-              const categoryName = items[0].trim().replace(/:\s*$/, '');
-              
-              if (categoryName) {
-                // Add category with bullet
-                sections.push(new Paragraph({
-                  spacing: { after: 40 },
-                  children: [new TextRun({
-                    text: `• ${categoryName}:`,
-                    font: "Segoe UI Semilight",
-                    bold: true
-                  })]
-                }));
-              }
-              
-              // Process remaining items as sub-items
-              for (let i = 1; i < items.length; i++) {
-                let item = items[i].trim();
-                
-                if (item) {
-                  // Clean up extra dashes at the beginning
-                  item = item.replace(/^-+\s*/, '');
-                  
-                  // Try to parse JSON objects in the item
-                  const jsonRegex = /\{(?:[^{}]|(?:\{[^{}]*\}))*\}/g;
-                  const jsonMatches = item.match(jsonRegex);
-                  
-                  if (jsonMatches) {
-                    jsonMatches.forEach(jsonStr => {
-                      try {
-                        const obj = JSON.parse(jsonStr);
-                        let replacement = '';
-                        
-                        // Format based on object structure
-                        if (obj.usuario && obj.descripcion) {
-                          replacement = `${obj.usuario}: ${obj.descripcion}`;
-                        } else if (obj.descripcion && obj.datos) {
-                          replacement = `${obj.descripcion}: ${Object.entries(obj.datos).map(([k,v]) => `${k}=${v}`).join(', ')}`;
-                        } else if (obj.requisito || obj.requirement) {
-                          replacement = obj.requisito || obj.requirement;
-                        } else {
-                          // Generic formatting
-                          replacement = Object.entries(obj).map(([k,v]) => `${k}: ${v}`).join(', ');
-                        }
-                        
-                        item = item.replace(jsonStr, replacement);
-                      } catch (e) {
-                        // If JSON parsing fails, leave as is
-                      }
-                    });
-                  }
-                  
-                  // Add sub-item with indentation
-                  sections.push(new Paragraph({
-                    spacing: { after: 20 },
-                    indent: { left: 432 }, // 0.3 inch indent for sub-items
-                    children: [new TextRun({
-                      text: `- ${item}`,
-                      font: "Segoe UI Semilight"
-                    })]
-                  }));
-                }
-              }
+            // Check for numbered items (1., 2., etc.)
+            if (/^\d+\./.test(trimmedLine)) {
+              indentLevel = 0;
             }
+            // Check for lettered items (a., b., etc.)
+            else if (/^[a-z]\./.test(trimmedLine)) {
+              indentLevel = 432; // 0.3 inch
+            }
+            // Check for roman numerals (i., ii., etc.)
+            else if (/^[ivx]+\./.test(trimmedLine)) {
+              indentLevel = 864; // 0.6 inch
+            }
+            // Check for leading spaces to determine indentation
+            else {
+              const leadingSpaces = line.length - line.trimStart().length;
+              indentLevel = Math.floor(leadingSpaces / 3) * 288; // 288 twips = 0.2 inch per 3 spaces
+            }
+            
+            sections.push(new Paragraph({
+              spacing: { after: 40 },
+              indent: { left: indentLevel },
+              children: [new TextRun({
+                text: formattedText,
+                font: "Segoe UI Semilight"
+              })]
+            }));
           }
         });
         
