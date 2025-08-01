@@ -576,7 +576,7 @@ export class DocumentService {
                   font: "Segoe UI Semilight"
                 })]
               })],
-              shading: { fill: "F2F2F2" },
+              shading: { fill: "DEEAF6" },
               width: { size: 2000, type: WidthType.DXA }
             }),
             new TableCell({
@@ -588,7 +588,7 @@ export class DocumentService {
                   font: "Segoe UI Semilight"
                 })]
               })],
-              shading: { fill: "F2F2F2" },
+              shading: { fill: "DEEAF6" },
               width: { size: 3000, type: WidthType.DXA }
             }),
             new TableCell({
@@ -600,7 +600,7 @@ export class DocumentService {
                   font: "Segoe UI Semilight"
                 })]
               })],
-              shading: { fill: "F2F2F2" },
+              shading: { fill: "DEEAF6" },
               width: { size: 4500, type: WidthType.DXA }
             })
           ]
