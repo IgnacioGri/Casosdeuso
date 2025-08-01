@@ -10,6 +10,38 @@ interface TestCase {
 }
 
 export class DocumentService {
+  // Helper method to create styled heading with borders
+  private static createStyledHeading(text: string): Paragraph {
+    return new Paragraph({
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 240, after: 240 },
+      indent: { left: 120 }, // 0.21 cm
+      keepNext: true,
+      keepLines: true,
+      border: {
+        bottom: {
+          color: "006BB6",
+          space: 1,
+          style: BorderStyle.SINGLE,
+          size: 8 // 1pt
+        },
+        left: {
+          color: "006BB6",
+          space: 1,
+          style: BorderStyle.SINGLE,
+          size: 8 // 1pt
+        }
+      },
+      children: [new TextRun({
+        text: text.toUpperCase(), // Simulating small caps with uppercase
+        bold: true,
+        size: 24, // 12pt
+        color: "006BB6",
+        font: "Segoe UI"
+      })]
+    });
+  }
+
   // Generate DOCX directly from form data - no HTML conversion needed
   static async generateDirectFromFormData(formData: any, testCases?: TestCase[]): Promise<Buffer> {
     const headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
@@ -32,17 +64,7 @@ export class DocumentService {
           }),
           
           // Project Information Section
-          new Paragraph({
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 240, after: 120 },
-            children: [new TextRun({
-              text: "Información del Proyecto",
-              bold: true,
-              size: 28,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }),
+          this.createStyledHeading("Información del Proyecto"),
           new Paragraph({
             spacing: { after: 120 },
             children: [
@@ -73,17 +95,7 @@ export class DocumentService {
           }),
           
           // Use Case Description Section
-          new Paragraph({
-            heading: HeadingLevel.HEADING_2,
-            spacing: { before: 240, after: 120 },
-            children: [new TextRun({
-              text: "Descripción del Caso de Uso",
-              bold: true,
-              size: 28,
-              color: "0070C0",
-              font: "Segoe UI Semilight"
-            })]
-          }),
+          this.createStyledHeading("Descripción del Caso de Uso"),
           new Paragraph({
             spacing: { after: 120 },
             children: [
@@ -145,17 +157,7 @@ export class DocumentService {
     
     // Main Flow (Flujo Principal) - for entity use cases
     if (formData.useCaseType === 'entity') {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Flujo Principal de Eventos",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Flujo Principal de Eventos"));
       
       // Add search functionality
       sections.push(new Paragraph({
@@ -226,17 +228,7 @@ export class DocumentService {
     
     // Business Rules
     if (formData.businessRules) {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Reglas de Negocio",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Reglas de Negocio"));
       
       // Handle both string and array formats
       let rules: string[] = [];
@@ -260,17 +252,7 @@ export class DocumentService {
     
     // Search Filters (for entity use cases)
     if (formData.searchFilters && formData.searchFilters.length > 0) {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Filtros de Búsqueda",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Filtros de Búsqueda"));
       
       formData.searchFilters.forEach((filter: string) => {
         sections.push(new Paragraph({
@@ -286,17 +268,7 @@ export class DocumentService {
     
     // Result Columns (for entity use cases)
     if (formData.resultColumns && formData.resultColumns.length > 0) {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Columnas de Resultado",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Columnas de Resultado"));
       
       formData.resultColumns.forEach((column: string) => {
         sections.push(new Paragraph({
@@ -312,17 +284,7 @@ export class DocumentService {
     
     // Entity Fields (for entity use cases)
     if (formData.entityFields && formData.entityFields.length > 0) {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Campos de Entidad",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Campos de Entidad"));
       
       formData.entityFields.forEach((field: any) => {
         sections.push(new Paragraph({
@@ -341,17 +303,7 @@ export class DocumentService {
     
     // Alternative Flows (Flujos Alternativos)
     if (formData.alternativeFlowsDescription || (formData.alternativeFlows && formData.alternativeFlows.length > 0)) {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Flujos Alternativos",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Flujos Alternativos"));
       
       // First add the general description if exists
       if (formData.alternativeFlowsDescription) {
@@ -383,17 +335,7 @@ export class DocumentService {
     
     // Special Requirements
     if (formData.specialRequirements) {
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 240, after: 120 },
-        children: [new TextRun({
-          text: "Requerimientos Especiales",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("Requerimientos Especiales"));
       
       sections.push(new Paragraph({
         spacing: { after: 120 },
@@ -407,17 +349,7 @@ export class DocumentService {
     // Test Cases Section - Just another form section
     if (formData.generateTestCase && formData.testSteps && formData.testSteps.length > 0) {
       // Test Cases header
-      sections.push(new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 400, after: 120 },
-        children: [new TextRun({
-          text: "CASOS DE PRUEBA",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }));
+      sections.push(this.createStyledHeading("CASOS DE PRUEBA"));
       
       // Objective
       if (formData.testCaseObjective) {
@@ -549,17 +481,7 @@ export class DocumentService {
     const elements: (Paragraph | Table)[] = [];
     
     // Header
-    elements.push(new Paragraph({
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 400, after: 120 },
-      children: [new TextRun({
-        text: "HISTORIA DE REVISIONES Y APROBACIONES",
-        bold: true,
-        size: 28,
-        color: "0070C0",
-        font: "Segoe UI Semilight"
-      })]
-    }));
+    elements.push(this.createStyledHeading("HISTORIA DE REVISIONES Y APROBACIONES"));
     
     // Table with revision history
     const table = new Table({
@@ -665,17 +587,7 @@ export class DocumentService {
     const paragraphs: Paragraph[] = [];
     
     // Test Cases header
-    paragraphs.push(new Paragraph({
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 400, after: 120 },
-      children: [new TextRun({
-        text: "CASOS DE PRUEBA",
-        bold: true,
-        size: 28,
-        color: "0070C0",
-        font: "Segoe UI Semilight"
-      })]
-    }));
+    paragraphs.push(this.createStyledHeading("CASOS DE PRUEBA"));
     
     // Objective
     paragraphs.push(new Paragraph({
