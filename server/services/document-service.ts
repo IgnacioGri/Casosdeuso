@@ -143,6 +143,87 @@ export class DocumentService {
   private static addFormDataSections(formData: any): Paragraph[] {
     const sections: Paragraph[] = [];
     
+    // Main Flow (Flujo Principal) - for entity use cases
+    if (formData.useCaseType === 'entity') {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Flujo Principal de Eventos",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Add search functionality
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "1. Buscar datos de la entidad",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      if (formData.searchFilters && formData.searchFilters.length > 0) {
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 720 },
+          children: [new TextRun({
+            text: `a. Filtros de búsqueda disponibles: ${formData.searchFilters.join(', ')}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      if (formData.resultColumns && formData.resultColumns.length > 0) {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 720 },
+          children: [new TextRun({
+            text: `b. Columnas del resultado de búsqueda: ${formData.resultColumns.join(', ')}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      // Add create functionality
+      sections.push(new Paragraph({
+        spacing: { after: 80, before: 80 },
+        children: [new TextRun({
+          text: "2. Agregar una nueva entidad",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      if (formData.entityFields && formData.entityFields.length > 0) {
+        const fieldsDescription = formData.entityFields.map((f: any) => 
+          `${f.name} (${f.type}${f.length ? `, ${f.length}` : ''}${f.mandatory ? ', obligatorio' : ', opcional'})`
+        ).join(', ');
+        
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 720 },
+          children: [new TextRun({
+            text: `a. Campos de la entidad: ${fieldsDescription}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        indent: { left: 720 },
+        children: [new TextRun({
+          text: "b. Al agregar se registra automáticamente la fecha y usuario de alta",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+    }
+    
     // Business Rules
     if (formData.businessRules) {
       sections.push(new Paragraph({
@@ -256,6 +337,71 @@ export class DocumentService {
           ]
         }));
       });
+    }
+    
+    // Alternative Flows (Flujos Alternativos)
+    if (formData.alternativeFlowsDescription || (formData.alternativeFlows && formData.alternativeFlows.length > 0)) {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Flujos Alternativos",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // First add the general description if exists
+      if (formData.alternativeFlowsDescription) {
+        sections.push(new Paragraph({
+          spacing: { after: 120 },
+          children: [new TextRun({
+            text: formData.alternativeFlowsDescription,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      // Then add individual alternative flows if they exist
+      if (formData.alternativeFlows && formData.alternativeFlows.length > 0) {
+        formData.alternativeFlows.forEach((flow: string, index: number) => {
+          if (flow && flow.trim()) {
+            sections.push(new Paragraph({
+              spacing: { after: 80 },
+              indent: { left: 720 },
+              children: [
+                new TextRun({ text: `${index + 1}. `, font: "Segoe UI Semilight" }),
+                new TextRun({ text: flow.trim(), font: "Segoe UI Semilight" })
+              ]
+            }));
+          }
+        });
+      }
+    }
+    
+    // Special Requirements
+    if (formData.specialRequirements) {
+      sections.push(new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 240, after: 120 },
+        children: [new TextRun({
+          text: "Requerimientos Especiales",
+          bold: true,
+          size: 28,
+          color: "0070C0",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        children: [new TextRun({
+          text: formData.specialRequirements,
+          font: "Segoe UI Semilight"
+        })]
+      }));
     }
     
     // Test Cases Section - Just another form section
