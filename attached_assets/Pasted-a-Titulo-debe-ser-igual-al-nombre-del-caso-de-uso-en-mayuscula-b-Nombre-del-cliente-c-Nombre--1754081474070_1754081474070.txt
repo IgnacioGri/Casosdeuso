@@ -1,0 +1,43 @@
+a.	Titulo : debe ser igual al nombre del caso de uso en mayuscula
+b.	Nombre del cliente
+c.	Nombre del proyecto
+d.	Nombre del caso de uso 
+e.	Descripción: explicación detallada del alcance del objetivo del caso de uso 
+f.	Flujo principal de eventos que debe mostrarse como una lista indentanda con sangrías e incluir solo las siguientes funcionalidades:
+i.	Buscar datos de la entidad 
+1.	Detallar los filtros de la busqueda de la entidad
+2.	Detallar las columnas del resultado de la búsqueda de la entidad
+ii.	Agregar una nueva entidad
+1.	Detallar cada uno de los datos de la entidad
+2.	Cuando se agrega una entidad se debe registrar la fecha y el usuario de alta
+g.	Flujos alternativos que mostrarse como una lista indentanda con sangrías e  debe incluir las siguientes funcionalidades
+i.	Modificar o actualizar una entidad. 
+1.	Detallar cada uno de los datos de la entidad
+2.	Mostrar el identificador
+3.	Mostrar la fecha y el usuario de alta
+4.	Cuando se modifica una entidad se debe registrar la fecha y el usuario de modificación.
+ii.	Eliminar una entidad
+1.	Para eliminar una entidad se debe verificar que no tenga relaciones con otras entidades
+h.	Reglas de negocio
+i.	Detallar cada una de las reglas de negocio
+ii.	Detallar los requerimientos especiales
+i.	Precondiciones
+j.	Postcondiciones
+k.	Generar un boceto grafico simplificados de interfaz de usuario del buscador de entidades. Debe incluir:
+i.	Paginado
+ii.	Boton de Buscar, Limpiar y Agregar
+iii.	Boton de editar y Eliminar en cada fila del resultado 
+l.	Detallar funcionalidades del boceto grafico la interfaz de usuario del buscador de entidades
+i.	Listar cada uno de los filtros de busqueda
+ii.	Listar cada uno de las columnas del resultado de búsqueda
+iii.	Indicar que debe paginar
+m.	Generar un boceto grafico simplificado de  la interfaz de usuario para agregar una entidad. Debe incluir:
+i.	Boton para Aceptar y Cancelar
+ii.	Fecha y usuario de alta
+iii.	Fecha y usuario de modificacion
+n.	Detallar funcionalidades del boceto grafico de la interfaz de usuario para agregar entidad
+i.	Listar cada uno de los datos indicando 
+•	Tipo de dato 
+•	Si es obligatorio
+•	Longitud
+•	Requerimientos especiales
