@@ -1678,12 +1678,12 @@ export class DocumentService {
             children: [new TextRun({ 
               text: "#", 
               bold: true, 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
             })]
           })],
-          width: { size: 8, type: WidthType.PERCENTAGE },
-          shading: { fill: "F2F2F2" },
+          width: { size: 5, type: WidthType.PERCENTAGE },
+          shading: { fill: "DEEAF6" },
           borders: this.getTableBorders()
         }),
         new TableCell({
@@ -1691,38 +1691,38 @@ export class DocumentService {
             children: [new TextRun({ 
               text: "Acción", 
               bold: true, 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
             })]
           })],
-          width: { size: 25, type: WidthType.PERCENTAGE },
-          shading: { fill: "F2F2F2" },
+          width: { size: 20, type: WidthType.PERCENTAGE },
+          shading: { fill: "DEEAF6" },
           borders: this.getTableBorders()
         }),
         new TableCell({
           children: [new Paragraph({
             children: [new TextRun({ 
-              text: "Datos de Entrada", 
+              text: "Datos de entrada", 
               bold: true, 
-              size: 20, 
+              size: 18, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 18, type: WidthType.PERCENTAGE },
+          shading: { fill: "DEEAF6" },
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Resultado esperado", 
+              bold: true, 
+              size: 18, 
               font: "Segoe UI Semilight" 
             })]
           })],
           width: { size: 22, type: WidthType.PERCENTAGE },
-          shading: { fill: "F2F2F2" },
-          borders: this.getTableBorders()
-        }),
-        new TableCell({
-          children: [new Paragraph({
-            children: [new TextRun({ 
-              text: "Resultado Esperado", 
-              bold: true, 
-              size: 20, 
-              font: "Segoe UI Semilight" 
-            })]
-          })],
-          width: { size: 25, type: WidthType.PERCENTAGE },
-          shading: { fill: "F2F2F2" },
+          shading: { fill: "DEEAF6" },
           borders: this.getTableBorders()
         }),
         new TableCell({
@@ -1730,15 +1730,29 @@ export class DocumentService {
             children: [new TextRun({ 
               text: "Observaciones", 
               bold: true, 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
             })]
           })],
-          width: { size: 20, type: WidthType.PERCENTAGE },
-          shading: { fill: "F2F2F2" },
+          width: { size: 18, type: WidthType.PERCENTAGE },
+          shading: { fill: "DEEAF6" },
+          borders: this.getTableBorders()
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Estado\n(P/F)", 
+              bold: true, 
+              size: 18, 
+              font: "Segoe UI Semilight" 
+            })]
+          })],
+          width: { size: 7, type: WidthType.PERCENTAGE },
+          shading: { fill: "DEEAF6" },
           borders: this.getTableBorders()
         })
-      ]
+      ],
+      tableHeader: true
     });
 
     const dataRows = testSteps.map(step => new TableRow({
@@ -1747,58 +1761,89 @@ export class DocumentService {
           children: [new Paragraph({
             children: [new TextRun({ 
               text: step.number?.toString() || "", 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
-            })]
+            })],
+            alignment: AlignmentType.CENTER
           })],
-          borders: this.getTableBorders()
+          borders: this.getTableBorders(),
+          width: { size: 5, type: WidthType.PERCENTAGE }
         }),
         new TableCell({
           children: [new Paragraph({
             children: [new TextRun({ 
               text: step.action || "", 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
-            })]
+            })],
+            spacing: { after: 120 }
           })],
-          borders: this.getTableBorders()
+          borders: this.getTableBorders(),
+          width: { size: 20, type: WidthType.PERCENTAGE }
         }),
         new TableCell({
           children: [new Paragraph({
             children: [new TextRun({ 
               text: step.inputData || "", 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
-            })]
+            })],
+            spacing: { after: 120 }
           })],
-          borders: this.getTableBorders()
+          borders: this.getTableBorders(),
+          width: { size: 18, type: WidthType.PERCENTAGE }
         }),
         new TableCell({
           children: [new Paragraph({
             children: [new TextRun({ 
               text: step.expectedResult || "", 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
-            })]
+            })],
+            spacing: { after: 120 }
           })],
-          borders: this.getTableBorders()
+          borders: this.getTableBorders(),
+          width: { size: 22, type: WidthType.PERCENTAGE }
         }),
         new TableCell({
           children: [new Paragraph({
             children: [new TextRun({ 
               text: step.observations || "", 
-              size: 20, 
+              size: 18, 
               font: "Segoe UI Semilight" 
-            })]
+            })],
+            spacing: { after: 120 }
           })],
-          borders: this.getTableBorders()
+          borders: this.getTableBorders(),
+          width: { size: 18, type: WidthType.PERCENTAGE }
+        }),
+        new TableCell({
+          children: [new Paragraph({
+            children: [new TextRun({ 
+              text: "Pendiente", 
+              size: 18, 
+              font: "Segoe UI Semilight" 
+            })],
+            alignment: AlignmentType.CENTER
+          })],
+          borders: this.getTableBorders(),
+          width: { size: 7, type: WidthType.PERCENTAGE }
         })
       ]
     }));
 
     return new Table({
       rows: [headerRow, ...dataRows],
-      width: { size: 100, type: WidthType.PERCENTAGE }
+      width: { size: 100, type: WidthType.PERCENTAGE },
+      layout: TableLayoutType.FIXED,
+      borders: {
+        top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        left: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        right: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
+        insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "666666" }
+      }
     });
   }
 
