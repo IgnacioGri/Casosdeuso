@@ -460,12 +460,28 @@ export class DocumentService {
         }));
         
         const preconditionsText = String(formData.testCasePreconditions || '');
+        const lines = preconditionsText.split('\n');
+        
+        lines.forEach((line: string) => {
+          if (line.trim()) {
+            // Determine indentation level based on leading spaces
+            const leadingSpaces = line.length - line.trimStart().length;
+            const indentLevel = Math.floor(leadingSpaces / 2) * 288; // 288 twips = 0.2 inch per level
+            
+            sections.push(new Paragraph({
+              spacing: { after: 40 },
+              indent: { left: indentLevel },
+              children: [new TextRun({
+                text: line.trim(),
+                font: "Segoe UI Semilight"
+              })]
+            }));
+          }
+        });
+        
+        // Add extra spacing after preconditions
         sections.push(new Paragraph({
-          spacing: { after: 120 },
-          children: [new TextRun({
-            text: preconditionsText,
-            font: "Segoe UI Semilight"
-          })]
+          spacing: { after: 80 }
         }));
       }
       
