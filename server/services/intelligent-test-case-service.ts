@@ -351,32 +351,8 @@ CONTEXTO BANCARIO ING:
         status: 'pending' as const
       }));
 
-      // Format preconditions if it's an object
-      let formattedPreconditions = '';
-      if (typeof parsed.preconditions === 'object' && parsed.preconditions !== null) {
-        // Convert object preconditions to formatted string
-        for (const [key, value] of Object.entries(parsed.preconditions)) {
-          formattedPreconditions += `• ${key}:\n`;
-          if (Array.isArray(value)) {
-            value.forEach((item: any) => {
-              if (typeof item === 'object' && item !== null) {
-                // If item has description or other properties
-                const desc = item.description || item.user || item.data || JSON.stringify(item);
-                formattedPreconditions += `  - ${desc}\n`;
-              } else {
-                formattedPreconditions += `  - ${item}\n`;
-              }
-            });
-          } else if (typeof value === 'string') {
-            formattedPreconditions += `  - ${value}\n`;
-          }
-          formattedPreconditions += '\n';
-        }
-      } else if (typeof parsed.preconditions === 'string') {
-        formattedPreconditions = parsed.preconditions;
-      } else {
-        formattedPreconditions = this.getDefaultPreconditions(formData);
-      }
+      // Format preconditions properly
+      const formattedPreconditions = this.formatPreconditions(parsed.preconditions, formData);
 
       return {
         objective: parsed.objective || `Verificar el funcionamiento completo del caso de uso: ${formData.useCaseName}`,
@@ -395,6 +371,171 @@ CONTEXTO BANCARIO ING:
         throw new Error(`Error al procesar la respuesta de IA: ${error instanceof Error ? error.message : 'Error desconocido'}`);
       }
     }
+  }
+
+  private formatPreconditions(preconditions: any, formData: UseCaseFormData): string {
+    // If preconditions is already a well-formatted string with hierarchical numbering, return it
+    if (typeof preconditions === 'string' && /^\d+\./.test(preconditions.trim())) {
+      return preconditions;
+    }
+
+    let formatted = '';
+    let sectionNumber = 1;
+
+    // Helper to extract text from various object formats
+    const extractText = (item: any): string => {
+      if (typeof item === 'string') {
+        return item;
+      }
+      if (typeof item === 'object' && item !== null) {
+        // Handle different object structures
+        if (item.description) return item.description;
+        if (item.usuario && item.descripcion) return `${item.usuario}: ${item.descripcion}`;
+        if (item.requisito) return item.requisito;
+        if (item.requirement) return item.requirement;
+        if (item.user) return item.user;
+        if (item.data) return item.data;
+        
+        // If it has datos property, format it nicely
+        if (item.datos) {
+          const dataParts = Object.entries(item.datos)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(', ');
+          return `${item.descripcion || 'Datos'}: ${dataParts}`;
+        }
+        
+        // Fallback to stringifying the object if nothing else works
+        return JSON.stringify(item);
+      }
+      return String(item);
+    };
+
+    // If preconditions is an object, convert it
+    if (typeof preconditions === 'object' && preconditions !== null) {
+      // Process each section
+      const sections = [
+        { key: ['usuarios', 'usuariosDePrueba', 'usuarios_de_prueba', 'users'], title: 'Usuarios de prueba' },
+        { key: ['datos', 'datosDePrueba', 'datos_de_prueba', 'data'], title: 'Datos de prueba' },
+        { key: ['infraestructura', 'infrastructure', 'sistema'], title: 'Infraestructura y configuración' }
+      ];
+
+      for (const section of sections) {
+        // Find the matching key
+        const matchingKey = section.key.find(k => preconditions[k]);
+        if (matchingKey && preconditions[matchingKey]) {
+          formatted += `${sectionNumber}. ${section.title}\n`;
+          
+          const items = preconditions[matchingKey];
+          if (Array.isArray(items)) {
+            items.forEach((item, index) => {
+              const letter = String.fromCharCode(97 + index); // a, b, c...
+              const text = extractText(item);
+              // Clean up the text - remove any remaining JSON artifacts
+              const cleanText = text.replace(/[{}]/g, '').replace(/"/g, '');
+              formatted += `   ${letter}. ${cleanText}\n`;
+            });
+          } else {
+            formatted += `   a. ${extractText(items)}\n`;
+          }
+          
+          formatted += '\n';
+          sectionNumber++;
+        }
+      }
+
+      // Handle any other sections not covered above
+      for (const [key, value] of Object.entries(preconditions)) {
+        if (!sections.some(s => s.key.includes(key))) {
+          formatted += `${sectionNumber}. ${key.charAt(0).toUpperCase() + key.slice(1)}\n`;
+          if (Array.isArray(value)) {
+            value.forEach((item: any, index: number) => {
+              const letter = String.fromCharCode(97 + index);
+              formatted += `   ${letter}. ${extractText(item)}\n`;
+            });
+          } else {
+            formatted += `   a. ${extractText(value)}\n`;
+          }
+          formatted += '\n';
+          sectionNumber++;
+        }
+      }
+    } else if (typeof preconditions === 'string') {
+      // If it's a string but poorly formatted, try to clean it up
+      const lines = preconditions.split('\n').filter(line => line.trim());
+      let currentSection = '';
+      let itemLetter = 'a';
+      
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        
+        // Skip double bullets
+        if (trimmedLine.startsWith('• •')) {
+          continue;
+        }
+        
+        // Check if it's a section header
+        if (trimmedLine.startsWith('•') && trimmedLine.endsWith(':')) {
+          currentSection = trimmedLine.replace(/^•\s*/, '').replace(/:$/, '');
+          formatted += `${sectionNumber}. ${currentSection}\n`;
+          sectionNumber++;
+          itemLetter = 'a';
+        }
+        // Handle sub-items
+        else if (trimmedLine.startsWith('-') || trimmedLine.startsWith('•')) {
+          const text = trimmedLine.replace(/^[-•]\s*/, '');
+          // Clean up any JSON objects
+          const cleanText = text.replace(/\[object Object\]/g, '')
+            .replace(/\{[^}]+\}/g, (match) => {
+              try {
+                const obj = JSON.parse(match);
+                return extractText(obj);
+              } catch {
+                return match;
+              }
+            });
+          formatted += `   ${itemLetter}. ${cleanText}\n`;
+          itemLetter = String.fromCharCode(itemLetter.charCodeAt(0) + 1);
+        }
+      }
+    }
+
+    // If still empty, provide default preconditions
+    if (!formatted.trim()) {
+      return this.getDefaultPreconditions(formData);
+    }
+
+    return formatted.trim();
+  }
+
+  private getDefaultPreconditions(formData: UseCaseFormData): string {
+    const projectName = formData.projectName || 'Sistema';
+    const useCaseName = formData.useCaseName || 'Gestión';
+    
+    let preconditions = `1. Usuarios de prueba
+   a. Usuario con perfil autorizado: Usuario con permisos completos para ejecutar las operaciones del caso de uso
+   b. Usuario sin permisos: Usuario válido pero sin acceso a esta funcionalidad específica
+
+2. Datos de prueba
+   a. Datos válidos: Registros de prueba que cumplen con todas las validaciones y reglas de negocio
+   b. Datos inválidos: Registros diseñados para probar validaciones y manejo de errores
+
+3. Infraestructura y configuración
+   a. Sistema ${projectName} desplegado en ambiente de pruebas (UAT)
+   b. Base de datos con datos de prueba precargados
+   c. Servicios externos simulados o disponibles según requerimientos`;
+
+    // Add specific preconditions based on use case type
+    if (formData.useCaseType === 'api') {
+      preconditions += `
+   d. Endpoint API configurado y accesible: ${formData.apiEndpoint || '/api/endpoint'}
+   e. Herramientas de prueba API (Postman, curl) disponibles`;
+    } else if (formData.useCaseType === 'service') {
+      preconditions += `
+   d. Servicio programado configurado con frecuencia: ${formData.serviceFrequency || 'Diaria'}
+   e. Logs y monitoreo habilitados para verificación`;
+    }
+
+    return preconditions;
   }
 
   private generateFallbackTestSteps(formData: UseCaseFormData): any[] {
