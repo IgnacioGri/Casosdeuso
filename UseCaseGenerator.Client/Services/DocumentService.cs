@@ -14,9 +14,20 @@ public class DocumentService : IDocumentService
         _jsRuntime = jsRuntime;
     }
 
-    public async Task<byte[]> DownloadDocxAsync(string content, string fileName)
+    public async Task<byte[]> DownloadDocxAsync(string content, string fileName, object formData = null)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/Document/docx", new { Content = content, FileName = fileName });
+        // IMPORTANT: Always send formData for DOCX generation (HTML conversion is deprecated)
+        if (formData == null)
+        {
+            throw new ArgumentException("formData is required for DOCX export. The HTML conversion method is deprecated.");
+        }
+        
+        var response = await _httpClient.PostAsJsonAsync("api/Document/docx", new 
+        { 
+            Content = content, 
+            FileName = fileName,
+            FormData = formData 
+        });
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsByteArrayAsync();
     }

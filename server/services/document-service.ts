@@ -872,6 +872,11 @@ export class DocumentService {
     
     return paragraphs;
   }
+  /**
+   * @deprecated This method converts HTML to DOCX and should not be used anymore.
+   * Use generateDirectFromFormData instead which generates DOCX directly without HTML conversion.
+   * This method is kept only for backward compatibility and will be removed in future versions.
+   */
   static async generateDocx(htmlContent: string, fileName: string, useCaseName: string = '', testCaseData?: any): Promise<Buffer> {
     // Convert HTML to docx structure
     const paragraphs = this.parseHtmlToParagraphs(htmlContent);

@@ -33,6 +33,15 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in both HTML preview and DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
 
+### Recent Updates (February 2, 2025)
+- **DOCX Export Architecture Fix**: Resolved fundamental issue where system was incorrectly using legacy HTML-to-DOCX conversion
+  - Both React and C# systems now ALWAYS use direct formData-to-DOCX generation method
+  - HTML conversion methods marked as deprecated with clear documentation
+  - All DOCX endpoints now require and validate formData presence
+  - Added Result Dialog in Blazor Generator.razor to display generated content with export options
+  - Updated Blazor DocumentService to pass formData when exporting DOCX
+  - Ensures consistent professional ING corporate formatting across both systems
+
 ### Recent Updates (January 31, 2025)
 - **Enhanced Intelligent Test Case Parsing**: Improved JSON parsing logic to handle various AI response formats more robustly
 - **Fallback Test Step Generation**: Added automatic fallback test step generation when AI doesn't provide complete test steps

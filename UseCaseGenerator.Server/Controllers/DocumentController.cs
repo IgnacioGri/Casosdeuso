@@ -36,8 +36,12 @@ public class DocumentController : ControllerBase
                 return BadRequest("Request cannot be null");
             }
             
-            // Validate content size
-            InputValidator.ValidateContentSize(request.Content, 100000);
+            // IMPORTANT: We no longer use HTML content for DOCX generation
+            // Always generate directly from formData
+            if (request.FormData == null)
+            {
+                return BadRequest("formData is required for DOCX export. The HTML conversion method is deprecated.");
+            }
             
             // Sanitize file name to prevent path traversal
             var sanitizedFileName = InputValidator.SanitizeFileName(request.FileName);
@@ -46,14 +50,14 @@ public class DocumentController : ControllerBase
             var useCase = new UseCase
             {
                 Id = Guid.NewGuid().ToString(),
-                ClientName = InputValidator.SanitizeText(request.FormData?.ClientName ?? "Cliente"),
-                ProjectName = InputValidator.SanitizeText(request.FormData?.ProjectName ?? "Proyecto"),
-                UseCaseName = InputValidator.SanitizeText(request.FormData?.UseCaseName ?? sanitizedFileName),
-                UseCaseCode = InputValidator.SanitizeText(request.FormData?.UseCaseCode, 50),
+                ClientName = InputValidator.SanitizeText(request.FormData.ClientName ?? "Cliente"),
+                ProjectName = InputValidator.SanitizeText(request.FormData.ProjectName ?? "Proyecto"),
+                UseCaseName = InputValidator.SanitizeText(request.FormData.UseCaseName ?? sanitizedFileName),
+                UseCaseCode = InputValidator.SanitizeText(request.FormData.UseCaseCode, 50),
                 FileName = sanitizedFileName,
-                Description = InputValidator.SanitizeText(request.FormData?.Description, 1000),
-                UseCaseType = request.FormData?.UseCaseType ?? UseCaseType.Entity,
-                BusinessRules = InputValidator.SanitizeText(request.FormData?.BusinessRules, 2000),
+                Description = InputValidator.SanitizeText(request.FormData.Description, 1000),
+                UseCaseType = request.FormData.UseCaseType ?? UseCaseType.Entity,
+                BusinessRules = InputValidator.SanitizeText(request.FormData.BusinessRules, 2000),
                 SearchFilters = request.FormData?.SearchFilters ?? new List<string>(),
                 ResultColumns = request.FormData?.ResultColumns ?? new List<string>(),
                 EntityFields = request.FormData?.EntityFields ?? new List<EntityField>(),
@@ -65,7 +69,8 @@ public class DocumentController : ControllerBase
                 CreatedAt = DateTime.UtcNow
             };
 
-            var docxBytes = _documentService.GenerateDocx(request.Content, useCase);
+            // Generate DOCX directly from UseCase data (no HTML conversion)
+            var docxBytes = _documentService.GenerateDocx("", useCase);
             
             return File(docxBytes, 
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -111,7 +116,8 @@ public class DocumentController : ControllerBase
 
             if (format.ToLower() == "docx")
             {
-                var docxBytes = _documentService.GenerateDocx(useCase.GeneratedContent ?? "", useCase);
+                // Generate DOCX directly from UseCase data (no HTML conversion)
+                var docxBytes = _documentService.GenerateDocx("", useCase);
                 return File(docxBytes, 
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     $"{useCase.FileName}.docx");

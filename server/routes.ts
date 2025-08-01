@@ -588,21 +588,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Content is required for DOCX export" });
       }
 
-      // Debug logging to understand which path is being taken
-      console.log('🔍 DOCX Export Debug Info:');
+      // Debug logging
+      console.log('🔍 DOCX Export - Using generateDirectFromFormData method');
       console.log('- formData exists:', !!formData);
-      console.log('- formData keys:', formData ? Object.keys(formData).length : 0);
-      console.log('- Generation method:', formData && Object.keys(formData).length > 0 ? 'generateDirectFromFormData' : 'generateDocx');
+      console.log('- formData keys:', formData ? Object.keys(formData) : []);
       
-      // Use direct generation from form data if available
-      const docxBuffer = formData && Object.keys(formData).length > 0
-        ? await DocumentService.generateDirectFromFormData(formData, formData.testCases)
-        : await DocumentService.generateDocx(
-            content,
-            fileName || 'caso-de-uso',
-            useCaseName || 'Caso de Uso',
-            formData || null
-          );
+      // ALWAYS use direct generation from form data (the correct method)
+      // The HTML conversion method (generateDocx) is legacy code we should not use
+      if (!formData || Object.keys(formData).length === 0) {
+        return res.status(400).json({ 
+          message: "formData is required for DOCX export. The HTML conversion method is deprecated." 
+        });
+      }
+      
+      const docxBuffer = await DocumentService.generateDirectFromFormData(formData, formData.testCases);
 
       // Add cache control headers to prevent browser caching
       res.set({

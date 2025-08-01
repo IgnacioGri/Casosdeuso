@@ -11,6 +11,7 @@
 @inject IUseCaseService UseCaseService
 @inject IJSRuntime JSRuntime
 @inject ISnackbar Snackbar
+@inject IDocumentService DocumentService
 
 <PageTitle>Generador de Casos de Uso - ING</PageTitle>
 
@@ -115,12 +116,69 @@
     </MudPaper>
 </MudContainer>
 
+<!-- Result Dialog -->
+<MudDialog @bind-IsVisible="showResultDialog" Options="new DialogOptions { MaxWidth = MaxWidth.Large, FullWidth = true }">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" Color="Color.Success" />
+            Caso de Uso Generado Exitosamente
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (generatedResponse != null && generatedResponse.Success)
+        {
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudCard Elevation="2">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Vista Previa del Documento</MudText>
+                            </CardHeaderContent>
+                            <CardHeaderActions>
+                                <MudButton Variant="Variant.Filled" 
+                                           Color="Color.Primary" 
+                                           StartIcon="@Icons.Material.Filled.Download"
+                                           OnClick="ExportDocx"
+                                           Disabled="isExporting">
+                                    @if (isExporting)
+                                    {
+                                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                    }
+                                    Exportar DOCX
+                                </MudButton>
+                                <MudButton Variant="Variant.Outlined" 
+                                           Color="Color.Primary" 
+                                           StartIcon="@Icons.Material.Filled.Download"
+                                           OnClick="ExportHtml"
+                                           Class="ml-2">
+                                    Exportar HTML
+                                </MudButton>
+                            </CardHeaderActions>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <div style="max-height: 500px; overflow-y: auto; padding: 20px; background-color: #f5f5f5; border-radius: 4px;">
+                                @((MarkupString)generatedResponse.Content)
+                            </div>
+                        </MudCardContent>
+                    </MudCard>
+                </MudItem>
+            </MudGrid>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => showResultDialog = false">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code {
     private int currentStep = 1;
     private int maxSteps => formData.UseCaseType == UseCaseType.Entity ? 11 : 8;
     private double progressValue => (double)currentStep / maxSteps * 100;
     private UseCaseFormData formData = new();
     private bool isGenerating = false;
+    private GenerateUseCaseResponse? generatedResponse = null;
+    private bool showResultDialog = false;
+    private bool isExporting = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -171,8 +229,9 @@
             
             if (response.Success)
             {
+                generatedResponse = response;
+                showResultDialog = true;
                 Snackbar.Add("Caso de uso generado exitosamente", Severity.Success);
-                // Navigate to result page or show result
             }
             else
             {
@@ -221,6 +280,68 @@
         catch (Exception)
         {
             // Ignore errors saving to localStorage
+        }
+    }
+
+    private async Task ExportDocx()
+    {
+        if (generatedResponse == null || !generatedResponse.Success || generatedResponse.UseCase == null)
+        {
+            Snackbar.Add("No hay contenido para exportar", Severity.Warning);
+            return;
+        }
+
+        isExporting = true;
+        StateHasChanged();
+
+        try
+        {
+            // Pass formData to DownloadDocxAsync (REQUIRED - HTML conversion is deprecated)
+            var docxBytes = await DocumentService.DownloadDocxAsync(
+                generatedResponse.Content, 
+                generatedResponse.UseCase.FileName ?? "caso-de-uso",
+                formData // Pass the complete form data for proper DOCX generation
+            );
+            
+            // Convert to base64 and download
+            var base64 = Convert.ToBase64String(docxBytes);
+            var fileName = $"{generatedResponse.UseCase.FileName ?? "caso-de-uso"}.docx";
+            
+            await JSRuntime.InvokeVoidAsync("downloadFile", fileName, $"data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{base64}");
+            
+            Snackbar.Add("Documento DOCX exportado exitosamente", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al exportar DOCX: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            isExporting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ExportHtml()
+    {
+        if (generatedResponse == null || !generatedResponse.Success || generatedResponse.UseCase == null)
+        {
+            Snackbar.Add("No hay contenido para exportar", Severity.Warning);
+            return;
+        }
+
+        try
+        {
+            DocumentService.DownloadHtml(
+                generatedResponse.Content,
+                generatedResponse.UseCase.FileName ?? "caso-de-uso"
+            );
+            
+            Snackbar.Add("Documento HTML exportado exitosamente", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al exportar HTML: {ex.Message}", Severity.Error);
         }
     }
 }
