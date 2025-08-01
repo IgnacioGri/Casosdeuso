@@ -1779,7 +1779,7 @@ CONTENIDO MEJORADO:`;
   - Registros históricos para validar consultas y reportes
 
 • Infraestructura:
-  - Sistema ${context?.projectName || 'de gestión'} desplegado en ambiente de pruebas
+  - Sistema desplegado en ambiente de pruebas
   - Servicios externos configurados (validación DNI, servicios bancarios)
   - Conexión estable a base de datos y servicios`;
       }
