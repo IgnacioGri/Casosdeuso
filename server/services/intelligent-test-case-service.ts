@@ -626,39 +626,7 @@ CONTEXTO BANCARIO ING:
     }
   }
 
-  private getDefaultPreconditions(formData: UseCaseFormData): string {
-    const basePreconditions = [
-      'Usuario autenticado en el sistema',
-      'Permisos de acceso configurados correctamente',
-      'Sistema operativo y base de datos disponibles',
-      'Conexión de red estable'
-    ];
 
-    switch (formData.useCaseType) {
-      case 'entity':
-        basePreconditions.push(
-          'Datos de prueba disponibles en la base de datos',
-          'Validaciones de negocio configuradas'
-        );
-        break;
-      case 'api':
-        basePreconditions.push(
-          'API endpoint configurado y disponible',
-          'Tokens de autenticación válidos',
-          'Servicios externos operativos'
-        );
-        break;
-      case 'service':
-        basePreconditions.push(
-          'Servicios programados configurados',
-          'Recursos del sistema disponibles',
-          'Configuración de logging activa'
-        );
-        break;
-    }
-
-    return basePreconditions.join('\n');
-  }
 
   private generateDemoIntelligentTests(formData: UseCaseFormData): IntelligentTestCaseResult {
     const baseTestSteps = [

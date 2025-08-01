@@ -1552,17 +1552,24 @@ export class DocumentService {
       });
       paragraphs.push(preconditionsTitle);
 
-      const preconditionsContent = new Paragraph({
-        spacing: { after: 120 },
-        children: [
-          new TextRun({
-            text: preconditions,
-            size: 22,
-            font: "Segoe UI Semilight"
-          })
-        ]
-      });
-      paragraphs.push(preconditionsContent);
+      // Process and format preconditions properly
+      const formattedPreconditions = this.formatPreconditionsForDocx(preconditions);
+      if (typeof formattedPreconditions === 'string') {
+        const preconditionsContent = new Paragraph({
+          spacing: { after: 120 },
+          children: [
+            new TextRun({
+              text: formattedPreconditions,
+              size: 22,
+              font: "Segoe UI Semilight"
+            })
+          ]
+        });
+        paragraphs.push(preconditionsContent);
+      } else {
+        // If formatted as paragraphs array, add them directly
+        paragraphs.push(...formattedPreconditions);
+      }
     }
 
     // Add test steps table if provided
@@ -1584,6 +1591,83 @@ export class DocumentService {
       const testStepsTable = this.createTestCaseTable(testCaseData.testSteps);
       paragraphs.push(testStepsTable);
     }
+  }
+
+  private static formatPreconditionsForDocx(preconditions: any): string | Paragraph[] {
+    // If preconditions is already well-formatted with hierarchical numbering, return it
+    if (typeof preconditions === 'string' && /^\d+\./.test(preconditions.trim())) {
+      return preconditions;
+    }
+
+    // Clean up badly formatted preconditions
+    if (typeof preconditions === 'string') {
+      const lines = preconditions.split('\n');
+      const cleanedLines: string[] = [];
+      let currentSection = '';
+      let sectionNumber = 1;
+      let itemLetter = 'a';
+      
+      for (const line of lines) {
+        const trimmedLine = line.trim();
+        
+        // Skip empty lines and double bullets
+        if (!trimmedLine || trimmedLine.startsWith('• •')) {
+          continue;
+        }
+        
+        // Check if it's a section header
+        if (trimmedLine.startsWith('•') && trimmedLine.endsWith(':')) {
+          currentSection = trimmedLine.replace(/^•\s*/, '').replace(/:$/, '');
+          cleanedLines.push(`${sectionNumber}. ${currentSection}`);
+          sectionNumber++;
+          itemLetter = 'a';
+        }
+        // Handle sub-items
+        else if (trimmedLine.startsWith('-') || trimmedLine.startsWith('•')) {
+          let text = trimmedLine.replace(/^[-•]\s*/, '');
+          
+          // Clean up JSON objects and [object Object]
+          text = text.replace(/\[object Object\]/g, '')
+            .replace(/\{[^}]+\}/g, (match) => {
+              try {
+                const obj = JSON.parse(match);
+                if (obj.requirement) return obj.requirement;
+                if (obj.requisito) return obj.requisito;
+                if (obj.user) return obj.user;
+                if (obj.description) return obj.description;
+                return '';
+              } catch {
+                return '';
+              }
+            })
+            .trim();
+          
+          if (text) {
+            cleanedLines.push(`   ${itemLetter}. ${text}`);
+            itemLetter = String.fromCharCode(itemLetter.charCodeAt(0) + 1);
+          }
+        }
+      }
+      
+      if (cleanedLines.length > 0) {
+        return cleanedLines.join('\n');
+      }
+    }
+    
+    // Default preconditions if parsing fails
+    return `1. Usuarios de prueba
+   a. Usuario con perfil autorizado con permisos completos
+   b. Usuario con permisos limitados
+   c. Usuario sin acceso al módulo
+   
+2. Datos de prueba
+   a. Registros válidos que cumplen con todas las validaciones
+   b. Registros inválidos para pruebas de validación
+   
+3. Infraestructura y configuración
+   a. Sistema desplegado en ambiente de pruebas
+   b. Base de datos con datos de prueba precargados
+   c. Servicios externos configurados o simulados`;
   }
 
   private static createTestCaseTable(testSteps: any[]): Table {
