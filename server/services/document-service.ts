@@ -542,51 +542,123 @@ export class DocumentService {
     return sections;
   }
   
-  private static createHistorySection(): Paragraph[] {
+  private static createHistorySection(): (Paragraph | Table)[] {
     const today = new Date();
     const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
     
-    return [
-      new Paragraph({
-        heading: HeadingLevel.HEADING_2,
-        spacing: { before: 400, after: 120 },
-        children: [new TextRun({
-          text: "HISTORIA DE REVISIONES Y APROBACIONES",
-          bold: true,
-          size: 28,
-          color: "0070C0",
-          font: "Segoe UI Semilight"
-        })]
-      }),
-      new Paragraph({
-        spacing: { after: 120 },
-        children: [
-          new TextRun({ text: "• Fecha: ", bold: true, font: "Segoe UI Semilight" }),
-          new TextRun({ text: formattedDate, font: "Segoe UI Semilight" })
-        ]
-      }),
-      new Paragraph({
-        spacing: { after: 120 },
-        children: [
-          new TextRun({ text: "• Acción: ", bold: true, font: "Segoe UI Semilight" }),
-          new TextRun({ text: "Versión original", font: "Segoe UI Semilight" })
-        ]
-      }),
-      new Paragraph({
-        spacing: { after: 120 },
-        children: [
-          new TextRun({ text: "• Responsable: ", bold: true, font: "Segoe UI Semilight" }),
-          new TextRun({ text: "Sistema", font: "Segoe UI Semilight" })
-        ]
-      }),
-      new Paragraph({
-        spacing: { after: 120 },
-        children: [
-          new TextRun({ text: "• Comentario: ", bold: true, font: "Segoe UI Semilight" }),
-          new TextRun({ text: "Documento generado automáticamente", font: "Segoe UI Semilight" })
-        ]
-      })
-    ];
+    const elements: (Paragraph | Table)[] = [];
+    
+    // Header
+    elements.push(new Paragraph({
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 400, after: 120 },
+      children: [new TextRun({
+        text: "HISTORIA DE REVISIONES Y APROBACIONES",
+        bold: true,
+        size: 28,
+        color: "0070C0",
+        font: "Segoe UI Semilight"
+      })]
+    }));
+    
+    // Table with revision history
+    const table = new Table({
+      rows: [
+        // Header row
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({
+                  text: "Fecha",
+                  bold: true,
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              shading: { fill: "F2F2F2" },
+              width: { size: 2000, type: WidthType.DXA }
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({
+                  text: "Elaboró",
+                  bold: true,
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              shading: { fill: "F2F2F2" },
+              width: { size: 3000, type: WidthType.DXA }
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({
+                  text: "Comentario",
+                  bold: true,
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              shading: { fill: "F2F2F2" },
+              width: { size: 4500, type: WidthType.DXA }
+            })
+          ]
+        }),
+        // Data row
+        new TableRow({
+          children: [
+            new TableCell({
+              children: [new Paragraph({
+                children: [new TextRun({
+                  text: formattedDate,
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              width: { size: 2000, type: WidthType.DXA }
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                children: [new TextRun({
+                  text: "Sistema",
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              width: { size: 3000, type: WidthType.DXA }
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                children: [new TextRun({
+                  text: "Versión original",
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              width: { size: 4500, type: WidthType.DXA }
+            })
+          ]
+        })
+      ],
+      width: {
+        size: 9500,
+        type: WidthType.DXA
+      },
+      margins: {
+        top: 72,  // 0.05 inches in twips
+        bottom: 72,
+        right: 72,
+        left: 72
+      }
+    });
+    
+    elements.push(table);
+    
+    // Add empty paragraph after table for spacing
+    elements.push(new Paragraph({
+      spacing: { after: 240 },
+      children: []
+    }));
+    
+    return elements;
   }
   
   private static formatTestCases(testCases: TestCase[], useCaseName: string): Paragraph[] {
