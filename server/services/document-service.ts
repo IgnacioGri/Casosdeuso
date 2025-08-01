@@ -375,15 +375,23 @@ export class DocumentService {
     if (formData.specialRequirements) {
       sections.push(this.createStyledHeading("Requerimientos Especiales"));
       
-      // Split by newlines if it's a multiline string
-      const requirements = formData.specialRequirements.split('\n').filter((r: string) => r.trim());
+      // Handle both string and array formats
+      let requirements: string[] = [];
+      if (typeof formData.specialRequirements === 'string') {
+        requirements = formData.specialRequirements.split('\n').filter((r: string) => r.trim());
+      } else if (Array.isArray(formData.specialRequirements)) {
+        requirements = formData.specialRequirements.filter((r: any) => r && r.toString().trim());
+      } else {
+        // If it's an object or other type, convert to string
+        requirements = [String(formData.specialRequirements)];
+      }
       
       requirements.forEach((req: string, index: number) => {
         sections.push(new Paragraph({
           spacing: { after: 80 },
           indent: { left: 288 },
           children: [new TextRun({
-            text: `${index + 1}. ${req.trim()}`,
+            text: `${index + 1}. ${req.toString().trim()}`,
             font: "Segoe UI Semilight"
           })]
         }));
