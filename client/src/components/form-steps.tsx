@@ -1,4 +1,4 @@
-import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot } from "lucide-react";
+import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot, X, Plus } from "lucide-react";
 import { TestCaseStep } from './steps/test-case-step';
 import { MinuteAnalysisStep } from './steps/minute-analysis-step';
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
@@ -670,96 +670,113 @@ export default function FormSteps({
               </p>
             </div>
 
-            {/* Lista manual de campos */}
+            {/* Tabla de campos */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Campos de la entidad
               </label>
               
-              <div className="space-y-3">
-              {formData.entityFields.map((field, index) => (
-                <div key={index} className="p-4 border border-gray-200 rounded-lg">
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <input 
-                        type="text" 
-                        value={field.name}
-                        onChange={(e) => onUpdateEntityField(index, { name: e.target.value })}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                        placeholder="Nombre del campo"
-                      />
-                      
-                      <select 
-                        value={field.type}
-                        onChange={(e) => onUpdateEntityField(index, { type: e.target.value as EntityField['type'] })}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10"
-                      >
-                        <option value="text">Texto</option>
-                        <option value="number">Número</option>
-                        <option value="date">Fecha</option>
-                        <option value="boolean">Booleano</option>
-                        <option value="email">Email</option>
-                      </select>
-                      
-                      <input 
-                        type="number" 
-                        value={field.length || ''}
-                        onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                        placeholder="Longitud máxima"
-                      />
-                    </div>
-                    
-                    <input 
-                      type="text" 
-                      value={field.description || ''}
-                      onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                      placeholder="Descripción del campo (propósito/contexto)"
-                    />
-                    
-                    <input 
-                      type="text" 
-                      value={field.validationRules || ''}
-                      onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                      placeholder="Reglas de validación (ej: 'Solo números', 'Formato YYYY-MM-DD')"
-                    />
-                    
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          checked={field.mandatory}
-                          onChange={(e) => onUpdateEntityField(index, { mandatory: e.target.checked })}
-                          className="mr-2"
-                        />
-                        <span className="text-sm">Obligatorio</span>
-                      </label>
-                      
-                      <Button 
-                        type="button" 
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onRemoveEntityField(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={onAddEntityField}
-              className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
-            >
-              Agregar campo
-            </Button>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse bg-white">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Nombre</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Tipo</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Longitud</th>
+                      <th className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700">Obligatorio</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Descripción</th>
+                      <th className="border border-gray-300 px-4 py-2 text-left text-sm font-medium text-gray-700">Validaciones</th>
+                      <th className="border border-gray-300 px-4 py-2 text-center text-sm font-medium text-gray-700" style={{width: '80px'}}>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formData.entityFields.map((field, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="border border-gray-300 px-2 py-1">
+                          <input 
+                            type="text" 
+                            value={field.name}
+                            onChange={(e) => onUpdateEntityField(index, { name: e.target.value })}
+                            className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
+                            placeholder="Nombre"
+                          />
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          <select 
+                            value={field.type}
+                            onChange={(e) => onUpdateEntityField(index, { type: e.target.value as EntityField['type'] })}
+                            className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded"
+                          >
+                            <option value="text">Texto</option>
+                            <option value="number">Número</option>
+                            <option value="date">Fecha</option>
+                            <option value="boolean">Booleano</option>
+                            <option value="email">Email</option>
+                          </select>
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          <input 
+                            type="number" 
+                            value={field.length || ''}
+                            onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
+                            className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
+                            placeholder="Long."
+                          />
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1 text-center">
+                          <input 
+                            type="checkbox" 
+                            checked={field.mandatory}
+                            onChange={(e) => onUpdateEntityField(index, { mandatory: e.target.checked })}
+                            className="cursor-pointer"
+                          />
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          <input 
+                            type="text" 
+                            value={field.description || ''}
+                            onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
+                            className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
+                            placeholder="Descripción del campo"
+                          />
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1">
+                          <input 
+                            type="text" 
+                            value={field.validationRules || ''}
+                            onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
+                            className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
+                            placeholder="Validaciones"
+                          />
+                        </td>
+                        <td className="border border-gray-300 px-2 py-1 text-center">
+                          <Button 
+                            type="button" 
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onRemoveEntityField(index)}
+                            className="text-red-500 hover:text-red-700 p-1 h-auto"
+                          >
+                            <X size={16} />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              <div className="mt-4">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={onAddEntityField}
+                  className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
+                >
+                  <Plus className="mr-2" size={16} />
+                  Agregar campo
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
