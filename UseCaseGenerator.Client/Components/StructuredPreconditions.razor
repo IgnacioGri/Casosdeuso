@@ -1,0 +1,270 @@
+@using UseCaseGenerator.Shared
+@using Microsoft.AspNetCore.Components
+
+<div class="mb-6">
+    <div class="d-flex align-items-center mb-2">
+        <label class="form-label mb-0">Precondiciones</label>
+        @if (AIAssistButton != null)
+        {
+            <div class="ms-2">
+                @AIAssistButton
+            </div>
+        }
+    </div>
+    
+    <MudCard>
+        <MudCardContent>
+            @foreach (var category in Categories)
+            {
+                <div class="mb-3">
+                    <MudGrid>
+                        <MudItem xs="12">
+                            <MudButton StartIcon="@(expandedCategories.Contains(category.Id) ? Icons.Material.Filled.ExpandMore : Icons.Material.Filled.ChevronRight)"
+                                     OnClick="() => ToggleCategory(category.Id)"
+                                     Variant="Variant.Text"
+                                     Size="Size.Small"
+                                     Style="text-transform: none;">
+                                <span class="fw-semibold">@category.Title</span>
+                                @if (category.Items.Count > 0)
+                                {
+                                    <span class="text-muted ms-2">(@category.Items.Count)</span>
+                                }
+                            </MudButton>
+                            
+                            @if (expandedCategories.Contains(category.Id))
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Add"
+                                             Size="Size.Small"
+                                             OnClick="() => AddItem(category.Id)" />
+                            }
+                        </MudItem>
+                    </MudGrid>
+                    
+                    @if (expandedCategories.Contains(category.Id))
+                    {
+                        <div class="ms-4 mt-2">
+                            @if (category.Items.Count == 0)
+                            {
+                                <MudButton Variant="Variant.Outlined"
+                                         StartIcon="@Icons.Material.Filled.Add"
+                                         OnClick="() => AddItem(category.Id)"
+                                         FullWidth="true"
+                                         Size="Size.Small"
+                                         Class="text-muted">
+                                    Agregar @category.Title.ToLower()
+                                </MudButton>
+                            }
+                            else
+                            {
+                                @for (int i = 0; i < category.Items.Count; i++)
+                                {
+                                    var index = i; // Capture for closure
+                                    <MudGrid Class="mb-2">
+                                        <MudItem xs="11">
+                                            <MudTextField @bind-Value="category.Items[index]"
+                                                        Placeholder="@category.Placeholder"
+                                                        Variant="Variant.Outlined"
+                                                        Lines="2"
+                                                        T="string"
+                                                        @onchange="() => UpdateFormattedValue()" />
+                                        </MudItem>
+                                        <MudItem xs="1">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                         Color="Color.Error"
+                                                         Size="Size.Small"
+                                                         OnClick="() => RemoveItem(category.Id, index)" />
+                                        </MudItem>
+                                    </MudGrid>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            }
+            
+            <MudDivider Class="my-3" />
+            <MudExpansionPanels Elevation="0">
+                <MudExpansionPanel Text="Vista previa del texto">
+                    <MudCard Elevation="0" Class="pa-3">
+                        <pre style="white-space: pre-wrap; font-size: 0.875rem;">@(FormatPreconditions() ?? "Las precondiciones aparecerán aquí...")</pre>
+                    </MudCard>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        </MudCardContent>
+    </MudCard>
+</div>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public RenderFragment? AIAssistButton { get; set; }
+    
+    private class PreconditionCategory
+    {
+        public string Id { get; set; } = "";
+        public string Title { get; set; } = "";
+        public string Placeholder { get; set; } = "";
+        public List<string> Items { get; set; } = new();
+    }
+    
+    private List<PreconditionCategory> Categories = new();
+    private HashSet<string> expandedCategories = new() { "users", "data", "infrastructure" };
+    
+    protected override void OnInitialized()
+    {
+        var parsed = ParsePreconditions(Value);
+        Categories = parsed.Any() ? parsed : GetDefaultCategories();
+    }
+    
+    private List<PreconditionCategory> GetDefaultCategories()
+    {
+        return new List<PreconditionCategory>
+        {
+            new() {
+                Id = "users",
+                Title = "Usuarios de prueba",
+                Placeholder = "Ej: Usuario QA_OPERADOR con perfil autorizado...",
+                Items = new()
+            },
+            new() {
+                Id = "data", 
+                Title = "Datos de prueba",
+                Placeholder = "Ej: Cliente con DNI 25123456, CUIT 20251234561...",
+                Items = new()
+            },
+            new() {
+                Id = "infrastructure",
+                Title = "Infraestructura",
+                Placeholder = "Ej: Sistema de Gestión Integral desplegado y accesible...",
+                Items = new()
+            }
+        };
+    }
+    
+    private List<PreconditionCategory> ParsePreconditions(string text)
+    {
+        var textValue = !string.IsNullOrEmpty(text) ? text : "";
+        if (string.IsNullOrWhiteSpace(textValue)) return new();
+        
+        var lines = textValue.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
+        var result = GetDefaultCategories();
+        PreconditionCategory? currentCategory = null;
+        
+        foreach (var line in lines)
+        {
+            var trimmed = line.Trim();
+            
+            // Check if it's a category header
+            if (trimmed.ToLower().Contains("usuarios de prueba:") || 
+                trimmed.ToLower().Contains("usuarios:"))
+            {
+                currentCategory = result.FirstOrDefault(c => c.Id == "users");
+            }
+            else if (trimmed.ToLower().Contains("datos de prueba:") || 
+                     trimmed.ToLower().Contains("datos:"))
+            {
+                currentCategory = result.FirstOrDefault(c => c.Id == "data");
+            }
+            else if (trimmed.ToLower().Contains("infraestructura:") || 
+                     trimmed.ToLower().Contains("sistema:"))
+            {
+                currentCategory = result.FirstOrDefault(c => c.Id == "infrastructure");
+            }
+            else if (trimmed.StartsWith("•") || trimmed.StartsWith("-"))
+            {
+                // It's a bullet point
+                var content = System.Text.RegularExpressions.Regex.Replace(trimmed, @"^[•\-]\s*", "").Trim();
+                if (!string.IsNullOrEmpty(content) && currentCategory != null)
+                {
+                    currentCategory.Items.Add(content);
+                }
+            }
+            else if (!string.IsNullOrEmpty(trimmed) && !trimmed.EndsWith(":"))
+            {
+                // It's content without bullet
+                if (currentCategory != null)
+                {
+                    currentCategory.Items.Add(trimmed);
+                }
+                else
+                {
+                    // Try to guess the category
+                    if (trimmed.ToLower().Contains("usuario") || 
+                        trimmed.ToLower().Contains("perfil"))
+                    {
+                        result.First(c => c.Id == "users").Items.Add(trimmed);
+                    }
+                    else if (trimmed.ToLower().Contains("cliente") || 
+                             trimmed.ToLower().Contains("dni") ||
+                             trimmed.ToLower().Contains("cuit"))
+                    {
+                        result.First(c => c.Id == "data").Items.Add(trimmed);
+                    }
+                    else
+                    {
+                        result.First(c => c.Id == "infrastructure").Items.Add(trimmed);
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private void ToggleCategory(string categoryId)
+    {
+        if (expandedCategories.Contains(categoryId))
+        {
+            expandedCategories.Remove(categoryId);
+        }
+        else
+        {
+            expandedCategories.Add(categoryId);
+        }
+    }
+    
+    private void AddItem(string categoryId)
+    {
+        var category = Categories.FirstOrDefault(c => c.Id == categoryId);
+        if (category != null)
+        {
+            category.Items.Add("");
+            UpdateFormattedValue();
+        }
+    }
+    
+    private void RemoveItem(string categoryId, int index)
+    {
+        var category = Categories.FirstOrDefault(c => c.Id == categoryId);
+        if (category != null && index >= 0 && index < category.Items.Count)
+        {
+            category.Items.RemoveAt(index);
+            UpdateFormattedValue();
+        }
+    }
+    
+    private string FormatPreconditions()
+    {
+        var result = "";
+        
+        foreach (var category in Categories)
+        {
+            if (category.Items.Any(item => !string.IsNullOrWhiteSpace(item)))
+            {
+                if (!string.IsNullOrEmpty(result)) result += "\n\n";
+                result += $"{category.Title}:\n";
+                foreach (var item in category.Items.Where(i => !string.IsNullOrWhiteSpace(i)))
+                {
+                    result += $"• {item}\n";
+                }
+            }
+        }
+        
+        return result.TrimEnd();
+    }
+    
+    private async void UpdateFormattedValue()
+    {
+        await ValueChanged.InvokeAsync(FormatPreconditions());
+    }
+}

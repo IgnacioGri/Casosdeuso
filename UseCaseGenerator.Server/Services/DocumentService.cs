@@ -526,11 +526,80 @@ public class DocumentService : IDocumentService
         // Add preconditions if exists
         if (!string.IsNullOrEmpty(useCase.TestCasePreconditions))
         {
-            var preconditionsPara = new Paragraph();
-            var preconditionsRun = preconditionsPara.AppendChild(new Run());
-            preconditionsRun.AppendChild(new Text($"Precondiciones: {useCase.TestCasePreconditions}"));
+            // Add preconditions heading
+            var preconditionsHeadingPara = new Paragraph();
+            var preconditionsHeadingRun = preconditionsHeadingPara.AppendChild(new Run());
+            preconditionsHeadingRun.AppendChild(new Text("Precondiciones:"));
             
-            body.AppendChild(preconditionsPara);
+            var preconditionsHeadingProps = preconditionsHeadingRun.AppendChild(new RunProperties());
+            preconditionsHeadingProps.AppendChild(new Bold());
+            
+            body.AppendChild(preconditionsHeadingPara);
+            
+            // Parse structured preconditions
+            var preconditionsText = useCase.TestCasePreconditions.ToString();
+            var lines = preconditionsText.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
+            
+            if (lines.Length > 0)
+            {
+                string currentCategory = "";
+                
+                foreach (var line in lines)
+                {
+                    var trimmedLine = line.Trim();
+                    
+                    // Check if it's a category header (ends with ':')
+                    if (trimmedLine.EndsWith(":") && !trimmedLine.StartsWith("•") && !trimmedLine.StartsWith("-"))
+                    {
+                        currentCategory = trimmedLine;
+                        
+                        // Add category heading
+                        var categoryPara = new Paragraph();
+                        var categoryRun = categoryPara.AppendChild(new Run());
+                        categoryRun.AppendChild(new Text(currentCategory));
+                        
+                        var categoryProps = categoryRun.AppendChild(new RunProperties());
+                        categoryProps.AppendChild(new Bold());
+                        categoryProps.AppendChild(new FontSize() { Val = "18" });
+                        categoryProps.AppendChild(new Color() { Val = "0070C0" });
+                        
+                        body.AppendChild(categoryPara);
+                    }
+                    else if (trimmedLine.StartsWith("•") || trimmedLine.StartsWith("-"))
+                    {
+                        // It's a bullet point
+                        var content = System.Text.RegularExpressions.Regex.Replace(trimmedLine, @"^[•\-]\s*", "").Trim();
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            AddBulletPoint(body, "", content);
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(trimmedLine))
+                    {
+                        // Regular line without bullet - add as a bullet point if within a category
+                        if (!string.IsNullOrEmpty(currentCategory))
+                        {
+                            AddBulletPoint(body, "", trimmedLine);
+                        }
+                        else
+                        {
+                            // Just add as regular paragraph if no category
+                            var contentPara = new Paragraph();
+                            var contentRun = contentPara.AppendChild(new Run());
+                            contentRun.AppendChild(new Text(trimmedLine));
+                            body.AppendChild(contentPara);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Fallback for single line preconditions
+                var contentPara = new Paragraph();
+                var contentRun = contentPara.AppendChild(new Run());
+                contentRun.AppendChild(new Text(preconditionsText));
+                body.AppendChild(contentPara);
+            }
         }
 
         // Create test steps table
@@ -549,11 +618,19 @@ public class DocumentService : IDocumentService
 
         // Header row for test steps
         var testHeaderRow = testTable.AppendChild(new TableRow());
-        var testHeaders = new[] { "#", "Acción", "Datos de Entrada", "Resultado Esperado", "Observaciones" };
+        var testHeaders = new[] { "#", "Acción", "Datos de Entrada", "Resultado Esperado", "Observaciones", "Estado (P/F)" };
+        
+        // Add shading to header row
+        var headerRowProps = testHeaderRow.AppendChild(new TableRowProperties());
         
         foreach (var header in testHeaders)
         {
             var cell = testHeaderRow.AppendChild(new TableCell());
+            
+            // Add shading to header cells
+            var cellProps = cell.AppendChild(new TableCellProperties());
+            cellProps.AppendChild(new Shading() { Val = ShadingPatternValues.Clear, Color = "auto", Fill = "DEEAF6" });
+            
             var para = cell.AppendChild(new Paragraph());
             var run = para.AppendChild(new Run());
             run.AppendChild(new Text(header));
@@ -572,7 +649,8 @@ public class DocumentService : IDocumentService
                 step.Action ?? "",
                 step.InputData ?? "",
                 step.ExpectedResult ?? "",
-                step.Observations ?? ""
+                step.Observations ?? "",
+                "Pendiente"  // Estado (P/F) - Default to "Pendiente"
             };
             
             foreach (var value in stepValues)

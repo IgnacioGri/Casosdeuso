@@ -123,8 +123,45 @@ export default function EnhancedDocumentPreview({
       if (formData.testCasePreconditions) {
         testCaseSection += `
           <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0;">Precondiciones:</h3>
-          <p style="margin-bottom: 16px;">${formData.testCasePreconditions}</p>
         `;
+        
+        // Parse structured preconditions
+        const preconditionsText = String(formData.testCasePreconditions || '');
+        const lines = preconditionsText.split('\n').filter(line => line.trim());
+        
+        if (lines.length > 0) {
+          let currentCategory = '';
+          
+          lines.forEach((line) => {
+            const trimmedLine = line.trim();
+            
+            // Check if it's a category header (ends with ':')
+            if (trimmedLine.endsWith(':') && !trimmedLine.startsWith('•') && !trimmedLine.startsWith('-')) {
+              currentCategory = trimmedLine;
+              testCaseSection += `
+                <h4 style="color: rgb(0, 112, 192); font-size: 13px; font-weight: 600; margin: 15px 0 8px 0;">${currentCategory}</h4>
+              `;
+            } else if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-')) {
+              // It's a bullet point
+              const content = trimmedLine.replace(/^[•\-]\s*/, '').trim();
+              if (content) {
+                testCaseSection += `
+                  <p style="margin: 4px 0 4px 20px;">• ${content}</p>
+                `;
+              }
+            } else if (trimmedLine) {
+              // Regular line without bullet - add as a bullet point
+              testCaseSection += `
+                <p style="margin: 4px 0 4px ${currentCategory ? '20px' : '0'};">${currentCategory ? '• ' : ''}${trimmedLine}</p>
+              `;
+            }
+          });
+        } else {
+          // Fallback for single line preconditions
+          testCaseSection += `
+            <p style="margin-bottom: 16px;">${preconditionsText}</p>
+          `;
+        }
       }
 
       if (formData.testSteps?.length) {

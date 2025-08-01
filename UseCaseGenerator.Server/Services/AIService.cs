@@ -110,8 +110,57 @@ public class AIService : IAIService, IDisposable
                 {
                     testCaseSection += $@"
             <h3 style=""color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;"">Precondiciones:</h3>
-            <p style=""margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;"">{request.FormData.TestCasePreconditions}</p>
           ";
+                    
+                    // Parse structured preconditions
+                    var preconditionsText = request.FormData.TestCasePreconditions.ToString();
+                    var lines = preconditionsText.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
+                    
+                    if (lines.Length > 0)
+                    {
+                        string currentCategory = "";
+                        
+                        foreach (var line in lines)
+                        {
+                            var trimmedLine = line.Trim();
+                            
+                            // Check if it's a category header (ends with ':')
+                            if (trimmedLine.EndsWith(":") && !trimmedLine.StartsWith("•") && !trimmedLine.StartsWith("-"))
+                            {
+                                currentCategory = trimmedLine;
+                                testCaseSection += $@"
+                <h4 style=""color: rgb(0, 112, 192); font-size: 13px; font-weight: 600; margin: 15px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;"">{currentCategory}</h4>
+              ";
+                            }
+                            else if (trimmedLine.StartsWith("•") || trimmedLine.StartsWith("-"))
+                            {
+                                // It's a bullet point
+                                var content = Regex.Replace(trimmedLine, @"^[•\-]\s*", "").Trim();
+                                if (!string.IsNullOrEmpty(content))
+                                {
+                                    testCaseSection += $@"
+                  <p style=""margin: 4px 0 4px 20px; font-family: 'Segoe UI Semilight', sans-serif;"">• {content}</p>
+                ";
+                                }
+                            }
+                            else if (!string.IsNullOrEmpty(trimmedLine))
+                            {
+                                // Regular line without bullet - add as a bullet point
+                                var marginLeft = !string.IsNullOrEmpty(currentCategory) ? "20px" : "0";
+                                var bullet = !string.IsNullOrEmpty(currentCategory) ? "• " : "";
+                                testCaseSection += $@"
+                  <p style=""margin: 4px 0 4px {marginLeft}; font-family: 'Segoe UI Semilight', sans-serif;"">{bullet}{trimmedLine}</p>
+                ";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Fallback for single line preconditions
+                        testCaseSection += $@"
+            <p style=""margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;"">{preconditionsText}</p>
+          ";
+                    }
                 }
 
                 if (request.FormData.TestSteps?.Count > 0)

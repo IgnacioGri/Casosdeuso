@@ -63,12 +63,7 @@
                           Placeholder="Ej: Verificar el correcto funcionamiento del módulo de gestión de clientes..."
                           Class="mb-3" />
             
-            <MudTextField @bind-Value="FormData.TestCasePreconditions"
-                          Label="Precondiciones"
-                          Variant="Variant.Outlined"
-                          Lines="3"
-                          Placeholder="Ej: Usuario autenticado con permisos de administrador, base de datos con datos de prueba..."
-                          Class="mb-3" />
+            <StructuredPreconditions @bind-Value="FormData.TestCasePreconditions" />
         </MudItem>
         
         <!-- Test Steps -->

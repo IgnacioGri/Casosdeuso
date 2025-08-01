@@ -389,19 +389,54 @@ export class DocumentService {
         }));
         
         const preconditionsText = String(formData.testCasePreconditions || '');
-        const preconditions = preconditionsText.split('\n').filter((p: string) => p.trim());
-        if (preconditions.length > 0) {
-          preconditions.forEach((condition: string) => {
-            sections.push(new Paragraph({
-              spacing: { after: 80 },
-              indent: { left: 720 },
-              children: [
-                new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
-                new TextRun({ text: condition.trim(), font: "Segoe UI Semilight" })
-              ]
-            }));
+        const lines = preconditionsText.split('\n').filter((p: string) => p.trim());
+        
+        if (lines.length > 0) {
+          let currentCategory = '';
+          
+          lines.forEach((line: string) => {
+            const trimmedLine = line.trim();
+            
+            // Check if it's a category header (ends with ':')
+            if (trimmedLine.endsWith(':') && !trimmedLine.startsWith('•') && !trimmedLine.startsWith('-')) {
+              currentCategory = trimmedLine;
+              sections.push(new Paragraph({
+                spacing: { before: 120, after: 60 },
+                children: [new TextRun({
+                  text: currentCategory,
+                  bold: true,
+                  size: 22,
+                  color: "0070C0",
+                  font: "Segoe UI Semilight"
+                })]
+              }));
+            } else if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-')) {
+              // It's a bullet point - remove the bullet and add our own
+              const content = trimmedLine.replace(/^[•\-]\s*/, '').trim();
+              if (content) {
+                sections.push(new Paragraph({
+                  spacing: { after: 60 },
+                  indent: { left: 720 },
+                  children: [
+                    new TextRun({ text: "• ", font: "Segoe UI Semilight" }),
+                    new TextRun({ text: content, font: "Segoe UI Semilight" })
+                  ]
+                }));
+              }
+            } else if (trimmedLine) {
+              // Regular line without bullet - add as a regular paragraph with indent
+              sections.push(new Paragraph({
+                spacing: { after: 60 },
+                indent: { left: currentCategory ? 720 : 0 },
+                children: [
+                  new TextRun({ text: currentCategory ? "• " : "", font: "Segoe UI Semilight" }),
+                  new TextRun({ text: trimmedLine, font: "Segoe UI Semilight" })
+                ]
+              }));
+            }
           });
         } else {
+          // Fallback for single line preconditions
           sections.push(new Paragraph({
             spacing: { after: 80 },
             children: [new TextRun({
