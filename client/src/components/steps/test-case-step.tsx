@@ -66,14 +66,20 @@ export function TestCaseStep({
 
       if (response.ok) {
         const result = await response.json();
+        console.log('Intelligent test case result:', result);
         onReplaceAllTestData({
-          objective: result.objective,
-          preconditions: result.preconditions,
-          testSteps: result.testSteps
+          objective: result.objective || '',
+          preconditions: result.preconditions || '',
+          testSteps: result.testSteps || []
         });
+      } else {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        alert(`Error al generar casos de prueba: ${errorText}`);
       }
     } catch (error) {
       console.error('Error generating intelligent tests:', error);
+      alert('Error al generar casos de prueba inteligentes. Por favor, intente nuevamente.');
     } finally {
       setIsGenerating(false);
     }

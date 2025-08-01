@@ -545,7 +545,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
     if (aiModel === 'demo') {
       return JSON.stringify({
         objective: `Verificar el funcionamiento completo del caso de uso: ${context.basicInfo?.useCaseName || 'Gestión de entidades'}`,
-        preconditions: `- Usuario autenticado en el sistema\n- Permisos adecuados para gestionar ${context.basicInfo?.useCaseType || 'entidades'}\n- Conexión a base de datos disponible`,
+        preconditions: `Usuarios de prueba:\n• Usuario QA_OPERADOR con perfil autorizado para realizar operaciones\n• Usuario QA_SUPERVISOR para validar auditoría\n\nDatos de prueba:\n• Cliente con DNI 25123456, CUIT 20251234561 en estado activo\n• Datos de prueba válidos según reglas de negocio del caso de uso\n\nInfraestructura:\n• Sistema de ${context.basicInfo?.projectName || 'Gestión'} desplegado y accesible\n• Base de datos con datos de prueba disponible\n• Servicios externos simulados o disponibles`,
         testSteps: [
           {
             number: 1,
@@ -1694,7 +1694,10 @@ CONTENIDO MEJORADO:`;
   private getDemoFieldImprovement(fieldName: string, fieldValue: string, fieldType: string): string {
     const fieldName_lower = fieldName.toLowerCase();
     
-    if (!fieldValue || fieldValue.trim() === '') {
+    // Convert fieldValue to string if it's not already
+    const valueStr = typeof fieldValue === 'string' ? fieldValue : JSON.stringify(fieldValue);
+    
+    if (!valueStr || valueStr.trim() === '') {
       // Provide examples for empty fields
       if ((fieldName_lower.includes('nombre') && fieldName_lower.includes('cliente')) || fieldName_lower === 'clientname') {
         return 'Banco Provincia';
