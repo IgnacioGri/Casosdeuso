@@ -341,9 +341,36 @@ CONTEXTO BANCARIO ING:
         status: 'pending' as const
       }));
 
+      // Format preconditions if it's an object
+      let formattedPreconditions = '';
+      if (typeof parsed.preconditions === 'object' && parsed.preconditions !== null) {
+        // Convert object preconditions to formatted string
+        for (const [key, value] of Object.entries(parsed.preconditions)) {
+          formattedPreconditions += `• ${key}:\n`;
+          if (Array.isArray(value)) {
+            value.forEach((item: any) => {
+              if (typeof item === 'object' && item !== null) {
+                // If item has description or other properties
+                const desc = item.description || item.user || item.data || JSON.stringify(item);
+                formattedPreconditions += `  - ${desc}\n`;
+              } else {
+                formattedPreconditions += `  - ${item}\n`;
+              }
+            });
+          } else if (typeof value === 'string') {
+            formattedPreconditions += `  - ${value}\n`;
+          }
+          formattedPreconditions += '\n';
+        }
+      } else if (typeof parsed.preconditions === 'string') {
+        formattedPreconditions = parsed.preconditions;
+      } else {
+        formattedPreconditions = this.getDefaultPreconditions(formData);
+      }
+
       return {
         objective: parsed.objective || `Verificar el funcionamiento completo del caso de uso: ${formData.useCaseName}`,
-        preconditions: parsed.preconditions || this.getDefaultPreconditions(formData),
+        preconditions: formattedPreconditions.trim(),
         testSteps,
         analysisNotes: parsed.analysisNotes || 'Análisis generado automáticamente basado en el caso de uso completo'
       };
