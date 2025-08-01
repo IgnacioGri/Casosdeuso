@@ -464,6 +464,37 @@ export class DocumentService {
         
         lines.forEach((line: string) => {
           if (line.trim()) {
+            let processedLine = line;
+            
+            // Try to parse JSON objects in the line
+            // Improved regex to handle nested JSON objects
+            const jsonRegex = /\{(?:[^{}]|(?:\{[^{}]*\}))*\}/g;
+            const jsonMatches = line.match(jsonRegex);
+            if (jsonMatches) {
+              jsonMatches.forEach(jsonStr => {
+                try {
+                  const obj = JSON.parse(jsonStr);
+                  let replacement = '';
+                  
+                  // Format based on object structure
+                  if (obj.usuario && obj.descripcion) {
+                    replacement = `${obj.usuario}: ${obj.descripcion}`;
+                  } else if (obj.descripcion && obj.datos) {
+                    replacement = `${obj.descripcion}: ${Object.entries(obj.datos).map(([k,v]) => `${k}=${v}`).join(', ')}`;
+                  } else if (obj.requisito || obj.requirement) {
+                    replacement = obj.requisito || obj.requirement;
+                  } else {
+                    // Generic formatting
+                    replacement = Object.entries(obj).map(([k,v]) => `${k}: ${v}`).join(', ');
+                  }
+                  
+                  processedLine = processedLine.replace(jsonStr, replacement);
+                } catch (e) {
+                  // If JSON parsing fails, leave as is
+                }
+              });
+            }
+            
             // Determine indentation level based on leading spaces
             const leadingSpaces = line.length - line.trimStart().length;
             const indentLevel = Math.floor(leadingSpaces / 2) * 288; // 288 twips = 0.2 inch per level
@@ -472,7 +503,7 @@ export class DocumentService {
               spacing: { after: 40 },
               indent: { left: indentLevel },
               children: [new TextRun({
-                text: line.trim(),
+                text: processedLine.trim(),
                 font: "Segoe UI Semilight"
               })]
             }));
