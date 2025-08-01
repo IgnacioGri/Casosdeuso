@@ -6,6 +6,9 @@ import { AIService } from "./services/ai-service";
 import { DocumentService } from "./services/document-service";
 import { MinuteAnalysisService } from "./services/minute-analysis-service";
 import { IntelligentTestCaseService } from "./services/intelligent-test-case-service";
+import multer from "multer";
+import mammoth from "mammoth";
+import * as XLSX from "xlsx";
 
 const USE_CASE_RULES = `
 REGLAS PARA CASOS DE USO CON IA - SEGUIR ESTRICTAMENTE:
@@ -502,6 +505,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
         formData: {},
         aiGeneratedFields: {}
       });
+    }
+  });
+
+  // NEW: Extract text from Office documents
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  });
+  
+  app.post("/api/extract-text", upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+      
+      const { originalname, buffer, mimetype } = req.file;
+      const extension = originalname.substring(originalname.lastIndexOf('.')).toLowerCase();
+      
+      let extractedText = '';
+      
+      // Handle DOCX files
+      if (extension === '.docx' || mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        try {
+          const result = await mammoth.extractRawText({ buffer });
+          extractedText = result.value;
+        } catch (error) {
+          console.error('Error extracting text from DOCX:', error);
+          return res.status(500).json({ error: 'Error procesando el archivo DOCX' });
+        }
+      }
+      // Handle XLSX/XLS files
+      else if (extension === '.xlsx' || extension === '.xls' || 
+               mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+               mimetype === 'application/vnd.ms-excel') {
+        try {
+          const workbook = XLSX.read(buffer, { type: 'buffer' });
+          const texts: string[] = [];
+          
+          // Extract text from all sheets
+          workbook.SheetNames.forEach(sheetName => {
+            const worksheet = workbook.Sheets[sheetName];
+            const sheetText = XLSX.utils.sheet_to_txt(worksheet);
+            texts.push(`=== Hoja: ${sheetName} ===\n${sheetText}`);
+          });
+          
+          extractedText = texts.join('\n\n');
+        } catch (error) {
+          console.error('Error extracting text from Excel:', error);
+          return res.status(500).json({ error: 'Error procesando el archivo Excel' });
+        }
+      }
+      // Handle PPTX files - for now, we'll return a message that these need special handling
+      else if (extension === '.pptx' || extension === '.ppt') {
+        // PowerPoint files are more complex to parse
+        // For now, we'll just inform the user
+        return res.status(400).json({ 
+          error: 'Los archivos PowerPoint requieren procesamiento especial. Por favor, copie y pegue el contenido manualmente.' 
+        });
+      }
+      else {
+        return res.status(400).json({ error: 'Tipo de archivo no soportado' });
+      }
+      
+      res.json({ 
+        text: extractedText,
+        filename: originalname
+      });
+      
+    } catch (error) {
+      console.error('Error extracting text:', error);
+      res.status(500).json({ error: 'Error procesando el archivo' });
     }
   });
 

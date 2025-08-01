@@ -54,21 +54,7 @@ export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious 
 
     const files = e.dataTransfer.files;
     if (files && files[0]) {
-      const file = files[0];
-      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result as string;
-          setMinuteText(text);
-        };
-        reader.readAsText(file);
-      } else {
-        toast({
-          title: "Tipo de archivo no soportado",
-          description: "Solo se admiten archivos de texto (.txt)",
-          variant: "destructive"
-        });
-      }
+      handleFile(files[0]);
     }
   };
 
@@ -87,13 +73,73 @@ export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files[0]) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const text = event.target?.result as string;
-        setMinuteText(text);
-      };
-      reader.readAsText(file);
+      handleFile(files[0]);
+    }
+  };
+
+  const handleFile = async (file: File) => {
+    const validTypes = [
+      'text/plain',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'application/vnd.ms-excel', // .xls
+      'application/vnd.ms-powerpoint' // .ppt
+    ];
+    
+    const validExtensions = ['.txt', '.docx', '.pptx', '.xlsx', '.xls', '.ppt'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (validTypes.includes(file.type) || validExtensions.includes(fileExtension)) {
+      if (file.type === 'text/plain' || fileExtension === '.txt') {
+        // Handle text files directly
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const text = event.target?.result as string;
+          setMinuteText(text);
+        };
+        reader.readAsText(file);
+      } else {
+        // For Office files, we need to send to backend
+        toast({
+          title: "Procesando archivo",
+          description: "Extrayendo texto del documento..."
+        });
+        
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          const response = await fetch('/api/extract-text', {
+            method: 'POST',
+            body: formData
+          });
+          
+          if (!response.ok) {
+            throw new Error('Error procesando el archivo');
+          }
+          
+          const data = await response.json();
+          setMinuteText(data.text || '');
+          
+          toast({
+            title: "Archivo procesado",
+            description: "El texto ha sido extraído exitosamente"
+          });
+        } catch (error) {
+          toast({
+            title: "Error al procesar archivo",
+            description: "No se pudo extraer el texto del documento",
+            variant: "destructive"
+          });
+        }
+      }
+    } else {
+      toast({
+        title: "Tipo de archivo no soportado",
+        description: "Solo se admiten archivos .txt, .docx, .pptx, .xlsx",
+        variant: "destructive"
+      });
     }
   };
 
@@ -257,15 +303,15 @@ CRITERIOS DE ACEPTACIÓN:
           <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
-              Arrastra y suelta un archivo de texto aquí
+              Arrastra y suelta un archivo aquí
             </p>
             <p className="text-xs text-gray-500">
-              o haz clic para seleccionar un archivo (.txt)
+              o haz clic para seleccionar un archivo (.txt, .docx, .pptx, .xlsx)
             </p>
           </div>
           <input
             type="file"
-            accept=".txt"
+            accept=".txt,.docx,.pptx,.xlsx,.xls,.ppt"
             onChange={handleFileUpload}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
