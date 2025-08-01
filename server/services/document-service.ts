@@ -659,13 +659,25 @@ export class DocumentService {
               children: [new Paragraph({
                 alignment: AlignmentType.CENTER,
                 children: [new TextRun({
-                  text: "Elaboró",
+                  text: "Acción",
                   bold: true,
                   font: "Segoe UI Semilight"
                 })]
               })],
               shading: { fill: "DEEAF6" },
-              width: { size: 3000, type: WidthType.DXA }
+              width: { size: 2000, type: WidthType.DXA }
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [new TextRun({
+                  text: "Responsable",
+                  bold: true,
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              shading: { fill: "DEEAF6" },
+              width: { size: 2500, type: WidthType.DXA }
             }),
             new TableCell({
               children: [new Paragraph({
@@ -696,11 +708,20 @@ export class DocumentService {
             new TableCell({
               children: [new Paragraph({
                 children: [new TextRun({
+                  text: "Creación",
+                  font: "Segoe UI Semilight"
+                })]
+              })],
+              width: { size: 2000, type: WidthType.DXA }
+            }),
+            new TableCell({
+              children: [new Paragraph({
+                children: [new TextRun({
                   text: "Sistema",
                   font: "Segoe UI Semilight"
                 })]
               })],
-              width: { size: 3000, type: WidthType.DXA }
+              width: { size: 2500, type: WidthType.DXA }
             }),
             new TableCell({
               children: [new Paragraph({

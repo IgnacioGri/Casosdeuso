@@ -426,16 +426,89 @@ public class DocumentService : IDocumentService
 
     private void AddRevisionHistoryTable(Body body, UseCase useCase)
     {
-        // Add revision history section with bullet format
+        // Add revision history section heading
         AddSectionHeading(body, "HISTORIA DE REVISIONES Y APROBACIONES", true);
         
         var today = DateTime.Now;
         var formattedDate = $"{today.Day}/{today.Month}/{today.Year}";
         
-        AddBulletPoint(body, "Fecha", formattedDate);
-        AddBulletPoint(body, "Acción", "Versión original");
-        AddBulletPoint(body, "Responsable", "Sistema");
-        AddBulletPoint(body, "Comentario", "Documento generado automáticamente");
+        // Create table with 4 columns
+        var table = new Table();
+        
+        // Table properties
+        var tableProps = table.AppendChild(new TableProperties());
+        tableProps.AppendChild(new TableBorders(
+            new TopBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new BottomBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new LeftBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new RightBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new InsideHorizontalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 },
+            new InsideVerticalBorder() { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 12 }
+        ));
+        tableProps.AppendChild(new TableWidth() { Width = "100%", Type = TableWidthUnitValues.Pct });
+        
+        // Header row
+        var headerRow = new TableRow();
+        
+        // Fecha column
+        var fechaCell = new TableCell();
+        fechaCell.Append(new TableCellProperties(
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        fechaCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Fecha")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(fechaCell);
+        
+        // Acción column
+        var accionCell = new TableCell();
+        accionCell.Append(new TableCellProperties(
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        accionCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Acción")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(accionCell);
+        
+        // Responsable column
+        var responsableCell = new TableCell();
+        responsableCell.Append(new TableCellProperties(
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        responsableCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Responsable")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(responsableCell);
+        
+        // Comentario column
+        var comentarioCell = new TableCell();
+        comentarioCell.Append(new TableCellProperties(
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        comentarioCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Comentario")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(comentarioCell);
+        
+        table.Append(headerRow);
+        
+        // Data row
+        var dataRow = new TableRow();
+        dataRow.Append(new TableCell(new Paragraph(new Run(new Text(formattedDate)))));
+        dataRow.Append(new TableCell(new Paragraph(new Run(new Text("Creación")))));
+        dataRow.Append(new TableCell(new Paragraph(new Run(new Text("Sistema")))));
+        dataRow.Append(new TableCell(new Paragraph(new Run(new Text("Versión original")))));
+        
+        table.Append(dataRow);
+        
+        body.Append(table);
+        
+        // Add spacing after table
+        body.Append(new Paragraph() { ParagraphProperties = new ParagraphProperties(new SpacingBetweenLines() { After = "240" }) });
     }
     
     private void AddRevisionHistoryTableOld(Body body, UseCase useCase)

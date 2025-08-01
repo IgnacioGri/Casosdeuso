@@ -319,22 +319,22 @@ export default function UseCaseGenerator() {
       // Agregar tabla de historial de revisiones
       const currentDate = new Date().toLocaleDateString('es-ES');
       contentSections.push(`
-        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 32px 0 12px 0;">Historial de Revisiones</h2>
+        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 32px 0 12px 0;">HISTORIA DE REVISIONES Y APROBACIONES</h2>
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
           <thead>
             <tr style="background-color: #f8f9fa;">
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 80px;">Versión</th>
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 100px;">Fecha</th>
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 150px;">Responsable</th>
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Descripción</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Fecha</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Responsable</th>
+              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Comentario</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style="border: 1px solid #666; padding: 8px; text-align: center;">1.0</td>
               <td style="border: 1px solid #666; padding: 8px; text-align: center;">${currentDate}</td>
+              <td style="border: 1px solid #666; padding: 8px; text-align: center;">Creación</td>
               <td style="border: 1px solid #666; padding: 8px;">Analista de Sistemas</td>
-              <td style="border: 1px solid #666; padding: 8px;">Creación inicial del documento de caso de uso.</td>
+              <td style="border: 1px solid #666; padding: 8px;">Versión original del documento</td>
             </tr>
           </tbody>
         </table>

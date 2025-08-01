@@ -441,7 +441,7 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
         ` : ''}
         
         <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0;">HISTORIA DE REVISIONES Y APROBACIONES</h2>
-        <table style="width: 2.17in; border-collapse: collapse; margin-top: 12px;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
           <thead>
             <tr style="background-color: #f8f9fa;">
               <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; vertical-align: middle;">Fecha</th>
