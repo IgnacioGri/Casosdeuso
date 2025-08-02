@@ -1,4 +1,4 @@
-import { Check, Clock, FileText, Settings, Bot, FileSearch, Search, Table, Database, Code, Cog, Zap, Info, Shield, TestTube, Globe } from "lucide-react";
+import { Check, Clock, FileText, Settings, Bot, FileSearch, Search, Table, Database, Code, Cog, Zap, Info, Shield, TestTube, Globe, Brain, Edit, List, Filter, Columns } from "lucide-react";
 
 interface EnhancedProgressIndicatorProps {
   currentStep: number;
@@ -22,26 +22,27 @@ const getStepInfo = (stepNumber: number, useCaseType: string) => {
     "Revisión Final y Generación"
   ];
 
-  // Icons based on step number and type
+  // Icons based on step number and type - matching form-steps.tsx icons
   const getIcon = () => {
-    if (stepNumber === 1) return FileSearch;
-    if (stepNumber === 2) return Bot;
-    if (stepNumber === 3) return FileText;
-    if (stepNumber === 4) return Info;
+    if (stepNumber === 1) return List;      // Tipo de Caso de Uso
+    if (stepNumber === 2) return Brain;      // Análisis de Minutas (not Bot)
+    if (stepNumber === 3) return Info;       // Información Básica
+    if (stepNumber === 4) return Edit;       // Detalles del Caso de Uso
     
     if (useCaseType === 'entity') {
-      if (stepNumber === 5) return Search;
-      if (stepNumber === 6) return Table;
-      if (stepNumber === 7) return Database;
-      if (stepNumber === 8) return Shield;
-      if (stepNumber === 9) return TestTube;
-      if (stepNumber === 10) return TestTube;
-      if (stepNumber === 11) return Zap;
+      if (stepNumber === 5) return Filter;   // Filtros de Búsqueda
+      if (stepNumber === 6) return Columns;  // Columnas de Resultado
+      if (stepNumber === 7) return Database; // Datos de la Entidad
+      if (stepNumber === 8) return Settings; // Opciones Adicionales
+      if (stepNumber === 9) return Settings; // Decisión sobre Casos de Prueba
+      if (stepNumber === 10) return TestTube; // Casos de Prueba
+      if (stepNumber === 11) return Zap;     // Generar
     } else if (useCaseType === 'api' || useCaseType === 'service') {
-      if (stepNumber === 5) return Globe;
-      if (stepNumber === 6) return Shield;
-      if (stepNumber === 7) return TestTube;
-      if (stepNumber === 8) return Zap;
+      if (stepNumber === 5) return Globe;    // API/Service Details
+      if (stepNumber === 6) return Settings; // Opciones Adicionales
+      if (stepNumber === 7) return Settings; // Decisión sobre Casos de Prueba
+      if (stepNumber === 8) return TestTube; // Casos de Prueba
+      if (stepNumber === 9) return Zap;      // Generar
     }
     return FileText;
   };
