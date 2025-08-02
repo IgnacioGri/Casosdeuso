@@ -71,17 +71,18 @@ export class AIService {
   static async generateUseCase(request: GenerateUseCaseRequest): Promise<GenerateUseCaseResponse> {
     const { aiModel, formData, rules } = request;
 
-    // If demo mode is selected, use cascading fallback starting with copilot
-    const selectedModel = aiModel === 'demo' ? 'copilot' : aiModel;
+    // If demo mode is selected, return pre-loaded demo content
+    if (aiModel === 'demo') {
+      console.log('Generating demo content with pre-loaded data');
+      return this.generateDemoContent(formData);
+    }
 
     try {
       const prompt = this.buildPrompt(formData, rules);
       
-      // Try to generate with selected model first, then fallback to others
+      // Try to generate with selected model first, then fallback to others if it fails
       const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
-      const modelOrder = selectedModel === 'copilot' 
-        ? aiModels 
-        : [selectedModel, ...aiModels.filter(m => m !== selectedModel)];
+      const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel)];
       
       const errors: Array<{model: string, error: string}> = [];
       let content: string | null = null;
@@ -509,6 +510,7 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
   }
 
   static async editUseCase(content: string, instructions: string, aiModel: string): Promise<GenerateUseCaseResponse> {
+    // If demo mode is selected, return content with demo indication
     if (aiModel === 'demo') {
       return {
         content: content + `\n\n<div style="background-color: #e6ffe6; padding: 10px; margin-top: 20px; border-left: 4px solid #28a745;"><strong>Modo Demo:</strong> Se aplicarían los cambios: "${instructions}"</div>`,
@@ -611,9 +613,9 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
       });
     }
 
-    // Use the same fallback mechanism as processFieldWithAI
+    // Use cascading fallback mechanism: try selected model first, then all others
     const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
-    const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel && m !== 'demo')];
+    const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel)];
     const errors: Array<{model: string, error: string}> = [];
     
     for (const model of modelOrder) {
@@ -637,8 +639,6 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
           case 'copilot':
             result = await AIService.processWithCopilot(prompt, JSON.stringify(context));
             break;
-          case 'demo':
-            continue; // Skip demo mode in fallback
           default:
             continue; // Skip unsupported models
         }
@@ -661,11 +661,9 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
   }
 
   static async processFieldWithAI(systemPrompt: string, fieldValue: string, aiModel: string): Promise<string> {
-    // Define fallback order - try other models if the primary fails
+    // Use cascading fallback: try requested model first, then all others
     const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
-    
-    // Start with the requested model
-    const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel && m !== 'demo')];
+    const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel)];
     
     const errors: Array<{model: string, error: string}> = [];
     
@@ -690,8 +688,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
           case 'copilot':
             result = await this.processWithCopilot(systemPrompt, fieldValue);
             break;
-          case 'demo':
-            continue; // Skip demo mode in fallback
+
           default:
             continue; // Skip unsupported models
         }
