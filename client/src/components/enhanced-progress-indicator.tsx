@@ -1,4 +1,4 @@
-import { Check, Clock, FileText, Settings, Bot, FileSearch, Search, Table, Database, Code, Cog, Zap, Info, Shield, TestTube, Globe } from "lucide-react";
+import { Check, Clock, FileText, Settings, Brain, FileSearch, Search, Table, Database, Code, Cog, Zap, Info, Shield, TestTube, Globe } from "lucide-react";
 
 interface EnhancedProgressIndicatorProps {
   currentStep: number;
@@ -25,7 +25,7 @@ const getStepInfo = (stepNumber: number, useCaseType: string) => {
   // Icons based on step number and type
   const getIcon = () => {
     if (stepNumber === 1) return FileSearch;
-    if (stepNumber === 2) return Bot;
+    if (stepNumber === 2) return Brain;
     if (stepNumber === 3) return FileText;
     if (stepNumber === 4) return Info;
     
@@ -131,7 +131,7 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
       </div>
       <div className="text-center">
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          Paso {currentStep} de {totalSteps}
+          <span className="font-bold">Paso {currentStep} de {totalSteps}</span>
         </div>
       </div>
     </div>

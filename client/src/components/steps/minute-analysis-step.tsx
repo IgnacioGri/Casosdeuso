@@ -307,7 +307,7 @@ CRITERIOS DE ACEPTACIÓN:
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
-            <Bot className="mr-2 text-ms-blue" size={20} />
+            <Brain className="mr-2 text-ms-blue" size={20} />
             Análisis Inteligente de Minutas
           </CardTitle>
         </div>
