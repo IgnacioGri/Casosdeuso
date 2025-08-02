@@ -1,0 +1,24 @@
+Bueno, ahora vamos a tocar un tema que venia evitando, como te acordas, en la minuta hay una seccion sobre bocetos wireframe:
+k.	Generar un boceto grafico simplificados de interfaz de usuario del buscador de entidades. Debe incluir:
+i.	Paginado
+ii.	Boton de Buscar, Limpiar y Agregar
+iii.	Boton de editar y Eliminar en cada fila del resultado 
+l.	Detallar funcionalidades del boceto grafico la interfaz de usuario del buscador de entidades
+i.	Listar cada uno de los filtros de busqueda
+ii.	Listar cada uno de las columnas del resultado de búsqueda
+iii.	Indicar que debe paginar
+m.	Generar un boceto grafico simplificado de  la interfaz de usuario para agregar una entidad. Debe incluir:
+i.	Boton para Aceptar y Cancelar
+ii.	Fecha y usuario de alta
+iii.	Fecha y usuario de modificacion
+n.	Detallar funcionalidades del boceto grafico de la interfaz de usuario para agregar entidad
+i.	Listar cada uno de los datos indicando 
+•	Tipo de dato 
+•	Si es obligatorio
+•	Longitud
+•	Requerimientos especiales
+o.	Pedir que se ingresen si se desea generar una imágen real tipo wireframe en estilo Microsoft de la interfaz de usuario del buscador de entidades
+p.	Pedir que se ingresen si se desea generar una imágen real tipo wireframe en estilo Microsoft de la interfaz de usuario del buscador de entidades
+
+
+En su momento yo había entendido mal esto y te lo copié y pegué así nomás sin pensarlo, pero después hablando con los dueños me dijeron que lo que ellos querían era que en algún momento del proceso, alguna inteligencia artificial, crear un boceto en base a alguna descripción de Wire Frames de cómo quedaría según esa minuta la verdad que yo esto me cuesta entenderlo un poco por ahi vos lo entender un poco mejor, pero me gustaría planearlo, así que no implementes nada, solo planeémoslo, que sería algo práctico que podríamos hacer de este estilo. Yo pienso que lo mejor sería que se genere un prompt en base a una descripción del sistema, según todos los otros datos y que ese esa descripción se inserte en algún Prompt y sea enviado a algún generador de imágenes y después esa imagen tendría que ser agregada a el docx de manera orgánica y que quede bien en la sección que pide la minuta. Qué te parece que podemos hacer? Si se te ocurre alguna alternativa no dudes en decirme
