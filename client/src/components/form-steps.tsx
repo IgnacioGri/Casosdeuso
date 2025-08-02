@@ -956,95 +956,11 @@ export default function FormSteps({
           </div>
           
           <div className="space-y-4">
-            <div>
-              <label className="flex items-center space-x-3">
-                <input 
-                  type="checkbox" 
-                  checked={formData.generateWireframes}
-                  onChange={(e) => handleInputChange('generateWireframes', e.target.checked)}
-                  className="form-checkbox"
-                />
-                <span className="text-sm font-medium text-gray-700">
-                  Generar descripciones de wireframes
-                </span>
-              </label>
-              <div className="text-xs text-gray-500 mt-1 ml-6">
-                Incluye descripciones detalladas de las interfaces de usuario
-              </div>
-            </div>
-
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
                 Una vez completado el caso de uso, podrás elegir si agregar casos de prueba en el siguiente paso.
               </p>
             </div>
-
-            {formData.generateWireframes && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Descripciones de Wireframes
-                </label>
-                <div className="relative mb-4">
-                  <textarea 
-                    value={formData.wireframesDescription || ''}
-                    onChange={(e) => handleInputChange('wireframesDescription', e.target.value)}
-                    rows={4} 
-                    className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
-                    placeholder="Describe todas las pantallas del sistema en lenguaje natural. Ej: Una pantalla de búsqueda con filtros, una de listado con tabla paginada, una de detalle para ver/editar registros..."
-                  />
-                  <div className="absolute top-2 right-2">
-                    <AIAssistButton
-                      fieldName="wireframesDescription"
-                      fieldValue={formData.wireframesDescription || ''}
-                      fieldType="wireframesDescription"
-                      context={{ step: 8, useCaseType: formData.useCaseType }}
-                      onImprovement={(value) => handleInputChange('wireframesDescription', value)}
-                      size="sm"
-                      aiModel={formData.aiModel}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {(formData.wireframeDescriptions || ['']).map((description, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="relative">
-                        <textarea
-                          value={description}
-                          onChange={(e) => onUpdateWireframeDescription(index, e.target.value)}
-                          rows={4}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
-                          placeholder={`Wireframe ${index + 1}: Describe la pantalla en lenguaje natural. Ej: Una pantalla de búsqueda donde el usuario puede filtrar por nombre, ver resultados en tabla y editar registros...`}
-                        />
-
-                      </div>
-                      {(formData.wireframeDescriptions || []).length > 1 && (
-                        <div className="flex justify-end">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onRemoveWireframeDescription(index)}
-                            className="text-red-600 hover:text-red-700"
-                          >
-                            ✕ Eliminar Wireframe
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={onAddWireframeDescription}
-                    className="text-blue-600 hover:text-blue-700"
-                  >
-                    + Agregar Wireframe
-                  </Button>
-                </div>
-              </div>
-            )}
-
 
             
             <div>
