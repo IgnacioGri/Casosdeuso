@@ -1,19 +1,35 @@
 /* ING Corporate Theme */
 :root {
-    --ing-primary: #FF6200;
-    --ing-secondary: #1976D2;
+    --ing-primary: #0070C0; /* ING Corporate Blue */
+    --ing-primary-hover: #005CA0; /* Darker for hover states */
+    --ing-secondary: #F2F2F2; /* Light gray for backgrounds */
     --ing-surface: #FFFFFF;
-    --ing-background: #F5F5F5;
-    --ing-text-primary: #212121;
-    --ing-text-secondary: #757575;
-    --ing-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    --ing-background: #F2F2F2; /* ING gray light */
+    --ing-text-primary: #333333; /* ING dark text */
+    --ing-text-secondary: #666666;
+    --ing-border: #CCCCCC; /* ING gray border */
+    --ing-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --ing-radius: 4px; /* ING standard radius */
 }
 
 html, body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300;
     margin: 0;
     padding: 0;
     background-color: var(--ing-background);
+    color: var(--ing-text-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Segoe UI Semilight', 'Segoe UI', system-ui, sans-serif;
+    font-weight: 300;
+    color: var(--ing-primary);
+}
+
+button {
+    font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif;
+    font-weight: 600;
 }
 
 #app {
@@ -24,18 +40,18 @@ html, body {
 }
 
 .mud-appbar {
-    background: linear-gradient(135deg, var(--ing-primary) 0%, #E65100 100%);
+    background: var(--ing-primary);
     box-shadow: var(--ing-shadow);
 }
 
 .mud-nav-link {
-    border-radius: 8px;
+    border-radius: var(--ing-radius);
     margin: 2px 0;
     transition: all 0.3s ease;
 }
 
 .mud-nav-link:hover {
-    background-color: rgba(255, 98, 0, 0.1);
+    background-color: rgba(0, 112, 192, 0.1);
     transform: translateX(4px);
 }
 
@@ -46,28 +62,30 @@ html, body {
 
 .mud-paper {
     box-shadow: var(--ing-shadow);
-    border-radius: 12px;
+    border-radius: var(--ing-radius);
 }
 
 .mud-button-filled-primary {
-    background: linear-gradient(135deg, var(--ing-primary) 0%, #E65100 100%);
-    box-shadow: 0 4px 8px rgba(255, 98, 0, 0.3);
-    transition: all 0.3s ease;
+    background: var(--ing-primary);
+    color: white;
+    box-shadow: none;
+    transition: all 0.2s ease;
+    border-radius: var(--ing-radius);
 }
 
 .mud-button-filled-primary:hover {
-    box-shadow: 0 6px 12px rgba(255, 98, 0, 0.4);
-    transform: translateY(-2px);
+    background: var(--ing-primary-hover);
+    box-shadow: 0 2px 4px rgba(0, 112, 192, 0.2);
 }
 
 .mud-card {
-    border-radius: 12px;
-    transition: all 0.3s ease;
+    border-radius: var(--ing-radius);
+    transition: all 0.2s ease;
+    border: 1px solid var(--ing-border);
 }
 
 .mud-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .loading-progress {
@@ -188,4 +206,37 @@ html, body {
 
 .mud-select.mud-input-focus .mud-input-slot::before {
     border-color: var(--ing-primary);
+}
+
+/* ING Corporate Input Styles */
+.mud-input-slot {
+    border-radius: var(--ing-radius) !important;
+}
+
+.mud-input, .mud-select {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ING Corporate Secondary Button */
+.mud-button-outlined-primary {
+    border: 1px solid var(--ing-primary);
+    color: var(--ing-primary);
+    background: white;
+    border-radius: var(--ing-radius);
+}
+
+.mud-button-outlined-primary:hover {
+    background: rgba(0, 112, 192, 0.05);
+    border-color: var(--ing-primary-hover);
+}
+
+/* ING Corporate AI Assist Button */
+.mud-button-filled-secondary {
+    background: var(--ing-primary);
+    color: white;
+    border-radius: var(--ing-radius);
+}
+
+.mud-button-filled-secondary:hover {
+    background: var(--ing-primary-hover);
 }
