@@ -1,4 +1,4 @@
-import { Brain, Settings } from 'lucide-react';
+import { Brain, Settings, Bot, Sparkles, Zap, Gem, Monitor, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -11,21 +11,22 @@ interface AIModelHeaderProps {
 
 export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProps) {
   const getModelIcon = (model: AIModel) => {
+    const iconClass = "h-4 w-4 text-ing-blue";
     switch (model) {
       case 'openai':
-        return '🤖';
+        return <Bot className={iconClass} />;
       case 'claude':
-        return '🧠';
+        return <Brain className={iconClass} />;
       case 'grok':
-        return '⚡';
+        return <Zap className={iconClass} />;
       case 'gemini':
-        return '💎';
+        return <Gem className={iconClass} />;
       case 'copilot':
-        return '💻';
+        return <Monitor className={iconClass} />;
       case 'demo':
-        return '🎯';
+        return <PlayCircle className={iconClass} />;
       default:
-        return '🤖';
+        return <Bot className={iconClass} />;
     }
   };
 
@@ -78,7 +79,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
         <SelectTrigger className="w-[250px]">
           <SelectValue>
             <div className="flex items-center gap-2">
-              <span className="text-lg">{getModelIcon(currentModel)}</span>
+              {getModelIcon(currentModel)}
               <Badge variant={getModelBadgeVariant(currentModel)} className="text-xs">
                 {currentModel.toUpperCase()}
               </Badge>
@@ -88,7 +89,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
         <SelectContent>
           <SelectItem value="demo">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-lg">🎯</span>
+              <PlayCircle className="h-4 w-4 text-ing-blue" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Demo</span>
                 <span className="text-xs text-gray-500">Modo Demo - Sin API</span>
@@ -97,7 +98,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="openai">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-lg">🤖</span>
+              <Bot className="h-4 w-4 text-ing-blue" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">GPT-4o</span>
                 <span className="text-xs text-gray-500">Balanceado y versátil</span>
@@ -106,7 +107,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="claude">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-lg">🧠</span>
+              <Brain className="h-4 w-4 text-ing-blue" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Claude 4.0</span>
                 <span className="text-xs text-gray-500">Análisis profundo</span>
@@ -115,7 +116,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="grok">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-lg">⚡</span>
+              <Zap className="h-4 w-4 text-ing-blue" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Grok</span>
                 <span className="text-xs text-gray-500">Rápido y directo</span>
@@ -124,7 +125,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="gemini">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-lg">💎</span>
+              <Gem className="h-4 w-4 text-ing-blue" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Gemini 2.5</span>
                 <span className="text-xs text-gray-500">Google AI</span>
@@ -133,7 +134,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="copilot">
             <div className="flex items-center gap-3 w-full">
-              <span className="text-lg">💻</span>
+              <Monitor className="h-4 w-4 text-ing-blue" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Microsoft Copilot</span>
                 <span className="text-xs text-gray-500">Microsoft Copilot - Empresarial</span>
