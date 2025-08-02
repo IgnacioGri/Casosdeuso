@@ -1121,10 +1121,10 @@ public class DocumentService : IDocumentService
                         {
                             // Use fixed dimensions matching original ratio
                             // Original: 2728x360 = 7.6:1 ratio
-                            // 400 pixels width, 53 pixels height (compensating for scaling)
+                            // 600 pixels width, 79 pixels height for proper display
                             // 1 pixel = 9525 EMUs
-                            width = 400L * 9525L;  // 3810000 EMUs
-                            height = 53L * 9525L;   // 504825 EMUs
+                            width = 600L * 9525L;  // 5715000 EMUs
+                            height = 79L * 9525L;   // 752475 EMUs
                         }
                     }
                     catch

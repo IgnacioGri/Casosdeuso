@@ -39,6 +39,10 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
   - Maintains fallback chain for backward compatibility
   - Applied to both TypeScript and C# document generation services
   - Custom header upload functionality remains fully functional in both systems
+- **Header Dimensions Fixed**: Corrected header image dimensions for proper display in DOCX
+  - Updated from 400x53 to 600x79 pixels in both TypeScript and C# systems
+  - Ensures header displays at correct size matching ING corporate standards
+  - Maintains 7.6:1 aspect ratio from original 2728x360 image
 
 ### Recent Updates (February 2, 2025) - Business Owner Feedback Implementation
 - **Enhanced AI Field Assistance Based on Business Feedback**:
