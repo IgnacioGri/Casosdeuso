@@ -6,10 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Generador de Casos de Uso</title>
     <base href="/" />
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- ING Corporate Typography -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* Force Segoe UI or fallback to Inter */
+        body, * {
+            font-family: 'Segoe UI Light', 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif !important;
+        }
+    </style>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
+    <link href="css/ing-override.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <link href="UseCaseGenerator.Client.styles.css" rel="stylesheet" />
 </head>

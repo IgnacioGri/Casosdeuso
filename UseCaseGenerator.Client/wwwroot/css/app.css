@@ -13,23 +13,85 @@
 }
 
 html, body {
-    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    font-weight: 300;
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 300 !important;
     margin: 0;
     padding: 0;
     background-color: var(--ing-background);
-    color: var(--ing-text-primary);
+    color: var(--ing-text-primary) !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Segoe UI Semilight', 'Segoe UI', system-ui, sans-serif;
-    font-weight: 300;
-    color: var(--ing-primary);
+/* Force all MudBlazor typography */
+* {
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
-button {
-    font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif;
-    font-weight: 600;
+h1, h2, h3, h4, h5, h6,
+.mud-typography-h1, .mud-typography-h2, .mud-typography-h3,
+.mud-typography-h4, .mud-typography-h5, .mud-typography-h6 {
+    font-family: 'Segoe UI Semilight', 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 300 !important;
+    color: var(--ing-primary) !important;
+}
+
+button, .mud-button {
+    font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+/* MudBlazor specific overrides */
+.mud-typography-body1, .mud-typography-body2,
+.mud-text-primary, .mud-text-secondary {
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 300 !important;
+}
+
+/* Labels and form elements */
+.mud-input-label, .mud-input-helper-text,
+.mud-select-label, label {
+    font-family: 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 400 !important;
+    color: var(--ing-text-primary) !important;
+}
+
+/* Text content */
+p, span, div, li, td, th {
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 300 !important;
+}
+
+/* Additional MudBlazor overrides */
+.mud-stepper-label-content,
+.mud-tab,
+.mud-card-content,
+.mud-card-header-title,
+.mud-dialog-title,
+.mud-dialog-content,
+.mud-list-item-text,
+.mud-table-cell,
+.mud-expansion-panel-header,
+.mud-expansion-panel-content {
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 300 !important;
+}
+
+/* Navigation and menu items */
+.mud-nav-item,
+.mud-navmenu,
+.mud-drawer-content {
+    font-family: 'Segoe UI Light', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* Stepper and progress */
+.mud-stepper-step-label {
+    font-family: 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Toolbar and AppBar */
+.mud-toolbar,
+.mud-appbar {
+    font-family: 'Segoe UI', system-ui, sans-serif !important;
 }
 
 #app {

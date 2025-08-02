@@ -1,0 +1,60 @@
+/* ING Corporate Design Override - Loads after MudBlazor */
+
+/* Force typography on EVERYTHING */
+body * {
+    font-family: 'Segoe UI Light', 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Specific overrides for common text elements */
+.mud-typography,
+.mud-card-content *,
+.mud-dialog-content *,
+.mud-drawer-content *,
+.mud-paper *,
+.mud-expansion-panel *,
+.mud-table *,
+.mud-list *,
+.mud-stepper * {
+    font-family: 'Segoe UI Light', 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+    font-weight: 300 !important;
+}
+
+/* Headers with more weight */
+h1, h2, h3, h4, h5, h6,
+.mud-typography-h1,
+.mud-typography-h2,
+.mud-typography-h3,
+.mud-typography-h4,
+.mud-typography-h5,
+.mud-typography-h6,
+.mud-card-header-title {
+    font-family: 'Segoe UI Semilight', 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+    font-weight: 300 !important;
+    color: #0070C0 !important;
+}
+
+/* Buttons */
+.mud-button,
+.mud-button *,
+button,
+button * {
+    font-family: 'Segoe UI Semibold', 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+    font-weight: 600 !important;
+}
+
+/* Labels */
+label,
+.mud-input-label,
+.mud-select-label,
+.mud-field-label {
+    font-family: 'Segoe UI', 'Inter', system-ui, sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Body text color */
+body,
+.mud-text-primary,
+.mud-typography-body1,
+.mud-typography-body2 {
+    color: #333333 !important;
+}
