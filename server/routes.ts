@@ -405,6 +405,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const useCase = await storage.createUseCase(insertData);
 
       res.json({
+        success: true,
         useCase,
         content: finalContent
       });
@@ -444,6 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json({
+        success: true,
         useCase: updatedUseCase,
         content: response.content
       });
