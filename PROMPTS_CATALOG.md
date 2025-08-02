@@ -146,6 +146,11 @@ Expande y mejora esta descripción de caso de uso:
 - Genera 1-2 párrafos completos (mínimo 150 palabras)
 - Primer párrafo: explica QUÉ hace el caso de uso y su propósito
 - Segundo párrafo: describe los BENEFICIOS y valor de negocio
+- Incluye explicación de alcance/objetivo como en minuta ING
+- Si aplica, menciona flujos principales con lista indentada (1-a-i):
+  1. Flujo principal (ej. Buscar [entidad])
+    a. Detallar filtros y columnas
+    i. Criterios de búsqueda
 - Usa un tono profesional pero claro
 - Incluye contexto relevante del negocio
 ```
@@ -154,9 +159,13 @@ Expande y mejora esta descripción de caso de uso:
 ```
 Mejora las reglas de negocio considerando:
 - Cada regla debe ser clara, específica y verificable
-- Usa formato de lista numerada
+- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:
+  1. Regla principal
+    a. Sub-regla o detalle
+    i. Especificación adicional
 - Incluye validaciones, restricciones y políticas
 - Considera aspectos regulatorios si aplica
+- Para modificar/eliminar: incluir verificaciones
 - Ejemplo: "1. El monto máximo por transferencia es de $50,000"
 ```
 
@@ -165,6 +174,7 @@ Mejora las reglas de negocio considerando:
 Mejora los requerimientos especiales enfocándote en:
 - Requerimientos no funcionales (rendimiento, seguridad, usabilidad)
 - Especifica métricas cuando sea posible
+- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos
 - Considera integraciones con otros sistemas
 - Ejemplo: "El sistema debe procesar 1000 transacciones por minuto"
 ```
@@ -228,6 +238,11 @@ REGLAS PARA CAMPOS DE ENTIDAD:
 - Para IDs usar tipo "number"
 - Incluir SIEMPRE description y validationRules para cada campo
 - El length es obligatorio para campos de texto
+- Auto-incluir campos de auditoría:
+  • fechaAlta (date, mandatory)
+  • usuarioAlta (text, mandatory)
+  • fechaModificacion (date, optional)
+  • usuarioModificacion (text, optional)
 ```
 
 ---
@@ -262,7 +277,7 @@ FORMATO DE RESPUESTA OBLIGATORIO:
       "action": "Acción específica y clara",
       "inputData": "Datos de entrada detallados",
       "expectedResult": "Resultado esperado verificable",
-      "observations": "Consideraciones o puntos de atención"
+      "observations": "Consideraciones o puntos de atención. Estado (P/F): Placeholder para resultado de ejecución"
     }
   ],
   "analysisNotes": "Notas sobre cobertura, riesgos o consideraciones especiales"
@@ -327,17 +342,21 @@ ESTRUCTURA OBLIGATORIA:
       a. Formato: JSON/XML con estructura detallada
       b. Parámetros obligatorios con tipos y validaciones
       c. Parámetros opcionales y valores por defecto
+      d. Incluir ejemplo detallado de request completo
    
    3. Response
       a. Formato: JSON/XML con estructura de respuesta
       b. Códigos de estado exitosos (200, 201, 204)
-      c. Estructura de datos de respuesta
+      c. Estructura de datos de respuesta con tipos
+      d. Incluir ejemplo detallado de response completo
 
 2. FLUJOS ALTERNATIVOS
    1. Errores de validación (400)
    2. Errores de autorización (401/403)
    3. Errores del servidor (500)
    4. Timeouts y reintentos
+
+IMPORTANTE: Incluye detalle de request/response en flujos, con ejemplos JSON completos
 ```
 
 ### Casos de Uso de Servicio/Proceso Automático
@@ -365,6 +384,13 @@ ESTRUCTURA OBLIGATORIA:
    1. Errores de configuración
    2. Fallos en dependencias externas
    3. Recuperación ante fallos
+
+3. REQUERIMIENTOS ESPECIALES
+- Indicar configurables específicos del proceso:
+  a. Path para archivos de configuración y datos
+  b. Usuario/clave/URL para web services externos
+  c. Parámetros de ejecución modificables sin recompilación
+  d. Variables de entorno requeridas
 ```
 
 ---

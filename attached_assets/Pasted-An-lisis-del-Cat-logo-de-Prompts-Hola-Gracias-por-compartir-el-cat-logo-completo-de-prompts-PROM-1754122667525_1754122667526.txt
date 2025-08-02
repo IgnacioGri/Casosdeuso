@@ -1,0 +1,52 @@
+Análisis del Catálogo de Prompts
+¡Hola! Gracias por compartir el catálogo completo de prompts (PROMPTS_CATALOG.md). Lo revisé en detalle, comparándolo con la minuta ING vr19 que me pasaste (la misma que analizamos antes, con reglas estrictas para estructuras de casos de uso, formatos, exportación a Word, y tipos específicos como entidades, APIs y procesos automáticos). En general, me parece un catálogo excelente y bien estructurado: es completo, organizado por categorías lógicas, con indicaciones claras de ubicaciones en código (TypeScript/C#), y resuelve problemas comunes como consistencia entre proveedores AI (orden de cascada) y límites de tokens. Después de muchas iteraciones, como mencionas, se nota que funcionan bien, ya que enfatizan profesionalismo, formatos estructurados (ej. JSON para minutas, numeración jerárquica), y alineación con contextos bancarios/empresariales. No sugiero cambios radicales, porque el sistema ya es robusto y fiel a la minuta en aspectos clave como verbos infinitivos, descripciones detalladas, y secciones obligatorias (flujos, pre/postcondiciones, reglas de negocio).
+Dicho eso, propongo mejoras menores y cuidadosas en algunas áreas, basadas en la minuta. Estas no alteran el núcleo de los prompts (que funcionan), sino que los refinan para mayor fidelidad: por ejemplo, incorporar explícitamente reglas como numeración multi-nivel (1-a-i con indent 0.2), colores RGB(0,112,192) para títulos, y configurables (path/URL para procesos). Explico cada sugerencia con "por qué" (justificación de la minuta y beneficio), y solo cambio lo necesario para evitar romper iteraciones previas. Si un prompt ya es óptimo, lo digo directamente.
+Voy a desglosar por categoría, como en tu catálogo, con mi opinión y sugerencias.
+1. Generación Principal de Casos de Uso
+Opinión: Este prompt base es fuerte: obliga a descripciones detalladas (150+ palabras, con propósito y beneficios), estructuras jerárquicas, y secciones como historia de revisiones. Alineado con la minuta (secciones claras, título en mayúsculas, descripción de alcance/objetivo). La inclusión de {rules} y datos del formulario es flexible para tipos de CU.
+Sugerencias de Mejora:
+•	Cambio Propuesto: En "FORMATO ESTRUCTURADO REQUERIDO", cambia la numeración de ejemplo de "4.1 / 4.2.1" a "1. / a. / i." con indent explícito. Prompt modificado:
+text
+2. Para flujos, usa numeración jerárquica profesional con indentación:
+   1. Flujo Básico
+     a. Menú principal
+       i. Ingreso de filtros
+     b. Subflujo: Alta
+       i. Validación de datos
+   Indenta 0.2 pulgadas por nivel a la derecha.
+Por Qué: La minuta especifica explícitamente "el primer nivel ordena con numero empezando de 1, el segundo nivel ordena con letras empezando con a indentando 0.2 a la derecha, y el tercer nivel ordena con numero romanos empezando con i indentando 0.2 a la derecha". Tu prompt actual usa decimales (4.1), que funcionan pero no son fieles al 100%. Beneficio: Outputs más consistentes con export DOCX (facilita parsing para indent en docx.js), sin alterar la lógica principal—solo precisa el ejemplo.
+•	Otro Cambio Menor: En "INSTRUCCIONES FINALES", añade "Incluye título en mayúsculas con color azul RGB(0,112,192) en la sección inicial."
+Por Qué: Minuta repite esto para títulos en todos tipos de CU. Beneficio: Prepara mejor para export, recordando a la IA el formato visual (aunque sea texto, ayuda en post-procesamiento).
+Resto del prompt: Óptimo, no cambiaría nada más, es decir todo lo demas lo dejaria tal cual esta—la expansión de descripción es perfecta para evitar outputs cortos.
+2. Edición de Casos de Uso
+Opinión: Simple y efectivo: Mantiene estructura original, aplica solo cambios solicitados, y preserva estilo ING. Bueno para iteraciones sin romper documentos existentes.
+Sugerencias de Mejora: Ninguna significativa. Este prompt es minimalista y funciona bien. Solo sugeriría agregar "Asegura indentación 0.2 en listas editadas si se modifican flujos" al final de INSTRUCCIONES.
+Por Qué: Refuerza la regla de indent en minuta para flujos, sin sobrecargar (ya que el prompt base lo maneja). Beneficio: Evita inconsistencias en ediciones de listas multi-nivel, pero es opcional ya que "Mantén la estructura" ya lo implica.
+3. Asistencia AI para Campos Individuales
+Opinión: Excelente granularidad: Contextos separados (bancario/empresarial), y prompts específicos por campo (ej. verbo infinitivo en nombre CU, expansión en descripción). Alineado con minuta (descripciones detalladas, reglas de negocio).
+Sugerencias de Mejora:
+•	Cambio Propuesto: En "Campo: Descripción", añade "Incluye explicación de alcance/objetivo como en minuta ING, con flujos principales si aplica (lista indentada 1-a-i)."
+Por Qué: Minuta exige "explicación detallada del alcance del objetivo del caso de uso" en descripciones. Tu prompt actual expande bien (150+ palabras), pero no menciona flujos/indent explícitamente. Beneficio: Mejora cumplimiento sin inventar—solo guía a incluir si relevante, manteniendo la longitud y párrafos.
+•	Campo: Reglas de Negocio y Requerimientos Especiales: Añade "Formatea como lista multi-nivel (1-a-i) si hay sub-reglas."
+Por Qué: Minuta usa listas indentadas para reglas/requerimientos (ej. en flujos alternos). Beneficio: Consistencia con generación principal, facilitando integración en DOCX.
+Resto: Óptimos—los ejemplos (ej. montos $50,000) son concretos y útiles.
+4. Análisis de Minutas
+Opinión: Muy preciso: Extrae solo lo explícito, usa JSON estructurado, y reglas para tipos (decimal para montos). Fiel a minuta (no inventar, fidelidad al documento).
+Sugerencias de Mejora: Ninguna mayor. Solo añade en REGLAS PARA CAMPOS DE ENTIDAD: "Agrega auto campos como fecha/usuario alta/mod si tipo entidad."
+Por Qué: Minuta obliga "registrar fecha y usuario de alta/modificación" en entidades. Tu prompt ya maneja tipos bien, pero esto asegura inclusión automática en JSON. Beneficio: Reduce post-edición, sin alterar la extracción estricta.
+5. Generación Inteligente de Casos de Prueba
+Opinión: Robusto para QA: Obliga pasos detallados (5-10), precondiciones categorizadas, y formato JSON. Alineado con sección "Solo para casos de prueba" en minuta (código/nombre CU, objetivo, precondiciones, tabla pasos con #/Acción/Datos/Resultado/Observaciones/Estado P/F, historia revisiones).
+Sugerencias de Mejora:
+•	Cambio Propuesto: En FORMATO DE RESPUESTA, añade en "testSteps": "Incluye columna Estado (P/F) como placeholder en observaciones." 
+•	Por Qué: Minuta especifica tabla con "Estado (P/F)". Tu prompt cubre pasos bien. Beneficio: Outputs completos para export, integrando directamente la estructura de minuta sin sobrecargar (placeholder evita generación ficticia).
+•	Precondiciones: Mantén categorizadas, pero añade "Incluye datos de prueba específicos (ej. IDs válidos/inválidos)."
+Por Qué: Minuta implica pruebas verificables; beneficio: Mejora ejecutabilidad.
+6. Prompts Específicos por Tipo de Caso de Uso
+Opinión: El corazón del catálogo: Diferencia bien por tipo (entidad: CRUD; API: endpoints/request/response; proceso: frecuencia/configurables). Perfecto para minuta (flujos principales/alternativos, configurables como path/URL).
+Sugerencias de Mejora:
+•	API/Web Service: Añade "Incluye detalle de request/response en flujos."
+Por Qué: Minuta lo obliga explícitamente. Beneficio: Refuerza sin cambiar estructura.
+•	Servicio/Proceso Automático: Añade "Para requerimientos especiales, indica configurables como path para archivos o usuario/clave/URL para web services."
+Por Qué: Minuta iii-iv lo especifica. Beneficio: Fidelidad exacta.
+Resto: Óptimo—no cambiaría más, ya que cubre pre/postcondiciones.
+En resumen, el catálogo es de alta calidad y funciona bien—mis sugerencias son refinamientos menores (5-6 cambios totales) para fidelidad 100% a minuta, sin romper iteraciones (solo agregan guías explícitas basadas en reglas existentes). Cambiaría para mayor precisión en outputs (ej. indent exacto reduce post-procesamiento

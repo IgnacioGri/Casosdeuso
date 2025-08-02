@@ -61,7 +61,7 @@ export class IntelligentTestCaseService {
       technicalDetails: {},
       businessRules: formData.businessRules || '',
       specialRequirements: formData.specialRequirements || '',
-      alternativeFlows: formData.alternativeFlows || [],
+      alternativeFlows: [],
       wireframes: formData.wireframeDescriptions || [],
       fullDescription: ''
     };
@@ -209,16 +209,14 @@ ESTRUCTURA REQUERIDA:
       "action": "Acción específica a realizar",
       "inputData": "Datos de entrada exactos",
       "expectedResult": "Resultado esperado específico",
-      "observations": "Observaciones técnicas importantes",
-      "status": "pending"
+      "observations": "Observaciones técnicas importantes. Estado (P/F): Placeholder para resultado de ejecución"
     },
     {
       "number": 2,
       "action": "Segunda acción a realizar",
       "inputData": "Datos de entrada para el segundo paso",
       "expectedResult": "Resultado esperado del segundo paso",
-      "observations": "Observaciones del segundo paso",
-      "status": "pending"
+      "observations": "Observaciones del segundo paso. Estado (P/F): Placeholder para resultado de ejecución"
     }
   ],
   "analysisNotes": "Análisis del contexto y cobertura de pruebas"

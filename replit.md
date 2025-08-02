@@ -33,13 +33,19 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
 
-### Recent Updates (February 2, 2025) - Entity Fields and Validation Fixes
-- **Fixed "decimal" field type validation**: Added "decimal" as valid field type in schema, frontend dropdown, and AI prompts
-- **Enhanced AI field generation**: Updated prompts to generate complete entity fields including:
-  - name, type, mandatory, length (existing)
-  - description and validationRules (now properly included)
-- **Improved minute analysis**: AI now generates all required field properties when analyzing uploaded documents
-- **Better field type guidance**: AI prompts now specify to use "decimal" for monetary amounts and "number" for IDs
+### Recent Updates (February 2, 2025) - Business Owner Feedback Implementation
+- **Enhanced AI Field Assistance Based on Business Feedback**:
+  - **Description fields**: Now generate 1-2 paragraphs with alcance/objetivo as in ING minutes, including multi-level formatting (1-a-i) for flows
+  - **Business rules**: Enhanced to use multi-level format (1-a-i) for sub-rules with clear examples
+  - **Special requirements**: Updated to use multi-level format for sub-requirements with metrics
+  - **Entity fields**: Auto-include audit fields (fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion)
+- **Test Case Generation Improvements**:
+  - Added "Estado (P/F)" placeholder in observations field for execution results
+  - Enhanced preconditions with specific test data formatting
+- **Use Case Type Specific Enhancements**:
+  - **API**: Added detailed request/response examples in flows with full JSON samples
+  - **Process**: Added configurables section for paths, credentials, and URLs as special requirements
+- **Complete Prompt Synchronization**: Both TypeScript and C# systems now have identical enhanced prompts
 
 ### Recent Updates (February 2, 2025) - Performance Optimizations
 - **Gemini Model Optimization**: Changed from `gemini-2.5-pro` to `gemini-2.5-flash` for 3-6x faster generation

@@ -207,15 +207,17 @@ ESTRUCTURA OBLIGATORIA:
    1. Identificación del servicio
       a. Endpoint: ${formData.apiEndpoint || 'Definir endpoint apropiado'}
       b. Método HTTP: GET/POST/PUT/DELETE
-      c. Headers requeridos
+      c. Headers requeridos (Authorization, Content-Type, etc.)
    2. Request
       a. Formato: ${formData.requestFormat || 'Definir formato JSON apropiado'}
-      b. Parámetros obligatorios
-      c. Parámetros opcionales
+      b. Parámetros obligatorios con tipos y validaciones
+      c. Parámetros opcionales y valores por defecto
+      d. Incluir ejemplo detallado de request completo
    3. Response
       a. Formato: ${formData.responseFormat || 'Definir formato JSON apropiado'}
-      b. Códigos de estado exitosos
-      c. Estructura de datos de respuesta
+      b. Códigos de estado exitosos (200, 201, 204)
+      c. Estructura de datos de respuesta con tipos
+      d. Incluir ejemplo detallado de response completo
 
 2. FLUJOS ALTERNATIVOS
    1. Errores de validación (400)
@@ -280,6 +282,10 @@ ${formData.configurationPaths ? `
 - Rutas de archivos: ${formData.configurationPaths}
 - Las rutas deben ser configurables vía archivo de configuración
 - Validación de existencia y permisos al inicio
+- Para requerimientos especiales, indicar:
+  a. Path configurables para archivos de entrada/salida
+  b. Directorios de trabajo temporales
+  c. Rutas de logs y archivos de error
 ` : ''}
 
 ${formData.webServiceCredentials ? `
@@ -287,7 +293,18 @@ ${formData.webServiceCredentials ? `
 - Configuración: ${formData.webServiceCredentials}
 - Usuario, clave y URL deben ser configurables
 - Almacenamiento seguro de credenciales
-` : ''}`;
+- Para requerimientos especiales, indicar:
+  a. Usuario/clave para autenticación en servicios externos
+  b. URLs de endpoints configurables por ambiente
+  c. Tokens y certificados necesarios
+` : ''}
+
+4. REQUERIMIENTOS ESPECIALES
+- Indicar configurables específicos del proceso:
+  a. Path para archivos de configuración y datos
+  b. Usuario/clave/URL para web services externos
+  c. Parámetros de ejecución modificables sin recompilación
+  d. Variables de entorno requeridas`;
   }
   
   return '';

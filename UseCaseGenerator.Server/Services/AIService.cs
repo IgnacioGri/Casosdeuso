@@ -245,6 +245,7 @@ INSTRUCCIONES:
 - Aplica SOLO los cambios solicitados
 - Preserva toda la información no afectada por los cambios
 - Asegúrate de que el documento siga siendo coherente y profesional
+- Asegura indentación 0.2 en listas editadas si se modifican flujos
 - Mantén el estilo y formato corporativo ING";
 
             var modifiedContent = await GenerateWithAI(prompt, aiModel);
@@ -624,15 +625,15 @@ NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción pr
 
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
-2. Para flujos, usa numeración jerárquica profesional:
-   4. Flujo Básico
-     4.1 Menú principal
-     4.2 Subflujo: Búsqueda
-       4.2.1 Ingreso de filtros
-       4.2.2 Ejecución de búsqueda
-     4.3 Subflujo: Alta
-       4.3.1 Validación de datos
-       4.3.2 Confirmación
+2. Para flujos, usa numeración jerárquica profesional con indentación:
+   1. Flujo Básico
+     a. Menú principal
+       i. Ingreso de filtros
+       ii. Ejecución de búsqueda
+     b. Subflujo: Alta
+       i. Validación de datos
+       ii. Confirmación
+   Indenta 0.2 pulgadas por nivel a la derecha.
 
 3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
@@ -659,6 +660,7 @@ INSTRUCCIONES FINALES:
 - Mantén consistencia en la numeración y formato
 - Incluye TODAS las secciones requeridas
 - Asegúrate de que la descripción sea detallada y profesional
+- Incluye título en MAYÚSCULAS con color azul RGB(0,112,192) en la sección inicial
 - El documento debe estar listo para convertirse a DOCX con formato corporativo ING
 ";
     }
@@ -680,8 +682,84 @@ INSTRUCCIONES FINALES:
 
     private string GetFieldRules(string fieldName, string fieldType, object? context)
     {
-        // Return specific validation rules for each field type
-        return $"Reglas para el campo {fieldName}: Debe ser profesional y seguir estándares ING.";
+        var fieldNameLower = fieldName.ToLower();
+        var useCaseType = (context as dynamic)?.fullFormData?.useCaseType ?? "entidad";
+        
+        // Base ING compliance rules
+        var ingCompliance = GetINGComplianceRules(useCaseType);
+        
+        if (fieldNameLower.Contains("nombre") && fieldNameLower.Contains("cliente"))
+        {
+            return $"{ingCompliance}\n- Debe ser un nombre de empresa real o banco\n- Primera letra mayúscula\n- Sin abreviaciones innecesarias";
+        }
+        
+        if (fieldNameLower.Contains("proyecto"))
+        {
+            return $"{ingCompliance}\n- Debe describir un sistema o proyecto tecnológico\n- Formato profesional\n- Relacionado con el cliente";
+        }
+        
+        if (fieldNameLower.Contains("codigo"))
+        {
+            return $"{ingCompliance}\n- Formato: 2 letras mayúsculas + 3 números (ej: CL005, AB123)\n- Las letras deben relacionarse con el módulo o área";
+        }
+        
+        if (fieldNameLower.Contains("nombre") && fieldNameLower.Contains("caso"))
+        {
+            return $"{ingCompliance}\n- OBLIGATORIO: Debe comenzar con verbo en infinitivo (Gestionar, Crear, Consultar, etc.)\n- Prepara para título en mayúsculas RGB(0,112,192)\n- Describe claramente la funcionalidad\n- Sin artículos innecesarios\n{GetUseCaseTypeSpecificRules(useCaseType)}";
+        }
+        
+        if (fieldNameLower.Contains("archivo"))
+        {
+            return $"{ingCompliance}\n- Formato exacto: 2 letras + 3 números + nombre descriptivo sin espacios\n- Ejemplo: BP005GestionarClientesPremium\n- Sin caracteres especiales";
+        }
+        
+        if (fieldNameLower.Contains("descripcion"))
+        {
+            return $"{ingCompliance}\n- Expandir a 1-2 párrafos completos (mínimo 150 palabras)\n- Primer párrafo: explica QUÉ hace el caso de uso y su propósito\n- Segundo párrafo: describe los BENEFICIOS y valor de negocio\n- Incluye explicación de alcance/objetivo como en minuta ING\n- Si aplica, menciona flujos principales con lista indentada (1-a-i):\n  1. Flujo principal (ej. Buscar [entidad])\n    a. Detallar filtros y columnas\n    i. Criterios de búsqueda\n- Usa un tono profesional pero claro\n- Incluye contexto relevante del negocio\n{GetUseCaseTypeSpecificRules(useCaseType)}";
+        }
+        
+        if (fieldNameLower.Contains("reglas") && fieldNameLower.Contains("negocio"))
+        {
+            return $"{ingCompliance}\n- Cada regla debe ser clara, específica y verificable\n- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:\n  1. Regla principal\n    a. Sub-regla o detalle\n    i. Especificación adicional\n- Incluye validaciones, restricciones y políticas\n- Considera aspectos regulatorios si aplica\n- Para modificar/eliminar: incluir verificaciones\n- Ejemplo: \"1. El monto máximo por transferencia es de $50,000\"";
+        }
+        
+        if (fieldNameLower.Contains("requerimientos"))
+        {
+            return $"{ingCompliance}\n- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)\n- Especifica métricas cuando sea posible\n- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos\n- Considera integraciones con otros sistemas\n- Ejemplo: \"El sistema debe procesar 1000 transacciones por minuto\"";
+        }
+        
+        if (fieldType == "searchFilter")
+        {
+            return $"{ingCompliance}\n- Nombre del campo de búsqueda\n- Debe ser un campo lógico de la entidad\n- Formato lista multi-nivel: 1. Filtro por [campo], a. Lógica [igual/mayor]";
+        }
+        
+        if (fieldType == "resultColumn")
+        {
+            return $"{ingCompliance}\n- Columnas para tabla de resultados\n- Información relevante para identificar registros\n- Formato multi-nivel con indent 0.2";
+        }
+        
+        if (fieldType == "entityField")
+        {
+            return $"{ingCompliance}\n- Campo de entidad con tipo/longitud/obligatorio\n- Auto-incluir campos de auditoría:\n  • fechaAlta (date, mandatory)\n  • usuarioAlta (text, mandatory)\n  • fechaModificacion (date, optional)\n  • usuarioModificacion (text, optional)\n- Tipos válidos: text/email/number/date/boolean/decimal\n- Para montos usar tipo \"decimal\"\n- Para IDs usar tipo \"number\"\n- Incluir SIEMPRE description y validationRules";
+        }
+        
+        return $"{ingCompliance}\n- Seguir buenas prácticas de documentación técnica\n- Usar lenguaje claro y profesional\n- Mantener coherencia con el resto del formulario";
+    }
+    
+    private string GetINGComplianceRules(string useCaseType)
+    {
+        return "CUMPLE MINUTA ING vr19: Segoe UI Semilight, interlineado simple, títulos azul RGB(0,112,192), listas multi-nivel (1-a-i), formato profesional";
+    }
+    
+    private string GetUseCaseTypeSpecificRules(string useCaseType)
+    {
+        return useCaseType switch
+        {
+            "entidad" => "\n- Para entidades: incluye filtros/columnas de búsqueda\n- Flujos CRUD (buscar, agregar, modificar, eliminar)\n- Wireframes con paginado y botones estándar",
+            "api" => "\n- Para APIs: incluye request/response detallados\n- Códigos de error y manejo de excepciones\n- Documentación de endpoints",
+            "proceso" => "\n- Para procesos: describe secuencia de pasos\n- Validaciones en cada etapa\n- Puntos de control y rollback",
+            _ => "\n- Adapta según tipo de caso de uso especificado"
+        };
     }
 
     private string BuildContextualPrompt(object? context)

@@ -159,15 +159,15 @@ NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción pr
 
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
-2. Para flujos, usa numeración jerárquica profesional:
-   4. Flujo Básico
-     4.1 Menú principal
-     4.2 Subflujo: Búsqueda
-       4.2.1 Ingreso de filtros
-       4.2.2 Ejecución de búsqueda
-     4.3 Subflujo: Alta
-       4.3.1 Validación de datos
-       4.3.2 Confirmación
+2. Para flujos, usa numeración jerárquica profesional con indentación:
+   1. Flujo Básico
+     a. Menú principal
+       i. Ingreso de filtros
+       ii. Ejecución de búsqueda
+     b. Subflujo: Alta
+       i. Validación de datos
+       ii. Confirmación
+   Indenta 0.2 pulgadas por nivel a la derecha.
 
 3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
@@ -194,6 +194,7 @@ INSTRUCCIONES FINALES:
 - Mantén consistencia en la numeración y formato
 - Incluye TODAS las secciones requeridas
 - Asegúrate de que la descripción sea detallada y profesional
+- Incluye título en MAYÚSCULAS con color azul RGB(0,112,192) en la sección inicial
 - El documento debe estar listo para convertirse a DOCX con formato corporativo ING`;
   }
 
@@ -515,6 +516,7 @@ INSTRUCCIONES:
 - Aplica SOLO los cambios solicitados
 - Preserva toda la información no afectada por los cambios
 - Asegúrate de que el documento siga siendo coherente y profesional
+- Asegura indentación 0.2 en listas editadas si se modifican flujos
 - Mantén el estilo y formato corporativo ING`;
 
       let modifiedContent: string;
@@ -886,15 +888,15 @@ INSTRUCCIONES:
     }
     
     if (fieldName_lower.includes('descripcion')) {
-      return `${ingCompliance}\n- Explicación clara del alcance del caso de uso (50-200 palabras)\n- Incluye flujos principales con listas indentadas:\n  1. Flujo principal (ej. Buscar [entidad])\n  a. Detallar filtros y columnas\n- Menciona precondiciones y postcondiciones\n- Lenguaje técnico pero comprensible\n${this.getUseCaseTypeSpecificRules(useCaseType)}`;
+      return `${ingCompliance}\n- Expandir a 1-2 párrafos completos (mínimo 150 palabras)\n- Primer párrafo: explica QUÉ hace el caso de uso y su propósito\n- Segundo párrafo: describe los BENEFICIOS y valor de negocio\n- Incluye explicación de alcance/objetivo como en minuta ING\n- Si aplica, menciona flujos principales con lista indentada (1-a-i):\n  1. Flujo principal (ej. Buscar [entidad])\n    a. Detallar filtros y columnas\n    i. Criterios de búsqueda\n- Usa un tono profesional pero claro\n- Incluye contexto relevante del negocio\n${this.getUseCaseTypeSpecificRules(useCaseType)}`;
     }
     
     if (fieldName_lower.includes('reglas') && fieldName_lower.includes('negocio')) {
-      return `${ingCompliance}\n- Lista numerada multi-nivel (1, a, i) con indent 0.2\n- Cada regla debe ser específica y verificable\n- Incluir validaciones de datos obligatorias\n- Mencionar restricciones de seguridad\n- Para modificar/eliminar: incluir verificaciones`;
+      return `${ingCompliance}\n- Cada regla debe ser clara, específica y verificable\n- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:\n  1. Regla principal\n    a. Sub-regla o detalle\n    i. Especificación adicional\n- Incluye validaciones, restricciones y políticas\n- Considera aspectos regulatorios si aplica\n- Para modificar/eliminar: incluir verificaciones\n- Ejemplo: "1. El monto máximo por transferencia es de $50,000"`;
     }
     
     if (fieldName_lower.includes('requerimientos')) {
-      return `${ingCompliance}\n- Requerimientos técnicos específicos en lista numerada\n- Tiempos de respuesta con límites máximos\n- Integraciones con formato de intercambio\n- Validaciones obligatorias\n- Tecnologías si aplica`;
+      return `${ingCompliance}\n- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)\n- Especifica métricas cuando sea posible\n- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos\n- Considera integraciones con otros sistemas\n- Ejemplo: "El sistema debe procesar 1000 transacciones por minuto"`;
     }
     
     if (fieldType === 'searchFilter') {
@@ -906,7 +908,7 @@ INSTRUCCIONES:
     }
     
     if (fieldType === 'entityField') {
-      return `${ingCompliance}\n- Campo de entidad con tipo/longitud/obligatorio\n- Auto-incluir: fechaAlta (date, mandatory), usuarioAlta (text, mandatory)\n- Tipos ING: text/email/number/date/boolean\n- Nombres descriptivos técnicamente precisos`;
+      return `${ingCompliance}\n- Campo de entidad con tipo/longitud/obligatorio\n- Auto-incluir campos de auditoría:\n  • fechaAlta (date, mandatory)\n  • usuarioAlta (text, mandatory)\n  • fechaModificacion (date, optional)\n  • usuarioModificacion (text, optional)\n- Tipos válidos: text/email/number/date/boolean/decimal\n- Para montos usar tipo "decimal"\n- Para IDs usar tipo "number"\n- Incluir SIEMPRE description y validationRules`;
     }
     
     return `${ingCompliance}\n- Seguir buenas prácticas de documentación técnica\n- Usar lenguaje claro y profesional\n- Mantener coherencia con el resto del formulario`;
