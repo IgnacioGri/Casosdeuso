@@ -2,6 +2,8 @@ export type UseCaseType = 'entity' | 'api' | 'service';
 
 export type AIModel = 'demo' | 'openai' | 'claude' | 'grok' | 'gemini' | 'copilot';
 
+export type AIModelForWireframes = 'demo' | 'openai' | 'gemini';
+
 export interface EntityField {
   name: string;
   type: 'text' | 'number' | 'date' | 'datetime' | 'boolean' | 'email';
@@ -43,6 +45,11 @@ export interface UseCaseFormData {
   generateWireframes: boolean;
   wireframeDescriptions?: string[];
   wireframesDescription?: string;
+  aiModelForWireframes?: AIModelForWireframes;
+  generatedWireframes?: {
+    searchWireframe?: string;
+    formWireframe?: string;
+  };
   // Test case fields
   generateTestCase?: boolean;
   testCaseObjective?: string;

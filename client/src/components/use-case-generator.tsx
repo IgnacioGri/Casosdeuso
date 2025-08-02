@@ -51,7 +51,7 @@ export default function UseCaseGenerator() {
 
   // Calculate total steps based on use case type and test case decision
   const getTotalSteps = () => {
-    const baseSteps = formData.useCaseType === 'entity' ? 9 : 7;
+    const baseSteps = formData.useCaseType === 'entity' ? 10 : 7;
     // Always show one more step for test case decision or final review
     return baseSteps + (formData.generateTestCase ? 1 : 0);
   };
@@ -264,7 +264,7 @@ export default function UseCaseGenerator() {
 
   const isReviewStep = () => {
     // Final review step happens after test cases (if enabled) or after decision step
-    const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
+    const baseStep = formData.useCaseType === 'entity' ? 10 : 7;
     if (formData.generateTestCase) {
       return currentStep === baseStep + 1; // Step after test cases
     } else {

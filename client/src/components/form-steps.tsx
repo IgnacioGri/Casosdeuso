@@ -1,6 +1,7 @@
 import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot, X, Plus } from "lucide-react";
 import { TestCaseStep } from './steps/test-case-step';
 import { MinuteAnalysisStep } from './steps/minute-analysis-step';
+import { WireframesStep } from './steps/wireframes-step';
 import { UseCaseFormData, EntityField, AIModel, UseCaseType } from "@/types/use-case";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -931,8 +932,18 @@ export default function FormSteps({
     );
   }
 
-  // Step 8: Additional Options (adjusted step number for non-entity types)
-  const isAdditionalOptionsStep = formData.useCaseType === 'entity' ? currentStep === 8 : currentStep === 6;
+  // Step 8: Wireframes (Entity only)
+  if (currentStep === 8 && formData.useCaseType === 'entity') {
+    return (
+      <WireframesStep
+        formData={formData}
+        onUpdateFormData={onUpdateFormData}
+      />
+    );
+  }
+
+  // Step 9: Additional Options (adjusted step number for non-entity types)
+  const isAdditionalOptionsStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 6;
   if (isAdditionalOptionsStep) {
     return (
       <Card className="shadow-sm border border-ms-border">
@@ -1096,7 +1107,7 @@ export default function FormSteps({
   // Test Cases Step (if enabled)
   const testCaseStepNumber = () => {
     if (formData.useCaseType === 'entity') {
-      return formData.generateTestCase ? 9 : null;
+      return formData.generateTestCase ? 10 : null;
     } else {
       return formData.generateTestCase ? 7 : null;
     }
@@ -1133,9 +1144,9 @@ export default function FormSteps({
     );
   }
 
-  // Step 9/7: Pre-Final Step with Test Case Decision
+  // Step 10/7: Pre-Final Step with Test Case Decision
   const getPreFinalStepNumber = () => {
-    return formData.useCaseType === 'entity' ? 9 : 7;
+    return formData.useCaseType === 'entity' ? 10 : 7;
   };
 
   const isPreFinalStep = currentStep === getPreFinalStepNumber() && !formData.generateTestCase;
@@ -1212,7 +1223,7 @@ export default function FormSteps({
 
   // Final Review Step (after test cases or after decision)
   const getFinalReviewStepNumber = () => {
-    const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
+    const baseStep = formData.useCaseType === 'entity' ? 10 : 7;
     return formData.generateTestCase ? baseStep + 1 : baseStep;
   };
 
