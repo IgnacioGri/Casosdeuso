@@ -621,36 +621,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Legacy: Export use case to docx (kept for backward compatibility)
+  // Legacy: Export use case to docx (no longer supported)
   app.get("/api/use-cases/:id/export", async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      const useCase = await storage.getUseCase(id);
-      if (!useCase) {
-        return res.status(404).json({ message: "Caso de uso no encontrado" });
-      }
-
-      const docxBuffer = await DocumentService.generateDocx(
-        useCase.generatedContent || '',
-        useCase.fileName || 'caso-de-uso',
-        useCase.useCaseName || '',
-        useCase || null
-      );
-
-      res.set({
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'Content-Disposition': `attachment; filename="${useCase.fileName}.docx"`,
-        'Content-Length': docxBuffer.length
-      });
-
-      res.send(docxBuffer);
-    } catch (error) {
-      console.error("Error exporting use case:", error);
-      res.status(500).json({
-        message: error instanceof Error ? error.message : "Error exportando el documento"
-      });
-    }
+    // This legacy route is no longer supported as the HTML to DOCX conversion method has been removed
+    // All DOCX exports must now use the /api/export-docx endpoint with formData
+    return res.status(410).json({ 
+      message: "Este método de exportación ya no está soportado. Por favor use el botón de exportar en la interfaz principal que utiliza el método correcto con formData.",
+      code: "LEGACY_EXPORT_DEPRECATED"
+    });
   });
 
   // Get all use cases
