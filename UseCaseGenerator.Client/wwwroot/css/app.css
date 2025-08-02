@@ -327,6 +327,30 @@ p, span, div, li, td, th {
     color: var(--ing-primary);
 }
 
+/* Fix for MudBlazor Select component overflow issues */
+.mud-select-input {
+    overflow: visible !important;
+}
+
+.mud-select-input > div {
+    overflow: visible !important;
+}
+
+.mud-input-control {
+    overflow: visible !important;
+}
+
+/* Ensure proper height for select components */
+.mud-select {
+    min-height: 56px !important;
+}
+
+.mud-select .mud-input-slot {
+    display: flex !important;
+    align-items: center !important;
+    overflow: visible !important;
+}
+
 .mud-chip.mud-chip-color-primary {
     background-color: var(--ing-primary);
     color: white;
