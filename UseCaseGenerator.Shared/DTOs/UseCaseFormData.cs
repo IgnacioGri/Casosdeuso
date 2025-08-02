@@ -31,10 +31,6 @@ public class UseCaseFormData
     public List<string> WireframeDescriptions { get; set; } = new();
     public string? WireframesDescription { get; set; }
     
-    // Alternative flows
-    public List<string> AlternativeFlows { get; set; } = new();
-    public string? AlternativeFlowsDescription { get; set; }
-    
     // API-specific fields
     public string? ApiEndpoint { get; set; }
     public string? RequestFormat { get; set; }

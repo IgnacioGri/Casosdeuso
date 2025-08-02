@@ -62,9 +62,11 @@ Estructura JSON requerida:
   ""entityFields"": [
     {
       ""name"": ""string"",
-      ""type"": ""text|number|date|boolean|email"",
+      ""type"": ""text|number|decimal|date|datetime|boolean|email"",
       ""mandatory"": true|false,
-      ""length"": number
+      ""length"": number,
+      ""description"": ""string"",
+      ""validationRules"": ""string""
     }
   ],
   ""businessRules"": [""string""],
@@ -153,7 +155,9 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
         var field = new EntityField
         {
             Name = GetStringProperty(fieldElement, "name", ""),
-            Mandatory = GetBoolProperty(fieldElement, "mandatory", false)
+            Mandatory = GetBoolProperty(fieldElement, "mandatory", false),
+            Description = GetStringProperty(fieldElement, "description", ""),
+            ValidationRules = GetStringProperty(fieldElement, "validationRules", "")
         };
 
         // Parse field type

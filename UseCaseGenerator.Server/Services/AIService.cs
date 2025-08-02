@@ -475,7 +475,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
             {
                 new { role = "user", content = prompt }
             },
-            max_tokens = 4000
+            max_tokens = 16000
         };
         
         using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
@@ -499,7 +499,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
             {
                 new { role = "user", content = prompt }
             },
-            max_tokens = 4000
+            max_tokens = 16000
         };
         
         using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
@@ -529,7 +529,7 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
             {
                 new { role = "user", content = prompt }
             },
-            max_tokens = 4000
+            max_tokens = 16000
         };
         
         using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");

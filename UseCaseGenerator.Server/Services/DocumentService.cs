@@ -269,32 +269,6 @@ public class DocumentService : IDocumentService
             AddSectionHeading(body, "Campos de Entidad");
             AddEntityFieldsTable(body, useCase.EntityFields);
         }
-
-        // Alternative Flows (Flujos Alternativos)
-        if (!string.IsNullOrEmpty(useCase.AlternativeFlowsDescription) || 
-            (useCase.AlternativeFlows?.Any() == true))
-        {
-            AddSectionHeading(body, "Flujos Alternativos");
-            
-            // First add the general description if exists
-            if (!string.IsNullOrEmpty(useCase.AlternativeFlowsDescription))
-            {
-                AddParagraph(body, useCase.AlternativeFlowsDescription);
-            }
-            
-            // Then add individual alternative flows if they exist
-            if (useCase.AlternativeFlows?.Any() == true)
-            {
-                for (int i = 0; i < useCase.AlternativeFlows.Count; i++)
-                {
-                    var flow = useCase.AlternativeFlows[i];
-                    if (!string.IsNullOrWhiteSpace(flow))
-                    {
-                        AddNumberedItem(body, $"{i + 1}. {flow.Trim()}");
-                    }
-                }
-            }
-        }
         
         // Special Requirements
         if (!string.IsNullOrEmpty(useCase.SpecialRequirements))
