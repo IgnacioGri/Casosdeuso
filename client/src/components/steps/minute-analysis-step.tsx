@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Upload, FileText, Loader2, Brain, CheckCircle } from 'lucide-react';
+import { Upload, FileText, Loader2, Brain, CheckCircle, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -307,7 +307,7 @@ CRITERIOS DE ACEPTACIÓN:
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
-            <Brain className="mr-2 text-ms-blue" size={20} />
+            <Bot className="mr-2 text-ms-blue" size={20} />
             Análisis Inteligente de Minutas
           </CardTitle>
         </div>

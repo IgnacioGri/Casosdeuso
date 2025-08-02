@@ -106,7 +106,7 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
                 >
                   {isCompleted ? <Check className="w-4 h-4" /> : isCurrent ? <Clock className="w-4 h-4" /> : <StepIcon className="w-3 h-3" />}
                 </div>
-                <div className={`text-[10px] font-medium text-center max-w-16 leading-tight ${
+                <div className={`text-[10px] font-bold text-center max-w-16 leading-tight ${
                   isCurrent ? 'text-blue-600 dark:text-blue-400' : 
                   isCompleted ? 'text-green-600 dark:text-green-400' : 
                   'text-gray-500 dark:text-gray-400'
