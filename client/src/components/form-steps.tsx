@@ -1201,18 +1201,7 @@ export default function FormSteps({
                 >
                   Sí, agregar casos de prueba
                 </Button>
-                <Button 
-                  type="button" 
-                  onClick={() => {
-                    handleInputChange('generateTestCase', false);
-                    // Skip to final review step
-                    if (onNextStep) onNextStep();
-                  }}
-                  variant="outline"
-                  className="border-gray-300"
-                >
-                  No, finalizar sin casos de prueba
-                </Button>
+                
               </div>
             </div>
             
