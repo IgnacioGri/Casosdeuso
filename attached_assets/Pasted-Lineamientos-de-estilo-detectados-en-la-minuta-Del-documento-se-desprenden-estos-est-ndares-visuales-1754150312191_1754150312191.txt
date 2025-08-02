@@ -1,0 +1,69 @@
+Lineamientos de estilo detectados en la minuta
+Del documento se desprenden estos estándares visuales que deberías mantener en la UI del generador web:
+Elemento	Estándar visual ING
+Fuente	Segoe UI Light / Semilight
+Color de título principal	Azul oscuro rgb(0, 112, 192)
+Color de fondo y contenido	Blanco o gris claro (tono corporativo, sin sombras fuertes)
+Interlineado	Simple
+Espaciado	Espaciado simple (sin márgenes exagerados)
+Tablas	Borde gris medio, títulos en negrita, contenido alineado
+Botones clave	Estilo Microsoft clásico: bordes suaves, colores planos
+Encabezado y pie de página	Encabezado gráfico, pie con paginación y nombre del documento
+✅ Revisión de tus capturas con mejoras propuestas (basado en esos lineamientos)
+1. Colores
+Actual: Uso mixto de azules, verdes, violetas.
+Sugerido ING:
+Color primario: rgb(0, 112, 192) (para botones, títulos activos, íconos principales)
+Color secundario: rgb(242, 242, 242) (fondo de inputs, cajas secundarias)
+Texto: Negro o gris oscuro (#333) para cuerpo. Nunca gris claro.
+Evitar: Verde fuerte, violeta chillón, rojos saturados.
+2. Tipografía
+Actual: Sans-serif genérica.
+Sugerido ING: Segoe UI Semilight o su equivalente web ("Segoe UI", system-ui, sans-serif).
+Títulos en bold con el azul corporativo.
+Textos de campos y ayuda en peso regular o light.
+Botones en semibold.
+3. Botones
+Actual: Hay azul, verde, blanco con borde, violeta.
+Sugerido ING:
+Primario (accionar): Fondo rgb(0, 112, 192), texto blanco.
+Secundario (volver, descartar): Borde rgb(0,112,192), texto azul, fondo blanco.
+AI Assist / IA: Si mantenés el violeta, que sea un violeta corporativo suave, no saturado. O directamente usá el azul oscuro con ícono que lo identifique como IA (cerebro, engranaje).
+Bordes con leve radio (4px máx), sin sombras fuertes.
+4. Estructura de los pasos (barra superior de navegación de pasos)
+Actual: íconos circulares con fondo blanco y borde azul.
+Sugerido ING:
+Fondo gris claro muy sutil.
+Paso actual con fondo azul rgb(0,112,192) y texto blanco.
+Pasos completados con check gris o verde suave.
+Paso futuro con sólo borde.
+5. Inputs y cuadros de texto
+Bordes grises claros (#ccc), padding interno generoso, esquinas levemente redondeadas.
+Agregar etiquetas arriba del input, no dentro como placeholder.
+Campos de texto largos (como minutado) deberían tener:
+Un borde más fuerte.
+Fondo ligeramente gris (#f9f9f9) o blanco puro.
+Padding interior alto (12px mínimo).
+6. Previsualización de pasos de prueba
+En lugar de cajas grandes y abiertas, usar una tabla con bordes finos como pide la minuta.
+Encabezados en negrita.
+Alinear datos: izquierda para textos, centro para botones o estado.
+Dejar suficiente espacio entre filas.
+Botón para agregar paso al pie, no al tope.
+7. Casos de prueba (paso 9)
+Podrías unificar el estilo de esa sección en tarjetas blancas con borde gris claro, similares a cómo Microsoft presenta forms en Word.
+Íconos suaves, sin sombras, títulos pequeños con tipografía Segoe UI Semibold.
+8. Botón de selección de IA (parte superior)
+Cambiar íconos emoji por íconos vectoriales planos y corporativos.
+Aplicar el color azul de marca.
+Dejar el nombre del modelo con tipografía light y que la selección activa sea azul con tilde.
+🌐 Propuesta visual resumida
+Elemento	Valor ING
+Color primario	#0070C0 (RGB 0,112,192)
+Fuente	Segoe UI Light (ó Semilight para énfasis)
+Espaciado	Simple, limpio, sin sombras ni bordes pesados
+Inputs	Borde gris claro, padding alto
+Botones	Azul primario o blanco con borde azul suave
+Estructura	Líneas limpias, jerarquía tipográfica clara
+Componentes IA	Íconos planos + color corporativo, sin saturar
+Tablas (Pasos)	Estilo Word ING: bordes grises, títulos en bold
