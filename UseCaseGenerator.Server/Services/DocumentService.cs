@@ -1119,12 +1119,11 @@ public class DocumentService : IDocumentService
                     {
                         using (var image = System.Drawing.Image.FromFile(imagePath))
                         {
-                            // Use fixed dimensions matching original ratio
-                            // Original: 2728x360 = 7.6:1 ratio
-                            // 600 pixels width, 79 pixels height for proper display
+                            // Use fixed dimensions that work correctly in DOCX
+                            // 900 pixels width, 120 pixels height (from working document)
                             // 1 pixel = 9525 EMUs
-                            width = 600L * 9525L;  // 5715000 EMUs
-                            height = 79L * 9525L;   // 752475 EMUs
+                            width = 900L * 9525L;  // 8572500 EMUs
+                            height = 120L * 9525L; // 1143000 EMUs
                         }
                     }
                     catch
