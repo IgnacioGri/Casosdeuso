@@ -217,84 +217,87 @@ export function TestCaseStep({
             </div>
           )}
 
-          {testSteps.map((step, index) => (
-            <div key={index} className="border rounded-lg p-4 mb-4 bg-gray-50">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium">Paso #{step.number}</h4>
-                <Button
-                  onClick={() => onRemoveTestStep(index)}
-                  variant="ghost"
-                  size="sm"
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor={`action-${index}`}>Acción</Label>
-                  <Textarea
-                    id={`action-${index}`}
-                    value={step.action}
-                    onChange={(e) => onUpdateTestStep(index, 'action', e.target.value)}
-                    placeholder="Describir la acción a realizar..."
-                    className="mt-1 min-h-16 resize-y"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor={`inputData-${index}`}>Datos de Entrada</Label>
-                  <Textarea
-                    id={`inputData-${index}`}
-                    value={step.inputData}
-                    onChange={(e) => onUpdateTestStep(index, 'inputData', e.target.value)}
-                    placeholder="Datos o información necesaria..."
-                    className="mt-1 min-h-16 resize-y"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor={`expectedResult-${index}`}>Resultado Esperado</Label>
-                  <Textarea
-                    id={`expectedResult-${index}`}
-                    value={step.expectedResult}
-                    onChange={(e) => onUpdateTestStep(index, 'expectedResult', e.target.value)}
-                    placeholder="Resultado que se espera obtener..."
-                    className="mt-1 min-h-16 resize-y"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor={`observations-${index}`}>Observaciones</Label>
-                  <Textarea
-                    id={`observations-${index}`}
-                    value={step.observations}
-                    onChange={(e) => onUpdateTestStep(index, 'observations', e.target.value)}
-                    placeholder="Notas adicionales o consideraciones..."
-                    className="mt-1 min-h-16 resize-y"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <Label htmlFor={`status-${index}`}>Estado (P/F)</Label>
-                <Select
-                  value={step.status}
-                  onValueChange={(value) => onUpdateTestStep(index, 'status', value)}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Seleccionar estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">Sin ejecutar</SelectItem>
-                    <SelectItem value="P">P - Pass (Aprobado)</SelectItem>
-                    <SelectItem value="F">F - Fail (Falló)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {testSteps.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr>
+                    <th className="text-center w-16">#</th>
+                    <th className="text-left min-w-[200px]">Acción</th>
+                    <th className="text-left min-w-[200px]">Datos de Entrada</th>
+                    <th className="text-left min-w-[200px]">Resultado Esperado</th>
+                    <th className="text-left min-w-[200px]">Observaciones</th>
+                    <th className="text-center w-32">Estado (P/F)</th>
+                    <th className="text-center w-16"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {testSteps.map((step, index) => (
+                    <tr key={index}>
+                      <td className="text-center font-medium">{step.number}</td>
+                      <td className="p-2">
+                        <Textarea
+                          value={step.action}
+                          onChange={(e) => onUpdateTestStep(index, 'action', e.target.value)}
+                          placeholder="Describir la acción a realizar..."
+                          className="min-h-16 resize-y w-full"
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Textarea
+                          value={step.inputData}
+                          onChange={(e) => onUpdateTestStep(index, 'inputData', e.target.value)}
+                          placeholder="Datos o información necesaria..."
+                          className="min-h-16 resize-y w-full"
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Textarea
+                          value={step.expectedResult}
+                          onChange={(e) => onUpdateTestStep(index, 'expectedResult', e.target.value)}
+                          placeholder="Resultado que se espera obtener..."
+                          className="min-h-16 resize-y w-full"
+                        />
+                      </td>
+                      <td className="p-2">
+                        <Textarea
+                          value={step.observations}
+                          onChange={(e) => onUpdateTestStep(index, 'observations', e.target.value)}
+                          placeholder="Notas adicionales o consideraciones..."
+                          className="min-h-16 resize-y w-full"
+                        />
+                      </td>
+                      <td className="text-center p-2">
+                        <Select
+                          value={step.status}
+                          onValueChange={(value) => onUpdateTestStep(index, 'status', value)}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="---" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">---</SelectItem>
+                            <SelectItem value="P">P</SelectItem>
+                            <SelectItem value="F">F</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </td>
+                      <td className="text-center p-2">
+                        <Button
+                          onClick={() => onRemoveTestStep(index)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

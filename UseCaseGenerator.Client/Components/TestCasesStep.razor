@@ -85,47 +85,74 @@
             
             @if (FormData.TestSteps.Any())
             {
-                <MudExpansionPanels Elevation="1">
-                    @foreach (var step in FormData.TestSteps.OrderBy(s => s.Number))
-                    {
-                        <MudExpansionPanel Text="@($"Paso {step.Number}: {step.Action}")">
-                            <MudGrid>
-                                <MudItem xs="12" md="6">
-                                    <MudTextField @bind-Value="step.Action"
-                                                  Label="Acción"
-                                                  Variant="Variant.Outlined"
-                                                  Class="mb-2" />
-                                </MudItem>
-                                <MudItem xs="12" md="6">
-                                    <MudTextField @bind-Value="step.InputData"
-                                                  Label="Datos de entrada"
-                                                  Variant="Variant.Outlined"
-                                                  Class="mb-2" />
-                                </MudItem>
-                                <MudItem xs="12" md="6">
-                                    <MudTextField @bind-Value="step.ExpectedResult"
-                                                  Label="Resultado esperado"
-                                                  Variant="Variant.Outlined"
-                                                  Class="mb-2" />
-                                </MudItem>
-                                <MudItem xs="12" md="6">
-                                    <MudTextField @bind-Value="step.Observations"
-                                                  Label="Observaciones"
-                                                  Variant="Variant.Outlined"
-                                                  Class="mb-2" />
-                                </MudItem>
-                                <MudItem xs="12">
-                                    <MudButton Variant="Variant.Text" 
-                                               Color="Color.Error"
-                                               StartIcon="@Icons.Material.Filled.Delete"
-                                               OnClick="() => RemoveTestStep(step)">
-                                        Eliminar Paso
-                                    </MudButton>
-                                </MudItem>
-                            </MudGrid>
-                        </MudExpansionPanel>
-                    }
-                </MudExpansionPanels>
+                <MudTable Items="@FormData.TestSteps.OrderBy(s => s.Number)" 
+                          Class="ing-table-styled" 
+                          Hover="true" 
+                          Bordered="true"
+                          Striped="true"
+                          Elevation="1">
+                    <HeaderContent>
+                        <MudTh Class="text-center" Style="width: 50px;">#</MudTh>
+                        <MudTh Style="min-width: 200px;">Acción</MudTh>
+                        <MudTh Style="min-width: 200px;">Datos de Entrada</MudTh>
+                        <MudTh Style="min-width: 200px;">Resultado Esperado</MudTh>
+                        <MudTh Style="min-width: 200px;">Observaciones</MudTh>
+                        <MudTh Class="text-center" Style="width: 120px;">Estado (P/F)</MudTh>
+                        <MudTh Class="text-center" Style="width: 100px;"></MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="step">
+                        <MudTd DataLabel="#" Class="text-center">@step.Number</MudTd>
+                        <MudTd DataLabel="Acción">
+                            <MudTextField @bind-Value="step.Action"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          Lines="2"
+                                          Placeholder="Describir la acción a realizar..."
+                                          Class="my-1" />
+                        </MudTd>
+                        <MudTd DataLabel="Datos de Entrada">
+                            <MudTextField @bind-Value="step.InputData"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          Lines="2"
+                                          Placeholder="Datos o información necesaria..."
+                                          Class="my-1" />
+                        </MudTd>
+                        <MudTd DataLabel="Resultado Esperado">
+                            <MudTextField @bind-Value="step.ExpectedResult"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          Lines="2"
+                                          Placeholder="Resultado que se espera obtener..."
+                                          Class="my-1" />
+                        </MudTd>
+                        <MudTd DataLabel="Observaciones">
+                            <MudTextField @bind-Value="step.Observations"
+                                          Variant="Variant.Outlined"
+                                          Dense="true"
+                                          Lines="2"
+                                          Placeholder="Notas adicionales o consideraciones..."
+                                          Class="my-1" />
+                        </MudTd>
+                        <MudTd DataLabel="Estado" Class="text-center">
+                            <MudSelect @bind-Value="step.Status"
+                                       Variant="Variant.Outlined"
+                                       Dense="true"
+                                       Placeholder="---"
+                                       Class="my-1">
+                                <MudSelectItem Value="@TestStepStatus.Empty">---</MudSelectItem>
+                                <MudSelectItem Value="@TestStepStatus.Passed">P</MudSelectItem>
+                                <MudSelectItem Value="@TestStepStatus.Failed">F</MudSelectItem>
+                            </MudSelect>
+                        </MudTd>
+                        <MudTd DataLabel="Acciones" Class="text-center">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="() => RemoveTestStep(step)" />
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
             }
             else
             {
