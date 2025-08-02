@@ -33,6 +33,13 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
 
+### Recent Updates (February 2, 2025) - Official Ingematica Header Implementation
+- **Official Header Image Updated**: Replaced default DOCX header with official Ingematica header in both React and C# systems
+  - Official header "Header oficial Ingematica _1754166268982.png" now used as primary default
+  - Maintains fallback chain for backward compatibility
+  - Applied to both TypeScript and C# document generation services
+  - Custom header upload functionality remains fully functional in both systems
+
 ### Recent Updates (February 2, 2025) - Business Owner Feedback Implementation
 - **Enhanced AI Field Assistance Based on Business Feedback**:
   - **Description fields**: Now generate 1-2 paragraphs with alcance/objetivo as in ING minutes, including multi-level formatting (1-a-i) for flows
