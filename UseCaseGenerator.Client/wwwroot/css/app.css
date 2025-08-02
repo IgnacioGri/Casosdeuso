@@ -276,6 +276,19 @@ p, span, div, li, td, th {
     margin-right: 8px;
 }
 
+/* Responsive utilities for logo display */
+@media (max-width: 599px) {
+    .mud-hidden-xs-down {
+        display: none !important;
+    }
+}
+
+@media (min-width: 600px) {
+    .mud-hidden-sm-and-up {
+        display: none !important;
+    }
+}
+
 /* Form Steps Progress */
 .step-progress {
     margin: 16px 0;

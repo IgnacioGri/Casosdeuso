@@ -18,9 +18,22 @@
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-4">
     <MudPaper Class="pa-6" Elevation="3">
         
-        <MudText Typo="Typo.h4" GutterBottom="true" Color="Color.Primary">
-            Generador de Casos de Uso
-        </MudText>
+        <MudGrid AlignItems="Center" Spacing="2" GutterBottom="true">
+            <MudItem xs="12" sm="8" md="6" Class="d-flex align-center">
+                @* Logo responsive: logo completo en pantallas grandes, logo pequeño en móvil *@
+                <img src="/images/ingematica-logo-full.png" 
+                     alt="Ingematica Logo" 
+                     class="mud-hidden-xs-down" 
+                     style="height: 40px; object-fit: contain; margin-right: 16px;" />
+                <img src="/attached_assets/company-logo.png" 
+                     alt="Ingematica Logo" 
+                     class="mud-hidden-sm-and-up" 
+                     style="height: 32px; width: 32px; object-fit: contain; margin-right: 12px;" />
+                <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-0">
+                    Generador de Casos de Uso
+                </MudText>
+            </MudItem>
+        </MudGrid>
         
         <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
             <MudGrid>

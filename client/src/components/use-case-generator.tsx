@@ -334,11 +334,19 @@ export default function UseCaseGenerator() {
                   </button>
                 </div>
               ) : (
-                <img 
-                  src="/attached_assets/company-logo.png" 
-                  alt="Company Logo" 
-                  className="h-8 w-8 object-contain"
-                />
+                <>
+                  {/* Logo responsive: logo completo en pantallas grandes, logo pequeño en móvil */}
+                  <img 
+                    src="/ingematica-logo-full.png" 
+                    alt="Ingematica Logo" 
+                    className="hidden sm:block h-10 object-contain"
+                  />
+                  <img 
+                    src="/attached_assets/company-logo.png" 
+                    alt="Ingematica Logo" 
+                    className="sm:hidden h-8 w-8 object-contain"
+                  />
+                </>
               )}
               <h1 className="text-xl font-semibold text-gray-900">
                 Generador de Casos de Uso
