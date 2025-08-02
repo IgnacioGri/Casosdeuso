@@ -339,7 +339,7 @@ export default function UseCaseGenerator() {
                   <img 
                     src="/ingematica-logo-full.png" 
                     alt="Ingematica Logo" 
-                    className="hidden sm:block h-20 object-contain"
+                    className="hidden sm:block h-10 object-contain"
                   />
                   <img 
                     src="/attached_assets/company-logo.png" 
