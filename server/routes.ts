@@ -601,7 +601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // NEW: Direct DOCX export endpoint for locally generated content
   app.post("/api/export-docx", async (req, res) => {
     try {
-      const { content, fileName, useCaseName, formData } = req.body;
+      const { content, fileName, useCaseName, formData, customHeaderImage } = req.body;
       
       if (!content) {
         return res.status(400).json({ message: "Content is required for DOCX export" });
@@ -622,7 +622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Extract test cases from formData if they exist
       const testCases = formData.testSteps || [];
-      const docxBuffer = await DocumentService.generateDirectFromFormData(formData, testCases);
+      const docxBuffer = await DocumentService.generateDirectFromFormData(formData, testCases, customHeaderImage);
 
       // Add cache control headers to prevent browser caching
       res.set({
@@ -712,6 +712,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error generating intelligent test cases:', error);
       res.status(500).json({ 
         error: 'Failed to generate intelligent test cases',
+        success: false
+      });
+    }
+  });
+
+  // Configure multer for header image upload
+  const headerImageStorage = multer.diskStorage({
+    destination: 'attached_assets/',
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const ext = file.originalname.split('.').pop();
+      cb(null, `header-${uniqueSuffix}.${ext}`);
+    }
+  });
+
+  const headerImageUpload = multer({
+    storage: headerImageStorage,
+    limits: {
+      fileSize: 2 * 1024 * 1024 // 2MB limit
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    }
+  });
+
+  // Header image upload endpoint
+  app.post("/api/upload-header", headerImageUpload.single('headerImage'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image file provided' });
+      }
+
+      // Return the relative URL for the uploaded image
+      const imageUrl = `/attached_assets/${req.file.filename}`;
+      
+      res.json({ 
+        success: true,
+        imageUrl: imageUrl,
+        filename: req.file.filename
+      });
+    } catch (error) {
+      console.error('Error uploading header image:', error);
+      res.status(500).json({ 
+        error: 'Failed to upload header image',
         success: false
       });
     }

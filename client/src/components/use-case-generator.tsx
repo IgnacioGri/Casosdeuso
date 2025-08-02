@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FileText, RefreshCw, ArrowLeft, ArrowRight, Cog } from "lucide-react";
+import { useState, useRef } from "react";
+import { FileText, RefreshCw, ArrowLeft, ArrowRight, Cog, Upload, X, Image } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,10 @@ export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState(0);
+  const [customHeaderImage, setCustomHeaderImage] = useState<string | null>(
+    localStorage.getItem('customHeaderImage')
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const {
@@ -90,7 +94,8 @@ export default function UseCaseGenerator() {
           content: generatedData.content,
           fileName: generatedData.useCase.fileName,
           useCaseName: generatedData.useCase.useCaseName,
-          formData: data
+          formData: data,
+          customHeaderImage: customHeaderImage
         }),
         credentials: 'include'
       });
@@ -190,6 +195,73 @@ export default function UseCaseGenerator() {
     });
   };
 
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Formato inválido",
+        description: "Por favor seleccione un archivo de imagen",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "Archivo muy grande",
+        description: "La imagen debe ser menor a 2MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Upload to server
+      const formData = new FormData();
+      formData.append('headerImage', file);
+      
+      const response = await apiRequest('POST', '/api/upload-header', formData);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl = data.imageUrl;
+        
+        // Save to localStorage and state
+        localStorage.setItem('customHeaderImage', imageUrl);
+        setCustomHeaderImage(imageUrl);
+        
+        toast({
+          title: "Imagen cargada",
+          description: "La imagen del header se ha actualizado correctamente"
+        });
+      } else {
+        throw new Error('Error al subir la imagen');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo cargar la imagen",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleClearCustomHeader = () => {
+    localStorage.removeItem('customHeaderImage');
+    setCustomHeaderImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    toast({
+      title: "Imagen eliminada",
+      description: "Se ha restaurado el header por defecto"
+    });
+  };
+
   const isReviewStep = () => {
     // Final review step happens after test cases (if enabled) or after decision step
     const baseStep = formData.useCaseType === 'entity' ? 9 : 7;
@@ -246,7 +318,35 @@ export default function UseCaseGenerator() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
-              <FileText className="text-ms-blue" size={24} />
+              {customHeaderImage ? (
+                <div className="relative group">
+                  <img 
+                    src={customHeaderImage} 
+                    alt="Custom Header" 
+                    className="h-12 max-w-xs object-contain"
+                  />
+                  <button
+                    onClick={handleClearCustomHeader}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Eliminar imagen personalizada"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <FileText className="text-ms-blue" size={24} />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-gray-500 hover:text-ms-blue p-1"
+                    title="Cargar imagen personalizada"
+                  >
+                    <Upload size={20} />
+                  </Button>
+                </div>
+              )}
               <h1 className="text-xl font-semibold text-gray-900">
                 Generador de Casos de Uso
               </h1>
@@ -269,6 +369,15 @@ export default function UseCaseGenerator() {
           </div>
         </div>
       </header>
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+      />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Form Section - Always full width */}

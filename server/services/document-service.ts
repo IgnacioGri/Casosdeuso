@@ -43,8 +43,17 @@ export class DocumentService {
   }
 
   // Generate DOCX directly from form data - no HTML conversion needed
-  static async generateDirectFromFormData(formData: any, testCases?: TestCase[]): Promise<Buffer> {
-    const headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+  static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string): Promise<Buffer> {
+    // Use custom header image if provided, otherwise use default
+    let headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+    
+    if (customHeaderImage) {
+      // If customHeaderImage is a URL path like /attached_assets/header-xxx.png, convert to file path
+      if (customHeaderImage.startsWith('/attached_assets/')) {
+        const filename = customHeaderImage.replace('/attached_assets/', '');
+        headerImagePath = path.join(process.cwd(), 'attached_assets', filename);
+      }
+    }
     
     const doc = new Document({
       sections: [{
