@@ -7,16 +7,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { useUseCaseForm } from "@/hooks/use-use-case-form";
 import EnhancedProgressIndicator from "@/components/enhanced-progress-indicator";
 import FormSteps from "@/components/form-steps";
-import EnhancedDocumentPreview from "@/components/enhanced-document-preview";
-import UseCaseTemplatePreview from "@/components/use-case-template-preview";
-import WireframePreview from "@/components/wireframe-preview";
+// Preview components removed - DOCX generated directly from formData
 import { AIModelHeader } from "@/components/ai-model-header";
 
 import { UseCase, AIModel } from "@/types/use-case";
 
 export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
-  const [generatedContent, setGeneratedContent] = useState<string>('');
   const { toast } = useToast();
 
   const {
@@ -55,17 +52,42 @@ export default function UseCaseGenerator() {
     return baseSteps + (formData.generateTestCase ? 1 : 0);
   };
 
-  const generateUseCaseMutation = useMutation({
+  const generateAndDownloadUseCaseMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await apiRequest('POST', '/api/use-cases/generate', data);
-      return response.json();
+      // First generate the use case
+      const generateResponse = await apiRequest('POST', '/api/use-cases/generate', data);
+      const generatedData = await generateResponse.json();
+      
+      if (!generatedData.success || !generatedData.useCase) {
+        throw new Error(generatedData.error || 'Error generando el caso de uso');
+      }
+      
+      // Then immediately export to DOCX
+      const exportResponse = await apiRequest('POST', '/api/export-docx', {
+        content: generatedData.content,
+        fileName: generatedData.useCase.fileName,
+        useCaseName: generatedData.useCase.useCaseName,
+        formData: data
+      });
+      
+      // Create blob and download
+      const blob = await exportResponse.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${generatedData.useCase.fileName}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      return generatedData;
     },
     onSuccess: (data) => {
       setGeneratedUseCase(data.useCase);
-      setGeneratedContent(data.content);
       toast({
         title: "Éxito",
-        description: "Caso de uso generado correctamente"
+        description: "Caso de uso generado y descargado correctamente"
       });
     },
     onError: (error) => {
@@ -74,49 +96,6 @@ export default function UseCaseGenerator() {
         description: error instanceof Error ? error.message : "Error generando el caso de uso",
         variant: "destructive"
       });
-    }
-  });
-
-  const editUseCaseMutation = useMutation({
-    mutationFn: async ({ instructions }: { instructions: string }) => {
-      if (!generatedUseCase) throw new Error("No use case to edit");
-      
-      const response = await apiRequest('POST', `/api/use-cases/${generatedUseCase.id}/edit`, {
-        instructions,
-        aiModel: formData.aiModel
-      });
-      return response.json();
-    },
-    onSuccess: (data) => {
-      setGeneratedUseCase(data.useCase);
-      setGeneratedContent(data.content);
-    }
-  });
-
-  const exportUseCaseMutation = useMutation({
-    mutationFn: async () => {
-      if (!generatedContent || !generatedUseCase) throw new Error("No document content to export");
-      
-      // Send the current content to server for DOCX conversion
-      const response = await apiRequest('POST', '/api/export-docx', {
-        content: generatedContent,
-        fileName: generatedUseCase.fileName,
-        useCaseName: generatedUseCase.useCaseName,
-        formData: formData
-      });
-      
-      // Create blob and download
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${generatedUseCase.fileName}.docx`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      return response;
     }
   });
 
@@ -138,236 +117,8 @@ export default function UseCaseGenerator() {
 
   const handleGenerateUseCase = () => {
     if (validateStep(currentStep)) {
-      // ✨ CRITICAL FIX: En el paso final, aplicar formato al contenido existente, no generar nuevo
-      // Construir el contenido completo con datos del formulario + casos de prueba
-      const contentSections = [];
-      
-      // Header con estilos Microsoft
-      contentSections.push(`
-        <div style="border-bottom: 3px solid rgb(0, 112, 192); padding-bottom: 12px; margin-bottom: 24px;">
-          <h1 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 24px; margin: 0;">ESPECIFICACIÓN DE CASO DE USO</h1>
-        </div>
-        
-        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Información del Proyecto</h2>
-        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
-          <tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold; width: 150px;">Cliente</td>
-            <td style="border: 1px solid #666; padding: 8px;">${formData.clientName || 'No especificado'}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Proyecto</td>
-            <td style="border: 1px solid #666; padding: 8px;">${formData.projectName || 'No especificado'}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Código</td>
-            <td style="border: 1px solid #666; padding: 8px;">${formData.useCaseCode || 'No especificado'}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Archivo</td>
-            <td style="border: 1px solid #666; padding: 8px;">${formData.fileName || 'No especificado'}</td>
-          </tr>
-        </table>
-      `);
-
-      // Caso de uso principal
-      contentSections.push(`
-        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Descripción del Caso de Uso</h2>
-        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
-          <tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold; width: 150px;">Nombre</td>
-            <td style="border: 1px solid #666; padding: 8px;">${formData.useCaseName || 'No especificado'}</td>
-          </tr>
-          <tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Tipo</td>
-            <td style="border: 1px solid #666; padding: 8px;">${
-              formData.useCaseType === 'entity' ? 'Gestión de Entidades' : 
-              formData.useCaseType === 'api' ? 'Integración API' : 
-              'Proceso Automático'
-            }</td>
-          </tr>
-          ${formData.description ? `<tr>
-            <td style="border: 1px solid #666; padding: 8px; background-color: #f8f9fa; font-weight: bold;">Descripción</td>
-            <td style="border: 1px solid #666; padding: 8px;">${formData.description}</td>
-          </tr>` : ''}
-        </table>
-      `);
-
-      // Filtros de búsqueda si existen
-      if (formData.searchFilters?.length) {
-        contentSections.push(`
-          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Filtros de Búsqueda</h2>
-          <ul style="font-family: 'Segoe UI Semilight', sans-serif; margin-left: 20px;">
-            ${formData.searchFilters.map(filter => filter.trim() ? `<li>${filter.trim()}</li>` : '').join('')}
-          </ul>
-        `);
-      }
-
-      // Columnas de resultado si existen
-      if (formData.resultColumns?.length) {
-        contentSections.push(`
-          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Columnas de Resultado</h2>
-          <ul style="font-family: 'Segoe UI Semilight', sans-serif; margin-left: 20px;">
-            ${formData.resultColumns.map(column => column.trim() ? `<li>${column.trim()}</li>` : '').join('')}
-          </ul>
-        `);
-      }
-
-      // Campos de entidad si existen
-      if (formData.entityFields?.length) {
-        contentSections.push(`
-          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 24px 0 12px 0;">Campos de Entidad</h2>
-          <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
-            <thead>
-              <tr style="background-color: #f8f9fa;">
-                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Nombre</th>
-                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Tipo</th>
-                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Longitud</th>
-                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Obligatorio</th>
-                <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${formData.entityFields.map(field => `
-                <tr>
-                  <td style="border: 1px solid #666; padding: 8px;">${field.name || ''}</td>
-                  <td style="border: 1px solid #666; padding: 8px;">${field.type || ''}</td>
-                  <td style="border: 1px solid #666; padding: 8px; text-align: center;">${field.length || ''}</td>
-                  <td style="border: 1px solid #666; padding: 8px; text-align: center;">${field.mandatory ? 'Sí' : 'No'}</td>
-                  <td style="border: 1px solid #666; padding: 8px;">${field.description || ''}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        `);
-      }
-
-      // Reglas de negocio
-      if (formData.businessRules) {
-        contentSections.push(`
-          <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif;">Reglas de Negocio</h2>
-          <div style="font-family: 'Segoe UI Semilight', sans-serif;">${
-            Array.isArray(formData.businessRules) 
-              ? formData.businessRules.map(rule => 
-                  typeof rule === 'string' && rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
-                ).join('')
-              : typeof formData.businessRules === 'string'
-                ? formData.businessRules.split('\n').map(rule => 
-                    rule.trim() ? `<p>• ${rule.trim()}</p>` : ''
-                  ).join('')
-                : `<p>• ${formData.businessRules}</p>`
-          }</div>
-        `);
-      }
-
-      // Casos de prueba si están habilitados
-      if (formData.generateTestCase && (formData.testSteps?.length > 0 || formData.testCaseObjective || formData.testCasePreconditions)) {
-        let testCaseSection = `
-          <h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">CASOS DE PRUEBA</h2>
-        `;
-
-        if (formData.testCaseObjective) {
-          testCaseSection += `
-            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Objetivo:</h3>
-            <p style="margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;">${formData.testCaseObjective}</p>
-          `;
-        }
-
-        if (formData.testCasePreconditions) {
-          testCaseSection += `
-            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Precondiciones:</h3>
-            <p style="margin-bottom: 16px; font-family: 'Segoe UI Semilight', sans-serif;">${formData.testCasePreconditions}</p>
-          `;
-        }
-
-        if (formData.testSteps && formData.testSteps.length > 0) {
-          testCaseSection += `
-            <h3 style="color: rgb(0, 112, 192); font-size: 14px; font-weight: 600; margin: 20px 0 8px 0; font-family: 'Segoe UI Semilight', sans-serif;">Pasos de Prueba:</h3>
-            <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
-              <thead>
-                <tr style="background-color: #f8f9fa;">
-                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold; width: 50px;">#</th>
-                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
-                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Datos de Entrada</th>
-                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Resultado Esperado</th>
-                  <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Observaciones</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-
-          formData.testSteps.forEach((step) => {
-            testCaseSection += `
-              <tr>
-                <td style="border: 1px solid #666; padding: 8px; text-align: center;">${step.number}</td>
-                <td style="border: 1px solid #666; padding: 8px;">${step.action || ''}</td>
-                <td style="border: 1px solid #666; padding: 8px;">${step.inputData || ''}</td>
-                <td style="border: 1px solid #666; padding: 8px;">${step.expectedResult || ''}</td>
-                <td style="border: 1px solid #666; padding: 8px;">${step.observations || ''}</td>
-              </tr>
-            `;
-          });
-
-          testCaseSection += `
-              </tbody>
-            </table>
-          `;
-        }
-
-        contentSections.push(testCaseSection);
-      }
-
-      // Agregar tabla de historial de revisiones
-      const currentDate = new Date().toLocaleDateString('es-ES');
-      contentSections.push(`
-        <h2 style="color: rgb(0, 112, 192); font-family: 'Segoe UI Semilight', sans-serif; font-size: 16px; margin: 32px 0 12px 0;">HISTORIA DE REVISIONES Y APROBACIONES</h2>
-        <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Segoe UI Semilight', sans-serif;">
-          <thead>
-            <tr style="background-color: #f8f9fa;">
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Fecha</th>
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Acción</th>
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Responsable</th>
-              <th style="border: 1px solid #666; padding: 8px; text-align: center; font-weight: bold;">Comentario</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="border: 1px solid #666; padding: 8px; text-align: center;">${currentDate}</td>
-              <td style="border: 1px solid #666; padding: 8px; text-align: center;">Creación</td>
-              <td style="border: 1px solid #666; padding: 8px;">Analista de Sistemas</td>
-              <td style="border: 1px solid #666; padding: 8px;">Versión original del documento</td>
-            </tr>
-          </tbody>
-        </table>
-      `);
-
-      // Construir el documento final completo
-      const finalContent = contentSections.join('');
-      
-      // Simular la respuesta sin llamar al servidor - NO generamos contenido nuevo con IA
-      setGeneratedContent(finalContent);
-      
-      // También simular el objeto generatedUseCase para que las descargas funcionen
-      setGeneratedUseCase({
-        clientName: formData.clientName || 'No especificado',
-        projectName: formData.projectName || 'No especificado',
-        useCaseCode: formData.useCaseCode || 'No especificado',
-        useCaseName: formData.useCaseName || 'No especificado',
-        fileName: formData.fileName || 'documento',
-        description: formData.description || '',
-        useCaseType: formData.useCaseType || 'entity',
-        searchFilters: formData.searchFilters || [],
-        resultColumns: formData.resultColumns || [],
-        entityFields: formData.entityFields || [],
-        businessRules: formData.businessRules || '',
-        specialRequirements: formData.specialRequirements || '',
-        generateWireframes: formData.generateWireframes || false
-      });
-      
-      toast({
-        title: "Éxito",
-        description: "Documento generado con formato aplicado correctamente"
-      });
-      
+      // Generate and download DOCX directly
+      generateAndDownloadUseCaseMutation.mutate(formData);
     } else {
       toast({
         title: "Formulario incompleto",
@@ -381,7 +132,6 @@ export default function UseCaseGenerator() {
     if (window.confirm('¿Está seguro de que desea reiniciar el formulario?')) {
       resetForm();
       setGeneratedUseCase(null);
-      setGeneratedContent('');
     }
   };
 
@@ -420,11 +170,11 @@ export default function UseCaseGenerator() {
         {isReviewStep() && (
           <Button 
             onClick={handleGenerateUseCase}
-            disabled={generateUseCaseMutation.isPending}
+            disabled={generateAndDownloadUseCaseMutation.isPending}
             className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
           >
             <Cog className="mr-2" size={16} />
-{generateUseCaseMutation.isPending ? 'Aplicando formato...' : 'Generar Documento'}
+{generateAndDownloadUseCaseMutation.isPending ? 'Generando documento...' : 'Generar y Descargar'}
           </Button>
         )}
         
@@ -520,26 +270,7 @@ export default function UseCaseGenerator() {
           </div>
         </div>
 
-        {/* Preview Section - Always below the form */}
-        <div className="w-full mt-12">
-          <div className="border-t-4 border-ms-blue pt-8">
-            <EnhancedDocumentPreview
-              formData={formData}
-              currentStep={currentStep}
-              generatedContent={generatedContent}
-              onRefresh={() => {
-                if (generatedUseCase) {
-                  editUseCaseMutation.mutateAsync({ instructions: "Actualizar el documento con los cambios más recientes" });
-                }
-              }}
-              onDownload={() => {
-                if (generatedUseCase) {
-                  exportUseCaseMutation.mutate();
-                }
-              }}
-            />
-          </div>
-        </div>
+
       </div>
     </div>
   );
