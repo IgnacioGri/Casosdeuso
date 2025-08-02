@@ -33,6 +33,14 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
 
+### Recent Updates (February 2, 2025) - Entity Fields and Validation Fixes
+- **Fixed "decimal" field type validation**: Added "decimal" as valid field type in schema, frontend dropdown, and AI prompts
+- **Enhanced AI field generation**: Updated prompts to generate complete entity fields including:
+  - name, type, mandatory, length (existing)
+  - description and validationRules (now properly included)
+- **Improved minute analysis**: AI now generates all required field properties when analyzing uploaded documents
+- **Better field type guidance**: AI prompts now specify to use "decimal" for monetary amounts and "number" for IDs
+
 ### Recent Updates (February 2, 2025) - Performance Optimizations
 - **Gemini Model Optimization**: Changed from `gemini-2.5-pro` to `gemini-2.5-flash` for 3-6x faster generation
 - **Token Limits Significantly Increased**: 

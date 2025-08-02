@@ -1146,22 +1146,32 @@ Convierte esta descripción de campos en JSON:
 
 "${fieldValue}"
 
-Formato requerido:
+Formato requerido COMPLETO (TODOS los campos son obligatorios):
 [
-  {"name": "nombreCampo", "type": "text", "mandatory": true, "length": 100}
+  {
+    "name": "nombreCampo",
+    "type": "text",
+    "mandatory": true,
+    "length": 100,
+    "description": "Descripción clara del propósito del campo",
+    "validationRules": "Reglas de validación específicas (ej: solo letras, formato específico, etc.)"
+  }
 ]
 
 Reglas ING:
-- Auto-incluir SIEMPRE: 
-  * {"name": "fechaAlta", "type": "date", "mandatory": true}
-  * {"name": "usuarioAlta", "type": "text", "mandatory": true, "length": 50}
-  * {"name": "fechaModificacion", "type": "date", "mandatory": false}  
-  * {"name": "usuarioModificacion", "type": "text", "mandatory": false, "length": 50}
+- Auto-incluir SIEMPRE estos campos de auditoría: 
+  * {"name": "fechaAlta", "type": "date", "mandatory": true, "description": "Fecha de creación del registro", "validationRules": "Fecha válida, no futura"}
+  * {"name": "usuarioAlta", "type": "text", "mandatory": true, "length": 50, "description": "Usuario que creó el registro", "validationRules": "Usuario válido del sistema"}
+  * {"name": "fechaModificacion", "type": "date", "mandatory": false, "description": "Fecha de última modificación", "validationRules": "Fecha válida, no futura"}  
+  * {"name": "usuarioModificacion", "type": "text", "mandatory": false, "length": 50, "description": "Usuario que modificó el registro", "validationRules": "Usuario válido del sistema"}
 - Nombres en camelCase español
-- Tipos ING: "text", "email", "number", "date", "boolean"
-- mandatory: true si dice "obligatorio", false si dice "opcional"
-- length: especificar cuando sea relevante
-- Para IDs: usar "number" y mandatory: true
+- Tipos válidos: "text", "email", "number", "decimal", "date", "datetime", "boolean"
+- mandatory: true si es obligatorio/requerido, false si es opcional
+- length: especificar para campos text (max caracteres) o number/decimal (dígitos totales)
+- description: SIEMPRE incluir una descripción clara del propósito del campo
+- validationRules: SIEMPRE incluir reglas de validación específicas (ej: "Solo números", "Formato CBU: 22 dígitos", "Monto mayor a 0", etc.)
+- Para montos usar tipo "decimal"
+- Para IDs usar tipo "number" con mandatory: true
 - Responde SOLO el JSON sin explicaciones`;
 
     try {

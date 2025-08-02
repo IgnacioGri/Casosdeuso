@@ -86,8 +86,22 @@ Para casos de uso tipo ENTIDAD, extrae y estructura la siguiente información:
   "resultColumns": ["columna1", "columna2", "columna3"],
   "columnsDescription": "Descripción de las columnas que se mostrarán en resultados",
   "entityFields": [
-    {"name": "campo1", "type": "text", "required": true, "length": 50},
-    {"name": "campo2", "type": "number", "required": false, "length": 10}
+    {
+      "name": "campo1",
+      "type": "text",
+      "mandatory": true,
+      "length": 50,
+      "description": "Descripción clara del propósito del campo",
+      "validationRules": "Reglas de validación específicas"
+    },
+    {
+      "name": "campo2",
+      "type": "number",
+      "mandatory": false,
+      "length": 10,
+      "description": "Descripción del campo numérico",
+      "validationRules": "Solo números positivos"
+    }
   ],
   "fieldsDescription": "Descripción de los campos de la entidad",
   "wireframeDescriptions": ["Pantalla de búsqueda", "Grilla de resultados", "Detalle"],
@@ -102,7 +116,14 @@ Para casos de uso tipo ENTIDAD, extrae y estructura la siguiente información:
 REGLAS ESPECÍFICAS:
 - useCaseName debe empezar con verbo infinitivo (Gestionar, Consultar, Procesar, etc.)
 - fileName sigue patrón: 2 letras + 3 números + descripción (ej: BP005GestionarClientes)
-- entityFields incluir SIEMPRE campos de auditoría: fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion
+- entityFields debe incluir TODOS los campos obligatorios del schema: name, type, mandatory, length, description, validationRules
+- Tipos válidos: "text", "number", "decimal", "date", "datetime", "boolean", "email"
+- Para montos usar tipo "decimal", para IDs usar "number"
+- entityFields incluir SIEMPRE campos de auditoría con descripciones completas:
+  * fechaAlta (date, mandatory: true, description: "Fecha de creación del registro", validationRules: "Fecha válida")
+  * usuarioAlta (text, mandatory: true, length: 50, description: "Usuario que creó el registro", validationRules: "Usuario del sistema")
+  * fechaModificacion (date, mandatory: false, description: "Fecha de última modificación", validationRules: "Fecha válida")
+  * usuarioModificacion (text, mandatory: false, length: 50, description: "Usuario que modificó", validationRules: "Usuario del sistema")
 - Extraer información específica del texto, no inventar datos genéricos
 `;
   }
