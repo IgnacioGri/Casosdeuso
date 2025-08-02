@@ -55,6 +55,20 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
   - Each operation shows estimated completion time
 - **Temperature Optimization**: Reduced to 0.3 for more consistent and faster responses
 
+### Recent Updates (February 2, 2025) - AI Prompt Optimization and Documentation
+- **AI Prompts Optimized**: Removed obsolete HTML generation instructions from all prompts
+  - Both React and C# systems now generate structured content directly for DOCX
+  - Eliminated resource waste on HTML formatting that was never used in final output
+  - Prompts now focus on document structure and professional content
+- **Complete Prompt Synchronization**: C# prompts upgraded to match React's quality
+  - Added mandatory 1-2 paragraph descriptions (150+ words minimum)
+  - Included all entity field properties (description, validationRules)
+  - Synchronized hierarchical numbering format across both systems
+- **Comprehensive Prompt Documentation**: Created PROMPTS_CATALOG.md
+  - All system prompts organized by category
+  - Includes generation, editing, field assistance, minute analysis, and test cases
+  - Documents AI model configurations and cascading fallback order
+
 ### Recent Updates (February 2, 2025) - Complete System Synchronization
 - **HTML Preview Completely Removed**: Eliminated all preview functionality from BOTH React AND C# systems
   - React: Removed ~300 lines including EnhancedDocumentPreview component
