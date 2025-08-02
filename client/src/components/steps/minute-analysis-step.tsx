@@ -306,7 +306,7 @@ CRITERIOS DE ACEPTACIÓN:
       <Card className="shadow-sm border border-ms-border">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
+          <CardTitle className="tracking-tight text-lg font-semibold flex items-center text-[#006bc2]">
             <Brain className="mr-2 text-ms-blue" size={20} />
             Análisis Inteligente de Minutas
           </CardTitle>
