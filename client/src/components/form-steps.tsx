@@ -57,9 +57,6 @@ export default function FormSteps({
   onAddWireframeDescription,
   onRemoveWireframeDescription,
   onUpdateWireframeDescription,
-  onAddAlternativeFlow,
-  onRemoveAlternativeFlow,
-  onUpdateAlternativeFlow,
   onAddTestStep,
   onRemoveTestStep,
   onUpdateTestStep,
@@ -1047,69 +1044,7 @@ export default function FormSteps({
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Flujos Alternativos
-              </label>
-              <div className="relative mb-4">
-                <textarea 
-                  value={formData.alternativeFlowsDescription || ''}
-                  onChange={(e) => handleInputChange('alternativeFlowsDescription', e.target.value)}
-                  rows={4} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
-                  placeholder="Describe los posibles errores y excepciones del sistema. Ej: Cuando no se encuentra un registro, cuando fallan validaciones, cuando hay problemas de conectividad..."
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="alternativeFlowsDescription"
-                    fieldValue={formData.alternativeFlowsDescription || ''}
-                    fieldType="alternativeFlowsDescription"
-                    context={{ step: 8, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => handleInputChange('alternativeFlowsDescription', value)}
-                    size="sm"
-                    aiModel={formData.aiModel}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                {(formData.alternativeFlows || ['']).map((flow, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="relative">
-                      <textarea
-                        value={flow}
-                        onChange={(e) => onUpdateAlternativeFlow(index, e.target.value)}
-                        rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y"
-                        placeholder={`Flujo alternativo ${index + 1}: Describe el escenario de error en lenguaje natural. Ej: Cuando el usuario busca un cliente que no existe, que pasa y como se maneja...`}
-                      />
 
-                    </div>
-                    {(formData.alternativeFlows || []).length > 1 && (
-                      <div className="flex justify-end">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onRemoveAlternativeFlow(index)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          ✕ Eliminar Flujo Alternativo
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={onAddAlternativeFlow}
-                  className="text-blue-600 hover:text-blue-700"
-                >
-                  + Agregar Flujo Alternativo
-                </Button>
-              </div>
-            </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

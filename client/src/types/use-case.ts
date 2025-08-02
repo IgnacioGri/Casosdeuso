@@ -43,8 +43,6 @@ export interface UseCaseFormData {
   generateWireframes: boolean;
   wireframeDescriptions?: string[];
   wireframesDescription?: string;
-  alternativeFlows?: string[];
-  alternativeFlowsDescription?: string;
   // Test case fields
   generateTestCase?: boolean;
   testCaseObjective?: string;

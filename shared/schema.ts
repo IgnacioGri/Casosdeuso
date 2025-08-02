@@ -20,8 +20,6 @@ export const useCases = pgTable("use_cases", {
   generateWireframes: boolean("generate_wireframes").default(false),
   wireframeDescriptions: jsonb("wireframe_descriptions").default('[]'),
   wireframesDescription: text("wireframes_description"),
-  alternativeFlows: jsonb("alternative_flows").default('[]'),
-  alternativeFlowsDescription: text("alternative_flows_description"),
   generatedContent: text("generated_content"),
   aiModel: text("ai_model").notNull(),
   // Minute analysis fields
@@ -97,8 +95,6 @@ const baseUseCaseFormSchema = z.object({
   generateWireframes: z.boolean().default(false),
   wireframeDescriptions: z.array(z.string()).default([]),
   wireframesDescription: z.string().optional(),
-  alternativeFlows: z.array(z.string()).default([]),
-  alternativeFlowsDescription: z.string().optional(),
   // Campos específicos para diferentes tipos de casos de uso
   apiEndpoint: z.string().optional(),
   requestFormat: z.string().optional(),

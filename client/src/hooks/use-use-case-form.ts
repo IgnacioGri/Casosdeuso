@@ -30,7 +30,6 @@ export function useUseCaseForm() {
     specialRequirements: '',
     generateWireframes: false,
     wireframeDescriptions: [''],
-    alternativeFlows: [''],
     // Campos específicos para tipos de casos de uso
     apiEndpoint: '',
     requestFormat: '',
@@ -141,30 +140,6 @@ export function useUseCaseForm() {
       ...prev,
       wireframeDescriptions: (prev.wireframeDescriptions || []).map((desc, i) => 
         i === index ? value : desc
-      )
-    }));
-  }, []);
-
-  // Alternative flows management
-  const addAlternativeFlow = useCallback(() => {
-    setFormData(prev => ({
-      ...prev,
-      alternativeFlows: [...(prev.alternativeFlows || []), '']
-    }));
-  }, []);
-
-  const removeAlternativeFlow = useCallback((index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      alternativeFlows: (prev.alternativeFlows || []).filter((_, i) => i !== index)
-    }));
-  }, []);
-
-  const updateAlternativeFlow = useCallback((index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      alternativeFlows: (prev.alternativeFlows || []).map((flow, i) => 
-        i === index ? value : flow
       )
     }));
   }, []);
@@ -568,7 +543,6 @@ Códigos de Error:
       specialRequirements: '',
       generateWireframes: false,
       wireframeDescriptions: [''],
-      alternativeFlows: [''],
       // Campos específicos para tipos de casos de uso
       apiEndpoint: '',
       requestFormat: '',
@@ -606,9 +580,6 @@ Códigos de Error:
     addWireframeDescription,
     removeWireframeDescription,
     updateWireframeDescription,
-    addAlternativeFlow,
-    removeAlternativeFlow,
-    updateAlternativeFlow,
     addTestStep,
     removeTestStep,
     updateTestStep,

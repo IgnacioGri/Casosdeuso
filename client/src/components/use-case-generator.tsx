@@ -36,9 +36,6 @@ export default function UseCaseGenerator() {
     addWireframeDescription,
     removeWireframeDescription,
     updateWireframeDescription,
-    addAlternativeFlow,
-    removeAlternativeFlow,
-    updateAlternativeFlow,
     addTestStep,
     removeTestStep,
     updateTestStep,
@@ -303,9 +300,6 @@ export default function UseCaseGenerator() {
             onAddWireframeDescription={addWireframeDescription}
             onRemoveWireframeDescription={removeWireframeDescription}
             onUpdateWireframeDescription={updateWireframeDescription}
-            onAddAlternativeFlow={addAlternativeFlow}
-            onRemoveAlternativeFlow={removeAlternativeFlow}
-            onUpdateAlternativeFlow={updateAlternativeFlow}
             onAddTestStep={addTestStep}
             onRemoveTestStep={removeTestStep}
             onUpdateTestStep={updateTestStep}

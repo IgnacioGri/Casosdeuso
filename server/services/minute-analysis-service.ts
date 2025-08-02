@@ -241,8 +241,6 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           fieldsDescription: "Campos principales de la entidad cliente con información personal y de auditoría",
           wireframeDescriptions: ["Pantalla de búsqueda con filtros", "Grilla de resultados paginada", "Detalle del cliente"],
           wireframesDescription: "Pantallas necesarias para la gestión completa de clientes",
-          alternativeFlows: ["Cliente no encontrado", "Error de validación", "Timeout de sesión"],
-          alternativeFlowsDescription: "Flujos alternativos para manejar errores y excepciones",
           businessRules: "1. Solo usuarios autorizados pueden acceder\n2. Validar documento con organismos oficiales",
           specialRequirements: "1. Auditoría completa de cambios\n2. Integración con servicios externos"
         };
@@ -267,7 +265,6 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
     "fechaConsulta": "2025-01-27T10:30:00Z"
   }
 }`,
-          alternativeFlows: ["Token inválido", "Cuenta inexistente", "Servicio no disponible"],
           businessRules: "1. Autenticación obligatoria\n2. Rate limiting por cliente",
           specialRequirements: "1. Encriptación SSL\n2. Logs de auditoría"
         };
@@ -280,7 +277,6 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           serviceFrequency: "Ejecución diaria a las 23:00 hrs",
           executionTime: "23:00 hrs",
           configurationPaths: "0 0 23 * * *",
-          alternativeFlows: ["Fallo en comunicación", "Reintento automático", "Notificación de error"],
           businessRules: "1. Ejecutar solo en días hábiles\n2. Generar backup antes del proceso",
           specialRequirements: "1. Logging detallado\n2. Alertas por email\n3. Mecanismo de rollback"
         };
