@@ -362,10 +362,9 @@ export default function UseCaseGenerator() {
                 variant="ghost" 
                 size="sm"
                 onClick={handleReset}
-                className="text-ms-blue hover:text-ms-blue/80"
+                className="text-ms-blue hover:text-ms-blue/80 px-2 py-1"
               >
-                <RefreshCw className="mr-1" size={16} />
-                Reiniciar
+                <RefreshCw size={14} />
               </Button>
             </div>
           </div>

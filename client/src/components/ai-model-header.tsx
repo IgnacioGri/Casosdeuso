@@ -143,10 +143,6 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
         </SelectContent>
       </Select>
-
-      <div className="text-xs text-gray-500 max-w-[200px]">
-        {getModelDescription(currentModel)}
-      </div>
     </div>
   );
 }
