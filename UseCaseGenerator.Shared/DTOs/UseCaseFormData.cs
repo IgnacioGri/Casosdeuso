@@ -66,6 +66,7 @@ public class GenerateDocxRequest
     public string FileName { get; set; } = string.Empty;
     public string? UseCaseName { get; set; }
     public UseCaseFormData? FormData { get; set; }
+    public string? CustomHeaderImage { get; set; }
 }
 
 public class ConvertToHtmlRequest

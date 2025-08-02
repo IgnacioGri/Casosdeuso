@@ -7,8 +7,42 @@
                        Color="Color.Inherit" 
                        Edge="Edge.Start" 
                        OnClick="@((e) => DrawerToggle())" />
+        
+        @if (!string.IsNullOrEmpty(customHeaderImage))
+        {
+            <div style="position: relative; display: inline-block; margin-left: 12px;">
+                <img src="@customHeaderImage" alt="Custom Header" style="height: 48px; max-width: 300px; object-fit: contain;" />
+                <MudIconButton Icon="@Icons.Material.Filled.Close" 
+                              Size="Size.Small" 
+                              Style="position: absolute; top: -8px; right: -8px; background: #f44336; color: white; width: 20px; height: 20px;"
+                              OnClick="ClearCustomHeader" 
+                              Title="Eliminar imagen personalizada" />
+            </div>
+        }
+        else
+        {
+            <img src="/company-logo.png" alt="Company Logo" style="height: 32px; width: 32px; object-fit: contain; margin-left: 12px;" />
+        }
+        
         <MudText Typo="Typo.h5" Class="ml-3">Generador de Casos de Uso</MudText>
         <MudSpacer />
+        
+        <!-- Custom Header Upload Button -->
+        <MudFileUpload T="IBrowserFile" Accept="image/*" FilesChanged="OnFileSelected" MaximumFileCount="1">
+            <ButtonTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Image" 
+                              Color="Color.Inherit" 
+                              Size="Size.Small"
+                              Title="Cargar imagen personalizada" />
+            </ButtonTemplate>
+        </MudFileUpload>
+        
+        <MudIconButton Icon="@Icons.Material.Filled.Refresh" 
+                      Color="Color.Inherit" 
+                      Size="Size.Small"
+                      OnClick="ResetApplication"
+                      Title="Reiniciar aplicación" />
+        
         <MudText Typo="Typo.body2" Class="mr-4">ING - Ingematica</MudText>
     </MudAppBar>
     
@@ -23,11 +57,78 @@
     </MudMainContent>
 </MudLayout>
 
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inject ISnackbar Snackbar
+
 @code {
     private bool drawerOpen = true;
+    private string? customHeaderImage;
+    private const long MaxFileSize = 5 * 1024 * 1024; // 5MB
+
+    protected override async Task OnInitializedAsync()
+    {
+        customHeaderImage = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "customHeaderImage");
+    }
 
     private void DrawerToggle()
     {
         drawerOpen = !drawerOpen;
+    }
+
+    private async Task OnFileSelected(IReadOnlyList<IBrowserFile> files)
+    {
+        if (files.Count == 0) return;
+
+        var file = files[0];
+
+        // Validate file size
+        if (file.Size > MaxFileSize)
+        {
+            Snackbar.Add("El archivo es demasiado grande. Máximo 5MB.", Severity.Error);
+            return;
+        }
+
+        // Validate file type
+        if (!file.ContentType.StartsWith("image/"))
+        {
+            Snackbar.Add("Solo se permiten archivos de imagen.", Severity.Error);
+            return;
+        }
+
+        try
+        {
+            using var stream = file.OpenReadStream(MaxFileSize);
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            
+            var base64 = Convert.ToBase64String(memoryStream.ToArray());
+            var dataUrl = $"data:{file.ContentType};base64,{base64}";
+            
+            customHeaderImage = dataUrl;
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "customHeaderImage", dataUrl);
+            
+            Snackbar.Add("Imagen de cabecera personalizada cargada correctamente.", Severity.Success);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al cargar la imagen: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ClearCustomHeader()
+    {
+        customHeaderImage = null;
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "customHeaderImage");
+        Snackbar.Add("Imagen personalizada eliminada.", Severity.Info);
+        StateHasChanged();
+    }
+
+    private async Task ResetApplication()
+    {
+        await JSRuntime.InvokeVoidAsync("localStorage.clear");
+        await JSRuntime.InvokeVoidAsync("location.reload");
     }
 }

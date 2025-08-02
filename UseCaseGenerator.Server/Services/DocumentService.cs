@@ -18,7 +18,7 @@ public class DocumentService : IDocumentService
         _logger = logger;
     }
 
-    public byte[] GenerateDocx(string htmlContent, UseCase useCase)
+    public byte[] GenerateDocx(string htmlContent, UseCase useCase, string? customHeaderImage = null)
     {
         // Generate directly from UseCase properties
         return GenerateDocxFromFormData(useCase);
@@ -34,8 +34,8 @@ public class DocumentService : IDocumentService
                 var mainPart = document.AddMainDocumentPart();
                 mainPart.Document = new Document();
                 
-                // Add header with ING logo
-                AddHeaderWithImage(mainPart);
+                // Add header with ING logo or custom image
+                AddHeaderWithImage(mainPart, customHeaderImage);
                 
                 // Add footer with page numbering
                 AddFooterWithPageNumbers(mainPart, useCase);
@@ -1045,7 +1045,7 @@ public class DocumentService : IDocumentService
         body.AppendChild(spacingPara);
     }
     
-    private void AddHeaderWithImage(MainDocumentPart mainPart)
+    private void AddHeaderWithImage(MainDocumentPart mainPart, string? customHeaderImage = null)
     {
         var headerPart = mainPart.AddNewPart<HeaderPart>("headerId1");
         
@@ -1055,27 +1055,65 @@ public class DocumentService : IDocumentService
         paragraphProperties.Append(new Justification() { Val = JustificationValues.Center });
         paragraph.Append(paragraphProperties);
         
-        // Try to add image, fallback to text if not available
-        var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "image_1754002431086.png");
-        var fallbackPath1 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_1753600608270.png");
-        var fallbackPath2 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_caso_de_uso.png");
+        // Try to add custom header image first, then fallback to default images
+        string? imagePath = null;
+        byte[]? imageData = null;
         
-        if (!File.Exists(imagePath))
+        // Handle custom header image (base64 data URL)
+        if (!string.IsNullOrEmpty(customHeaderImage) && customHeaderImage.StartsWith("data:image/"))
         {
-            if (File.Exists(fallbackPath1))
+            try
+            {
+                var base64Data = customHeaderImage.Substring(customHeaderImage.IndexOf(',') + 1);
+                imageData = Convert.FromBase64String(base64Data);
+                _logger.LogInformation("Using custom header image from base64 data");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to decode custom header image, using fallback");
+            }
+        }
+        
+        // Fallback to default images if no custom image or custom image failed
+        if (imageData == null)
+        {
+            var defaultImagePath = Path.Combine(Directory.GetCurrentDirectory(), "company-logo.png");
+            var fallbackPath1 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "image_1754002431086.png");
+            var fallbackPath2 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_1753600608270.png");
+            var fallbackPath3 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_caso_de_uso.png");
+            
+            if (File.Exists(defaultImagePath))
+                imagePath = defaultImagePath;
+            else if (File.Exists(fallbackPath1))
                 imagePath = fallbackPath1;
             else if (File.Exists(fallbackPath2))
                 imagePath = fallbackPath2;
+            else if (File.Exists(fallbackPath3))
+                imagePath = fallbackPath3;
         }
         
-        if (File.Exists(imagePath))
+        // Add image to header
+        if (imageData != null || !string.IsNullOrEmpty(imagePath))
         {
             try
             {
                 var imagePart = headerPart.AddImagePart(ImagePartType.Png);
-                using (var stream = new FileStream(imagePath, FileMode.Open))
+                
+                if (imageData != null)
                 {
-                    imagePart.FeedData(stream);
+                    // Use custom header image data
+                    using (var stream = new MemoryStream(imageData))
+                    {
+                        imagePart.FeedData(stream);
+                    }
+                }
+                else if (!string.IsNullOrEmpty(imagePath))
+                {
+                    // Use file from path
+                    using (var stream = new FileStream(imagePath, FileMode.Open))
+                    {
+                        imagePart.FeedData(stream);
+                    }
                 }
                 
                 var run = new Run();

@@ -70,7 +70,7 @@ public class DocumentController : ControllerBase
             };
 
             // Generate DOCX directly from UseCase data (no HTML conversion)
-            var docxBytes = _documentService.GenerateDocx("", useCase);
+            var docxBytes = _documentService.GenerateDocx("", useCase, request.CustomHeaderImage);
             
             return File(docxBytes, 
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
