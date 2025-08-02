@@ -145,6 +145,45 @@ export class DocumentService {
               })
             ]
           })
+        },
+        footers: {
+          default: new Footer({
+            children: [
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: "Página ",
+                    font: "Segoe UI Semilight",
+                    size: 18
+                  }),
+                  new TextRun({
+                    children: [PageNumber.CURRENT],
+                    font: "Segoe UI Semilight",
+                    size: 18
+                  }),
+                  new TextRun({
+                    text: " de ",
+                    font: "Segoe UI Semilight",
+                    size: 18
+                  }),
+                  new TextRun({
+                    children: [PageNumber.TOTAL_PAGES],
+                    font: "Segoe UI Semilight",
+                    size: 18
+                  }),
+                  new TextRun({
+                    text: "\t\t\t\t\t" + (formData.useCaseName || "CASO DE USO"),
+                    font: "Segoe UI Semilight",
+                    size: 18
+                  })
+                ],
+                tabStops: [{
+                  type: TabStopType.RIGHT,
+                  position: TabStopPosition.MAX
+                }]
+              })
+            ]
+          })
         }
       }]
     });
