@@ -148,28 +148,18 @@ export class AIService {
   }
 
   private static buildPrompt(formData: any, rules: string): string {
-    return `INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML. NO incluyas explicaciones como "Claro, aquí tienes...", "Se han incorporado mejoras...", "actualizado con los cambios más recientes", etc. NO incluyas bloques de código con \`\`\`html. Responde SOLO con HTML puro.
+    return `Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
 
-IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO, no un resultado de ejecución. Debe contener secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
+IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
 
 INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
 - Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
 - Segundo párrafo: Beneficios clave, valor para el negocio, mejoras que aporta, problemas que resuelve.
 NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción proporcionada con contexto relevante del negocio bancario/empresarial.
 
-Genera un documento de caso de uso formal siguiendo estrictamente estas reglas:
-
-${rules}
-
-FORMATO ESPECÍFICO REQUERIDO:
-1. Presenta los metadatos como tabla HTML con estilo inline:
-   <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
-     <tr><td style="border:1px solid #ccc; padding:8px; font-weight:bold;">Campo</td><td style="border:1px solid #ccc; padding:8px; font-weight:bold;">Valor</td></tr>
-     <tr><td style="border:1px solid #ccc; padding:8px;">Nombre del Cliente</td><td style="border:1px solid #ccc; padding:8px;">${formData.clientName}</td></tr>
-     <!-- etc... -->
-   </table>
-
-2. Para flujos, usa numeración jerárquica mejorada:
+FORMATO ESTRUCTURADO REQUERIDO:
+1. Organiza la información en secciones claras con títulos y subtítulos
+2. Para flujos, usa numeración jerárquica profesional:
    4. Flujo Básico
      4.1 Menú principal
      4.2 Subflujo: Búsqueda
@@ -179,23 +169,11 @@ FORMATO ESPECÍFICO REQUERIDO:
        4.3.1 Validación de datos
        4.3.2 Confirmación
 
-3. Historia de revisiones como tabla con estilo profesional:
-   <table style="width:100%; border-collapse:collapse; font-size:11px; line-height:1.2;">
-     <tr style="background-color:#f5f5f5;">
-       <th style="border:1px solid #999; padding:6px;">Versión</th>
-       <th style="border:1px solid #999; padding:6px;">Fecha</th>
-       <th style="border:1px solid #999; padding:6px;">Autor</th>
-       <th style="border:1px solid #999; padding:6px;">Descripción del Cambio</th>
-     </tr>
-     <tr>
-       <td style="border:1px solid #999; padding:6px;">1.0</td>
-       <td style="border:1px solid #999; padding:6px;">15/04/2024</td>
-       <td style="border:1px solid #999; padding:6px;">Analista de Sistemas</td>
-       <td style="border:1px solid #999; padding:6px;">Creación inicial del documento de caso de uso.</td>
-     </tr>
-   </table>
+3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
-Datos del formulario:
+${rules}
+
+DATOS DEL FORMULARIO COMPLETOS:
 - Tipo de caso de uso: ${formData.useCaseType}
 - Cliente: ${formData.clientName}
 - Proyecto: ${formData.projectName}
@@ -205,14 +183,18 @@ Datos del formulario:
 - Descripción: ${formData.description}
 - Filtros de búsqueda: ${formData.searchFilters?.join(', ') || 'Ninguno'}
 - Columnas de resultado: ${formData.resultColumns?.join(', ') || 'Ninguna'}
-- Campos de entidad: ${formData.entityFields?.map((f: any) => `${f.name} (${f.type}${f.mandatory ? ', obligatorio' : ''})`).join(', ') || 'Ninguno'}
+- Campos de entidad: ${formData.entityFields?.map((f: any) => `${f.name} (${f.type}${f.mandatory ? ', obligatorio' : ''}, largo: ${f.length || 'N/A'}, ${f.description || 'sin descripción'}, validaciones: ${f.validationRules || 'ninguna'})`).join('; ') || 'Ninguno'}
 - Reglas de negocio: ${formData.businessRules || 'Ninguna específica'}
 - Requerimientos especiales: ${formData.specialRequirements || 'Ninguno'}
 - Generar wireframes: ${formData.generateWireframes ? 'Sí' : 'No'}
 ${formData.wireframeDescriptions?.length ? `- Descripciones de wireframes: ${formData.wireframeDescriptions.filter((w: string) => w.trim()).join('; ')}` : ''}
-${formData.alternativeFlows?.length ? `- Flujos alternativos: ${formData.alternativeFlows.filter((f: string) => f.trim()).join('; ')}` : ''}
 
-Responde SOLO con el HTML del documento completo. Usa estilos inline para el formato Microsoft especificado. NO agregues explicaciones antes o después.`;
+INSTRUCCIONES FINALES:
+- Genera un documento completo y profesional
+- Mantén consistencia en la numeración y formato
+- Incluye TODAS las secciones requeridas
+- Asegúrate de que la descripción sea detallada y profesional
+- El documento debe estar listo para convertirse a DOCX con formato corporativo ING`;
   }
 
   static cleanAIResponse(content: string): string {
@@ -521,14 +503,19 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
     }
 
     try {
-      const prompt = `INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML. NO incluyas explicaciones como "Claro, aquí tienes...", "Se han incorporado mejoras...", "actualizado con los cambios más recientes", "estructurado profesionalmente", etc. NO incluyas bloques de código con \`\`\`html. Responde SOLO con HTML puro.
+      const prompt = `Eres un experto en documentación de casos de uso. Tu tarea es modificar el documento existente aplicando los cambios solicitados mientras mantienes la estructura y formato profesional.
 
 Modifica el siguiente documento de caso de uso aplicando estos cambios: "${instructions}"
 
 Documento actual:
 ${content}
 
-Devuelve el documento completo modificado manteniendo exactamente el formato HTML y el estilo Microsoft. NO agregues texto explicativo.`;
+INSTRUCCIONES:
+- Mantén la estructura y formato existente del documento
+- Aplica SOLO los cambios solicitados
+- Preserva toda la información no afectada por los cambios
+- Asegúrate de que el documento siga siendo coherente y profesional
+- Mantén el estilo y formato corporativo ING`;
 
       let modifiedContent: string;
       

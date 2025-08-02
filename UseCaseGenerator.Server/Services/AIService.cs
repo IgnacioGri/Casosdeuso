@@ -233,14 +233,19 @@ public class AIService : IAIService, IDisposable
 
         try
         {
-            var prompt = $@"INSTRUCCIÓN CRÍTICA: Tu respuesta DEBE comenzar inmediatamente con una etiqueta HTML (<div>, <h1>, <table>, etc.) y terminar con su etiqueta de cierre correspondiente. NO escribas NADA antes del HTML. NO escribas NADA después del HTML.
+            var prompt = $@"Eres un experto en documentación de casos de uso. Tu tarea es modificar el documento existente aplicando los cambios solicitados mientras mantienes la estructura y formato profesional.
 
 Modifica el siguiente documento de caso de uso aplicando estos cambios: ""{instructions}""
 
 Documento actual:
 {content}
 
-Devuelve el documento completo modificado manteniendo exactamente el formato HTML y el estilo Microsoft. NO agregues texto explicativo.";
+INSTRUCCIONES:
+- Mantén la estructura y formato existente del documento
+- Aplica SOLO los cambios solicitados
+- Preserva toda la información no afectada por los cambios
+- Asegúrate de que el documento siga siendo coherente y profesional
+- Mantén el estilo y formato corporativo ING";
 
             var modifiedContent = await GenerateWithAI(prompt, aiModel);
             return CleanAIResponse(modifiedContent);
@@ -601,22 +606,60 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
     private string BuildPrompt(UseCaseFormData formData, string rules)
     {
-        // Build the comprehensive prompt for use case generation
+        // Build the comprehensive prompt for use case generation - synchronized with TypeScript version
+        var entityFieldsDescription = formData.EntityFields?.Any() == true
+            ? string.Join("; ", formData.EntityFields.Select(f => 
+                $"{f.Name} ({f.Type}{(f.Mandatory ? ", obligatorio" : "")}, largo: {f.Length ?? 0}, {f.Description ?? "sin descripción"}, validaciones: {f.ValidationRules ?? "ninguna"})"))
+            : "Ninguno";
+
         return $@"
-REGLAS CRÍTICAS:
+Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
+
+IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
+
+INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
+- Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
+- Segundo párrafo: Beneficios clave, valor para el negocio, mejoras que aporta, problemas que resuelve.
+NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción proporcionada con contexto relevante del negocio bancario/empresarial.
+
+FORMATO ESTRUCTURADO REQUERIDO:
+1. Organiza la información en secciones claras con títulos y subtítulos
+2. Para flujos, usa numeración jerárquica profesional:
+   4. Flujo Básico
+     4.1 Menú principal
+     4.2 Subflujo: Búsqueda
+       4.2.1 Ingreso de filtros
+       4.2.2 Ejecución de búsqueda
+     4.3 Subflujo: Alta
+       4.3.1 Validación de datos
+       4.3.2 Confirmación
+
+3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
+
 {rules}
 
-DATOS DEL CASO DE USO:
+DATOS DEL FORMULARIO COMPLETOS:
+- Tipo de caso de uso: {formData.UseCaseType}
 - Cliente: {formData.ClientName}
 - Proyecto: {formData.ProjectName}
 - Código: {formData.UseCaseCode}
 - Nombre: {formData.UseCaseName}
-- Tipo: {formData.UseCaseType}
+- Archivo: {formData.FileName}
 - Descripción: {formData.Description}
+- Filtros de búsqueda: {(formData.SearchFilters?.Any() == true ? string.Join(", ", formData.SearchFilters) : "Ninguno")}
+- Columnas de resultado: {(formData.ResultColumns?.Any() == true ? string.Join(", ", formData.ResultColumns) : "Ninguna")}
+- Campos de entidad: {entityFieldsDescription}
+- Reglas de negocio: {formData.BusinessRules ?? "Ninguna específica"}
+- Requerimientos especiales: {formData.SpecialRequirements ?? "Ninguno"}
+- Generar wireframes: {(formData.GenerateWireframes ? "Sí" : "No")}
+{(formData.WireframeDescriptions?.Any(w => !string.IsNullOrWhiteSpace(w)) == true ? $"- Descripciones de wireframes: {string.Join("; ", formData.WireframeDescriptions.Where(w => !string.IsNullOrWhiteSpace(w)))}" : "")}
 
-INSTRUCCIONES:
-Genera un documento de caso de uso completo en formato HTML siguiendo las reglas ING especificadas.
-Responde ÚNICAMENTE con HTML limpio, sin explicaciones adicionales.
+INSTRUCCIONES FINALES:
+- Genera un documento completo y profesional
+- Mantén consistencia en la numeración y formato
+- Incluye TODAS las secciones requeridas
+- Asegúrate de que la descripción sea detallada y profesional
+- El documento debe estar listo para convertirse a DOCX con formato corporativo ING
 ";
     }
 
