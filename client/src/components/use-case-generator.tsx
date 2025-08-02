@@ -334,18 +334,7 @@ export default function UseCaseGenerator() {
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-2">
-                  <FileText className="text-ms-blue" size={24} />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-gray-500 hover:text-ms-blue p-1"
-                    title="Cargar imagen personalizada"
-                  >
-                    <Upload size={20} />
-                  </Button>
-                </div>
+                <FileText className="text-ms-blue" size={24} />
               )}
               <h1 className="text-xl font-semibold text-gray-900">
                 Generador de Casos de Uso
@@ -356,6 +345,16 @@ export default function UseCaseGenerator() {
                 currentModel={formData.aiModel}
                 onModelChange={(model: AIModel) => updateFormData({ aiModel: model })}
               />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-gray-600 hover:text-ms-blue"
+                title="Cargar imagen personalizada"
+              >
+                <Image className="mr-1" size={16} />
+                Header
+              </Button>
               <Button 
                 variant="ghost" 
                 size="sm"
