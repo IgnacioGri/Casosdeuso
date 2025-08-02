@@ -148,8 +148,8 @@ export class DocumentService {
                     type: "png",
                     data: fs.readFileSync(headerImagePath),
                     transformation: { 
-                      width: 900,  // Correct width as per working document
-                      height: 120  // Correct height as per working document
+                      width: 600,  // 900 / 1.5 scaling factor = 600
+                      height: 80   // 120 / 1.5 scaling factor = 80
                     }
                   })
                 ]
