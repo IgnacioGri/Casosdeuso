@@ -48,8 +48,8 @@ export type UseCase = typeof useCases.$inferSelect;
 // Form data schemas
 export const entityFieldSchema = z.object({
   name: z.string(), // Permitir nombres vacíos, la validación se hace a nivel de formulario
-  type: z.enum(['text', 'number', 'date', 'boolean', 'email']),
-  length: z.number().optional(),
+  type: z.enum(['text', 'number', 'date', 'datetime', 'boolean', 'email']),
+  length: z.number().nullable().optional(),
   mandatory: z.boolean().default(false),
   description: z.string().default(''), // Documentar propósito del campo
   validationRules: z.string().default(''), // Reglas de validación específicas

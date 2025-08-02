@@ -4,7 +4,7 @@ export type AIModel = 'demo' | 'openai' | 'claude' | 'grok' | 'gemini' | 'copilo
 
 export interface EntityField {
   name: string;
-  type: 'text' | 'number' | 'date' | 'boolean' | 'email';
+  type: 'text' | 'number' | 'date' | 'datetime' | 'boolean' | 'email';
   length?: number;
   mandatory: boolean;
   description?: string; // Documentar propósito del campo

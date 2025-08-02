@@ -710,6 +710,7 @@ export default function FormSteps({
                             <option value="text">Texto</option>
                             <option value="number">Número</option>
                             <option value="date">Fecha</option>
+                            <option value="datetime">Fecha y Hora</option>
                             <option value="boolean">Booleano</option>
                             <option value="email">Email</option>
                           </select>
