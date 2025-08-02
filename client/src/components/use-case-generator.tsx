@@ -14,6 +14,7 @@ import { UseCase, AIModel } from "@/types/use-case";
 
 export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
+  const [generationProgress, setGenerationProgress] = useState<string>("");
   const { toast } = useToast();
 
   const {
@@ -54,6 +55,8 @@ export default function UseCaseGenerator() {
 
   const generateAndDownloadUseCaseMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      setGenerationProgress("Generando contenido del caso de uso...");
+      
       // First generate the use case
       const generateResponse = await apiRequest('POST', '/api/use-cases/generate', data);
       const generatedData = await generateResponse.json();
@@ -61,6 +64,8 @@ export default function UseCaseGenerator() {
       if (!generatedData.success || !generatedData.useCase) {
         throw new Error(generatedData.error || 'Error generando el caso de uso');
       }
+      
+      setGenerationProgress("Creando documento DOCX...");
       
       // Then immediately export to DOCX - using fetch directly for binary response
       console.log('Exporting to DOCX with data:', {
@@ -89,6 +94,8 @@ export default function UseCaseGenerator() {
         throw new Error(`Error exportando DOCX: ${exportResponse.status} - ${errorData}`);
       }
       
+      setGenerationProgress("Descargando documento...");
+      
       // Create blob and download
       const blob = await exportResponse.blob();
       const url = window.URL.createObjectURL(blob);
@@ -104,12 +111,14 @@ export default function UseCaseGenerator() {
     },
     onSuccess: (data) => {
       setGeneratedUseCase(data.useCase);
+      setGenerationProgress("");
       toast({
         title: "Éxito",
         description: "Caso de uso generado y descargado correctamente"
       });
     },
     onError: (error) => {
+      setGenerationProgress("");
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Error generando el caso de uso",
@@ -193,7 +202,7 @@ export default function UseCaseGenerator() {
             className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
           >
             <Cog className="mr-2" size={16} />
-{generateAndDownloadUseCaseMutation.isPending ? 'Generando documento...' : 'Generar y Descargar'}
+{generateAndDownloadUseCaseMutation.isPending ? (generationProgress || 'Generando documento...') : 'Generar y Descargar'}
           </Button>
         )}
         

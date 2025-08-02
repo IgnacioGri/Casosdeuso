@@ -365,9 +365,11 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
     
     const client = getGeminiClient();
     const response = await client.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash", // Modelo más rápido
       config: {
         systemInstruction: "Eres un experto en documentación de casos de uso. Genera documentos profesionales siguiendo exactamente las reglas proporcionadas.",
+        maxOutputTokens: 8000,
+        temperature: 0.3
       },
       contents: prompt,
     });
@@ -752,10 +754,12 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
   private static async processWithGemini(systemPrompt: string, fieldValue: string): Promise<string> {
     const client = getGeminiClient();
     const response = await client.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-2.5-flash", // Modelo más rápido
       config: {
         systemInstruction: systemPrompt,
-        responseMimeType: "text/plain"
+        responseMimeType: "text/plain",
+        maxOutputTokens: 2000,
+        temperature: 0.3
       },
       contents: fieldValue
     });

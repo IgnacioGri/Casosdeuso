@@ -33,6 +33,12 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
 
+### Recent Updates (February 2, 2025) - Performance Optimizations
+- **Gemini Model Optimization**: Changed from `gemini-2.5-pro` to `gemini-2.5-flash` for 3-6x faster generation
+- **Token Limits Added**: Limited responses to 8000 tokens for use cases, 2000 for test cases
+- **Enhanced Progress Indicators**: Added real-time status updates during generation process
+- **Temperature Optimization**: Reduced to 0.3 for more consistent and faster responses
+
 ### Recent Updates (February 2, 2025) - Complete System Synchronization
 - **HTML Preview Completely Removed**: Eliminated all preview functionality from BOTH React AND C# systems
   - React: Removed ~300 lines including EnhancedDocumentPreview component
