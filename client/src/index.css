@@ -247,6 +247,95 @@ button {
   text-transform: none !important;
 }
 
+/* ING Corporate Table Styles */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--ing-gray-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: white;
+}
+
+/* Table headers */
+thead {
+  background-color: #DEEAF6 !important;
+}
+
+th {
+  background-color: #DEEAF6 !important;
+  color: var(--ing-text-dark) !important;
+  font-weight: 600 !important;
+  font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif !important;
+  padding: 12px 16px !important;
+  text-align: left;
+  border-bottom: 2px solid var(--ing-blue) !important;
+}
+
+/* Table body cells */
+td {
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--ing-gray-border) !important;
+  font-family: 'Segoe UI Light', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* Alternating row colors */
+tbody tr:nth-child(even) {
+  background-color: #FAFAFA !important;
+}
+
+tbody tr:hover {
+  background-color: #F0F0F0 !important;
+}
+
+/* Remove bottom border from last row */
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ING Corporate Card/Panel Styles */
+.rounded-lg,
+.rounded-md,
+[class*="rounded"] {
+  border-radius: 4px !important;
+}
+
+/* Card and dialog styling */
+[class*="bg-white"],
+[class*="dialog"],
+[class*="modal"],
+[class*="card"] {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--ing-gray-border) !important;
+}
+
+/* Stepper/Progress styling */
+[class*="stepper"],
+[class*="progress"] {
+  color: var(--ing-blue) !important;
+}
+
+/* Active step */
+[class*="active"] [class*="step"] {
+  background-color: var(--ing-blue) !important;
+  color: white !important;
+}
+
+/* Completed step */
+[class*="completed"] [class*="step"] {
+  background-color: var(--ing-blue) !important;
+  opacity: 0.7;
+}
+
+/* Dialog/Modal headers */
+[class*="dialog-header"],
+[class*="modal-header"] {
+  background-color: #FAFAFA !important;
+  border-bottom: 1px solid var(--ing-gray-border) !important;
+  padding: 16px 24px !important;
+}
+
 /* Custom scrollbar for preview */
 .overflow-y-auto::-webkit-scrollbar {
   width: 6px;
