@@ -488,9 +488,16 @@ INSTRUCCIONES FINALES:
       </div>
     `;
 
+    // Include demo wireframe paths if wireframes are enabled
+    const generatedWireframes = formData.generateWireframes ? {
+      searchWireframe: '/attached_assets/generated_images/Search_interface_wireframe_59d3b735.png',
+      formWireframe: '/attached_assets/generated_images/Form_interface_wireframe_bf6aaf30.png'
+    } : undefined;
+
     return {
       content,
-      success: true
+      success: true,
+      ...(generatedWireframes && { generatedWireframes })
     };
   }
 
