@@ -267,14 +267,7 @@ public class DocumentService : IDocumentService
         if (useCase.EntityFields?.Any() == true)
         {
             AddSectionHeading(body, "Campos de Entidad");
-            foreach (var field in useCase.EntityFields)
-            {
-                var fieldText = $"{field.Name} ({field.Type})";
-                if (field.Length.HasValue) fieldText += $" - Longitud: {field.Length}";
-                if (field.Mandatory) fieldText += " - Obligatorio";
-                if (!string.IsNullOrEmpty(field.Description)) fieldText += $" - {field.Description}";
-                AddBulletItem(body, fieldText);
-            }
+            AddEntityFieldsTable(body, useCase.EntityFields);
         }
 
         // Alternative Flows (Flujos Alternativos)
@@ -633,6 +626,131 @@ public class DocumentService : IDocumentService
         cell.Append(para);
         
         return cell;
+    }
+
+    private void AddEntityFieldsTable(Body body, List<EntityField> entityFields)
+    {
+        var table = new Table();
+        
+        // Table properties
+        var tblPr = new TableProperties();
+        tblPr.Append(new TableWidth() { Width = "9800", Type = TableWidthUnitValues.Dxa });
+        tblPr.Append(new TableBorders(
+            new TopBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new BottomBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new LeftBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new RightBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new InsideHorizontalBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
+            new InsideVerticalBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 }
+        ));
+        table.Append(tblPr);
+        
+        // Header row
+        var headerRow = new TableRow();
+        
+        // Nombre column
+        var nameCell = new TableCell();
+        nameCell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = "2500", Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        var namePara = new Paragraph();
+        var nameParaProps = new ParagraphProperties();
+        nameParaProps.Append(new Justification() { Val = JustificationValues.Center });
+        namePara.Append(nameParaProps);
+        var nameRun = new Run();
+        var nameRunProps = new RunProperties();
+        nameRunProps.Append(new Bold());
+        nameRunProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        nameRun.Append(nameRunProps);
+        nameRun.Append(new Text("Nombre"));
+        namePara.Append(nameRun);
+        nameCell.Append(namePara);
+        headerRow.Append(nameCell);
+        
+        // Tipo column
+        var typeCell = new TableCell();
+        typeCell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = "1500", Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        typeCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Tipo")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(typeCell);
+        
+        // Longitud column
+        var lengthCell = new TableCell();
+        lengthCell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = "1200", Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        lengthCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Longitud")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(lengthCell);
+        
+        // Obligatorio column
+        var mandatoryCell = new TableCell();
+        mandatoryCell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = "1300", Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        mandatoryCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Obligatorio")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(mandatoryCell);
+        
+        // Descripción column
+        var descCell = new TableCell();
+        descCell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = "3300", Type = TableWidthUnitValues.Dxa },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        descCell.Append(new Paragraph(new Run(new RunProperties(new Bold()), new Text("Descripción")))
+        {
+            ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+        });
+        headerRow.Append(descCell);
+        
+        table.Append(headerRow);
+        
+        // Data rows
+        foreach (var field in entityFields)
+        {
+            var dataRow = new TableRow();
+            
+            // Name
+            dataRow.Append(new TableCell(new Paragraph(new Run(new Text(field.Name ?? "")))));
+            
+            // Type
+            dataRow.Append(new TableCell(new Paragraph(new Run(new Text(field.Type ?? "")))));
+            
+            // Length
+            dataRow.Append(new TableCell(new Paragraph(new Run(new Text(field.Length?.ToString() ?? "-")))
+            {
+                ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+            }));
+            
+            // Mandatory
+            dataRow.Append(new TableCell(new Paragraph(new Run(new Text(field.Mandatory ? "Sí" : "No")))
+            {
+                ParagraphProperties = new ParagraphProperties(new Justification() { Val = JustificationValues.Center })
+            }));
+            
+            // Description
+            dataRow.Append(new TableCell(new Paragraph(new Run(new Text(field.Description ?? "")))));
+            
+            table.Append(dataRow);
+        }
+        
+        body.Append(table);
+        
+        // Add spacing after table
+        body.Append(new Paragraph() { ParagraphProperties = new ParagraphProperties(new SpacingBetweenLines() { After = "240" }) });
     }
 
     private void AddRevisionHistoryTable(Body body, UseCase useCase)
@@ -1062,45 +1180,78 @@ public class DocumentService : IDocumentService
         
         // Número de página a la izquierda
         var run1 = new Run();
-        run1.Append(new Text("Página "));
+        var runProps1 = new RunProperties();
+        runProps1.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps1.Append(new FontSize() { Val = "18" }); // 9pt
+        run1.Append(runProps1);
+        run1.Append(new Text("página ")); // minúscula como en React
         paragraph.Append(run1);
         
         var run2 = new Run();
+        var runProps2 = new RunProperties();
+        runProps2.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps2.Append(new FontSize() { Val = "18" });
+        run2.Append(runProps2);
         run2.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
         paragraph.Append(run2);
         
         var run3 = new Run();
+        var runProps3 = new RunProperties();
+        runProps3.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps3.Append(new FontSize() { Val = "18" });
+        run3.Append(runProps3);
         run3.Append(new FieldCode(" PAGE "));
         paragraph.Append(run3);
         
         var run4 = new Run();
+        var runProps4 = new RunProperties();
+        runProps4.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps4.Append(new FontSize() { Val = "18" });
+        run4.Append(runProps4);
         run4.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
         paragraph.Append(run4);
         
         var run5 = new Run();
+        var runProps5 = new RunProperties();
+        runProps5.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps5.Append(new FontSize() { Val = "18" });
+        run5.Append(runProps5);
         run5.Append(new Text(" de "));
         paragraph.Append(run5);
         
         var run6 = new Run();
+        var runProps6 = new RunProperties();
+        runProps6.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps6.Append(new FontSize() { Val = "18" });
+        run6.Append(runProps6);
         run6.Append(new FieldChar() { FieldCharType = FieldCharValues.Begin });
         paragraph.Append(run6);
         
         var run7 = new Run();
+        var runProps7 = new RunProperties();
+        runProps7.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps7.Append(new FontSize() { Val = "18" });
+        run7.Append(runProps7);
         run7.Append(new FieldCode(" NUMPAGES "));
         paragraph.Append(run7);
         
         var run8 = new Run();
+        var runProps8 = new RunProperties();
+        runProps8.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps8.Append(new FontSize() { Val = "18" });
+        run8.Append(runProps8);
         run8.Append(new FieldChar() { FieldCharType = FieldCharValues.End });
         paragraph.Append(run8);
         
         // Tabulación y nombre del caso de uso a la derecha
         var run9 = new Run();
+        var runProps9 = new RunProperties();
+        runProps9.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        runProps9.Append(new FontSize() { Val = "18" });
+        run9.Append(runProps9);
         run9.Append(new TabChar());
+        run9.Append(new Text(useCase?.UseCaseName ?? "Caso de Uso"));
         paragraph.Append(run9);
-        
-        var run10 = new Run();
-        run10.Append(new Text(useCase?.UseCaseName ?? "Caso de Uso"));
-        paragraph.Append(run10);
         
         footer.Append(paragraph);
         footerPart.Footer = footer;
