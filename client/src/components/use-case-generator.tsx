@@ -9,12 +9,14 @@ import EnhancedProgressIndicator from "@/components/enhanced-progress-indicator"
 import FormSteps from "@/components/form-steps";
 // Preview components removed - DOCX generated directly from formData
 import { AIModelHeader } from "@/components/ai-model-header";
+import { ProgressIndicator } from "@/components/progress-indicator";
 
 import { UseCase, AIModel } from "@/types/use-case";
 
 export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
   const [generationProgress, setGenerationProgress] = useState<string>("");
+  const [progressPercentage, setProgressPercentage] = useState(0);
   const { toast } = useToast();
 
   const {
@@ -55,16 +57,25 @@ export default function UseCaseGenerator() {
 
   const generateAndDownloadUseCaseMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      setProgressPercentage(10);
       setGenerationProgress("Generando contenido del caso de uso...");
+      
+      // Simular progreso gradual
+      const progressInterval = setInterval(() => {
+        setProgressPercentage(prev => Math.min(prev + 10, 70));
+      }, 3000);
       
       // First generate the use case
       const generateResponse = await apiRequest('POST', '/api/use-cases/generate', data);
       const generatedData = await generateResponse.json();
       
+      clearInterval(progressInterval);
+      
       if (!generatedData.success || !generatedData.useCase) {
         throw new Error(generatedData.error || 'Error generando el caso de uso');
       }
       
+      setProgressPercentage(80);
       setGenerationProgress("Creando documento DOCX...");
       
       // Then immediately export to DOCX - using fetch directly for binary response
@@ -94,6 +105,7 @@ export default function UseCaseGenerator() {
         throw new Error(`Error exportando DOCX: ${exportResponse.status} - ${errorData}`);
       }
       
+      setProgressPercentage(95);
       setGenerationProgress("Descargando documento...");
       
       // Create blob and download
@@ -107,11 +119,20 @@ export default function UseCaseGenerator() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       
+      setProgressPercentage(100);
+      setGenerationProgress("¡Documento generado exitosamente!");
+      
       return generatedData;
     },
     onSuccess: (data) => {
       setGeneratedUseCase(data.useCase);
-      setGenerationProgress("");
+      
+      // Reset progress after a brief delay
+      setTimeout(() => {
+        setGenerationProgress("");
+        setProgressPercentage(0);
+      }, 1500);
+      
       toast({
         title: "Éxito",
         description: "Caso de uso generado y descargado correctamente"
@@ -119,6 +140,7 @@ export default function UseCaseGenerator() {
     },
     onError: (error) => {
       setGenerationProgress("");
+      setProgressPercentage(0);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Error generando el caso de uso",
@@ -220,7 +242,8 @@ export default function UseCaseGenerator() {
   );
 
   return (
-    <div className="min-h-screen bg-ms-gray">
+    <>
+      <div className="min-h-screen bg-ms-gray">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-ms-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -301,5 +324,14 @@ export default function UseCaseGenerator() {
 
       </div>
     </div>
+    
+    {/* Progress Indicator for Document Generation */}
+    <ProgressIndicator
+      isVisible={generateAndDownloadUseCaseMutation.isPending}
+      progress={progressPercentage}
+      message={generationProgress}
+      subMessage="Esto puede tomar de 20 a 60 segundos dependiendo de la complejidad"
+    />
+    </>
   );
 }

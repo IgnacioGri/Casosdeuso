@@ -368,7 +368,7 @@ Responde SOLO con el HTML del documento completo. Usa estilos inline para el for
       model: "gemini-2.5-flash", // Modelo más rápido
       config: {
         systemInstruction: "Eres un experto en documentación de casos de uso. Genera documentos profesionales siguiendo exactamente las reglas proporcionadas.",
-        maxOutputTokens: 8000,
+        maxOutputTokens: 16000, // Aumentado para contenido completo
         temperature: 0.3
       },
       contents: prompt,
@@ -754,9 +754,10 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
   private static async processWithGemini(systemPrompt: string, fieldValue: string): Promise<string> {
     const client = getGeminiClient();
     
-    // Use higher token limit for test case generation
+    // Use higher token limit for test case generation and minute analysis
     const isTestCaseGeneration = systemPrompt.includes('casos de prueba') || systemPrompt.includes('test cases');
-    const maxTokens = isTestCaseGeneration ? 6000 : 2000;
+    const isMinuteAnalysis = systemPrompt.includes('minuta') || systemPrompt.includes('análisis de documento');
+    const maxTokens = isTestCaseGeneration ? 12000 : (isMinuteAnalysis ? 10000 : 4000);
     
     const response = await client.models.generateContent({
       model: "gemini-2.5-flash", // Modelo más rápido

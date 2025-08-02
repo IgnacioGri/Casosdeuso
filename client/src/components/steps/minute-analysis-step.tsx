@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { UseCaseFormData } from '@/types/use-case';
 import { HelpButton } from '@/components/help-button';
+import { ProgressIndicator } from '@/components/progress-indicator';
 
 interface MinuteAnalysisStepProps {
   formData: UseCaseFormData;
@@ -19,20 +20,47 @@ interface MinuteAnalysisStepProps {
 export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious }: MinuteAnalysisStepProps) {
   const [minuteText, setMinuteText] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
   const { toast } = useToast();
 
   const analyzeMinuteMutation = useMutation({
     mutationFn: async (data: { text: string; useCaseType: string; aiModel: string }) => {
+      setProgress(10);
+      setProgressMessage('Preparando análisis de minuta...');
+      
       const response = await apiRequest('POST', '/api/analyze-minute', {
         minuteContent: data.text,
         useCaseType: data.useCaseType,
         aiModel: data.aiModel
       });
-      return response.json();
+      
+      setProgress(50);
+      setProgressMessage('Procesando contenido con IA...');
+      
+      // Simular progreso gradual mientras esperamos
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 5, 90));
+      }, 1000);
+      
+      const result = await response.json();
+      clearInterval(progressInterval);
+      
+      setProgress(100);
+      setProgressMessage('¡Análisis completado!');
+      
+      return result;
     },
     onSuccess: (data) => {
       // Apply the analyzed data to the form
       onFormChange(data.formData);
+      
+      // Reset progress after a brief delay
+      setTimeout(() => {
+        setProgress(0);
+        setProgressMessage('');
+      }, 1500);
+      
       toast({
         title: "Análisis completado",
         description: "La minuta ha sido analizada y el formulario se ha completado automáticamente"
@@ -275,7 +303,8 @@ CRITERIOS DE ACEPTACIÓN:
   };
 
   return (
-    <Card className="shadow-sm border border-ms-border">
+    <>
+      <Card className="shadow-sm border border-ms-border">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-semibold text-gray-900 flex items-center">
@@ -391,5 +420,14 @@ CRITERIOS DE ACEPTACIÓN:
         </div>
       </CardContent>
     </Card>
+    
+    {/* Progress Indicator */}
+    <ProgressIndicator
+      isVisible={analyzeMinuteMutation.isPending}
+      progress={progress}
+      message={progressMessage}
+      subMessage="Esto puede tomar de 10 a 30 segundos dependiendo del contenido"
+    />
+    </>
   );
 }

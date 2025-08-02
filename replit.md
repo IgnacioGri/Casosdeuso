@@ -35,8 +35,16 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 
 ### Recent Updates (February 2, 2025) - Performance Optimizations
 - **Gemini Model Optimization**: Changed from `gemini-2.5-pro` to `gemini-2.5-flash` for 3-6x faster generation
-- **Token Limits Added**: Limited responses to 8000 tokens for use cases, 2000 for test cases
-- **Enhanced Progress Indicators**: Added real-time status updates during generation process
+- **Token Limits Significantly Increased**: 
+  - Document generation: 16000 tokens (from 8000)
+  - Test case generation: 12000 tokens (from 2000)
+  - Minute analysis: 10000 tokens (new)
+  - Regular fields: 4000 tokens (from 2000)
+- **Enhanced Progress Indicators**: Added visual progress bars with percentage tracking for:
+  - Intelligent minute analysis
+  - AI test case generation  
+  - Document generation and download
+  - Each operation shows estimated completion time
 - **Temperature Optimization**: Reduced to 0.3 for more consistent and faster responses
 
 ### Recent Updates (February 2, 2025) - Complete System Synchronization

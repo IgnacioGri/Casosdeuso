@@ -10,6 +10,7 @@ import { AIAssistButton } from "@/components/ai-assist-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { ProgressIndicator } from "@/components/progress-indicator";
 
 
 interface TestCaseStepProps {
@@ -47,12 +48,22 @@ export function TestCaseStep({
   onReplaceAllTestData
 }: TestCaseStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('');
 
   const handleIntelligentGeneration = async () => {
     if (!formData || !onReplaceAllTestData) return;
     
     setIsGenerating(true);
+    setProgress(10);
+    setProgressMessage('Analizando caso de uso...');
+    
     try {
+      // Simular progreso gradual
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 80));
+      }, 2000);
+      
       const response = await fetch('/api/generate-intelligent-tests', {
         method: 'POST',
         headers: {
@@ -64,14 +75,27 @@ export function TestCaseStep({
         }),
       });
 
+      clearInterval(progressInterval);
+      setProgress(90);
+      setProgressMessage('Procesando respuesta...');
+
       if (response.ok) {
         const result = await response.json();
         console.log('Intelligent test case result:', result);
+        setProgress(100);
+        setProgressMessage('¡Casos de prueba generados!');
+        
         onReplaceAllTestData({
           objective: result.objective || '',
           preconditions: result.preconditions || '',
           testSteps: result.testSteps || []
         });
+        
+        // Reset progress after a delay
+        setTimeout(() => {
+          setProgress(0);
+          setProgressMessage('');
+        }, 1500);
       } else {
         const errorText = await response.text();
         console.error('Error response:', errorText);
@@ -82,11 +106,16 @@ export function TestCaseStep({
       alert('Error al generar casos de prueba inteligentes. Por favor, intente nuevamente.');
     } finally {
       setIsGenerating(false);
+      if (progress < 100) {
+        setProgress(0);
+        setProgressMessage('');
+      }
     }
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">Casos de Prueba</h3>
@@ -269,5 +298,14 @@ export function TestCaseStep({
         </div>
       </div>
     </div>
+    
+    {/* Progress Indicator */}
+    <ProgressIndicator
+      isVisible={isGenerating}
+      progress={progress}
+      message={progressMessage}
+      subMessage="Generando casos de prueba basados en el análisis completo del caso de uso"
+    />
+    </>
   );
 }
