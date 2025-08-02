@@ -145,15 +145,16 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
       </div>
 
       {/* Generate Wireframes Checkbox */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-3">
         <Checkbox
           id="generateWireframes"
           checked={formData.generateWireframes}
           onCheckedChange={(checked) => 
             onUpdateFormData({ generateWireframes: checked as boolean })
           }
+          className="h-5 w-5 border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
         />
-        <Label htmlFor="generateWireframes" className="cursor-pointer">
+        <Label htmlFor="generateWireframes" className="cursor-pointer text-sm font-medium">
           ¿Desea generar wireframes visuales?
         </Label>
       </div>
