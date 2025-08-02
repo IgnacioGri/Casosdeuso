@@ -1156,7 +1156,8 @@ public class DocumentService : IDocumentService
         // Fallback to default images if no custom image or custom image failed
         if (imageData == null)
         {
-            var officialHeaderPath = Path.Combine(Directory.GetCurrentDirectory(), "official-ingematica-header.png");
+            var officialHeaderPath = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Header oficial Ingematica  _1754166268982.png");
+            var fallbackHeaderPath = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "official-ingematica-header.png");
             var companyLogoPath = Path.Combine(Directory.GetCurrentDirectory(), "company-logo.png");
             var fallbackPath1 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "image_1754002431086.png");
             var fallbackPath2 = Path.Combine(Directory.GetCurrentDirectory(), "attached_assets", "Encabezado_1753600608270.png");
@@ -1164,6 +1165,8 @@ public class DocumentService : IDocumentService
             
             if (File.Exists(officialHeaderPath))
                 imagePath = officialHeaderPath;
+            else if (File.Exists(fallbackHeaderPath))
+                imagePath = fallbackHeaderPath;
             else if (File.Exists(companyLogoPath))
                 imagePath = companyLogoPath;
             else if (File.Exists(fallbackPath1))

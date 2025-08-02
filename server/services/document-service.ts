@@ -46,11 +46,14 @@ export class DocumentService {
   // Generate DOCX directly from form data - no HTML conversion needed
   static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string): Promise<Buffer> {
     // Use custom header image if provided, otherwise use official Ingematica header
-    let headerImagePath = path.join(process.cwd(), 'attached_assets', 'official-ingematica-header.png');
+    let headerImagePath = path.join(process.cwd(), 'attached_assets', 'Header oficial Ingematica  _1754166268982.png');
     
     // Fallback to older headers if official header doesn't exist
     if (!fs.existsSync(headerImagePath)) {
-      headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+      headerImagePath = path.join(process.cwd(), 'attached_assets', 'official-ingematica-header.png');
+      if (!fs.existsSync(headerImagePath)) {
+        headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
+      }
     }
     
     if (customHeaderImage) {

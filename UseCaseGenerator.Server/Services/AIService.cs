@@ -401,9 +401,26 @@ INSTRUCCIONES:
         if (_openAIClient == null)
             throw new InvalidOperationException("OpenAI client not configured");
 
-        // TODO: Implement modern OpenAI API integration
-        await Task.Delay(100); // Simulate API call
-        return fieldValue; // Return original value for now
+        // Determine token limit based on context
+        bool isTestCaseGeneration = systemPrompt.Contains("casos de prueba") || systemPrompt.Contains("test cases");
+        bool isMinuteAnalysis = systemPrompt.Contains("minuta") || systemPrompt.Contains("análisis de documento");
+        int maxTokens = isTestCaseGeneration ? 12000 : (isMinuteAnalysis ? 10000 : 4000);
+
+        var chatCompletionOptions = new ChatCompletionOptions
+        {
+            Temperature = 0.3f,
+            MaxTokens = maxTokens,
+            TopP = 0.95f
+        };
+
+        var messages = new List<ChatMessage>
+        {
+            new SystemChatMessage(systemPrompt),
+            new UserChatMessage(fieldValue)
+        };
+
+        var response = await _openAIClient.CompleteChatAsync(messages, chatCompletionOptions);
+        return response.Value.Content[0].Text;
     }
 
     private GenerateUseCaseResponse GenerateDemoContent(UseCaseFormData formData)
@@ -525,10 +542,57 @@ INSTRUCCIONES:
         return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
-    private Task<string> GenerateWithGemini(string prompt)
+    private async Task<string> GenerateWithGemini(string prompt)
     {
-        // Implementation for Gemini API
-        throw new NotImplementedException("Gemini integration pending");
+        if (string.IsNullOrEmpty(_geminiApiKey))
+        {
+            throw new InvalidOperationException("Gemini API key no está configurada");
+        }
+
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("x-goog-api-key", _geminiApiKey);
+        
+        // For document generation, always use 16000 tokens
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    parts = new[]
+                    {
+                        new { text = prompt }
+                    }
+                }
+            },
+            generationConfig = new
+            {
+                temperature = 0.3,
+                maxOutputTokens = 16000, // For document generation
+                topP = 0.95,
+                topK = 40
+            }
+        };
+
+        var response = await client.PostAsJsonAsync(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2-5-flash:generateContent",
+            requestBody
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Gemini API error: {error}");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var content = result.GetProperty("candidates")[0]
+            .GetProperty("content")
+            .GetProperty("parts")[0]
+            .GetProperty("text")
+            .GetString();
+
+        return content ?? string.Empty;
     }
 
     private async Task<string> GenerateWithCopilot(string prompt)
@@ -555,19 +619,131 @@ INSTRUCCIONES:
         return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
-    private Task<string> ProcessWithClaude(string systemPrompt, string fieldValue)
+    private async Task<string> ProcessWithClaude(string systemPrompt, string fieldValue)
     {
-        throw new NotImplementedException("Claude integration pending");
+        if (string.IsNullOrEmpty(_claudeApiKey))
+        {
+            throw new InvalidOperationException("Claude API key no está configurada");
+        }
+
+        // Determine token limit based on context
+        bool isTestCaseGeneration = systemPrompt.Contains("casos de prueba") || systemPrompt.Contains("test cases");
+        bool isMinuteAnalysis = systemPrompt.Contains("minuta") || systemPrompt.Contains("análisis de documento");
+        int maxTokens = isTestCaseGeneration ? 12000 : (isMinuteAnalysis ? 10000 : 4000);
+
+        var client = GetHttpClient("Anthropic");
+        
+        var requestBody = new
+        {
+            model = "claude-sonnet-4-20250514",
+            max_tokens = maxTokens,
+            temperature = 0.3,
+            system = systemPrompt,
+            messages = new[]
+            {
+                new { role = "user", content = fieldValue }
+            }
+        };
+        
+        using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("v1/messages", httpContent);
+        response.EnsureSuccessStatusCode();
+        
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+        
+        return responseObj.GetProperty("content")[0].GetProperty("text").GetString() ?? "";
     }
 
-    private Task<string> ProcessWithGrok(string systemPrompt, string fieldValue)
+    private async Task<string> ProcessWithGrok(string systemPrompt, string fieldValue)
     {
-        throw new NotImplementedException("Grok integration pending");
+        if (string.IsNullOrEmpty(_grokApiKey))
+        {
+            throw new InvalidOperationException("Grok API key no está configurada");
+        }
+
+        // Token limit for Grok (doesn't support as high as others)
+        int maxTokens = 4000;
+
+        var client = GetHttpClient("Grok");
+        
+        var requestBody = new
+        {
+            model = "grok-2-1212",
+            messages = new[]
+            {
+                new { role = "system", content = systemPrompt },
+                new { role = "user", content = fieldValue }
+            },
+            temperature = 0.3,
+            max_tokens = maxTokens
+        };
+        
+        using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+        var response = await client.PostAsync("chat/completions", httpContent);
+        response.EnsureSuccessStatusCode();
+        
+        var responseJson = await response.Content.ReadAsStringAsync();
+        var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+        
+        return responseObj.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
     }
 
-    private Task<string> ProcessWithGemini(string systemPrompt, string fieldValue)
+    private async Task<string> ProcessWithGemini(string systemPrompt, string fieldValue)
     {
-        throw new NotImplementedException("Gemini integration pending");
+        if (string.IsNullOrEmpty(_geminiApiKey))
+        {
+            throw new InvalidOperationException("Gemini API key no está configurada");
+        }
+
+        // Determine token limit based on context
+        bool isTestCaseGeneration = systemPrompt.Contains("casos de prueba") || systemPrompt.Contains("test cases");
+        bool isMinuteAnalysis = systemPrompt.Contains("minuta") || systemPrompt.Contains("análisis de documento");
+        int maxTokens = isTestCaseGeneration ? 12000 : (isMinuteAnalysis ? 10000 : 4000);
+
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("x-goog-api-key", _geminiApiKey);
+        
+        var requestBody = new
+        {
+            contents = new[]
+            {
+                new
+                {
+                    parts = new[]
+                    {
+                        new { text = $"{systemPrompt}\n\n{fieldValue}" }
+                    }
+                }
+            },
+            generationConfig = new
+            {
+                temperature = 0.3,
+                maxOutputTokens = maxTokens,
+                topP = 0.95,
+                topK = 40
+            }
+        };
+
+        var response = await client.PostAsJsonAsync(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2-5-flash:generateContent",
+            requestBody
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new InvalidOperationException($"Gemini API error: {error}");
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var content = result.GetProperty("candidates")[0]
+            .GetProperty("content")
+            .GetProperty("parts")[0]
+            .GetProperty("text")
+            .GetString();
+
+        return content ?? string.Empty;
     }
 
     private async Task<string> ProcessWithCopilot(string systemPrompt, string fieldValue)
@@ -576,6 +752,11 @@ INSTRUCCIONES:
         
         try
         {
+            // Determine token limit based on context
+            bool isTestCaseGeneration = systemPrompt.Contains("casos de prueba") || systemPrompt.Contains("test cases");
+            bool isMinuteAnalysis = systemPrompt.Contains("minuta") || systemPrompt.Contains("análisis de documento");
+            int maxTokens = isTestCaseGeneration ? 12000 : (isMinuteAnalysis ? 10000 : 4000);
+
             var requestBody = new
             {
                 messages = new[]
@@ -584,8 +765,8 @@ INSTRUCCIONES:
                     new { role = "user", content = $"Mejora este campo: {fieldValue}" }
                 },
                 model = "copilot-latest",
-                max_tokens = 500,
-                temperature = 0.2
+                max_tokens = maxTokens,
+                temperature = 0.3
             };
 
             using var httpContent = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
