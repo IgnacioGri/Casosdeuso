@@ -374,3 +374,26 @@ tbody tr:last-child td {
 .shadow-sm {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Fix for Select component overflow issues */
+[data-radix-collection-item] > div {
+  overflow: visible !important;
+}
+
+/* Fix for SelectTrigger content clipping */
+button[role="combobox"] > span {
+  line-clamp: unset !important;
+  -webkit-line-clamp: unset !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: 100% !important;
+}
+
+/* Ensure SelectTrigger has proper height */
+button[role="combobox"][data-state="open"],
+button[role="combobox"][data-state="closed"] {
+  overflow: visible !important;
+  height: auto !important;
+  min-height: 3.5rem !important;
+}
