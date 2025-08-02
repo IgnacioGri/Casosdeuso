@@ -331,7 +331,41 @@ CONTEXTO BANCARIO ING:
 
       console.log('Cleaned intelligent test result for JSON parsing:', cleanedResult);
 
-      const parsed = JSON.parse(cleanedResult);
+      let parsed;
+      try {
+        parsed = JSON.parse(cleanedResult);
+      } catch (jsonError) {
+        console.error('Initial JSON parse failed, attempting to fix incomplete JSON...');
+        
+        // Try to fix common JSON issues
+        // Add missing closing brackets/braces
+        const openBraces = (cleanedResult.match(/{/g) || []).length;
+        const closeBraces = (cleanedResult.match(/}/g) || []).length;
+        const openBrackets = (cleanedResult.match(/\[/g) || []).length;
+        const closeBrackets = (cleanedResult.match(/]/g) || []).length;
+        
+        let fixedResult = cleanedResult;
+        
+        // Add missing closing brackets
+        for (let i = 0; i < openBrackets - closeBrackets; i++) {
+          fixedResult += ']';
+        }
+        
+        // Add missing closing braces
+        for (let i = 0; i < openBraces - closeBraces; i++) {
+          fixedResult += '}';
+        }
+        
+        // Try parsing the fixed result
+        try {
+          parsed = JSON.parse(fixedResult);
+          console.log('Successfully parsed after fixing JSON structure');
+        } catch (secondError) {
+          // If still failing, throw original error
+          throw jsonError;
+        }
+      }
+      
       console.log('Parsed intelligent test result:', parsed);
 
       // Validate the parsed result has required fields

@@ -753,12 +753,17 @@ Devuelve el documento completo modificado manteniendo exactamente el formato HTM
 
   private static async processWithGemini(systemPrompt: string, fieldValue: string): Promise<string> {
     const client = getGeminiClient();
+    
+    // Use higher token limit for test case generation
+    const isTestCaseGeneration = systemPrompt.includes('casos de prueba') || systemPrompt.includes('test cases');
+    const maxTokens = isTestCaseGeneration ? 6000 : 2000;
+    
     const response = await client.models.generateContent({
       model: "gemini-2.5-flash", // Modelo más rápido
       config: {
         systemInstruction: systemPrompt,
         responseMimeType: "text/plain",
-        maxOutputTokens: 2000,
+        maxOutputTokens: maxTokens,
         temperature: 0.3
       },
       contents: fieldValue
