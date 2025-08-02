@@ -603,7 +603,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const docxBuffer = await DocumentService.generateDirectFromFormData(formData, formData.testCases);
+      // Extract test cases from formData if they exist
+      const testCases = formData.testSteps || [];
+      const docxBuffer = await DocumentService.generateDirectFromFormData(formData, testCases);
 
       // Add cache control headers to prevent browser caching
       res.set({

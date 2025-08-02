@@ -62,13 +62,32 @@ export default function UseCaseGenerator() {
         throw new Error(generatedData.error || 'Error generando el caso de uso');
       }
       
-      // Then immediately export to DOCX
-      const exportResponse = await apiRequest('POST', '/api/export-docx', {
-        content: generatedData.content,
+      // Then immediately export to DOCX - using fetch directly for binary response
+      console.log('Exporting to DOCX with data:', {
+        hasContent: !!generatedData.content,
         fileName: generatedData.useCase.fileName,
-        useCaseName: generatedData.useCase.useCaseName,
-        formData: data
+        hasFormData: !!data
       });
+      
+      // Use fetch directly to handle binary response properly
+      const exportResponse = await fetch('/api/export-docx', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: generatedData.content,
+          fileName: generatedData.useCase.fileName,
+          useCaseName: generatedData.useCase.useCaseName,
+          formData: data
+        }),
+        credentials: 'include'
+      });
+      
+      // Check if response is ok
+      if (!exportResponse.ok) {
+        const errorData = await exportResponse.text();
+        console.error('Export error:', errorData);
+        throw new Error(`Error exportando DOCX: ${exportResponse.status} - ${errorData}`);
+      }
       
       // Create blob and download
       const blob = await exportResponse.blob();
