@@ -26,6 +26,7 @@ public class UseCase
     public bool GenerateWireframes { get; set; }
     public List<string> WireframeDescriptions { get; set; } = new();
     public string? WireframesDescription { get; set; }
+    public GeneratedWireframes? GeneratedWireframes { get; set; }
     
     // Preconditions and Postconditions
     public string? Preconditions { get; set; }

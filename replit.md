@@ -33,6 +33,16 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Test Case Integration**: Intelligent test case generation fully integrated into the document generation process, appearing in DOCX export with professional table formatting. Enhanced error handling with fallback test step generation when AI responses are incomplete.
 - **Data Management**: Primarily uses in-memory storage for development and demo purposes, with a defined architecture for PostgreSQL integration using Drizzle ORM for production.
 
+### Recent Updates (February 2, 2025) - Complete Wireframe Feature Synchronization
+- **Wireframe Generation Feature Fully Synchronized**: Both React and C# systems now have identical wireframe functionality
+  - Added GeneratedWireframes property to C# DTOs matching TypeScript structure
+  - C# AIService now returns demo wireframe paths identical to TypeScript
+  - Implemented wireframe embedding in C# DocumentService with proper image handling
+  - Added AddWireframeImage method for consistent PNG embedding at 450x338px (6.25x4.69 inches)
+  - Both systems embed wireframes in "BOCETOS GRÁFICOS DE INTERFAZ DE USUARIO" section
+  - Demo mode uses same images: Search_interface_wireframe_59d3b735.png and Form_interface_wireframe_bf6aaf30.png
+  - Complete error handling for missing images in both systems
+
 ### Recent Updates (February 2, 2025) - Official Ingematica Header Implementation
 - **Official Header Image Updated**: Replaced default DOCX header with official Ingematica header in both React and C# systems
   - Official header "Header oficial Ingematica _1754166268982.png" now used as primary default

@@ -65,6 +65,8 @@ public class DocumentController : ControllerBase
                 TestCaseObjective = InputValidator.SanitizeText(request.FormData?.TestCaseObjective, 500),
                 TestCasePreconditions = InputValidator.SanitizeText(request.FormData?.TestCasePreconditions, 500),
                 TestSteps = request.FormData?.TestSteps ?? new List<TestStep>(),
+                GenerateWireframes = request.FormData?.GenerateWireframes ?? false,
+                // GeneratedWireframes will be set from AI response later
                 // FormData not stored in UseCase model
                 CreatedAt = DateTime.UtcNow
             };

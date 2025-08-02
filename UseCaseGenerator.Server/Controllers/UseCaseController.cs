@@ -51,6 +51,12 @@ public class UseCaseController : ControllerBase
             
             if (response.Success && response.UseCase != null)
             {
+                // Set GeneratedWireframes from AI response
+                if (response.GeneratedWireframes != null)
+                {
+                    response.UseCase.GeneratedWireframes = response.GeneratedWireframes;
+                }
+                
                 await _repository.CreateAsync(response.UseCase);
             }
 

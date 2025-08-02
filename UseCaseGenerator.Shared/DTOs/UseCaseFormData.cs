@@ -121,6 +121,13 @@ public class GenerateUseCaseResponse
     public string? Error { get; set; }
     public string Content { get; set; } = string.Empty;
     public UseCase? UseCase { get; set; }
+    public GeneratedWireframes? GeneratedWireframes { get; set; }
+}
+
+public class GeneratedWireframes
+{
+    public string? SearchWireframe { get; set; }
+    public string? FormWireframe { get; set; }
 }
 
 public class AIAssistRequest

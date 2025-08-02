@@ -300,6 +300,78 @@ public class DocumentService : IDocumentService
             AddParagraph(body, postconditionsText);
         }
 
+        // Wireframes Section - Add generated wireframe images if they exist
+        if (useCase.GenerateWireframes && useCase.GeneratedWireframes != null)
+        {
+            AddStyledHeading(body, "BOCETOS GRÁFICOS DE INTERFAZ DE USUARIO");
+            
+            // Add search wireframe if it exists
+            if (!string.IsNullOrEmpty(useCase.GeneratedWireframes.SearchWireframe))
+            {
+                var wireframeTitlePara1 = body.AppendChild(new Paragraph());
+                var wireframeTitleProps1 = wireframeTitlePara1.AppendChild(new ParagraphProperties());
+                wireframeTitleProps1.AppendChild(new SpacingBetweenLines() { Before = "120", After = "60" });
+                var wireframeTitleRun1 = wireframeTitlePara1.AppendChild(new Run());
+                var wireframeTitleRunProps1 = wireframeTitleRun1.AppendChild(new RunProperties());
+                wireframeTitleRunProps1.AppendChild(new Bold());
+                wireframeTitleRunProps1.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+                wireframeTitleRunProps1.AppendChild(new Color() { Val = "0070C0" });
+                wireframeTitleRunProps1.AppendChild(new FontSize() { Val = "24" });
+                wireframeTitleRun1.AppendChild(new Text("Wireframe 1: Interfaz de Búsqueda"));
+                
+                // Try to add the search wireframe image
+                try
+                {
+                    var searchWireframePath = useCase.GeneratedWireframes.SearchWireframe;
+                    if (searchWireframePath.StartsWith("/"))
+                        searchWireframePath = searchWireframePath.Substring(1);
+                    
+                    var searchImagePath = Path.Combine(Directory.GetCurrentDirectory(), searchWireframePath);
+                    if (File.Exists(searchImagePath))
+                    {
+                        AddWireframeImage(body, mainPart, searchImagePath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error loading search wireframe");
+                }
+            }
+            
+            // Add form wireframe if it exists
+            if (!string.IsNullOrEmpty(useCase.GeneratedWireframes.FormWireframe))
+            {
+                var wireframeTitlePara2 = body.AppendChild(new Paragraph());
+                var wireframeTitleProps2 = wireframeTitlePara2.AppendChild(new ParagraphProperties());
+                wireframeTitleProps2.AppendChild(new SpacingBetweenLines() { Before = "120", After = "60" });
+                var wireframeTitleRun2 = wireframeTitlePara2.AppendChild(new Run());
+                var wireframeTitleRunProps2 = wireframeTitleRun2.AppendChild(new RunProperties());
+                wireframeTitleRunProps2.AppendChild(new Bold());
+                wireframeTitleRunProps2.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+                wireframeTitleRunProps2.AppendChild(new Color() { Val = "0070C0" });
+                wireframeTitleRunProps2.AppendChild(new FontSize() { Val = "24" });
+                wireframeTitleRun2.AppendChild(new Text("Wireframe 2: Formulario de Gestión"));
+                
+                // Try to add the form wireframe image
+                try
+                {
+                    var formWireframePath = useCase.GeneratedWireframes.FormWireframe;
+                    if (formWireframePath.StartsWith("/"))
+                        formWireframePath = formWireframePath.Substring(1);
+                    
+                    var formImagePath = Path.Combine(Directory.GetCurrentDirectory(), formWireframePath);
+                    if (File.Exists(formImagePath))
+                    {
+                        AddWireframeImage(body, mainPart, formImagePath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error loading form wireframe");
+                }
+            }
+        }
+
         // Test Cases Section
         if (useCase.GenerateTestCase && useCase.TestSteps?.Any() == true)
         {
@@ -1214,6 +1286,27 @@ public class DocumentService : IDocumentService
                                 new A.PresetGeometry(new A.AdjustValueList()) { Preset = A.ShapeTypeValues.Rectangle }))
                     ) { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" })
             ) { DistanceFromTop = 0U, DistanceFromBottom = 0U, DistanceFromLeft = 0U, DistanceFromRight = 0U });
+    }
+    
+    private void AddWireframeImage(Body body, MainDocumentPart mainPart, string imagePath)
+    {
+        // Create a paragraph for the image
+        var imagePara = body.AppendChild(new Paragraph());
+        var imageParaProps = imagePara.AppendChild(new ParagraphProperties());
+        imageParaProps.AppendChild(new SpacingBetweenLines() { After = "120" });
+        imageParaProps.AppendChild(new Justification() { Val = JustificationValues.Center });
+        
+        // Add the image
+        using (FileStream stream = new FileStream(imagePath, FileMode.Open))
+        {
+            var imagePart = mainPart.AddImagePart(ImagePartType.Png);
+            imagePart.FeedData(stream);
+            
+            // Add the image to the document
+            var run = imagePara.AppendChild(new Run());
+            var drawing = CreateImageDrawing(mainPart.GetIdOfPart(imagePart), 4320000L, 3240000L); // 450x338 px at 96 DPI
+            run.AppendChild(drawing);
+        }
     }
     
     private void AddFooterWithPageNumbers(MainDocumentPart mainPart, UseCase useCase)

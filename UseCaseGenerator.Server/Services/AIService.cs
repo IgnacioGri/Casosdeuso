@@ -210,7 +210,14 @@ public class AIService : IAIService, IDisposable
             return new GenerateUseCaseResponse
             {
                 Content = finalContent,
-                Success = true
+                Success = true,
+                GeneratedWireframes = request.FormData.GenerateWireframes && request.FormData.AiModel == AIModel.Demo
+                    ? new GeneratedWireframes
+                    {
+                        SearchWireframe = "/attached_assets/generated_images/Search_interface_wireframe_59d3b735.png",
+                        FormWireframe = "/attached_assets/generated_images/Form_interface_wireframe_bf6aaf30.png"
+                    }
+                    : null
             };
         }
         catch (Exception ex)
