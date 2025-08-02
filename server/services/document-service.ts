@@ -1,7 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun, TabStopType, TabStopPosition } from 'docx';
 import * as fs from 'fs';
 import * as path from 'path';
-import { imageSize } from 'image-size';
+import sizeOf from 'image-size';
 
 interface TestCase {
   action: string;
@@ -143,27 +143,41 @@ export class DocumentService {
           default: new Header({
             children: [
               fs.existsSync(headerImagePath) ? (() => {
-                // Get actual image dimensions
-                const dimensions = imageSize(headerImagePath);
-                const imageWidth = dimensions.width || 600;
-                const imageHeight = dimensions.height || 100;
-                
-                // Calculate proportional scaling to fit page width
-                // Page width is typically 595 pixels (Letter size at 72 DPI)
-                const maxWidth = 550; // Leave some margin
-                const scale = Math.min(1, maxWidth / imageWidth);
-                const scaledWidth = Math.floor(imageWidth * scale);
-                const scaledHeight = Math.floor(imageHeight * scale);
-                
-                return new Paragraph({
-                  children: [
-                    new ImageRun({
-                      type: "png",
-                      data: fs.readFileSync(headerImagePath) as Buffer,
-                      transformation: { width: scaledWidth, height: scaledHeight }
-                    })
-                  ]
-                });
+                try {
+                  // Get actual image dimensions
+                  const dimensions = sizeOf(headerImagePath);
+                  const imageWidth = dimensions.width || 600;
+                  const imageHeight = dimensions.height || 100;
+                  
+                  // Calculate proportional scaling to fit page width
+                  // Page width is typically 595 pixels (Letter size at 72 DPI)
+                  const maxWidth = 550; // Leave some margin
+                  const scale = Math.min(1, maxWidth / imageWidth);
+                  const scaledWidth = Math.floor(imageWidth * scale);
+                  const scaledHeight = Math.floor(imageHeight * scale);
+                  
+                  return new Paragraph({
+                    children: [
+                      new ImageRun({
+                        type: "png",
+                        data: fs.readFileSync(headerImagePath) as Buffer,
+                        transformation: { width: scaledWidth, height: scaledHeight }
+                      })
+                    ]
+                  });
+                } catch (error) {
+                  console.log('Error reading image dimensions, using default size:', error);
+                  // Fallback to default dimensions if image-size fails
+                  return new Paragraph({
+                    children: [
+                      new ImageRun({
+                        type: "png",
+                        data: fs.readFileSync(headerImagePath) as Buffer,
+                        transformation: { width: 550, height: 50 } // Default 11:1 ratio
+                      })
+                    ]
+                  });
+                }
               })() : new Paragraph({
                 children: [new TextRun({
                   text: "INGEMATICA - Documentación de casos de uso",
