@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { UseCaseFormData } from '@/types/use-case';
-import { HelpButton } from '@/components/help-button';
 import { ProgressIndicator } from '@/components/progress-indicator';
 
 interface MinuteAnalysisStepProps {
@@ -311,7 +310,6 @@ CRITERIOS DE ACEPTACIÓN:
             <Brain className="mr-2 text-ms-blue" size={20} />
             Análisis Inteligente de Minutas
           </CardTitle>
-          <HelpButton step={2} useCaseType={formData.useCaseType} />
         </div>
         <p className="text-sm text-gray-600">
           Sube o pega el texto de la minuta de reunión para que la IA complete automáticamente el formulario

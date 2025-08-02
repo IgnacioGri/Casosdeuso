@@ -5,7 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Trash2, Sparkles, Brain, RefreshCw } from "lucide-react";
 import { TestStep } from "@/types/use-case";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { HelpButton } from "@/components/help-button";
 import { AIAssistButton } from "@/components/ai-assist-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -119,7 +118,6 @@ export function TestCaseStep({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">Casos de Prueba</h3>
-          <HelpButton step={9} useCaseType="entity" />
         </div>
         
         {formData && onReplaceAllTestData && (

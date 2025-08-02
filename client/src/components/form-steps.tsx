@@ -9,7 +9,6 @@ import { LiveValidation } from "@/components/live-validation";
 import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 
 import { AIAssistButton } from "@/components/ai-assist-button";
-import { HelpButton } from "@/components/help-button";
 import { AIGeneratedTag } from "@/components/ai-generated-tag";
 
 interface FormStepsProps {
@@ -85,9 +84,6 @@ export default function FormSteps({
                 <p className="text-gray-600 dark:text-gray-400 text-sm">
                   Selecciona el tipo de caso de uso que vas a crear para ayudar a la IA a generar contenido específico
                 </p>
-              </div>
-              <div className="ml-4">
-                <HelpButton step={1} useCaseType={formData.useCaseType} />
               </div>
             </div>
           </div>
@@ -208,8 +204,7 @@ export default function FormSteps({
               <Info className="mr-2 text-ms-blue" size={20} />
               Información Básica
             </h3>
-            <HelpButton step={3} useCaseType={formData.useCaseType} />
-        </div>
+          </div>
           
           <div className="space-y-4">
             <div>
@@ -269,7 +264,6 @@ export default function FormSteps({
               <Edit className="mr-2 text-ms-blue" size={20} />
               Detalles del Caso de Uso
             </h3>
-            <HelpButton step={4} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">
@@ -362,7 +356,6 @@ export default function FormSteps({
               <Filter className="mr-2 text-ms-blue" size={20} />
               Filtros de Búsqueda
             </h3>
-            <HelpButton step={5} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-6">
@@ -466,7 +459,6 @@ export default function FormSteps({
               <Columns className="mr-2 text-ms-blue" size={20} />
               Columnas de Resultado
             </h3>
-            <HelpButton step={6} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-6">
@@ -570,7 +562,6 @@ export default function FormSteps({
               <Database className="mr-2 text-ms-blue" size={20} />
               Datos de la Entidad
             </h3>
-            <HelpButton step={7} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-6">
@@ -951,7 +942,6 @@ export default function FormSteps({
               <Settings className="mr-2 text-ms-blue" size={20} />
               Opciones Adicionales
             </h3>
-            <HelpButton step={8} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">
@@ -1183,7 +1173,6 @@ export default function FormSteps({
               <Settings className="mr-2 text-ms-blue" size={20} />
               Decisión sobre Casos de Prueba
             </h3>
-            <HelpButton step={9} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">
@@ -1289,7 +1278,6 @@ export default function FormSteps({
               <Settings className="mr-2 text-ms-blue" size={20} />
               Revisión Final y Generación
             </h3>
-            <HelpButton step={11} useCaseType={formData.useCaseType} />
           </div>
           
           <div className="space-y-4">
