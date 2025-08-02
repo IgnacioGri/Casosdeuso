@@ -296,20 +296,7 @@ export default function FormSteps({
               <LiveValidation value={formData.fileName} type="fileName" />
             </div>
             
-            {formData.useCaseType === 'entity' && (
-              <div className="flex items-center space-x-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <input 
-                  type="checkbox"
-                  id="generateWireframes"
-                  checked={formData.generateWireframes}
-                  onChange={(e) => handleInputChange('generateWireframes', e.target.checked)}
-                  className="rounded border-gray-300 text-ms-blue focus:ring-ms-blue focus:ring-offset-0"
-                />
-                <label htmlFor="generateWireframes" className="text-sm text-gray-700 dark:text-gray-300">
-                  ✨ Generar bocetos gráficos de wireframes para interfaces de usuario
-                </label>
-              </div>
-            )}
+            
             
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
