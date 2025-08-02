@@ -349,11 +349,10 @@ export default function UseCaseGenerator() {
                 variant="ghost"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-gray-600 hover:text-ms-blue"
+                className="text-gray-600 hover:text-ms-blue px-2 py-1 text-xs"
                 title="Cargar imagen personalizada"
               >
-                <Image className="mr-1" size={16} />
-                Header
+                <Image size={14} />
               </Button>
               <Button 
                 variant="ghost" 
