@@ -1,6 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun, TabStopType, TabStopPosition } from 'docx';
 import * as fs from 'fs';
 import * as path from 'path';
+import { imageSize } from 'image-size';
 
 interface TestCase {
   action: string;
@@ -141,21 +142,40 @@ export class DocumentService {
         headers: {
           default: new Header({
             children: [
-              fs.existsSync(headerImagePath) ? new Paragraph({
-                children: [
-                  new ImageRun({
-                    type: "png",
-                    data: fs.readFileSync(headerImagePath),
-                    transformation: { width: 600, height: 100 }  // Ajustado para nueva imagen ING
-                  })
-                ]
-              }) : new Paragraph({
+              fs.existsSync(headerImagePath) ? (() => {
+                // Get actual image dimensions
+                const dimensions = imageSize(headerImagePath);
+                const imageWidth = dimensions.width || 600;
+                const imageHeight = dimensions.height || 100;
+                
+                // Calculate proportional scaling to fit page width
+                // Page width is typically 595 pixels (Letter size at 72 DPI)
+                const maxWidth = 550; // Leave some margin
+                const scale = Math.min(1, maxWidth / imageWidth);
+                const scaledWidth = Math.floor(imageWidth * scale);
+                const scaledHeight = Math.floor(imageHeight * scale);
+                
+                return new Paragraph({
+                  children: [
+                    new ImageRun({
+                      type: "png",
+                      data: fs.readFileSync(headerImagePath) as Buffer,
+                      transformation: { width: scaledWidth, height: scaledHeight }
+                    })
+                  ]
+                });
+              })() : new Paragraph({
                 children: [new TextRun({
-                  text: "ING Bank",
+                  text: "INGEMATICA - Documentación de casos de uso",
                   bold: true,
                   size: 28,
-                  color: "FF6600"
+                  color: "0070C0"
                 })]
+              }),
+              // Add spacing after header
+              new Paragraph({
+                spacing: { after: 240 }, // Add space after header
+                children: []
               })
             ]
           })
@@ -198,6 +218,17 @@ export class DocumentService {
               })
             ]
           })
+        },
+        properties: {
+          page: {
+            margin: {
+              top: 1440,    // 1 inch = 1440 DOCX units
+              right: 1440,
+              bottom: 1440,
+              left: 1440,
+              header: 340   // 0.6 cm = 340 DOCX units (1 cm = 567 DOCX units)
+            }
+          }
         }
       }]
     });

@@ -74,8 +74,15 @@ public class DocumentService : IDocumentService
                 sectionProps.Append(headerReference);
                 sectionProps.Append(footerReference);
                 
-                // Add page margins
-                sectionProps.Append(new PageMargin() { Top = 1440, Right = 1440, Bottom = 1440, Left = 1440 });
+                // Add page margins with header margin from top (0.6 cm = 340 DOCX units)
+                sectionProps.Append(new PageMargin() 
+                { 
+                    Top = 1440,      // 1 inch = 1440 DOCX units
+                    Right = 1440, 
+                    Bottom = 1440, 
+                    Left = 1440,
+                    Header = 340     // 0.6 cm = 340 DOCX units (1 cm = 567 DOCX units)
+                });
                 
                 // IMPORTANT: Section properties must be the last element in the body
                 body.Append(sectionProps);
@@ -1102,6 +1109,37 @@ public class DocumentService : IDocumentService
             {
                 var imagePart = headerPart.AddImagePart(ImagePartType.Png);
                 
+                // Calculate flexible dimensions based on actual image
+                long width = 6000000L;
+                long height = 1000000L;
+                
+                if (!string.IsNullOrEmpty(imagePath))
+                {
+                    try
+                    {
+                        using (var image = System.Drawing.Image.FromFile(imagePath))
+                        {
+                            // Calculate proportional scaling to fit page width
+                            // Page width is about 6000000 EMUs (for letter size)
+                            double aspectRatio = (double)image.Width / image.Height;
+                            width = 6000000L; // Max width
+                            height = (long)(width / aspectRatio);
+                            
+                            // Ensure height is reasonable
+                            if (height > 1500000L) // Max height ~1.5 inches
+                            {
+                                height = 1500000L;
+                                width = (long)(height * aspectRatio);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // Fall back to default if image reading fails
+                        _logger.LogWarning("Could not read image dimensions, using defaults");
+                    }
+                }
+                
                 if (imageData != null)
                 {
                     // Use custom header image data
@@ -1120,7 +1158,7 @@ public class DocumentService : IDocumentService
                 }
                 
                 var run = new Run();
-                var drawing = CreateImageDrawing(headerPart.GetIdOfPart(imagePart), 6000000L, 1000000L); // Proporción 6:1 para nueva imagen ING
+                var drawing = CreateImageDrawing(headerPart.GetIdOfPart(imagePart), width, height);
                 run.Append(drawing);
                 paragraph.Append(run);
             }
@@ -1136,6 +1174,12 @@ public class DocumentService : IDocumentService
         }
         
         header.Append(paragraph);
+        
+        // Add spacing paragraph after header
+        var spacingPara = new Paragraph();
+        spacingPara.Append(new ParagraphProperties());
+        header.Append(spacingPara);
+        
         headerPart.Header = header;
         headerPart.Header.Save();
     }
