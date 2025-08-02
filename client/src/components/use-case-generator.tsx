@@ -339,7 +339,7 @@ export default function UseCaseGenerator() {
                   <img 
                     src="/ingematica-logo-full.png" 
                     alt="Ingematica Logo" 
-                    className="hidden sm:block h-10 object-contain"
+                    className="hidden sm:block h-20 object-contain"
                   />
                   <img 
                     src="/attached_assets/company-logo.png" 
@@ -348,20 +348,22 @@ export default function UseCaseGenerator() {
                   />
                 </>
               )}
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-gray-900 hidden sm:block">
                 Generador de Casos de Uso
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <AIModelHeader 
-                currentModel={formData.aiModel}
-                onModelChange={(model: AIModel) => updateFormData({ aiModel: model })}
-              />
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="scale-90 sm:scale-100">
+                <AIModelHeader 
+                  currentModel={formData.aiModel}
+                  onModelChange={(model: AIModel) => updateFormData({ aiModel: model })}
+                />
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-gray-600 hover:text-ms-blue px-2 py-1 text-xs"
+                className="hidden sm:flex text-gray-600 hover:text-ms-blue px-2 py-1 text-xs"
                 title="Cargar imagen personalizada"
               >
                 <Image size={14} />
