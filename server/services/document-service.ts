@@ -149,7 +149,7 @@ export class DocumentService {
                     data: fs.readFileSync(headerImagePath),
                     transformation: { 
                       width: 600,  // Full width for header
-                      height: 80   // Better height for visibility (7.5:1 ratio)
+                      height: 200  // Proper height for 3:1 ratio matching original
                     }
                   })
                 ]

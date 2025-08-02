@@ -1120,10 +1120,10 @@ public class DocumentService : IDocumentService
                         using (var image = System.Drawing.Image.FromFile(imagePath))
                         {
                             // Use fixed dimensions for better consistency
-                            // 600 pixels width, 80 pixels height (7.5:1 ratio)
+                            // 600 pixels width, 200 pixels height (3:1 ratio)
                             // 1 pixel = 9525 EMUs
                             width = 600L * 9525L;  // 5715000 EMUs
-                            height = 80L * 9525L;  // 762000 EMUs
+                            height = 200L * 9525L; // 1905000 EMUs
                         }
                     }
                     catch
