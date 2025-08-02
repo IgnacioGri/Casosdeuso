@@ -128,16 +128,19 @@ p, span, div, li, td, th {
 }
 
 .mud-button-filled-primary {
-    background: var(--ing-primary);
-    color: white;
-    box-shadow: none;
+    background: var(--ing-primary) !important;
+    color: white !important;
+    box-shadow: none !important;
     transition: all 0.2s ease;
-    border-radius: var(--ing-radius);
+    border-radius: var(--ing-radius) !important;
+    border: none !important;
+    text-transform: none !important;
 }
 
 .mud-button-filled-primary:hover {
-    background: var(--ing-primary-hover);
-    box-shadow: 0 2px 4px rgba(0, 112, 192, 0.2);
+    background: var(--ing-primary-hover) !important;
+    box-shadow: 0 2px 4px rgba(0, 112, 192, 0.2) !important;
+    transform: none !important;
 }
 
 .mud-card {
@@ -273,32 +276,92 @@ p, span, div, li, td, th {
 /* ING Corporate Input Styles */
 .mud-input-slot {
     border-radius: var(--ing-radius) !important;
+    background-color: white !important;
 }
 
 .mud-input, .mud-select {
     font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
+/* Input fields styling */
+.mud-input-outlined .mud-input-slot {
+    border: 1px solid var(--ing-border) !important;
+    padding: 12px !important;
+}
+
+.mud-input-outlined.mud-input-focus .mud-input-slot {
+    border-color: var(--ing-primary) !important;
+    box-shadow: 0 0 0 2px rgba(0, 112, 192, 0.1) !important;
+}
+
+/* Textarea styling */
+.mud-input-outlined textarea {
+    padding: 12px !important;
+    background: #FAFAFA !important;
+}
+
+/* Select styling */
+.mud-select-outlined .mud-input-slot {
+    border: 1px solid var(--ing-border) !important;
+    padding: 12px !important;
+}
+
+.mud-select-outlined.mud-input-focus .mud-input-slot {
+    border-color: var(--ing-primary) !important;
+}
+
+/* Labels positioned above inputs */
+.mud-input-label {
+    position: relative !important;
+    transform: none !important;
+    margin-bottom: 8px !important;
+    font-size: 14px !important;
+    color: var(--ing-text-primary) !important;
+}
+
+.mud-input-label-outlined {
+    background: transparent !important;
+    padding: 0 !important;
+}
+
 /* ING Corporate Secondary Button */
 .mud-button-outlined-primary {
-    border: 1px solid var(--ing-primary);
-    color: var(--ing-primary);
-    background: white;
-    border-radius: var(--ing-radius);
+    border: 1px solid var(--ing-primary) !important;
+    color: var(--ing-primary) !important;
+    background: white !important;
+    border-radius: var(--ing-radius) !important;
+    text-transform: none !important;
 }
 
 .mud-button-outlined-primary:hover {
-    background: rgba(0, 112, 192, 0.05);
-    border-color: var(--ing-primary-hover);
+    background: rgba(0, 112, 192, 0.05) !important;
+    border-color: var(--ing-primary) !important;
+}
+
+/* Text buttons */
+.mud-button-text-primary {
+    color: var(--ing-primary) !important;
+    text-transform: none !important;
+}
+
+.mud-button-text-primary:hover {
+    background: rgba(0, 112, 192, 0.05) !important;
 }
 
 /* ING Corporate AI Assist Button */
 .mud-button-filled-secondary {
-    background: var(--ing-primary);
-    color: white;
-    border-radius: var(--ing-radius);
+    background: var(--ing-primary) !important;
+    color: white !important;
+    border-radius: var(--ing-radius) !important;
+    text-transform: none !important;
 }
 
 .mud-button-filled-secondary:hover {
-    background: var(--ing-primary-hover);
+    background: var(--ing-primary-hover) !important;
+}
+
+/* Disabled buttons */
+.mud-button:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
 }

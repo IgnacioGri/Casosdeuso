@@ -162,10 +162,22 @@
 }
 
 /* ING Corporate form styles */
+input, textarea, select {
+  font-family: 'Segoe UI', system-ui, sans-serif !important;
+  border: 1px solid var(--ing-gray-border) !important;
+  border-radius: 4px !important;
+  padding: 12px !important;
+  background-color: white !important;
+}
+
+textarea {
+  background-color: #FAFAFA !important;
+}
+
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--ing-blue);
-  box-shadow: 0 0 0 2px hsl(207, 100%, 38%, 0.1);
+  border-color: var(--ing-blue) !important;
+  box-shadow: 0 0 0 2px hsl(207, 100%, 38%, 0.1) !important;
 }
 
 /* ING Corporate border radius (4px max) */
@@ -179,11 +191,60 @@ input:focus, textarea:focus, select:focus {
 
 /* ING Corporate labels above inputs */
 label {
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  font-weight: 400;
-  color: var(--ing-text-dark);
+  font-family: 'Segoe UI', system-ui, sans-serif !important;
+  font-weight: 400 !important;
+  color: var(--ing-text-dark) !important;
   margin-bottom: 4px;
   display: block;
+}
+
+/* ING Corporate Button Styles */
+/* Primary buttons */
+.bg-primary,
+button[class*="bg-primary"],
+button[class*="bg-blue-600"] {
+  background-color: var(--ing-blue) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.bg-primary:hover,
+button[class*="bg-primary"]:hover,
+button[class*="bg-blue-600"]:hover {
+  background-color: var(--ing-blue-hover) !important;
+  box-shadow: 0 2px 4px rgba(0, 112, 192, 0.2) !important;
+}
+
+/* Secondary/outlined buttons */
+button[class*="border"],
+button[class*="outline"] {
+  background-color: white !important;
+  color: var(--ing-blue) !important;
+  border: 1px solid var(--ing-blue) !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+}
+
+button[class*="border"]:hover,
+button[class*="outline"]:hover {
+  background-color: rgba(0, 112, 192, 0.05) !important;
+}
+
+/* AI Assist buttons - keep violet but style consistently */
+button[class*="violet"],
+button[class*="purple"] {
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+}
+
+/* Button spacing */
+button {
+  padding: 8px 16px !important;
+  min-height: 40px;
+  text-transform: none !important;
 }
 
 /* Custom scrollbar for preview */
