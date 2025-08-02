@@ -1119,18 +1119,11 @@ public class DocumentService : IDocumentService
                     {
                         using (var image = System.Drawing.Image.FromFile(imagePath))
                         {
-                            // Calculate proportional scaling to fit page width
-                            // Page width is about 6000000 EMUs (for letter size)
-                            double aspectRatio = (double)image.Width / image.Height;
-                            width = 6000000L; // Max width
-                            height = (long)(width / aspectRatio);
-                            
-                            // Ensure height is reasonable
-                            if (height > 1500000L) // Max height ~1.5 inches
-                            {
-                                height = 1500000L;
-                                width = (long)(height * aspectRatio);
-                            }
+                            // Use fixed dimensions for better consistency
+                            // 600 pixels width, 80 pixels height (7.5:1 ratio)
+                            // 1 pixel = 9525 EMUs
+                            width = 600L * 9525L;  // 5715000 EMUs
+                            height = 80L * 9525L;  // 762000 EMUs
                         }
                     }
                     catch

@@ -148,8 +148,8 @@ export class DocumentService {
                     type: "png",
                     data: fs.readFileSync(headerImagePath),
                     transformation: { 
-                      width: 550,  // Optimal width for page with margins
-                      height: 50   // Proportional height based on 11:1 ratio
+                      width: 600,  // Full width for header
+                      height: 80   // Better height for visibility (7.5:1 ratio)
                     }
                   })
                 ]
