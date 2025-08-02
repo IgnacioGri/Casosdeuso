@@ -575,12 +575,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(500).json({ error: 'Error procesando el archivo Excel' });
         }
       }
-      // Handle PPTX files - for now, we'll return a message that these need special handling
-      else if (extension === '.pptx' || extension === '.ppt') {
-        // PowerPoint files are more complex to parse
-        // For now, we'll just inform the user
+      // Handle PPTX files
+      else if (extension === '.pptx') {
+        try {
+          // PPTX files are ZIP archives containing XML files
+          const AdmZip = (await import('adm-zip')).default;
+          const zip = new AdmZip(buffer);
+          const zipEntries = zip.getEntries();
+          const texts: string[] = [];
+          let slideNumber = 0;
+          
+          // Sort entries to process slides in order
+          const slideEntries = zipEntries
+            .filter(entry => entry.entryName.startsWith('ppt/slides/slide') && entry.entryName.endsWith('.xml'))
+            .sort((a, b) => {
+              const numA = parseInt(a.entryName.match(/slide(\d+)\.xml/)?.[1] || '0');
+              const numB = parseInt(b.entryName.match(/slide(\d+)\.xml/)?.[1] || '0');
+              return numA - numB;
+            });
+          
+          for (const slideEntry of slideEntries) {
+            slideNumber++;
+            const slideXml = slideEntry.getData().toString('utf8');
+            const slideTexts: string[] = [];
+            slideTexts.push(`=== Diapositiva ${slideNumber} ===`);
+            
+            // Extract text using regex (simple but effective for most cases)
+            const textMatches = slideXml.match(/<a:t[^>]*>([^<]+)<\/a:t>/g);
+            if (textMatches) {
+              textMatches.forEach(match => {
+                const text = match.replace(/<[^>]+>/g, '').trim();
+                if (text) {
+                  slideTexts.push(text);
+                }
+              });
+            }
+            
+            // Try to find notes for this slide
+            const notesEntry = zipEntries.find(entry => 
+              entry.entryName === `ppt/notesSlides/notesSlide${slideNumber}.xml`
+            );
+            
+            if (notesEntry) {
+              const notesXml = notesEntry.getData().toString('utf8');
+              const notesMatches = notesXml.match(/<a:t[^>]*>([^<]+)<\/a:t>/g);
+              if (notesMatches && notesMatches.length > 0) {
+                slideTexts.push('Notas:');
+                notesMatches.forEach(match => {
+                  const text = match.replace(/<[^>]+>/g, '').trim();
+                  if (text) {
+                    slideTexts.push(text);
+                  }
+                });
+              }
+            }
+            
+            if (slideTexts.length > 1) { // More than just the slide header
+              texts.push(slideTexts.join('\n'));
+            }
+          }
+          
+          extractedText = texts.join('\n\n');
+          
+          if (!extractedText || extractedText.trim() === '') {
+            extractedText = 'No se pudo extraer texto del archivo PowerPoint. El archivo puede estar vacío.';
+          }
+        } catch (error) {
+          console.error('Error extracting text from PowerPoint:', error);
+          return res.status(500).json({ error: 'Error procesando el archivo PowerPoint' });
+        }
+      }
+      else if (extension === '.ppt') {
+        // Old binary PPT format is not supported
         return res.status(400).json({ 
-          error: 'Los archivos PowerPoint requieren procesamiento especial. Por favor, copie y pegue el contenido manualmente.' 
+          error: 'El formato .ppt (PowerPoint 97-2003) no está soportado. Por favor, convierta el archivo a .pptx o copie y pegue el contenido manualmente.' 
         });
       }
       else {
