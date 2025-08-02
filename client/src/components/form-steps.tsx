@@ -97,7 +97,7 @@ export default function FormSteps({
                 value={formData.useCaseType} 
                 onValueChange={(value) => handleInputChange('useCaseType', value as UseCaseType)}
               >
-                <SelectTrigger className="w-full h-14 px-4 border-2 border-gray-200 hover:border-ms-blue focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/20 rounded-lg bg-white dark:bg-gray-800 transition-colors">
+                <SelectTrigger className="w-full h-auto min-h-[3.5rem] px-4 py-3 border-2 border-gray-200 hover:border-ms-blue focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/20 rounded-lg bg-white dark:bg-gray-800 transition-colors overflow-visible">
                   <SelectValue className="flex items-center">
                     {formData.useCaseType === 'entity' && (
                       <div className="flex items-center">
@@ -129,7 +129,7 @@ export default function FormSteps({
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="w-full border-2 border-gray-200 rounded-lg bg-white dark:bg-gray-800 shadow-lg">
-                  <SelectItem value="entity" className="h-14 px-4 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
+                  <SelectItem value="entity" className="h-auto min-h-[3.5rem] px-4 py-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer">
                     <div className="flex items-center w-full">
                       <Database className="mr-3 text-blue-500" size={20} />
                       <div className="text-left">
@@ -138,7 +138,7 @@ export default function FormSteps({
                       </div>
                     </div>
                   </SelectItem>
-                  <SelectItem value="api" className="h-14 px-4 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer">
+                  <SelectItem value="api" className="h-auto min-h-[3.5rem] px-4 py-3 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer">
                     <div className="flex items-center w-full">
                       <Globe className="mr-3 text-green-500" size={20} />
                       <div className="text-left">
@@ -147,7 +147,7 @@ export default function FormSteps({
                       </div>
                     </div>
                   </SelectItem>
-                  <SelectItem value="service" className="h-14 px-4 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer">
+                  <SelectItem value="service" className="h-auto min-h-[3.5rem] px-4 py-3 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer">
                     <div className="flex items-center w-full">
                       <Clock className="mr-3 text-purple-500" size={20} />
                       <div className="text-left">
