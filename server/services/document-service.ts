@@ -1874,7 +1874,7 @@ export class DocumentService {
     return new Table({
       rows: [headerRow, ...dataRows],
       width: { size: 100, type: WidthType.PERCENTAGE },
-      layout: TableLayoutType.FIXED,
+
       borders: {
         top: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
         bottom: { style: BorderStyle.SINGLE, size: 1, color: "666666" },
