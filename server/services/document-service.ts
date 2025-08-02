@@ -491,6 +491,95 @@ export class DocumentService {
       })]
     }));
     
+    // Wireframes Section - Add generated wireframe images if they exist
+    if (formData.generateWireframes && formData.generatedWireframes) {
+      sections.push(this.createStyledHeading("BOCETOS GRÁFICOS DE INTERFAZ DE USUARIO"));
+      
+      // Add search wireframe if it exists
+      if (formData.generatedWireframes.searchWireframe) {
+        sections.push(new Paragraph({
+          spacing: { before: 120, after: 60 },
+          children: [new TextRun({
+            text: "Wireframe 1: Interfaz de Búsqueda",
+            bold: true,
+            size: 24,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        try {
+          // Convert the URL path to file path
+          let searchWireframePath = formData.generatedWireframes.searchWireframe;
+          if (searchWireframePath.startsWith('/')) {
+            searchWireframePath = searchWireframePath.substring(1);
+          }
+          const searchImagePath = path.join(process.cwd(), searchWireframePath);
+          
+          if (fs.existsSync(searchImagePath)) {
+            sections.push(new Paragraph({
+              spacing: { after: 120 },
+              alignment: AlignmentType.CENTER,
+              children: [
+                new ImageRun({
+                  type: "png",
+                  data: fs.readFileSync(searchImagePath),
+                  transformation: {
+                    width: 450,  // 6.25 inches
+                    height: 338  // Maintain aspect ratio (4:3)
+                  }
+                })
+              ]
+            }));
+          }
+        } catch (error) {
+          console.error('Error loading search wireframe:', error);
+        }
+      }
+      
+      // Add form wireframe if it exists
+      if (formData.generatedWireframes.formWireframe) {
+        sections.push(new Paragraph({
+          spacing: { before: 120, after: 60 },
+          children: [new TextRun({
+            text: "Wireframe 2: Formulario de Gestión",
+            bold: true,
+            size: 24,
+            color: "0070C0",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        try {
+          // Convert the URL path to file path
+          let formWireframePath = formData.generatedWireframes.formWireframe;
+          if (formWireframePath.startsWith('/')) {
+            formWireframePath = formWireframePath.substring(1);
+          }
+          const formImagePath = path.join(process.cwd(), formWireframePath);
+          
+          if (fs.existsSync(formImagePath)) {
+            sections.push(new Paragraph({
+              spacing: { after: 120 },
+              alignment: AlignmentType.CENTER,
+              children: [
+                new ImageRun({
+                  type: "png",
+                  data: fs.readFileSync(formImagePath),
+                  transformation: {
+                    width: 450,  // 6.25 inches
+                    height: 338  // Maintain aspect ratio (4:3)
+                  }
+                })
+              ]
+            }));
+          }
+        } catch (error) {
+          console.error('Error loading form wireframe:', error);
+        }
+      }
+    }
+    
     // Test Cases Section (now at the correct position after preconditions/postconditions)
     if (formData.generateTestCase && formData.testSteps && formData.testSteps.length > 0) {
       sections.push(this.createStyledHeading("CASOS DE PRUEBA"));
