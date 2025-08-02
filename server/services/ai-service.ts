@@ -71,33 +71,62 @@ export class AIService {
   static async generateUseCase(request: GenerateUseCaseRequest): Promise<GenerateUseCaseResponse> {
     const { aiModel, formData, rules } = request;
 
-    if (aiModel === 'demo') {
-      throw new Error('El modo demo no está disponible. Por favor, configure una clave API válida para usar el generador.');
-    }
+    // If demo mode is selected, use cascading fallback starting with copilot
+    const selectedModel = aiModel === 'demo' ? 'copilot' : aiModel;
 
     try {
       const prompt = this.buildPrompt(formData, rules);
       
-      let content: string;
+      // Try to generate with selected model first, then fallback to others
+      const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
+      const modelOrder = selectedModel === 'copilot' 
+        ? aiModels 
+        : [selectedModel, ...aiModels.filter(m => m !== selectedModel)];
       
-      switch (aiModel) {
-        case 'openai':
-          content = await this.generateWithOpenAI(prompt);
-          break;
-        case 'claude':
-          content = await this.generateWithClaude(prompt);
-          break;
-        case 'grok':
-          content = await this.generateWithGrok(prompt);
-          break;
-        case 'gemini':
-          content = await this.generateWithGemini(prompt);
-          break;
-        case 'copilot':
-          content = await this.generateWithCopilot(prompt);
-          break;
-        default:
-          throw new Error(`Modelo de IA no soportado: ${aiModel}`);
+      const errors: Array<{model: string, error: string}> = [];
+      let content: string | null = null;
+      
+      for (const model of modelOrder) {
+        try {
+          console.log(`Attempting to generate use case with AI model: ${model}`);
+          
+          switch (model) {
+            case 'openai':
+              content = await this.generateWithOpenAI(prompt);
+              break;
+            case 'claude':
+              content = await this.generateWithClaude(prompt);
+              break;
+            case 'grok':
+              content = await this.generateWithGrok(prompt);
+              break;
+            case 'gemini':
+              content = await this.generateWithGemini(prompt);
+              break;
+            case 'copilot':
+              content = await this.generateWithCopilot(prompt);
+              break;
+            default:
+              continue;
+          }
+          
+          if (content) {
+            console.log(`Successfully generated use case with ${model}`);
+            break;
+          }
+        } catch (error: any) {
+          console.error(`Failed to generate with ${model}:`, error.message || error);
+          errors.push({
+            model,
+            error: error.message || 'Unknown error'
+          });
+          // Continue to next model
+        }
+      }
+      
+      if (!content) {
+        const errorDetails = errors.map(e => `${e.model}: ${e.error}`).join('\n');
+        throw new Error(`No se pudo generar el caso de uso con ningún modelo de IA disponible. Por favor, configure al menos una clave API válida.\n\nErrores:\n${errorDetails}`);
       }
 
       // Clean content to remove any explanatory text before HTML

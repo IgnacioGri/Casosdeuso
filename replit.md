@@ -70,7 +70,7 @@ The application employs a modern full-stack .NET architecture, ensuring a clear 
 - **Better Error Logging**: Enhanced logging for intelligent test case generation to help diagnose integration issues
 - **Test Case Export Integration**: Ensured intelligent test cases are properly included in DOCX exports
 - **Cascading AI Provider Fallback**: Implemented automatic fallback mechanism that tries multiple AI providers in sequence if one fails (e.g., Copilot → Gemini → OpenAI → Claude → Grok)
-- **Removed Demo Mode**: Eliminated demo data fallbacks - system now shows proper error messages when all AI providers fail
+- **Demo Mode Fixed**: When "demo" is selected, system now uses cascading fallback starting with Copilot instead of throwing immediate error
 - **Consistent Error Handling**: Both TypeScript and C# systems now have identical cascading fallback logic and error messages in Spanish
 - **DOCX Export Fix**: Fixed type validation error in DOCX export where testCasePreconditions could be non-string values (arrays/objects from AI responses)
 - **UI Improvements**: Updated progress indicator with correct step names and smaller icons (w-8 h-8) for better visual balance with 11 steps
