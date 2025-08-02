@@ -44,7 +44,7 @@ export class DocumentService {
 
   // Generate DOCX directly from form data - no HTML conversion needed
   static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string): Promise<Buffer> {
-    // Use custom header image if provided, otherwise use default
+    // Use custom header image if provided, otherwise use default ING header
     let headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
     
     if (customHeaderImage) {

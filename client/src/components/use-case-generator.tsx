@@ -334,7 +334,11 @@ export default function UseCaseGenerator() {
                   </button>
                 </div>
               ) : (
-                <FileText className="text-ms-blue" size={24} />
+                <img 
+                  src="/attached_assets/company-logo.png" 
+                  alt="Company Logo" 
+                  className="h-8 w-8 object-contain"
+                />
               )}
               <h1 className="text-xl font-semibold text-gray-900">
                 Generador de Casos de Uso
