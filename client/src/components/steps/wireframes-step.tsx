@@ -10,6 +10,10 @@ import { ImageIcon, RefreshCw, Loader2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 
+// Demo wireframe images
+import demoSearchWireframe from '@assets/generated_images/Search_interface_wireframe_59d3b735.png';
+import demoFormWireframe from '@assets/generated_images/Form_interface_wireframe_bf6aaf30.png';
+
 interface WireframesStepProps {
   formData: UseCaseFormData;
   onUpdateFormData: (data: Partial<UseCaseFormData>) => void;
@@ -47,19 +51,19 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
 
   const handleGenerateWireframe = async (type: 'search' | 'form') => {
     if (!formData.aiModelForWireframes || formData.aiModelForWireframes === 'demo') {
-      // For demo mode, use placeholder images
+      // For demo mode, use pre-generated example images
       if (type === 'search') {
         onUpdateFormData({
           generatedWireframes: {
             ...formData.generatedWireframes,
-            searchWireframe: '/demo-search-wireframe.png'
+            searchWireframe: demoSearchWireframe
           }
         });
       } else {
         onUpdateFormData({
           generatedWireframes: {
             ...formData.generatedWireframes,
-            formWireframe: '/demo-form-wireframe.png'
+            formWireframe: demoFormWireframe
           }
         });
       }
