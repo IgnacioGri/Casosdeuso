@@ -1204,16 +1204,6 @@ export default function FormSteps({
                 
               </div>
             </div>
-            
-            <div className="flex space-x-4">
-              <Button 
-                type="button" 
-                onClick={onLoadDemoData}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Cargar Datos Demo
-              </Button>
-            </div>
           </div>
         </CardContent>
       </Card>
