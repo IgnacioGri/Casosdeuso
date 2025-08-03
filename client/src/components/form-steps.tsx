@@ -11,6 +11,9 @@ import UseCaseTemplatePreview from "@/components/use-case-template-preview";
 
 import { AIAssistButton } from "@/components/ai-assist-button";
 import { AIGeneratedTag } from "@/components/ai-generated-tag";
+import { SmartAutocomplete } from './smart-autocomplete';
+import { ContextualTooltip, fieldTooltips } from './contextual-tooltip';
+import { AnimatedField, AddFieldButton, SmoothButton } from './micro-interactions';
 
 interface FormStepsProps {
   currentStep: number;
@@ -209,43 +212,93 @@ export default function FormSteps({
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nombre del Cliente *
-              </label>
-              <input 
-                type="text" 
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Nombre del Cliente *
+                </label>
+                <ContextualTooltip
+                  content={fieldTooltips.clientName.content}
+                  example={fieldTooltips.clientName.example}
+                  format={fieldTooltips.clientName.format}
+                />
+              </div>
+              <SmartAutocomplete
                 value={formData.clientName}
-                onChange={(e) => handleInputChange('clientName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                onChange={(value) => handleInputChange('clientName', value)}
                 placeholder="Ej: Banco Nacional de Argentina"
+                suggestions={[
+                  'Banco Santander Argentina S.A.',
+                  'Banco de la Nación Argentina',
+                  'Banco Provincia de Buenos Aires',
+                  'Banco Ciudad de Buenos Aires',
+                  'Banco Galicia',
+                  'Banco BBVA Argentina',
+                  'Banco Macro S.A.',
+                  'Banco HSBC Argentina',
+                  'Banco Patagonia S.A.',
+                  'Banco Credicoop'
+                ]}
+                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.clientName} type="required" label="Nombre del Cliente" />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nombre del Proyecto *
-              </label>
-              <input 
-                type="text" 
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Nombre del Proyecto *
+                </label>
+                <ContextualTooltip
+                  content={fieldTooltips.projectName.content}
+                  example={fieldTooltips.projectName.example}
+                  format={fieldTooltips.projectName.format}
+                />
+              </div>
+              <SmartAutocomplete
                 value={formData.projectName}
-                onChange={(e) => handleInputChange('projectName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                onChange={(value) => handleInputChange('projectName', value)}
                 placeholder="Ej: Sistema de Gestión de Usuarios"
+                suggestions={[
+                  'Sistema de Gestión de Préstamos Personales',
+                  'Sistema de Home Banking',
+                  'Sistema de Gestión de Cuentas',
+                  'Sistema de Transferencias Interbancarias',
+                  'Sistema de Pagos Electrónicos',
+                  'Portal de Autogestión de Clientes',
+                  'Sistema de Gestión de Tarjetas',
+                  'Sistema de Gestión de Inversiones',
+                  'Sistema de Gestión de Riesgos',
+                  'Sistema de Prevención de Fraudes'
+                ]}
+                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.projectName} type="required" label="Nombre del Proyecto" />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Código del Caso de Uso *
-              </label>
-              <input 
-                type="text" 
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Código del Caso de Uso *
+                </label>
+                <ContextualTooltip
+                  content={fieldTooltips.useCaseCode.content}
+                  example={fieldTooltips.useCaseCode.example}
+                  format={fieldTooltips.useCaseCode.format}
+                />
+              </div>
+              <SmartAutocomplete
                 value={formData.useCaseCode}
-                onChange={(e) => handleInputChange('useCaseCode', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                onChange={(value) => handleInputChange('useCaseCode', value)}
                 placeholder="Ej: UC001"
+                suggestions={[
+                  'UC001', 'UC002', 'UC003', 'UC004', 'UC005',
+                  'PRE-001', 'PRE-002', 'PRE-003',
+                  'GES-001', 'GES-002', 'GES-003',
+                  'REP-001', 'REP-002', 'REP-003',
+                  'API-001', 'API-002', 'API-003',
+                  'PROC-001', 'PROC-002', 'PROC-003'
+                ]}
+                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.useCaseCode} type="required" label="Código del Caso de Uso" />
             </div>
@@ -269,15 +322,36 @@ export default function FormSteps({
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Nombre del Caso de Uso *
-              </label>
-              <input 
-                type="text" 
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Nombre del Caso de Uso *
+                </label>
+                <ContextualTooltip
+                  content={fieldTooltips.useCaseName.content}
+                  example={fieldTooltips.useCaseName.example}
+                  format={fieldTooltips.useCaseName.format}
+                />
+              </div>
+              <SmartAutocomplete
                 value={formData.useCaseName}
-                onChange={(e) => handleInputChange('useCaseName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                onChange={(value) => handleInputChange('useCaseName', value)}
                 placeholder="Ej: Gestionar Usuarios del Sistema"
+                suggestions={[
+                  'Gestionar Clientes',
+                  'Gestionar Usuarios',
+                  'Gestionar Cuentas Bancarias',
+                  'Gestionar Préstamos',
+                  'Gestionar Transferencias',
+                  'Gestionar Pagos',
+                  'Gestionar Inversiones',
+                  'Consultar Saldos',
+                  'Consultar Movimientos',
+                  'Generar Reportes',
+                  'Procesar Transacciones',
+                  'Validar Documentos',
+                  'Autorizar Operaciones'
+                ]}
+                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.useCaseName} type="useCaseName" />
             </div>
@@ -394,42 +468,45 @@ export default function FormSteps({
 
             {/* Lista manual de filtros */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Filtros disponibles para la búsqueda
-              </label>
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Filtros disponibles para la búsqueda
+                </label>
+                <ContextualTooltip
+                  content="Filtros que permiten a los usuarios buscar registros específicos"
+                  example="Nombre, DNI, Estado, Fecha"
+                  format="Un filtro por línea"
+                />
+              </div>
               
               <div className="space-y-2">
               {formData.searchFilters.map((filter, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <input 
-                    type="text" 
-                    value={filter}
-                    onChange={(e) => onUpdateSearchFilter(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                    placeholder="Nombre del filtro (ej: Nombre)"
-                  />
-
-                  <Button 
-                    type="button" 
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRemoveSearchFilter(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    Eliminar
-                  </Button>
-                </div>
+                <AnimatedField key={index} index={index} onRemove={() => onRemoveSearchFilter(index)}>
+                  <div className="flex items-center space-x-2">
+                    <SmartAutocomplete
+                      value={filter}
+                      onChange={(value) => onUpdateSearchFilter(index, value)}
+                      placeholder="Nombre del filtro (ej: Nombre)"
+                      suggestions={[
+                        'Nombre', 'Apellido', 'DNI', 'CUIT', 'Estado',
+                        'Fecha Desde', 'Fecha Hasta', 'Tipo', 'Categoría',
+                        'Sucursal', 'Monto Mínimo', 'Monto Máximo',
+                        'Email', 'Teléfono', 'Ciudad', 'Provincia'
+                      ]}
+                      useCaseType={formData.useCaseType}
+                      className="flex-1"
+                    />
+                  </div>
+                </AnimatedField>
               ))}
               </div>
               
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={onAddSearchFilter}
-                className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
-              >
-                Agregar filtro
-              </Button>
+              <div className="mt-3">
+                <AddFieldButton
+                  onClick={onAddSearchFilter}
+                  label="Agregar filtro"
+                />
+              </div>
             </div>
           </div>
         </CardContent>
@@ -497,42 +574,45 @@ export default function FormSteps({
 
             {/* Lista manual de columnas */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Columnas que se mostrarán en los resultados de búsqueda
-              </label>
+              <div className="flex items-center gap-2 mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Columnas que se mostrarán en los resultados de búsqueda
+                </label>
+                <ContextualTooltip
+                  content="Columnas que aparecerán en la grilla de resultados"
+                  example="ID, Nombre, Estado, Fecha Alta"
+                  format="Una columna por línea"
+                />
+              </div>
               
               <div className="space-y-2">
                 {formData.resultColumns.map((column, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <input 
-                      type="text" 
-                      value={column}
-                      onChange={(e) => onUpdateResultColumn(index, e.target.value)}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                      placeholder="Nombre de la columna (ej: ID)"
-                    />
-
-                    <Button 
-                      type="button" 
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemoveResultColumn(index)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Eliminar
-                    </Button>
-                  </div>
+                  <AnimatedField key={index} index={index} onRemove={() => onRemoveResultColumn(index)}>
+                    <div className="flex items-center space-x-2">
+                      <SmartAutocomplete
+                        value={column}
+                        onChange={(value) => onUpdateResultColumn(index, value)}
+                        placeholder="Nombre de la columna (ej: ID)"
+                        suggestions={[
+                          'ID', 'Código', 'Nombre', 'Apellido', 'Descripción',
+                          'Estado', 'Fecha Alta', 'Fecha Modificación', 
+                          'Usuario Alta', 'Tipo', 'Categoría', 'Monto',
+                          'Saldo', 'Email', 'Teléfono', 'Sucursal'
+                        ]}
+                        useCaseType={formData.useCaseType}
+                        className="flex-1"
+                      />
+                    </div>
+                  </AnimatedField>
                 ))}
               </div>
               
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={onAddResultColumn}
-                className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
-              >
-                Agregar columna
-              </Button>
+              <div className="mt-3">
+                <AddFieldButton
+                  onClick={onAddResultColumn}
+                  label="Agregar columna"
+                />
+              </div>
             </div>
           </div>
         </CardContent>
@@ -667,14 +747,21 @@ export default function FormSteps({
                   </thead>
                   <tbody>
                     {formData.entityFields.map((field, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index} className="hover:bg-gray-50 transition-colors">
                         <td className="border border-gray-300 px-2 py-1">
-                          <input 
-                            type="text" 
+                          <SmartAutocomplete
                             value={field.name}
-                            onChange={(e) => onUpdateEntityField(index, { name: e.target.value })}
-                            className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
-                            placeholder="Nombre"
+                            onChange={(value) => onUpdateEntityField(index, { name: value })}
+                            placeholder="Nombre del campo"
+                            suggestions={[
+                              'id', 'codigo', 'nombre', 'apellido', 'descripcion', 
+                              'email', 'telefono', 'direccion', 'dni', 'cuit', 
+                              'estado', 'fechaAlta', 'fechaBaja', 'usuarioAlta', 
+                              'usuarioBaja', 'activo', 'tipo', 'monto', 'saldo',
+                              'fechaNacimiento', 'categoria', 'prioridad'
+                            ]}
+                            useCaseType={formData.useCaseType}
+                            className="w-full"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1">
@@ -745,15 +832,10 @@ export default function FormSteps({
               </div>
               
               <div className="mt-4">
-                <Button 
-                  type="button" 
-                  variant="outline"
+                <AddFieldButton
                   onClick={onAddEntityField}
-                  className="text-ms-blue border-ms-blue hover:bg-ms-blue hover:text-white"
-                >
-                  <Plus className="mr-2" size={16} />
-                  Agregar campo
-                </Button>
+                  label="Agregar campo"
+                />
               </div>
             </div>
           </div>
