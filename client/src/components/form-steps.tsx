@@ -212,14 +212,15 @@ export default function FormSteps({
           
           <div className="space-y-4">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="flex items-baseline gap-1 mb-1">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nombre del Cliente *
                 </label>
                 <ContextualTooltip
                   content={fieldTooltips.clientName.content}
                   example={fieldTooltips.clientName.example}
                   format={fieldTooltips.clientName.format}
+                  className="ml-0.5"
                 />
               </div>
               <SmartAutocomplete
@@ -244,14 +245,15 @@ export default function FormSteps({
             </div>
             
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="flex items-baseline gap-1 mb-1">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nombre del Proyecto *
                 </label>
                 <ContextualTooltip
                   content={fieldTooltips.projectName.content}
                   example={fieldTooltips.projectName.example}
                   format={fieldTooltips.projectName.format}
+                  className="ml-0.5"
                 />
               </div>
               <SmartAutocomplete
@@ -276,14 +278,15 @@ export default function FormSteps({
             </div>
             
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="flex items-baseline gap-1 mb-1">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Código del Caso de Uso *
                 </label>
                 <ContextualTooltip
                   content={fieldTooltips.useCaseCode.content}
                   example={fieldTooltips.useCaseCode.example}
                   format={fieldTooltips.useCaseCode.format}
+                  className="ml-0.5"
                 />
               </div>
               <SmartAutocomplete
@@ -322,14 +325,15 @@ export default function FormSteps({
           
           <div className="space-y-4">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="flex items-baseline gap-1 mb-1">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nombre del Caso de Uso *
                 </label>
                 <ContextualTooltip
                   content={fieldTooltips.useCaseName.content}
                   example={fieldTooltips.useCaseName.example}
                   format={fieldTooltips.useCaseName.format}
+                  className="ml-0.5"
                 />
               </div>
               <SmartAutocomplete
@@ -468,14 +472,15 @@ export default function FormSteps({
 
             {/* Lista manual de filtros */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="flex items-baseline gap-1 mb-1">
+                <label className="text-sm font-medium text-gray-700">
                   Filtros disponibles para la búsqueda
                 </label>
                 <ContextualTooltip
                   content="Filtros que permiten a los usuarios buscar registros específicos"
                   example="Nombre, DNI, Estado, Fecha"
                   format="Un filtro por línea"
+                  className="ml-0.5"
                 />
               </div>
               
@@ -574,14 +579,15 @@ export default function FormSteps({
 
             {/* Lista manual de columnas */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+              <div className="flex items-baseline gap-1 mb-1">
+                <label className="text-sm font-medium text-gray-700">
                   Columnas que se mostrarán en los resultados de búsqueda
                 </label>
                 <ContextualTooltip
                   content="Columnas que aparecerán en la grilla de resultados"
                   example="ID, Nombre, Estado, Fecha Alta"
                   format="Una columna por línea"
+                  className="ml-0.5"
                 />
               </div>
               
