@@ -2,6 +2,14 @@
 
 Este documento contiene todos los prompts utilizados en el sistema, diferenciados por plataforma (React/TypeScript vs C#/Blazor).
 
+## ⚠️ CAMBIOS CRÍTICOS IMPLEMENTADOS (Enero 2025)
+
+### Mejoras de Robustez en Prompts
+- **CRÍTICO**: Todos los ejemplos ahora están marcados como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+- **CRÍTICO**: Instrucciones explícitas para usar EXACTAMENTE los datos de formData y nunca valores genéricos como "Apellido", "DNI", "Segmento"
+- **Fallback para actores**: "Si no hay actor explícito, usar 'Actor no identificado'"
+- **Wireframes dinámicos**: Los wireframes ahora usan datos específicos del formulario en lugar de valores hardcoded
+
 ## Índice
 1. [Generación Principal de Casos de Uso](#1-generación-principal-de-casos-de-uso)
    - [TypeScript/React](#11-typescriptreact)
@@ -30,11 +38,17 @@ Este documento contiene todos los prompts utilizados en el sistema, diferenciado
 **Ubicación**: `server/services/ai-service.ts` - método `buildPrompt()`
 
 ```typescript
-// Prompt base en TypeScript
+// Prompt base en TypeScript (ACTUALIZADO - Enero 2025)
 const basePrompt = `
 Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
 
 IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
+
+⚠️ INSTRUCCIONES CRÍTICAS SOBRE EL USO DE EJEMPLOS Y DATOS:
+1. NUNCA uses valores por defecto o genéricos como "Apellido", "DNI", "Segmento" salvo que sean EXACTAMENTE los especificados en los datos del formulario.
+2. Cualquier ejemplo en este prompt está marcado como: "Ejemplo ilustrativo, no debe reproducirse salvo que aplique al caso específico".
+3. SIEMPRE usa los valores EXACTOS proporcionados en formData (filtros, columnas, campos).
+4. Si formData no especifica un valor, NO lo inventes. Indica "no especificado por el usuario".
 
 INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
 - Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
@@ -44,7 +58,7 @@ NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción pr
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
 2. Para flujos, usa numeración jerárquica profesional:
-   4. Flujo Básico
+   4. Flujo Básico (Ejemplo ilustrativo, no debe reproducirse salvo que aplique)
      4.1 Menú principal
      4.2 Subflujo: Búsqueda
        4.2.1 Ingreso de filtros
@@ -55,9 +69,13 @@ FORMATO ESTRUCTURADO REQUERIDO:
 
 3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
+INSTRUCCIONES PARA ACTORES:
+- Si no hay actor explícito en los datos, usar: "Actor no identificado"
+- NUNCA inventes actores como "Empleado Bancario" si no están especificados
+
 ${rules}
 
-DATOS DEL FORMULARIO COMPLETOS:
+DATOS DEL FORMULARIO COMPLETOS (usar EXACTAMENTE estos valores):
 - Tipo de caso de uso: ${formData.useCaseType}
 - Cliente: ${formData.clientName}
 - Proyecto: ${formData.projectName}
@@ -65,13 +83,13 @@ DATOS DEL FORMULARIO COMPLETOS:
 - Nombre: ${formData.useCaseName}
 - Archivo: ${formData.fileName}
 - Descripción: ${formData.description}
-- Filtros de búsqueda: ${JSON.stringify(formData.searchFilters)}
-- Columnas de resultado: ${JSON.stringify(formData.resultColumns)}
+- Filtros de búsqueda: ${formData.searchFilters?.length ? formData.searchFilters.join(", ") : "Ninguno especificado"}
+- Columnas de resultado: ${formData.resultColumns?.length ? formData.resultColumns.join(", ") : "Ninguna especificada"}
 - Campos de entidad: ${JSON.stringify(formData.entityFields)}
-- Reglas de negocio: ${formData.businessRules}
-- Requerimientos especiales: ${formData.specialRequirements}
-- Generar wireframes: ${formData.generateWireframes}
-- Descripciones de wireframes: ${JSON.stringify(formData.wireframeDescriptions)}
+- Reglas de negocio: ${formData.businessRules || "Ninguna específica"}
+- Requerimientos especiales: ${formData.specialRequirements || "Ninguno"}
+- Generar wireframes: ${formData.generateWireframes ? "Sí" : "No"}
+- Descripciones de wireframes: ${formData.wireframeDescriptions?.filter(w => w?.trim()).join("; ") || ""}
 
 INSTRUCCIONES FINALES:
 - Genera un documento completo y profesional
@@ -79,6 +97,7 @@ INSTRUCCIONES FINALES:
 - Incluye TODAS las secciones requeridas
 - Asegúrate de que la descripción sea detallada y profesional
 - El documento debe estar listo para convertirse a DOCX con formato corporativo ING
+- CRÍTICO: Usa SOLO los datos exactos proporcionados en formData
 `;
 ```
 
@@ -92,11 +111,17 @@ const systemMessage = "Eres un experto en documentación de casos de uso. Genera
 **Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs` - método `BuildPrompt()`
 
 ```csharp
-// Prompt base en C#
+// Prompt base en C# (ACTUALIZADO - Enero 2025)
 var basePrompt = $@"
 Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
 
 IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
+
+⚠️ INSTRUCCIONES CRÍTICAS SOBRE EL USO DE EJEMPLOS Y DATOS:
+1. NUNCA uses valores por defecto o genéricos como ""Apellido"", ""DNI"", ""Segmento"" salvo que sean EXACTAMENTE los especificados en los datos del formulario.
+2. Cualquier ejemplo en este prompt está marcado como: ""Ejemplo ilustrativo, no debe reproducirse salvo que aplique al caso específico"".
+3. SIEMPRE usa los valores EXACTOS proporcionados en formData (filtros, columnas, campos).
+4. Si formData no especifica un valor, NO lo inventes. Indica ""no especificado por el usuario"".
 
 INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
 - Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
@@ -106,20 +131,24 @@ NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción pr
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
 2. Para flujos, usa numeración jerárquica profesional:
-   4. Flujo Básico
-     4.1 Menú principal
-     4.2 Subflujo: Búsqueda
-       4.2.1 Ingreso de filtros
-       4.2.2 Ejecución de búsqueda
-     4.3 Subflujo: Alta
-       4.3.1 Validación de datos
-       4.3.2 Confirmación
+   1. Flujo Básico (Ejemplo ilustrativo, no debe reproducirse salvo que aplique)
+     a. Menú principal
+       i. Ingreso de filtros
+       ii. Ejecución de búsqueda
+     b. Subflujo: Alta
+       i. Validación de datos
+       ii. Confirmación
+   Indenta 0.2 pulgadas por nivel a la derecha.
 
 3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
+INSTRUCCIONES PARA ACTORES:
+- Si no hay actor explícito en los datos, usar: ""Actor no identificado""
+- NUNCA inventes actores como ""Empleado Bancario"" si no están especificados
+
 {rules}
 
-DATOS DEL FORMULARIO COMPLETOS:
+DATOS DEL FORMULARIO COMPLETOS (usar EXACTAMENTE estos valores):
 - Tipo de caso de uso: {formData.UseCaseType}
 - Cliente: {formData.ClientName}
 - Proyecto: {formData.ProjectName}
@@ -127,20 +156,22 @@ DATOS DEL FORMULARIO COMPLETOS:
 - Nombre: {formData.UseCaseName}
 - Archivo: {formData.FileName}
 - Descripción: {formData.Description}
-- Filtros de búsqueda: {JsonSerializer.Serialize(formData.SearchFilters)}
-- Columnas de resultado: {JsonSerializer.Serialize(formData.ResultColumns)}
-- Campos de entidad: {JsonSerializer.Serialize(formData.EntityFields)}
-- Reglas de negocio: {formData.BusinessRules}
-- Requerimientos especiales: {formData.SpecialRequirements}
-- Generar wireframes: {formData.GenerateWireframes}
-- Descripciones de wireframes: {JsonSerializer.Serialize(formData.WireframeDescriptions)}
+- Filtros de búsqueda: {(formData.SearchFilters?.Any() == true ? string.Join("", "", formData.SearchFilters) : ""Ninguno especificado"")}
+- Columnas de resultado: {(formData.ResultColumns?.Any() == true ? string.Join("", "", formData.ResultColumns) : ""Ninguna especificada"")}
+- Campos de entidad: {entityFieldsDescription}
+- Reglas de negocio: {formData.BusinessRules ?? ""Ninguna específica""}
+- Requerimientos especiales: {formData.SpecialRequirements ?? ""Ninguno""}
+- Generar wireframes: {(formData.GenerateWireframes ? ""Sí"" : ""No"")}
+{(formData.WireframeDescriptions?.Any(w => !string.IsNullOrWhiteSpace(w)) == true ? $""- Descripciones de wireframes: {string.Join(""; "", formData.WireframeDescriptions.Where(w => !string.IsNullOrWhiteSpace(w)))}"" : """")}
 
 INSTRUCCIONES FINALES:
 - Genera un documento completo y profesional
 - Mantén consistencia en la numeración y formato
 - Incluye TODAS las secciones requeridas
 - Asegúrate de que la descripción sea detallada y profesional
+- Incluye título en MAYÚSCULAS con color azul RGB(0,112,192) en la sección inicial
 - El documento debe estar listo para convertirse a DOCX con formato corporativo ING
+- CRÍTICO: Usa SOLO los datos exactos proporcionados en formData
 ";
 ```
 
@@ -501,9 +532,15 @@ float temperature = 0.3f;
 **Ubicación**: `server/services/intelligent-test-case-service.ts`
 
 ```typescript
-// Prompt principal para casos de prueba en TypeScript
+// Prompt principal para casos de prueba en TypeScript (ACTUALIZADO - Enero 2025)
 const testCasePrompt = `
 Como experto en QA y testing de software, genera casos de prueba profesionales para el siguiente caso de uso.
+
+⚠️ INSTRUCCIONES CRÍTICAS SOBRE DATOS:
+1. NUNCA uses datos genéricos como "Apellido", "DNI", "Segmento" en los casos de prueba
+2. USA EXACTAMENTE los datos especificados en el contexto del caso de uso
+3. Si el contexto no especifica datos, indica "datos a definir por el usuario"
+4. Cualquier ejemplo genérico está marcado como: "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
 
 CONTEXTO DEL CASO DE USO:
 ${JSON.stringify(context)}
@@ -514,6 +551,7 @@ INSTRUCCIONES CRÍTICAS:
 3. Incluye tanto flujos principales como alternativos
 4. Considera casos límite y validaciones
 5. Genera precondiciones realistas y específicas
+6. USA SOLO los filtros, columnas y campos especificados en el contexto
 
 FORMATO DE RESPUESTA OBLIGATORIO:
 {
@@ -522,9 +560,9 @@ FORMATO DE RESPUESTA OBLIGATORIO:
   "testSteps": [
     {
       "number": 1,
-      "action": "Acción específica y clara",
-      "inputData": "Datos de entrada detallados",
-      "expectedResult": "Resultado esperado verificable",
+      "action": "Acción específica y clara usando datos del contexto",
+      "inputData": "Datos de entrada detallados del contexto específico",
+      "expectedResult": "Resultado esperado verificable con datos del contexto",
       "observations": "Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba"
     }
   ],
@@ -535,13 +573,14 @@ REQUISITOS:
 - El objetivo debe explicar QUÉ se prueba y POR QUÉ es importante
 - Las precondiciones deben estar categorizadas (Usuario, Sistema, Datos, Infraestructura)
 - Cada paso debe ser independiente y atómico
-- Los datos de entrada deben ser específicos (no genéricos)
+- Los datos de entrada deben ser específicos del contexto (NO genéricos)
 - Los resultados esperados deben ser medibles
+- CRÍTICO: Usar SOLO datos del contexto proporcionado
 `;
 
 // Configuración para casos de prueba
 const testCaseTokens = 12000; // Token limit para casos de prueba
-const temperature = 0.3;
+const temperature = 0.2; // Reducida para mayor precisión
 ```
 
 ### 5.2. C#/Blazor
@@ -549,9 +588,15 @@ const temperature = 0.3;
 **Ubicación**: `UseCaseGenerator.Server/Services/IntelligentTestCaseService.cs`
 
 ```csharp
-// Prompt principal para casos de prueba en C#
+// Prompt principal para casos de prueba en C# (ACTUALIZADO - Enero 2025)
 var testCasePrompt = $@"
 Como experto en QA y testing de software, genera casos de prueba profesionales para el siguiente caso de uso.
+
+⚠️ INSTRUCCIONES CRÍTICAS SOBRE DATOS:
+1. NUNCA uses datos genéricos como ""Apellido"", ""DNI"", ""Segmento"" en los casos de prueba
+2. USA EXACTAMENTE los datos especificados en el contexto del caso de uso
+3. Si el contexto no especifica datos, indica ""datos a definir por el usuario""
+4. Cualquier ejemplo genérico está marcado como: ""Ejemplo ilustrativo, no debe reproducirse salvo que aplique""
 
 CONTEXTO DEL CASO DE USO:
 {JsonSerializer.Serialize(context)}
@@ -562,6 +607,7 @@ INSTRUCCIONES CRÍTICAS:
 3. Incluye tanto flujos principales como alternativos
 4. Considera casos límite y validaciones
 5. Genera precondiciones realistas y específicas
+6. USA SOLO los filtros, columnas y campos especificados en el contexto
 
 FORMATO DE RESPUESTA OBLIGATORIO:
 {{
@@ -570,9 +616,9 @@ FORMATO DE RESPUESTA OBLIGATORIO:
   ""testSteps"": [
     {{
       ""number"": 1,
-      ""action"": ""Acción específica y clara"",
-      ""inputData"": ""Datos de entrada detallados"",
-      ""expectedResult"": ""Resultado esperado verificable"",
+      ""action"": ""Acción específica y clara usando datos del contexto"",
+      ""inputData"": ""Datos de entrada detallados del contexto específico"",
+      ""expectedResult"": ""Resultado esperado verificable con datos del contexto"",
       ""observations"": ""Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba""
     }}
   ],
@@ -583,13 +629,14 @@ REQUISITOS:
 - El objetivo debe explicar QUÉ se prueba y POR QUÉ es importante
 - Las precondiciones deben estar categorizadas (Usuario, Sistema, Datos, Infraestructura)
 - Cada paso debe ser independiente y atómico
-- Los datos de entrada deben ser específicos (no genéricos)
+- Los datos de entrada deben ser específicos del contexto (NO genéricos)
 - Los resultados esperados deben ser medibles
+- CRÍTICO: Usar SOLO datos del contexto proporcionado
 ";
 
 // Configuración para casos de prueba
 int testCaseTokens = 12000; // Token limit para casos de prueba
-float temperature = 0.3f;
+float temperature = 0.2f; // Reducida para mayor precisión
 ```
 
 ---
@@ -704,7 +751,83 @@ ESTRUCTURA OBLIGATORIA:
 4. **Validación**: Se incluyen reglas de validación específicas para cada tipo de dato
 5. **Sincronización**: Los prompts están sincronizados entre TypeScript y C#
 
+## 6. Prompts para Wireframes Dinámicos (NUEVOS - Enero 2025)
+
+### 6.1. Wireframes para Entidades - TypeScript
+**Ubicación**: `server/services/ai-service.ts` - método `generateEntitySearchWireframe()`
+
+```typescript
+function generateEntitySearchWireframe(userDescription, formData) {
+  const filters = formData.searchFilters || [];
+  const columns = formData.resultColumns || [];
+  
+  return `Wireframe textual ING para buscador de entidades ${formData.useCaseName || "entidad"}.
+
+IMPORTANTE: Este wireframe usa EXACTAMENTE los datos provistos en el formulario. NO sustituir con valores genéricos.
+
+Panel de búsqueda superior con los siguientes filtros${filters.length ? ":" : " (no especificados por el usuario):"}
+${filters.length ? filters.map(f => `- ${f}`).join("\n") : "- (El usuario no especificó filtros)"}
+
+Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
+
+Tabla de resultados con paginado ING activado, mostrando las siguientes columnas${columns.length ? ":" : " (no especificadas por el usuario):"}
+${columns.length ? columns.map(c => `- ${c}`).join("\n") : "- (El usuario no especificó columnas)"}
+
+Cada fila incluye botones Editar y Eliminar al final.
+
+Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).`;
+}
+```
+
+### 6.2. Wireframes para Entidades - C#
+**Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs` - método `GenerateEntitySearchWireframe()`
+
+```csharp
+private string GenerateEntitySearchWireframe(string userDescription, UseCaseFormData formData)
+{
+    var filters = formData.SearchFilters ?? new List<string>();
+    var columns = formData.ResultColumns ?? new List<string>();
+    
+    var wireframe = $@"Wireframe textual ING para buscador de entidades {formData.UseCaseName ?? "entidad"}.
+
+IMPORTANTE: Este wireframe usa EXACTAMENTE los datos provistos en el formulario. NO sustituir con valores genéricos.
+
+Panel de búsqueda superior con los siguientes filtros{(filters.Any() ? ":" : " (no especificados por el usuario):")}
+{(filters.Any() ? string.Join("\n", filters.Select(f => $"- {f}")) : "- (El usuario no especificó filtros)")}
+
+Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
+
+Tabla de resultados con paginado ING activado, mostrando las siguientes columnas{(columns.Any() ? ":" : " (no especificadas por el usuario):")}
+{(columns.Any() ? string.Join("\n", columns.Select(c => $"- {c}")) : "- (El usuario no especificó columnas)")}
+
+Cada fila incluye botones Editar y Eliminar al final.
+
+Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).";
+
+    return FormatProfessionalText(wireframe);
+}
+```
+
+---
+
 ## 7. Configuración de Modelos AI
+
+## Resumen de Cambios de Robustez Implementados
+
+Los siguientes cambios fueron implementados en **ambos sistemas** (TypeScript y C#) para prevenir el uso de datos genéricos:
+
+### ✅ Cambios Completados:
+1. **Instrucciones explícitas** para usar EXACTAMENTE los datos de formData
+2. **Marcación de ejemplos** como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+3. **Fallback para actores**: "Actor no identificado" cuando no se especifica
+4. **Wireframes dinámicos** que indican claramente cuando no hay datos especificados
+5. **Temperatura reducida** para casos de prueba (0.2) para mayor precisión
+6. **Validaciones explícitas** para evitar valores hardcoded como "Apellido", "DNI", "Segmento"
+
+### 🎯 Objetivo Logrado:
+Ambos sistemas ahora generan documentos usando **únicamente** los datos específicos proporcionados por el usuario, eliminando completamente la generación de valores genéricos o por defecto.
+
+---
 
 ### 7.1. TypeScript/React
 
