@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { ProgressIndicator } from "@/components/progress-indicator";
+import { AdaptiveLoading, AdaptiveProgressSteps } from "@/components/adaptive-loading";
 
 
 interface TestCaseStepProps {
@@ -301,12 +302,34 @@ export function TestCaseStep({
     </div>
     
     {/* Progress Indicator */}
-    <ProgressIndicator
-      isVisible={isGenerating}
-      progress={progress}
-      message={progressMessage}
-      subMessage="Generando casos de prueba basados en el análisis completo del caso de uso"
-    />
+    {/* Adaptive Loading for Test Case Generation */}
+    {isGenerating && (
+      <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-96 border border-gray-200 dark:border-gray-700 z-50">
+        <AdaptiveProgressSteps
+          stages={[
+            { stage: "Analizando caso de uso", message: "Revisando información ingresada" },
+            { stage: "Identificando escenarios", message: "Detectando flujos y condiciones" },
+            { stage: "Generando casos", message: "Creando escenarios de prueba con IA" },
+            { stage: "Validando resultados", message: "Verificando completitud y coherencia" }
+          ]}
+          currentStage={
+            progress < 25 ? 0 :
+            progress < 50 ? 1 :
+            progress < 75 ? 2 : 3
+          }
+        />
+        <div className="mt-4">
+          <AdaptiveLoading
+            context="test-generation"
+            isLoading={true}
+            progress={progress}
+            message={progressMessage}
+            submessage="Creando casos de prueba inteligentes"
+            variant="inline"
+          />
+        </div>
+      </div>
+    )}
     </>
   );
 }

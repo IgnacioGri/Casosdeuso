@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { AdaptiveLoading } from "@/components/adaptive-loading";
 
 
 interface AIAssistButtonProps {
@@ -83,11 +84,18 @@ export function AIAssistButton({
       title={`Mejorar "${fieldName}" con IA según reglas ING`}
     >
       {improveMutation.isPending ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <AdaptiveLoading
+          context="ai-assist"
+          isLoading={true}
+          size="sm"
+          variant="inline"
+        />
       ) : (
-        <Sparkles className="h-4 w-4" />
+        <>
+          <Sparkles className="h-4 w-4" />
+          <span className="ml-1 hidden sm:inline">AI Assist</span>
+        </>
       )}
-      <span className="ml-1 hidden sm:inline">AI Assist</span>
     </Button>
   );
 }

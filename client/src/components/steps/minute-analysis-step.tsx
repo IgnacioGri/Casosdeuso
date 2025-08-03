@@ -8,6 +8,7 @@ import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { UseCaseFormData } from '@/types/use-case';
 import { ProgressIndicator } from '@/components/progress-indicator';
+import { AdaptiveLoading, AdaptiveProgressSteps } from '@/components/adaptive-loading';
 
 interface MinuteAnalysisStepProps {
   formData: UseCaseFormData;
@@ -420,12 +421,34 @@ CRITERIOS DE ACEPTACIÓN:
     </Card>
     
     {/* Progress Indicator */}
-    <ProgressIndicator
-      isVisible={analyzeMinuteMutation.isPending}
-      progress={progress}
-      message={progressMessage}
-      subMessage="Esto puede tomar de 10 a 30 segundos dependiendo del contenido"
-    />
+    {/* Adaptive Loading for Minute Analysis */}
+    {analyzeMinuteMutation.isPending && (
+      <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-96 border border-gray-200 dark:border-gray-700 z-50">
+        <AdaptiveProgressSteps
+          stages={[
+            { stage: "Preparando análisis", message: "Iniciando procesamiento de minuta" },
+            { stage: "Extrayendo datos", message: "Identificando información relevante" },
+            { stage: "Aplicando IA", message: "Procesando con inteligencia artificial" },
+            { stage: "Completando formulario", message: "Aplicando datos extraídos" }
+          ]}
+          currentStage={
+            progress < 25 ? 0 :
+            progress < 50 ? 1 :
+            progress < 75 ? 2 : 3
+          }
+        />
+        <div className="mt-4">
+          <AdaptiveLoading
+            context="minute-analysis"
+            isLoading={true}
+            progress={progress}
+            message={progressMessage}
+            submessage="Analizando minuta con IA"
+            variant="inline"
+          />
+        </div>
+      </div>
+    )}
     </>
   );
 }

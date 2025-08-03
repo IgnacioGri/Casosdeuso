@@ -9,6 +9,7 @@ import { UseCaseFormData, AIModelForWireframes } from '@/types/use-case';
 import { ImageIcon, RefreshCw, Loader2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { AdaptiveLoading } from '@/components/adaptive-loading';
 
 // Demo wireframe images
 import demoSearchWireframe from '@assets/generated_images/Search_interface_wireframe_59d3b735.png';
@@ -202,11 +203,18 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     className="w-full"
                   >
                     {isGeneratingSearch ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <AdaptiveLoading
+                        context="wireframe-generation"
+                        isLoading={true}
+                        size="sm"
+                        variant="inline"
+                      />
                     ) : (
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Regenerar
+                      </>
                     )}
-                    Regenerar
                   </Button>
                 </div>
               ) : (
@@ -216,11 +224,18 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                   className="w-full"
                 >
                   {isGeneratingSearch ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <AdaptiveLoading
+                      context="wireframe-generation"
+                      isLoading={true}
+                      size="sm"
+                      variant="inline"
+                    />
                   ) : (
-                    <ImageIcon className="h-4 w-4 mr-2" />
+                    <>
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Generar Wireframe Buscador
+                    </>
                   )}
-                  Generar Wireframe Buscador
                 </Button>
               )}
             </div>
@@ -247,11 +262,18 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     className="w-full"
                   >
                     {isGeneratingForm ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <AdaptiveLoading
+                        context="wireframe-generation"
+                        isLoading={true}
+                        size="sm"
+                        variant="inline"
+                      />
                     ) : (
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Regenerar
+                      </>
                     )}
-                    Regenerar
                   </Button>
                 </div>
               ) : (
@@ -261,11 +283,18 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                   className="w-full"
                 >
                   {isGeneratingForm ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <AdaptiveLoading
+                      context="wireframe-generation"
+                      isLoading={true}
+                      size="sm"
+                      variant="inline"
+                    />
                   ) : (
-                    <ImageIcon className="h-4 w-4 mr-2" />
+                    <>
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Generar Wireframe Formulario
+                    </>
                   )}
-                  Generar Wireframe Formulario
                 </Button>
               )}
             </div>
