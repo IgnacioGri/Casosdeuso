@@ -65,6 +65,7 @@ export const testStepSchema = z.object({
 // Base schema para validación común
 const baseUseCaseFormSchema = z.object({
   useCaseType: z.enum(['entity', 'api', 'service']),
+  // Solo campos básicos obligatorios - Información Básica y Detalles del Caso de Uso
   clientName: z.string().min(1, "El nombre del cliente es requerido"),
   projectName: z.string().min(1, "El nombre del proyecto es requerido"),
   useCaseCode: z.string().min(1, "El código del caso de uso es requerido"),
@@ -115,20 +116,8 @@ const baseUseCaseFormSchema = z.object({
 });
 
 // Schema con validación condicional según el tipo de caso de uso
-export const useCaseFormSchema = baseUseCaseFormSchema.refine(
-  (data) => {
-    // Para casos de uso tipo 'entity', al menos un campo de entidad debe tener nombre
-    if (data.useCaseType === 'entity') {
-      return data.entityFields.some(field => field.name.trim().length > 0);
-    }
-    // Para API y service, no se requieren campos de entidad
-    return true;
-  },
-  {
-    message: "Para casos de uso de entidad, debe especificar al menos un campo con nombre",
-    path: ["entityFields"]
-  }
-);
+// SOLO validaciones condicionales, el resto de campos son opcionales para flexibilidad en demos
+export const useCaseFormSchema = baseUseCaseFormSchema;
 
 export type UseCaseFormData = z.infer<typeof useCaseFormSchema>;
 export type EntityField = z.infer<typeof entityFieldSchema>;

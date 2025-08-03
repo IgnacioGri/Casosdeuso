@@ -213,33 +213,17 @@ export function useUseCaseForm() {
         );
         return !!(formData.useCaseName && formData.fileName && formData.description && startsWithInfinitive); // Use Case Details
       case 5:
-        return formData.useCaseType !== 'entity' || formData.searchFilters.some(f => f.trim()); // Search Filters (Entity only)
+        return true; // Search Filters ahora opcional para flexibilidad en demos
       case 6:
-        if (formData.useCaseType === 'entity') {
-          return formData.resultColumns.some(c => c.trim()); // Result Columns (Entity only)
-        } else {
-          return true; // Optional fields for non-entity types
-        }
+        return true; // Result Columns ahora opcional para flexibilidad en demos
       case 7:
-        if (formData.useCaseType === 'entity') {
-          return formData.entityFields.some(f => f.name.trim()); // Entity Fields (Entity only)
-        } else {
-          // Test cases step for non-entity if enabled
-          if (formData.generateTestCase) {
-            return !!(formData.testCaseObjective && formData.testCasePreconditions);
-          }
-          return true; // Review step for non-entity without test cases
-        }
+        return true; // Entity Fields ahora opcional para flexibilidad en demos
       case 8:
-        return true; // Optional fields (Business Rules)
+        return true; // Business Rules siempre opcional
       case 9:
-        // Test cases step if enabled, otherwise review step
-        if (formData.generateTestCase && formData.useCaseType === 'entity') {
-          return !!(formData.testCaseObjective && formData.testCasePreconditions);
-        }
-        return true; // Review step
+        return true; // Test cases siempre opcional
       case 10:
-        return true; // Final review step for entity with test cases
+        return true; // Final review step siempre opcional
       default:
         return true;
     }

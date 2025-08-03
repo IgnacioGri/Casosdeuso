@@ -40,6 +40,9 @@ public class UseCaseFormValidator
     {
         var result = new ValidationResult();
         
+        // SOLO campos básicos obligatorios - Información Básica y Detalles del Caso de Uso
+        // El resto son opcionales para flexibilidad en demos en vivo
+        
         if (string.IsNullOrEmpty(formData.ClientName))
             result.AddError("El nombre del cliente es requerido");
             
@@ -62,8 +65,8 @@ public class UseCaseFormValidator
         if (string.IsNullOrEmpty(formData.Description))
             result.AddError("La descripción es requerida");
             
-        if (formData.UseCaseType == Models.UseCaseType.Entity && !HaveAtLeastOneFieldWithName(formData.EntityFields))
-            result.AddError("Para casos de uso de entidad, debe especificar al menos un campo con nombre");
+        // Eliminada la validación obligatoria de campos de entidad para mayor flexibilidad
+        // Los campos de entidad, filtros, columnas, etc. ahora son completamente opcionales
             
         return result;
     }
