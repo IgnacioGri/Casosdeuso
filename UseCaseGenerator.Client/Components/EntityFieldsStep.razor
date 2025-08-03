@@ -1,6 +1,7 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
+@using UseCaseGenerator.Client.Components
 @using System.Text.Json
 @using UseCaseGenerator.Client.Services
 @inject IAIAssistService AIAssistService
@@ -37,8 +38,12 @@
                                    Disabled="isGeneratingFields || string.IsNullOrWhiteSpace(fieldsDescription)">
                             @if (isGeneratingFields)
                             {
-                                <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                                <span class="ml-2">Generando campos...</span>
+                                <AdaptiveLoading 
+                                    IsLoading="true"
+                                    LoadingText="Generando campos..."
+                                    AnimationType="pulse"
+                                    ShowProgressText="true"
+                                    CompactMode="true" />
                             }
                             else
                             {

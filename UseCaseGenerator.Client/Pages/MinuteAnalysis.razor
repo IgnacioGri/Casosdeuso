@@ -3,6 +3,7 @@
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
 @using UseCaseGenerator.Client.Services
+@using UseCaseGenerator.Client.Components
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components
 @inject IAIAssistService AIAssistService
@@ -102,8 +103,12 @@
                                Disabled="isAnalyzing || (string.IsNullOrWhiteSpace(minuteContent) && uploadedFile == null)">
                         @if (isAnalyzing)
                         {
-                            <MudProgressCircular Size="Size.Small" Indeterminate="true" />
-                            <span class="ml-2">Analizando...</span>
+                            <AdaptiveLoading 
+                                IsLoading="true"
+                                LoadingText="Analizando minuta..."
+                                AnimationType="pulse"
+                                ShowProgressText="true"
+                                CompactMode="true" />
                         }
                         else
                         {

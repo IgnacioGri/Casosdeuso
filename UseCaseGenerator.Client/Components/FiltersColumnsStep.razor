@@ -2,6 +2,7 @@
 @using UseCaseGenerator.Shared.DTOs
 @using Microsoft.AspNetCore.Components.Web
 @using UseCaseGenerator.Client.Services
+@using UseCaseGenerator.Client.Components
 @using System.Text.Json
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
@@ -18,7 +19,15 @@
     
     <!-- Search Filters Section -->
     <MudItem xs="12" md="6">
-        <MudText Typo="Typo.h6" Class="mb-3">Filtros de Búsqueda</MudText>
+        <div class="d-flex align-items-baseline gap-1 mb-3">
+            <MudText Typo="Typo.h6">Filtros de Búsqueda</MudText>
+            <ContextualTooltip
+                Content="Filtros que permiten a los usuarios buscar registros específicos"
+                Example="Nombre, DNI, Estado, Fecha"
+                Format="Un filtro por línea"
+                Side="top"
+                Class="ml-1" />
+        </div>
         
         <MudExpansionPanels Elevation="1" Class="mb-3">
             <MudExpansionPanel Text="Generador Inteligente de Filtros">
@@ -48,11 +57,11 @@
         </MudExpansionPanels>
         
         <div class="d-flex align-center mb-2">
-            <MudTextField @bind-Value="newFilter"
-                          Label="Nuevo filtro"
-                          Variant="Variant.Outlined"
-                          Class="flex-grow-1 mr-2"
-                          @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddFilter(); })" />
+            <SmartAutocomplete @bind-Value="newFilter"
+                             Placeholder="Ingrese un filtro..."
+                             Suggestions="@filterSuggestions"
+                             UseCaseType="@FormData.UseCaseType"
+                             Class="flex-grow-1 mr-2" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddFilter"
@@ -88,7 +97,15 @@
     
     <!-- Result Columns Section -->
     <MudItem xs="12" md="6">
-        <MudText Typo="Typo.h6" Class="mb-3">Columnas de Resultado</MudText>
+        <div class="d-flex align-items-baseline gap-1 mb-3">
+            <MudText Typo="Typo.h6">Columnas de Resultado</MudText>
+            <ContextualTooltip
+                Content="Columnas que aparecerán en la grilla de resultados"
+                Example="ID, Nombre, Estado, Fecha Alta"
+                Format="Una columna por línea"
+                Side="top"
+                Class="ml-1" />
+        </div>
         
         <MudExpansionPanels Elevation="1" Class="mb-3">
             <MudExpansionPanel Text="Generador Inteligente de Columnas">
@@ -118,11 +135,11 @@
         </MudExpansionPanels>
         
         <div class="d-flex align-center mb-2">
-            <MudTextField @bind-Value="newColumn"
-                          Label="Nueva columna"
-                          Variant="Variant.Outlined"
-                          Class="flex-grow-1 mr-2"
-                          @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddColumn(); })" />
+            <SmartAutocomplete @bind-Value="newColumn"
+                             Placeholder="Ingrese una columna..."
+                             Suggestions="@columnSuggestions"
+                             UseCaseType="@FormData.UseCaseType"
+                             Class="flex-grow-1 mr-2" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddColumn"
@@ -177,6 +194,23 @@
     private string columnsDescription = "";
     private bool isGeneratingFilters = false;
     private bool isGeneratingColumns = false;
+    
+    private List<string> filterSuggestions = new()
+    {
+        "DNI", "CUIT", "Apellido", "Nombre", "Email", "Teléfono", 
+        "Número de Cliente", "Estado", "Fecha Alta", "Fecha Baja",
+        "Sucursal", "Tipo Cliente", "Segmento", "Código Postal",
+        "Provincia", "Ciudad", "País", "Categoría"
+    };
+    
+    private List<string> columnSuggestions = new()
+    {
+        "ID", "Código", "Nombre", "Apellido", "Descripción",
+        "Estado", "Fecha Alta", "Fecha Modificación", 
+        "Usuario Alta", "Tipo", "Categoría", "Monto",
+        "Saldo", "Email", "Teléfono", "Sucursal",
+        "DNI", "CUIT", "CBU", "Alias", "Número Cuenta"
+    };
 
     private async Task AddFilter()
     {

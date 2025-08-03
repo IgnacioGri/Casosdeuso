@@ -1,6 +1,7 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Shared.Models
+@using UseCaseGenerator.Client.Components
 @inject HttpClient Http
 @inject ISnackbar Snackbar
 
@@ -29,8 +30,12 @@
                            Style="border-color: #9c27b0; color: #9c27b0;">
                     @if (isGenerating)
                     {
-                        <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
-                        <span>Generando...</span>
+                        <AdaptiveLoading 
+                            IsLoading="true"
+                            LoadingText="Generando casos de prueba..."
+                            AnimationType="spin"
+                            ShowProgressText="true"
+                            CompactMode="true" />
                     }
                     else
                     {

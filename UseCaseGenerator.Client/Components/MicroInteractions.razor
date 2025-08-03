@@ -1,0 +1,386 @@
+@namespace UseCaseGenerator.Client.Components
+
+<div class="@GetContainerClass()" @onclick="HandleClick">
+    @if (Type == "button")
+    {
+        <button type="button" 
+                class="interactive-button @GetButtonClass() @Class"
+                disabled="@Disabled">
+            @if (ShowIcon && Icon != null)
+            {
+                <span class="button-icon">@Icon</span>
+            }
+            <span class="button-content">@ChildContent</span>
+            @if (ShowRipple)
+            {
+                <span class="ripple-container"></span>
+            }
+        </button>
+    }
+    else if (Type == "card")
+    {
+        <div class="interactive-card @GetCardClass() @Class">
+            @ChildContent
+        </div>
+    }
+    else if (Type == "field")
+    {
+        <div class="interactive-field @GetFieldClass() @Class">
+            @ChildContent
+        </div>
+    }
+    else if (Type == "icon")
+    {
+        <span class="interactive-icon @GetIconClass() @Class">
+            @ChildContent
+        </span>
+    }
+    else
+    {
+        @ChildContent
+    }
+</div>
+
+<style>
+    /* Button Interactions */
+    .interactive-button {
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: center;
+    }
+
+    .interactive-button:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 86, 210, 0.2);
+    }
+
+    .interactive-button:not(:disabled):active {
+        transform: translateY(0);
+        transition-duration: 0.1s;
+    }
+
+    .interactive-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Primary Button */
+    .interactive-button.primary {
+        background-color: #0056D2;
+        color: white;
+    }
+
+    .interactive-button.primary:not(:disabled):hover {
+        background-color: #003D96;
+    }
+
+    /* Secondary Button */
+    .interactive-button.secondary {
+        background-color: #f3f4f6;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+    }
+
+    .interactive-button.secondary:not(:disabled):hover {
+        background-color: #e5e7eb;
+        border-color: #d1d5db;
+    }
+
+    /* Success Button */
+    .interactive-button.success {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .interactive-button.success:not(:disabled):hover {
+        background-color: #059669;
+    }
+
+    /* Danger Button */
+    .interactive-button.danger {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .interactive-button.danger:not(:disabled):hover {
+        background-color: #dc2626;
+    }
+
+    /* Button Icon */
+    .button-icon {
+        display: inline-flex;
+        transition: transform 0.3s ease;
+    }
+
+    .interactive-button:hover .button-icon {
+        transform: scale(1.1);
+    }
+
+    /* Ripple Effect */
+    .ripple-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: scale(0);
+        animation: ripple 0.6s ease-out;
+    }
+
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* Card Interactions */
+    .interactive-card {
+        position: relative;
+        border-radius: 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+
+    .interactive-card.elevate {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .interactive-card.elevate:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .interactive-card.scale {
+        transform-origin: center;
+    }
+
+    .interactive-card.scale:hover {
+        transform: scale(1.02);
+    }
+
+    .interactive-card.glow:hover {
+        box-shadow: 0 0 20px rgba(0, 86, 210, 0.3);
+    }
+
+    /* Field Interactions */
+    .interactive-field {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .interactive-field.slide-in {
+        animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .interactive-field.fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .interactive-field.bounce-in {
+        animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes bounceIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* Icon Interactions */
+    .interactive-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+
+    .interactive-icon.rotate:hover {
+        transform: rotate(180deg);
+    }
+
+    .interactive-icon.pulse:hover {
+        animation: pulse 0.5s;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .interactive-icon.shake:hover {
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+        25% {
+            transform: translateX(-5px);
+        }
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    /* Focus States */
+    .interactive-button:focus-visible,
+    .interactive-card:focus-visible,
+    .interactive-icon:focus-visible {
+        outline: 2px solid #0056D2;
+        outline-offset: 2px;
+    }
+
+    /* Smooth state transitions */
+    .state-transition {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .state-enter {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    .state-enter-active {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .state-exit {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .state-exit-active {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+</style>
+
+@code {
+    [Parameter] public string Type { get; set; } = "button";
+    [Parameter] public string Variant { get; set; } = "primary";
+    [Parameter] public string Animation { get; set; } = "default";
+    [Parameter] public bool Disabled { get; set; } = false;
+    [Parameter] public bool ShowIcon { get; set; } = false;
+    [Parameter] public bool ShowRipple { get; set; } = true;
+    [Parameter] public RenderFragment? Icon { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+
+    private string GetContainerClass()
+    {
+        return Type switch
+        {
+            "field" => $"field-container {Animation}",
+            _ => ""
+        };
+    }
+
+    private string GetButtonClass()
+    {
+        return Variant.ToLower();
+    }
+
+    private string GetCardClass()
+    {
+        return Animation switch
+        {
+            "elevate" => "elevate",
+            "scale" => "scale",
+            "glow" => "glow",
+            _ => "elevate"
+        };
+    }
+
+    private string GetFieldClass()
+    {
+        return Animation switch
+        {
+            "slide-in" => "slide-in",
+            "fade-in" => "fade-in",
+            "bounce-in" => "bounce-in",
+            _ => "fade-in"
+        };
+    }
+
+    private string GetIconClass()
+    {
+        return Animation switch
+        {
+            "rotate" => "rotate",
+            "pulse" => "pulse",
+            "shake" => "shake",
+            _ => "pulse"
+        };
+    }
+
+    private async Task HandleClick(MouseEventArgs e)
+    {
+        if (!Disabled && OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(e);
+        }
+
+        // Create ripple effect for buttons
+        if (Type == "button" && ShowRipple && !Disabled)
+        {
+            // Note: In a real implementation, you'd need JavaScript interop to create the ripple at click position
+            // This is a simplified version
+            StateHasChanged();
+        }
+    }
+}

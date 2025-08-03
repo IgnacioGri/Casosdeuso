@@ -1,0 +1,359 @@
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="tooltip-container">
+    @if (ChildContent != null)
+    {
+        <span @onmouseover="ShowTooltip" @onmouseout="HideTooltip" @onfocus="ShowTooltip" @onblur="HideTooltip">
+            @ChildContent
+        </span>
+    }
+    else
+    {
+        <button type="button" 
+                class="tooltip-trigger @GetVariantClass() @Class"
+                @onmouseover="ShowTooltip" 
+                @onmouseout="HideTooltip"
+                @onfocus="ShowTooltip"
+                @onblur="HideTooltip">
+            @GetIcon()
+        </button>
+    }
+    
+    @if (IsVisible)
+    {
+        <div class="tooltip-content @GetSideClass() @GetAlignClass()">
+            <div class="tooltip-arrow"></div>
+            <div class="tooltip-body">
+                @if (!string.IsNullOrEmpty(Content))
+                {
+                    <p class="tooltip-text">@Content</p>
+                }
+                
+                @if (!string.IsNullOrEmpty(Example))
+                {
+                    <div class="tooltip-example">
+                        <span class="example-label">Ejemplo:</span>
+                        <span class="example-text">@Example</span>
+                    </div>
+                }
+                
+                @if (!string.IsNullOrEmpty(Format))
+                {
+                    <div class="tooltip-format">
+                        <span class="format-label">Formato:</span>
+                        <span class="format-text">@Format</span>
+                    </div>
+                }
+                
+                @if (!string.IsNullOrEmpty(Warning))
+                {
+                    <div class="tooltip-warning">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="warning-icon">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <span class="warning-text">@Warning</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .tooltip-container {
+        position: relative;
+        display: inline-flex;
+        align-items: baseline;
+    }
+
+    .tooltip-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: help;
+        transition: transform 0.2s, color 0.2s;
+        padding: 2px;
+        border-radius: 4px;
+    }
+
+    .tooltip-trigger:hover {
+        transform: scale(1.1);
+    }
+
+    .tooltip-trigger:active {
+        transform: scale(0.95);
+    }
+
+    .tooltip-trigger.info {
+        color: #0056D2;
+    }
+
+    .tooltip-trigger.info:hover {
+        color: #003D96;
+    }
+
+    .tooltip-trigger.help {
+        color: #6b7280;
+    }
+
+    .tooltip-trigger.help:hover {
+        color: #374151;
+    }
+
+    .tooltip-trigger.warning {
+        color: #f97316;
+    }
+
+    .tooltip-trigger.warning:hover {
+        color: #ea580c;
+    }
+
+    .tooltip-content {
+        position: absolute;
+        z-index: 1000;
+        min-width: 200px;
+        max-width: 320px;
+        padding: 12px;
+        background: #1f2937;
+        color: white;
+        border-radius: 6px;
+        border: 1px solid #374151;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        animation: fadeIn 0.2s ease-out;
+        pointer-events: none;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .tooltip-arrow {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: #1f2937;
+        border: 1px solid #374151;
+        transform: rotate(45deg);
+    }
+
+    /* Side positioning */
+    .tooltip-content.top {
+        bottom: 100%;
+        margin-bottom: 8px;
+    }
+
+    .tooltip-content.top .tooltip-arrow {
+        bottom: -5px;
+        border-bottom: 1px solid #374151;
+        border-right: 1px solid #374151;
+        border-top: none;
+        border-left: none;
+    }
+
+    .tooltip-content.bottom {
+        top: 100%;
+        margin-top: 8px;
+    }
+
+    .tooltip-content.bottom .tooltip-arrow {
+        top: -5px;
+        border-top: 1px solid #374151;
+        border-left: 1px solid #374151;
+        border-bottom: none;
+        border-right: none;
+    }
+
+    .tooltip-content.left {
+        right: 100%;
+        margin-right: 8px;
+    }
+
+    .tooltip-content.left .tooltip-arrow {
+        right: -5px;
+        border-right: 1px solid #374151;
+        border-bottom: 1px solid #374151;
+        border-left: none;
+        border-top: none;
+    }
+
+    .tooltip-content.right {
+        left: 100%;
+        margin-left: 8px;
+    }
+
+    .tooltip-content.right .tooltip-arrow {
+        left: -5px;
+        border-left: 1px solid #374151;
+        border-top: 1px solid #374151;
+        border-right: none;
+        border-bottom: none;
+    }
+
+    /* Align positioning */
+    .tooltip-content.center {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .tooltip-content.center .tooltip-arrow {
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+    }
+
+    .tooltip-content.start {
+        left: 0;
+    }
+
+    .tooltip-content.start .tooltip-arrow {
+        left: 16px;
+    }
+
+    .tooltip-content.end {
+        right: 0;
+    }
+
+    .tooltip-content.end .tooltip-arrow {
+        right: 16px;
+    }
+
+    /* Tooltip content styling */
+    .tooltip-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    .tooltip-text {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #f3f4f6;
+    }
+
+    .tooltip-example,
+    .tooltip-format,
+    .tooltip-warning {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #374151;
+        font-size: 13px;
+    }
+
+    .example-label,
+    .format-label {
+        font-weight: 600;
+        color: #9ca3af;
+        margin-right: 4px;
+    }
+
+    .example-text,
+    .format-text {
+        color: #d1d5db;
+    }
+
+    .tooltip-warning {
+        display: flex;
+        align-items: center;
+        color: #fbbf24;
+    }
+
+    .warning-icon {
+        flex-shrink: 0;
+        margin-right: 6px;
+    }
+
+    .warning-text {
+        color: #fbbf24;
+    }
+</style>
+
+@code {
+    [Parameter] public string? Content { get; set; }
+    [Parameter] public string? Example { get; set; }
+    [Parameter] public string? Format { get; set; }
+    [Parameter] public string? Warning { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Side { get; set; } = "top";
+    [Parameter] public string Align { get; set; } = "center";
+    [Parameter] public string Variant { get; set; } = "info";
+    [Parameter] public string Class { get; set; } = "";
+
+    private bool IsVisible = false;
+    private System.Timers.Timer? hideTimer;
+
+    private void ShowTooltip()
+    {
+        hideTimer?.Stop();
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    private void HideTooltip()
+    {
+        hideTimer = new System.Timers.Timer(100);
+        hideTimer.Elapsed += (sender, args) =>
+        {
+            InvokeAsync(() =>
+            {
+                IsVisible = false;
+                StateHasChanged();
+            });
+        };
+        hideTimer.AutoReset = false;
+        hideTimer.Start();
+    }
+
+    private string GetVariantClass()
+    {
+        return Variant.ToLower() switch
+        {
+            "help" => "help",
+            "warning" => "warning",
+            _ => "info"
+        };
+    }
+
+    private string GetSideClass()
+    {
+        return Side.ToLower();
+    }
+
+    private string GetAlignClass()
+    {
+        return Align.ToLower();
+    }
+
+    private RenderFragment GetIcon() => Variant.ToLower() switch
+    {
+        "help" => @<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>,
+        "warning" => @<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>,
+        _ => @<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="16"></line>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+        </svg>
+    };
+
+    public void Dispose()
+    {
+        hideTimer?.Dispose();
+    }
+}

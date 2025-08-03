@@ -1,6 +1,7 @@
 @using MudBlazor
 @using UseCaseGenerator.Shared.DTOs
 @using UseCaseGenerator.Client.Services
+@using UseCaseGenerator.Client.Components
 @using System.Text.Json
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
@@ -16,48 +17,88 @@
     </MudItem>
     
     <MudItem xs="12" md="6">
-        <MudTextField @bind-Value="FormData.ClientName"
-                      Label="Nombre del Cliente"
-                      Variant="Variant.Outlined"
-                      Required="true"
-                      HelperText="Ej: Banco Provincia"
-                      Class="mb-4" />
+        <div class="d-flex align-items-baseline gap-1 mb-1">
+            <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Cliente</MudText>
+            <ContextualTooltip
+                Content="Nombre completo de la empresa u organización cliente"
+                Example="Banco Provincia, Banco Macro, YPF"
+                Format="Nombre formal de la institución"
+                Side="top"
+                Class="ml-1" />
+        </div>
+        <SmartAutocomplete
+            @bind-Value="FormData.ClientName"
+            Placeholder="Ej: Banco Provincia"
+            Suggestions="@clientSuggestions"
+            Class="w-full" />
     </MudItem>
     
     <MudItem xs="12" md="6">
-        <MudTextField @bind-Value="FormData.ProjectName"
-                      Label="Nombre del Proyecto"
-                      Variant="Variant.Outlined"
-                      Required="true"
-                      HelperText="Ej: Sistema de Gestión Integral"
-                      Class="mb-4" />
+        <div class="d-flex align-items-baseline gap-1 mb-1">
+            <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Proyecto</MudText>
+            <ContextualTooltip
+                Content="Nombre completo del proyecto o sistema"
+                Example="Sistema de Gestión Integral, Portal Web Bancario"
+                Format="Nombre descriptivo del proyecto"
+                Side="top"
+                Class="ml-1" />
+        </div>
+        <SmartAutocomplete
+            @bind-Value="FormData.ProjectName"
+            Placeholder="Ej: Sistema de Gestión Integral"
+            Suggestions="@projectSuggestions"
+            Class="w-full" />
     </MudItem>
     
     <MudItem xs="12" md="6">
+        <div class="d-flex align-items-baseline gap-1 mb-1">
+            <MudText Typo="Typo.body1" Class="text-subtitle">Código del Caso de Uso</MudText>
+            <ContextualTooltip
+                Content="Identificador único del caso de uso"
+                Example="BP001, MC002, YP003"
+                Format="2 letras mayúsculas + 3 números"
+                Side="top"
+                Class="ml-1" />
+        </div>
         <MudTextField @bind-Value="FormData.UseCaseCode"
-                      Label="Código del Caso de Uso"
                       Variant="Variant.Outlined"
                       Required="true"
-                      HelperText="Formato: 2 letras + 3 números (Ej: BP001)"
-                      Class="mb-4" />
+                      Placeholder="Ej: BP001"
+                      Class="mb-2" />
     </MudItem>
     
     <MudItem xs="12" md="6">
-        <MudTextField @bind-Value="FormData.UseCaseName"
-                      Label="Nombre del Caso de Uso"
-                      Variant="Variant.Outlined"
-                      Required="true"
-                      HelperText="Debe comenzar con verbo infinitivo (Gestionar, Crear, Ver...)"
-                      Class="mb-4" />
+        <div class="d-flex align-items-baseline gap-1 mb-1">
+            <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Caso de Uso</MudText>
+            <ContextualTooltip
+                Content="Nombre descriptivo que comienza con verbo en infinitivo"
+                Example="Gestionar Clientes, Consultar Saldos, Crear Transferencias"
+                Format="Verbo infinitivo + Objeto"
+                Side="top"
+                Class="ml-1" />
+        </div>
+        <SmartAutocomplete
+            @bind-Value="FormData.UseCaseName"
+            Placeholder="Ej: Gestionar Clientes Premium"
+            Suggestions="@useCaseSuggestions"
+            Class="w-full" />
     </MudItem>
     
     <MudItem xs="12">
+        <div class="d-flex align-items-baseline gap-1 mb-1">
+            <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Archivo</MudText>
+            <ContextualTooltip
+                Content="Nombre del archivo sin extensión ni espacios"
+                Example="BP001GestionarClientes, MC002ConsultarSaldos"
+                Format="CódigoCasoUso + NombreCasoUso (sin espacios)"
+                Side="top"
+                Class="ml-1" />
+        </div>
         <MudTextField @bind-Value="FormData.FileName"
-                      Label="Nombre del Archivo"
                       Variant="Variant.Outlined"
                       Required="true"
-                      HelperText="Formato: AB123NombreCasoUso (sin espacios)"
-                      Class="mb-4" />
+                      Placeholder="Ej: BP001GestionarClientes"
+                      Class="mb-2" />
     </MudItem>
     
     <MudItem xs="12">
@@ -82,6 +123,28 @@
 @code {
     [Parameter] public UseCaseFormData FormData { get; set; } = new();
     [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
+
+    private List<string> clientSuggestions = new()
+    {
+        "Banco Provincia", "Banco Macro", "Banco Galicia", "Banco Santander",
+        "Banco BBVA", "Banco HSBC", "Banco Ciudad", "Banco Nación",
+        "YPF", "Telecom", "Personal", "Movistar", "Claro"
+    };
+
+    private List<string> projectSuggestions = new()
+    {
+        "Sistema de Gestión Integral", "Portal Web Bancario", "Sistema de Home Banking",
+        "Plataforma de Pagos", "Sistema de Transferencias", "Portal de Clientes",
+        "Sistema de Atención al Cliente", "Plataforma Digital", "Sistema de Facturación"
+    };
+
+    private List<string> useCaseSuggestions = new()
+    {
+        "Gestionar Clientes", "Gestionar Clientes Premium", "Consultar Saldos",
+        "Realizar Transferencias", "Administrar Cuentas", "Generar Reportes",
+        "Procesar Pagos", "Validar Documentos", "Autorizar Operaciones",
+        "Configurar Perfiles", "Auditar Transacciones", "Exportar Datos"
+    };
 
     private async Task LoadPremiumClientExample()
     {

@@ -1,0 +1,403 @@
+@namespace UseCaseGenerator.Client.Components
+
+<div class="adaptive-loading-container">
+    @if (IsLoading)
+    {
+        <div class="loading-overlay @(Overlay ? "overlay" : "")">
+            <div class="loading-content">
+                @switch (Type)
+                {
+                    case "spinner":
+                        <div class="loading-spinner @GetSizeClass()">
+                            <div class="spinner-circle"></div>
+                        </div>
+                        break;
+
+                    case "dots":
+                        <div class="loading-dots @GetSizeClass()">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                        break;
+
+                    case "pulse":
+                        <div class="loading-pulse @GetSizeClass()">
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring"></div>
+                            <div class="pulse-ring"></div>
+                        </div>
+                        break;
+
+                    case "progress":
+                        <div class="loading-progress @GetSizeClass()">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: @Progress%"></div>
+                            </div>
+                            @if (ShowPercentage)
+                            {
+                                <span class="progress-text">@Progress%</span>
+                            }
+                        </div>
+                        break;
+
+                    case "skeleton":
+                        <div class="loading-skeleton @GetSizeClass()">
+                            @for (int i = 0; i < SkeletonLines; i++)
+                            {
+                                <div class="skeleton-line" style="width: @GetSkeletonWidth(i)"></div>
+                            }
+                        </div>
+                        break;
+
+                    case "shimmer":
+                        <div class="loading-shimmer @GetSizeClass()">
+                            <div class="shimmer-wrapper">
+                                <div class="shimmer"></div>
+                            </div>
+                        </div>
+                        break;
+
+                    case "corporate":
+                        <div class="loading-corporate @GetSizeClass()">
+                            <div class="corporate-logo">
+                                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="40" height="40" rx="8" fill="#0056D2"/>
+                                    <path d="M20 10L10 20L20 30L30 20L20 10Z" fill="white" opacity="0.9"/>
+                                </svg>
+                            </div>
+                            <div class="corporate-text">@LoadingText</div>
+                        </div>
+                        break;
+                }
+
+                @if (!string.IsNullOrEmpty(Message))
+                {
+                    <div class="loading-message">@Message</div>
+                }
+            </div>
+        </div>
+    }
+    
+    @ChildContent
+</div>
+
+<style>
+    .adaptive-loading-container {
+        position: relative;
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        pointer-events: none;
+    }
+
+    .loading-overlay.overlay {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(2px);
+        pointer-events: all;
+    }
+
+    .loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Spinner Loading */
+    .loading-spinner {
+        position: relative;
+    }
+
+    .spinner-circle {
+        border: 3px solid #e5e7eb;
+        border-top-color: #0056D2;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .loading-spinner.small .spinner-circle {
+        width: 24px;
+        height: 24px;
+    }
+
+    .loading-spinner.medium .spinner-circle {
+        width: 36px;
+        height: 36px;
+    }
+
+    .loading-spinner.large .spinner-circle {
+        width: 48px;
+        height: 48px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Dots Loading */
+    .loading-dots {
+        display: flex;
+        gap: 6px;
+    }
+
+    .loading-dots .dot {
+        background: #0056D2;
+        border-radius: 50%;
+        animation: bounce 1.4s ease-in-out infinite both;
+    }
+
+    .loading-dots.small .dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .loading-dots.medium .dot {
+        width: 12px;
+        height: 12px;
+    }
+
+    .loading-dots.large .dot {
+        width: 16px;
+        height: 16px;
+    }
+
+    .loading-dots .dot:nth-child(1) {
+        animation-delay: -0.32s;
+    }
+
+    .loading-dots .dot:nth-child(2) {
+        animation-delay: -0.16s;
+    }
+
+    @keyframes bounce {
+        0%, 80%, 100% {
+            transform: scale(0);
+            opacity: 0.5;
+        }
+        40% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Pulse Loading */
+    .loading-pulse {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pulse-ring {
+        position: absolute;
+        border: 2px solid #0056D2;
+        border-radius: 50%;
+        opacity: 0;
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    .loading-pulse.small .pulse-ring {
+        width: 30px;
+        height: 30px;
+    }
+
+    .loading-pulse.medium .pulse-ring {
+        width: 40px;
+        height: 40px;
+    }
+
+    .loading-pulse.large .pulse-ring {
+        width: 50px;
+        height: 50px;
+    }
+
+    .pulse-ring:nth-child(2) {
+        animation-delay: 0.5s;
+    }
+
+    .pulse-ring:nth-child(3) {
+        animation-delay: 1s;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+
+    /* Progress Loading */
+    .loading-progress {
+        width: 200px;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 8px;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: #0056D2;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        display: block;
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    /* Skeleton Loading */
+    .loading-skeleton {
+        width: 100%;
+    }
+
+    .skeleton-line {
+        height: 12px;
+        background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+        background-size: 200% 100%;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        animation: shimmer 1.5s infinite;
+    }
+
+    /* Shimmer Loading */
+    .loading-shimmer {
+        width: 100%;
+        height: 100%;
+        min-height: 100px;
+    }
+
+    .shimmer-wrapper {
+        width: 100%;
+        height: 100%;
+        background: #f3f4f6;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .shimmer {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.5) 50%,
+            transparent 100%
+        );
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        to {
+            left: 100%;
+        }
+    }
+
+    /* Corporate Loading */
+    .loading-corporate {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .corporate-logo {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .corporate-text {
+        font-size: 14px;
+        color: #6b7280;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    /* Loading Message */
+    .loading-message {
+        font-size: 14px;
+        color: #6b7280;
+        text-align: center;
+        max-width: 300px;
+        line-height: 1.5;
+    }
+
+    /* Size Classes */
+    .small {
+        transform: scale(0.75);
+    }
+
+    .large {
+        transform: scale(1.25);
+    }
+
+    /* Fade transition */
+    .adaptive-loading-container > *:not(.loading-overlay) {
+        transition: opacity 0.3s ease;
+    }
+
+    .adaptive-loading-container:has(.loading-overlay.overlay) > *:not(.loading-overlay) {
+        opacity: 0.5;
+    }
+</style>
+
+@code {
+    [Parameter] public bool IsLoading { get; set; } = false;
+    [Parameter] public string Type { get; set; } = "spinner";
+    [Parameter] public string Size { get; set; } = "medium";
+    [Parameter] public bool Overlay { get; set; } = false;
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public int Progress { get; set; } = 0;
+    [Parameter] public bool ShowPercentage { get; set; } = true;
+    [Parameter] public int SkeletonLines { get; set; } = 3;
+    [Parameter] public string LoadingText { get; set; } = "Procesando...";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string GetSizeClass()
+    {
+        return Size.ToLower() switch
+        {
+            "small" => "small",
+            "large" => "large",
+            _ => "medium"
+        };
+    }
+
+    private string GetSkeletonWidth(int index)
+    {
+        return index switch
+        {
+            0 => "100%",
+            1 => "85%",
+            2 => "70%",
+            _ => "60%"
+        };
+    }
+}

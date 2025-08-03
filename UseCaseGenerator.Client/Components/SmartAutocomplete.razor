@@ -1,0 +1,302 @@
+@using System.Timers
+@using UseCaseGenerator.Shared.Models
+@implements IDisposable
+
+<div class="smart-autocomplete-container">
+    <div class="input-wrapper">
+        @if (Icon != null)
+        {
+            <span class="input-icon">@Icon</span>
+        }
+        <input type="text"
+               class="form-control @Class"
+               value="@Value"
+               @oninput="OnInputChanged"
+               @onfocus="OnInputFocus"
+               @onblur="OnInputBlur"
+               placeholder="@Placeholder"
+               autocomplete="off" />
+        @if (ShowSuggestions && FilteredSuggestions.Any())
+        {
+            <span class="dropdown-indicator">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </span>
+        }
+    </div>
+    
+    @if (ShowSuggestions && FilteredSuggestions.Any())
+    {
+        <div class="suggestions-dropdown">
+            <div class="suggestions-list">
+                @foreach (var (suggestion, index) in FilteredSuggestions.Select((s, i) => (s, i)))
+                {
+                    <div class="suggestion-item @(index == HighlightedIndex ? "highlighted" : "")"
+                         @onclick="() => SelectSuggestion(suggestion)"
+                         @onmouseover="() => HighlightedIndex = index">
+                        <span class="suggestion-text">@suggestion</span>
+                        @if (Value == suggestion)
+                        {
+                            <span class="suggestion-check">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .smart-autocomplete-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        color: #6b7280;
+        pointer-events: none;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 8px 36px 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .input-wrapper input:focus {
+        outline: none;
+        border-color: #0056D2;
+        box-shadow: 0 0 0 3px rgba(0, 86, 210, 0.1);
+    }
+
+    .dropdown-indicator {
+        position: absolute;
+        right: 12px;
+        color: #6b7280;
+        pointer-events: none;
+        transition: transform 0.2s;
+    }
+
+    .suggestions-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 4px;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 50;
+        animation: slideDown 0.2s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .suggestions-list {
+        padding: 4px;
+    }
+
+    .suggestion-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background-color 0.2s;
+    }
+
+    .suggestion-item:hover,
+    .suggestion-item.highlighted {
+        background-color: #f3f4f6;
+    }
+
+    .suggestion-text {
+        color: #1f2937;
+        font-size: 14px;
+    }
+
+    .suggestion-check {
+        color: #10b981;
+        margin-left: 8px;
+    }
+</style>
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public List<string> Suggestions { get; set; } = new();
+    [Parameter] public string Placeholder { get; set; } = "Escriba para ver sugerencias...";
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public RenderFragment? Icon { get; set; }
+    [Parameter] public string? UseCaseType { get; set; }
+
+    private bool ShowSuggestions = false;
+    private string InputValue = "";
+    private List<string> FilteredSuggestions = new();
+    private int HighlightedIndex = -1;
+    private System.Timers.Timer? debounceTimer;
+    private bool isBlurring = false;
+
+    // Contextual suggestions based on use case type
+    private readonly Dictionary<string, List<string>> contextualSuggestions = new()
+    {
+        ["entity"] = new() {
+            "Código", "Nombre", "Descripción", "Estado", "Fecha Alta", "Usuario Alta",
+            "Fecha Modificación", "Usuario Modificación", "Activo", "Tipo",
+            "Categoría", "Prioridad", "Observaciones", "Referencia"
+        },
+        ["entity_banking"] = new() {
+            "CBU", "Alias", "Número Cuenta", "Titular", "DNI", "CUIT", "CUIL",
+            "Saldo", "Tipo Cuenta", "Sucursal", "Banco", "Moneda", "Estado Cuenta",
+            "Fecha Apertura", "Límite Descubierto"
+        },
+        ["api"] = new() {
+            "ID", "Endpoint", "Method", "Status Code", "Response Time", "Request Body",
+            "Response Body", "Headers", "Authorization", "API Key", "Token",
+            "Content Type", "Accept", "User Agent"
+        },
+        ["process"] = new() {
+            "Proceso ID", "Nombre Proceso", "Estado Proceso", "Fecha Inicio", "Fecha Fin",
+            "Usuario Ejecutor", "Parámetros", "Resultado", "Error", "Duración",
+            "Prioridad", "Cola", "Reintentos", "Última Ejecución"
+        }
+    };
+
+    protected override void OnInitialized()
+    {
+        InputValue = Value;
+        UpdateFilteredSuggestions();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (InputValue != Value)
+        {
+            InputValue = Value;
+            UpdateFilteredSuggestions();
+        }
+    }
+
+    private List<string> GetContextualSuggestions()
+    {
+        var baseSuggestions = new List<string>(Suggestions);
+        
+        if (UseCaseType == "entity" && InputValue.ToLower().Contains("banc"))
+        {
+            baseSuggestions.AddRange(contextualSuggestions["entity_banking"]);
+        }
+        else if (!string.IsNullOrEmpty(UseCaseType) && contextualSuggestions.ContainsKey(UseCaseType))
+        {
+            baseSuggestions.AddRange(contextualSuggestions[UseCaseType]);
+        }
+        else
+        {
+            baseSuggestions.AddRange(contextualSuggestions["entity"]);
+        }
+        
+        return baseSuggestions.Distinct().ToList();
+    }
+
+    private void UpdateFilteredSuggestions()
+    {
+        var allSuggestions = GetContextualSuggestions();
+        
+        if (string.IsNullOrWhiteSpace(InputValue))
+        {
+            FilteredSuggestions = allSuggestions.Take(10).ToList();
+        }
+        else
+        {
+            FilteredSuggestions = allSuggestions
+                .Where(s => s.Contains(InputValue, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(s => s.IndexOf(InputValue, StringComparison.OrdinalIgnoreCase))
+                .ThenBy(s => s.Length)
+                .Take(10)
+                .ToList();
+        }
+        
+        HighlightedIndex = -1;
+    }
+
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        InputValue = e.Value?.ToString() ?? "";
+        
+        debounceTimer?.Stop();
+        debounceTimer = new System.Timers.Timer(300);
+        debounceTimer.Elapsed += async (sender, args) =>
+        {
+            await InvokeAsync(async () =>
+            {
+                UpdateFilteredSuggestions();
+                await ValueChanged.InvokeAsync(InputValue);
+                StateHasChanged();
+            });
+        };
+        debounceTimer.AutoReset = false;
+        debounceTimer.Start();
+        
+        ShowSuggestions = true;
+    }
+
+    private void OnInputFocus()
+    {
+        ShowSuggestions = true;
+        isBlurring = false;
+    }
+
+    private async Task OnInputBlur()
+    {
+        isBlurring = true;
+        // Delay to allow click events on suggestions
+        await Task.Delay(200);
+        if (isBlurring)
+        {
+            ShowSuggestions = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SelectSuggestion(string suggestion)
+    {
+        isBlurring = false;
+        InputValue = suggestion;
+        await ValueChanged.InvokeAsync(suggestion);
+        ShowSuggestions = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        debounceTimer?.Dispose();
+    }
+}
