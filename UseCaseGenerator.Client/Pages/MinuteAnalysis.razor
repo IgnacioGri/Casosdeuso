@@ -96,20 +96,24 @@
                                   Placeholder="Pega aquí el contenido de la minuta a analizar..."
                                   Class="mb-3" T="string" />
                     
-                    @if (!isAnalyzing)
-                    {
-                        <MudButton Variant="Variant.Filled" 
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.Analytics"
-                                   OnClick="AnalyzeMinute"
-                                   Disabled="string.IsNullOrWhiteSpace(minuteContent) && uploadedFile == null">
-                            Analizar Minuta
-                        </MudButton>
-                    }
-                    else
-                    {
-                        <ThinkingLoader SubText="Extrayendo información del documento con IA" />
-                    }
+                    <MudButton Variant="Variant.Filled" 
+                               Color="@(isAnalyzing ? Color.Secondary : Color.Primary)"
+                               StartIcon="@(isAnalyzing ? null : Icons.Material.Filled.Analytics)"
+                               OnClick="AnalyzeMinute"
+                               Disabled="@(isAnalyzing || (string.IsNullOrWhiteSpace(minuteContent) && uploadedFile == null))"
+                               Class="@(isAnalyzing ? "thinking-button" : "")">
+                        @if (isAnalyzing)
+                        {
+                            <div class="thinking-button-content">
+                                <div class="thinking-pulse"></div>
+                                <span class="thinking-text">Pensando<span class="thinking-dots">@currentDots</span></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <span>Analizar Minuta</span>
+                        }
+                    </MudButton>
                 </MudCard>
             </MudItem>
             
@@ -172,6 +176,65 @@
     </MudPaper>
 </MudContainer>
 
+<style>
+    .thinking-button {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%) !important;
+        border: none !important;
+        animation: thinking-pulse 2s ease-in-out infinite;
+    }
+
+    .thinking-button-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        gap: 8px;
+    }
+
+    .thinking-pulse {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        animation: pulse-expand 1.5s ease-in-out infinite;
+        left: 16px;
+    }
+
+    .thinking-text {
+        color: white;
+        font-weight: 500;
+        display: flex;
+        align-items: baseline;
+        margin-left: 24px;
+    }
+
+    .thinking-dots {
+        margin-left: 2px;
+        animation: thinking-dots-fade 1.5s ease-in-out infinite;
+    }
+
+    @keyframes thinking-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(147, 51, 234, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); }
+    }
+
+    @keyframes pulse-expand {
+        0% { transform: scale(0.8); opacity: 0.8; }
+        50% { transform: scale(1.2); opacity: 0.3; }
+        100% { transform: scale(0.8); opacity: 0.8; }
+    }
+
+    @keyframes thinking-dots-fade {
+        0% { opacity: 0.4; }
+        50% { opacity: 1; }
+        100% { opacity: 0.4; }
+    }
+</style>
+
 @code {
     private AIModel selectedAIModel = AIModel.Demo;
     private string minuteContent = "";
@@ -180,6 +243,11 @@
     private MinuteAnalysisResponse? analysisResult;
     private string dragClass = "";
     private readonly string defaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
+    
+    // Thinking animation variables
+    private string currentDots = "...";
+    private System.Timers.Timer? dotsTimer;
+    private int dotsState = 0;
 
     private async Task OnInputFileChanged(InputFileChangeEventArgs e)
     {
@@ -207,6 +275,7 @@
         }
 
         isAnalyzing = true;
+        StartDotsAnimation();
         try
         {
             var request = new MinuteAnalysisRequest
@@ -232,8 +301,43 @@
         }
         finally
         {
+            StopDotsAnimation();
             isAnalyzing = false;
         }
+    }
+
+    private void StartDotsAnimation()
+    {
+        dotsTimer = new System.Timers.Timer(400); // Change every 400ms
+        dotsTimer.Elapsed += UpdateDots;
+        dotsTimer.AutoReset = true;
+        dotsTimer.Start();
+    }
+
+    private void StopDotsAnimation()
+    {
+        dotsTimer?.Stop();
+        dotsTimer?.Dispose();
+        dotsTimer = null;
+        currentDots = "...";
+        dotsState = 0;
+    }
+
+    private async void UpdateDots(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        await InvokeAsync(() =>
+        {
+            dotsState = (dotsState + 1) % 4;
+            currentDots = dotsState switch
+            {
+                0 => "...",
+                1 => "....",
+                2 => ".....",
+                3 => "......",
+                _ => "..."
+            };
+            StateHasChanged();
+        });
     }
 
     private void CreateUseCaseFromAnalysis()
