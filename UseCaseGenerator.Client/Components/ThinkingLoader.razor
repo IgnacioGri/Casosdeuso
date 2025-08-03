@@ -1,0 +1,197 @@
+@using System.Timers
+@implements IDisposable
+
+<div class="thinking-container">
+    <div class="thinking-content">
+        <div class="thinking-icon">
+            <div class="pulse-circle"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="brain-icon">
+                <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"></path>
+                <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"></path>
+                <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"></path>
+                <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"></path>
+                <path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"></path>
+                <path d="M3.477 10.896a4 4 0 0 1 .585-.396"></path>
+                <path d="M19.938 10.5a4 4 0 0 1 .585.396"></path>
+                <path d="M6 18a4 4 0 0 1-1.967-.516"></path>
+                <path d="M19.967 17.484A4 4 0 0 1 18 18"></path>
+            </svg>
+        </div>
+        <div class="thinking-text">
+            <span class="thinking-label">Pensando</span>
+            <span class="thinking-dots">@currentDots</span>
+        </div>
+        @if (!string.IsNullOrEmpty(SubText))
+        {
+            <div class="thinking-subtext">@SubText</div>
+        }
+    </div>
+</div>
+
+<style>
+    .thinking-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        margin: 20px 0;
+    }
+
+    .thinking-content {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .thinking-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pulse-circle {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(147, 51, 234, 0.2);
+        animation: pulse-violet 2s ease-in-out infinite;
+    }
+
+    .brain-icon {
+        color: #9333ea;
+        z-index: 1;
+        filter: drop-shadow(0 2px 4px rgba(147, 51, 234, 0.1));
+    }
+
+    .thinking-text {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .thinking-label {
+        font-size: 18px;
+        font-weight: 600;
+        color: #374151;
+        letter-spacing: 0.5px;
+    }
+
+    .thinking-dots {
+        font-size: 18px;
+        font-weight: 600;
+        color: #9333ea;
+        display: inline-block;
+        min-width: 60px;
+        text-align: left;
+        animation: thinking-dots 1.5s ease-in-out infinite;
+    }
+
+    .thinking-subtext {
+        font-size: 14px;
+        color: #6b7280;
+        font-style: italic;
+        max-width: 300px;
+        line-height: 1.4;
+    }
+
+    @keyframes pulse-violet {
+        0% {
+            transform: scale(0.8);
+            opacity: 0.8;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 0.3;
+        }
+        100% {
+            transform: scale(0.8);
+            opacity: 0.8;
+        }
+    }
+
+    @keyframes thinking-dots {
+        0% {
+            opacity: 0.4;
+        }
+        50% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0.4;
+        }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .thinking-container {
+            padding: 30px 15px;
+        }
+        
+        .thinking-label,
+        .thinking-dots {
+            font-size: 16px;
+        }
+        
+        .pulse-circle {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .brain-icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+</style>
+
+@code {
+    [Parameter] public string SubText { get; set; } = "";
+    
+    private string currentDots = "...";
+    private System.Timers.Timer? dotsTimer;
+    private int dotsState = 0; // 0 = "...", 1 = "....", 2 = ".....", 3 = "......"
+
+    protected override void OnInitialized()
+    {
+        StartDotsAnimation();
+    }
+
+    private void StartDotsAnimation()
+    {
+        dotsTimer = new System.Timers.Timer(400); // Cambiar cada 400ms
+        dotsTimer.Elapsed += UpdateDots;
+        dotsTimer.AutoReset = true;
+        dotsTimer.Start();
+    }
+
+    private async void UpdateDots(object? sender, ElapsedEventArgs e)
+    {
+        await InvokeAsync(() =>
+        {
+            dotsState = (dotsState + 1) % 4;
+            currentDots = dotsState switch
+            {
+                0 => "...",
+                1 => "....",
+                2 => ".....",
+                3 => "......",
+                _ => "..."
+            };
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        dotsTimer?.Stop();
+        dotsTimer?.Dispose();
+    }
+}

@@ -96,25 +96,20 @@
                                   Placeholder="Pega aquí el contenido de la minuta a analizar..."
                                   Class="mb-3" T="string" />
                     
-                    <MudButton Variant="Variant.Filled" 
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.Analytics"
-                               OnClick="AnalyzeMinute"
-                               Disabled="isAnalyzing || (string.IsNullOrWhiteSpace(minuteContent) && uploadedFile == null)">
-                        @if (isAnalyzing)
-                        {
-                            <AdaptiveLoading 
-                                IsLoading="true"
-                                LoadingText="Analizando minuta..."
-                                AnimationType="pulse"
-                                ShowProgressText="true"
-                                CompactMode="true" />
-                        }
-                        else
-                        {
-                            <span>Analizar Minuta</span>
-                        }
-                    </MudButton>
+                    @if (!isAnalyzing)
+                    {
+                        <MudButton Variant="Variant.Filled" 
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Analytics"
+                                   OnClick="AnalyzeMinute"
+                                   Disabled="string.IsNullOrWhiteSpace(minuteContent) && uploadedFile == null">
+                            Analizar Minuta
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <ThinkingLoader SubText="Extrayendo información del documento con IA" />
+                    }
                 </MudCard>
             </MudItem>
             
