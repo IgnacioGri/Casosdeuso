@@ -769,3 +769,115 @@ private readonly List<string> FallbackOrder = new()
 | Gemini | gemini-2.5-flash | Optimizado para velocidad |
 | Grok | grok-2-1212 | API compatible con OpenAI |
 | Copilot | Varía | Según configuración corporativa |
+
+---
+
+## 8. Prompts para Generación de Wireframes
+
+### 8.1 Wireframe Individual (TypeScript/React)
+**Archivo:** `server/services/ai-service.ts`
+**Función:** `generateIntelligentWireframeDescription`
+
+```typescript
+private generateIntelligentWireframeDescription(fieldValue: string): string {
+  // Para descripciones vacías - wireframe por defecto
+  if (!fieldValue || fieldValue.trim() === '') {
+    return 'Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.';
+  }
+
+  // Lógica de mejora basada en contenido:
+  // - Descripciones cortas (<50 caracteres): añadir contexto ING específico
+  // - Buscar/filtro: "Panel de búsqueda ING con [descripción], botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING y opciones de editar/eliminar por fila."
+  // - Formulario: "Formulario ING estructurado con [descripción]. Incluye validaciones ING estándar y botones Guardar/Cancelar. Layout según minuta ING."
+  // - Tabla/lista: "[descripción] con paginado ING, ordenamiento y botones de acción (Editar/Eliminar/Ver Detalle) por fila según estándares ING."
+  // - Otros: "Wireframe ING con [descripción]. Incluye botones estándar (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado ING. UI textual describiendo layout según minuta ING."
+  
+  // Para descripciones largas: añadir elementos de cumplimiento ING si no están presentes
+}
+```
+
+### 8.2 Wireframes Múltiples (TypeScript/React)
+**Archivo:** `server/services/ai-service.ts`
+**Función:** `generateIntelligentWireframesDescription`
+
+```typescript
+private generateIntelligentWireframesDescription(fieldValue: string): string {
+  // Para descripciones vacías - sistema completo por defecto
+  if (!fieldValue || fieldValue.trim() === '') {
+    return `Pantalla principal con panel de búsqueda (filtros: Nombre, DNI, Email, Estado), botones Buscar/Limpiar/Agregar.
+Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar.
+Formulario modal para alta/modificación con campos obligatorios y validaciones ING.
+Mensaje de confirmación para operaciones exitosas o de error según corresponda.`;
+  }
+
+  // Lógica de mejora para múltiples pantallas (<100 caracteres):
+  // - Buscar/filtro: "[descripción]. Incluye panel superior con filtros ING estándar, botones Buscar/Limpiar/Agregar, tabla de resultados con paginado ING y botones de acción por fila."
+  // - Formulario: "[descripción]. Modal o página con campos organizados según estándares ING, validaciones en tiempo real, botones Guardar/Cancelar y mensajes de confirmación."
+  // - Tabla/lista: "[descripción]. Con paginado ING, ordenamiento por columnas, filtros superiores y botones de acción (Editar/Eliminar/Ver) por cada fila."
+  // - Otros: "[descripción]. Sistema completo con wireframes ING: pantalla de búsqueda con filtros, tabla de resultados paginada, formularios modales para CRUD y mensajes de confirmación/error."
+}
+```
+
+### 8.3 Wireframe Individual (C#/Blazor)
+**Archivo:** `UseCaseGenerator.Server/Services/AIService.cs`
+**Función:** Integrado en `ImproveFieldAsync` con `fieldType === "wireframeDescription"`
+
+```csharp
+// En C# la lógica está integrada en ImproveFieldAsync
+// Cuando fieldType === "wireframeDescription" se aplica la misma lógica que TypeScript:
+// 1. Verificar si la descripción está vacía o es muy corta
+// 2. Añadir contexto ING específico según el tipo de wireframe detectado
+// 3. Incluir elementos estándar: botones ING, paginado, validaciones
+// 4. Formato profesional según minuta ING vr19
+// 5. Aplicar formatProfessionalText() para consistencia
+
+private string GetWireframeDefaultDescription()
+{
+    return "Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.";
+}
+```
+
+### 8.4 Wireframes Múltiples (C#/Blazor)  
+**Archivo:** `UseCaseGenerator.Server/Services/AIService.cs`
+**Función:** Integrado en `ImproveFieldAsync` con `fieldType === "wireframesDescription"`
+
+```csharp
+// En C# la lógica está integrada en ImproveFieldAsync
+// Cuando fieldType === "wireframesDescription" se aplica lógica para múltiples pantallas:
+// 1. Sistema completo de wireframes ING
+// 2. Pantalla de búsqueda con filtros estándar
+// 3. Tabla de resultados con paginado ING
+// 4. Formularios modales para CRUD
+// 5. Mensajes de confirmación y error
+
+private string GetWireframesDefaultDescription()
+{
+    return @"Pantalla principal con panel de búsqueda (filtros: Nombre, DNI, Email, Estado), botones Buscar/Limpiar/Agregar.
+Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar.
+Formulario modal para alta/modificación con campos obligatorios y validaciones ING.
+Mensaje de confirmación para operaciones exitosas o de error según corresponda.";
+}
+```
+
+### Elementos Comunes de Wireframes ING
+
+**Componentes Estándar:**
+- Panel de búsqueda con filtros estándar
+- Botones: Buscar/Limpiar/Agregar/Editar/Eliminar
+- Paginado ING en tablas de resultados  
+- Validaciones en tiempo real
+- Mensajes de confirmación/error
+- Layout según minuta ING vr19
+- UI textual describiendo componentes
+
+**Reglas de Mejora:**
+1. **Descripciones vacías**: Usar plantilla por defecto con elementos ING completos
+2. **Descripciones cortas**: Detectar tipo (búsqueda/formulario/tabla) y expandir con contexto ING
+3. **Descripciones largas**: Verificar y añadir elementos ING faltantes
+4. **Formato profesional**: Aplicar estándares de texto según minuta ING
+
+**Casos de Uso Específicos:**
+- **Búsqueda**: Panel superior + tabla con paginado + botones de acción
+- **Formularios**: Campos organizados + validaciones + botones Guardar/Cancelar
+- **Listados**: Tabla con ordenamiento + filtros + acciones por fila
+- **CRUD Completo**: Combinación de búsqueda + formularios + confirmaciones
