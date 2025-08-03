@@ -1106,8 +1106,37 @@ Mensaje de confirmación para operaciones exitosas o de error según corresponda
     private UseCaseFormData? ExtractFormDataFromContext(object? context)
     {
         // Try to extract form data from context object
-        // This would need to be implemented based on how context is structured
-        return null; // For now, return null - can be enhanced later
+        if (context == null)
+            return null;
+            
+        // Check if context is a UseCaseFormData directly
+        if (context is UseCaseFormData formData)
+            return formData;
+            
+        // Check if context is a JSON string
+        if (context is string jsonString)
+        {
+            try
+            {
+                return JsonSerializer.Deserialize<UseCaseFormData>(jsonString);
+            }
+            catch
+            {
+                // If deserialization fails, return null
+            }
+        }
+        
+        // Check if context has a FullFormData property (similar to TypeScript)
+        var contextType = context.GetType();
+        var fullFormDataProp = contextType.GetProperty("FullFormData");
+        if (fullFormDataProp != null)
+        {
+            var fullFormData = fullFormDataProp.GetValue(context);
+            if (fullFormData is UseCaseFormData data)
+                return data;
+        }
+        
+        return null;
     }
 
     private string GenerateEntitySearchWireframe(string userDescription, UseCaseFormData formData)
