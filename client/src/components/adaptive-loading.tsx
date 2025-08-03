@@ -43,7 +43,7 @@ const loadingConfigs: Record<LoadingContext, LoadingConfig> = {
     icon: <Brain className="h-5 w-5" />,
     message: 'Analizando minuta...',
     submessage: 'Extrayendo información relevante',
-    animationStyle: 'float',
+    animationStyle: 'pulse',
     duration: 'slow',
     color: 'text-indigo-600'
   },
@@ -51,7 +51,7 @@ const loadingConfigs: Record<LoadingContext, LoadingConfig> = {
     icon: <TestTube className="h-5 w-5" />,
     message: 'Generando casos de prueba...',
     submessage: 'Creando escenarios de validación',
-    animationStyle: 'bounce',
+    animationStyle: 'spin',
     duration: 'medium',
     color: 'text-green-600'
   },

@@ -11,6 +11,8 @@ Preferred communication style: Simple, everyday language.
 - **New Functions Added**: Implemented `generateEntitySearchWireframe()`, `generateCompleteEntityWireframes()`, `generateServiceWireframe()`, and `generateCompleteServiceWireframes()` in both TypeScript and C# systems.
 - **User Feedback Integration**: Wireframes now use specific form data instead of generic placeholders like "Apellido", "DNI", "Segmento".
 - **Enhanced AI Assistance**: Improved field enhancement capabilities with context-aware wireframe generation for all use case types (entity, API, process).
+- **UI Enhancements**: Added smart autocomplete with contextual suggestions, informative tooltips with Ingematica styling, and professional micro-interactions for better user experience.
+- **Animation Fixes**: Changed inappropriate animations - minute analysis from 'float' to 'pulse' and test generation from 'bounce' to 'spin' for more professional appearance.
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
