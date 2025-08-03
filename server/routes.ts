@@ -479,15 +479,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { fieldName, fieldValue, fieldType, context, aiModel } = req.body;
       
+      // Debug logging
+      console.log('🔍 AI Assist Request:', {
+        fieldName,
+        fieldValue: fieldValue || '[empty]',
+        fieldType,
+        aiModel,
+        hasContext: !!context
+      });
+      
       if (!fieldName || !fieldType) {
         return res.status(400).json({ error: 'Field name and type are required' });
       }
 
       const improvedValue = await AIService.improveField(fieldName, fieldValue, fieldType, context, aiModel);
       
+      console.log('✅ AI Assist Response:', improvedValue ? `"${improvedValue.substring(0, 50)}..."` : '[empty]');
+      
       res.json({ improvedValue });
     } catch (error) {
-      console.error('Error with AI assist:', error);
+      console.error('❌ Error with AI assist:', error);
       res.status(500).json({ error: 'Error processing field with AI' });
     }
   });

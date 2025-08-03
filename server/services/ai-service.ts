@@ -990,11 +990,13 @@ INSTRUCCIONES:
   private async callOpenAIForImprovement(prompt: string): Promise<string> {
     try {
       if (!process.env.OPENAI_API_KEY) {
-        console.warn('OpenAI API key not configured, using fallback');
-        return '';
+        const error = new Error('OpenAI API key not configured');
+        console.error('❌', error.message);
+        throw error;
       }
       
       const openai = getOpenAIClient();
+      console.log('📤 Calling OpenAI API...');
       const response = await openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }],
@@ -1002,44 +1004,79 @@ INSTRUCCIONES:
         temperature: 0.3
       });
       
-      const result = response.choices[0].message.content || '';
-      console.log('OpenAI Response:', result ? 'Success' : 'Empty response');
+      const result = response.choices[0]?.message?.content || '';
+      
+      if (!result || result.trim() === '') {
+        throw new Error('OpenAI returned empty response');
+      }
+      
+      console.log('✅ OpenAI Response:', result.substring(0, 100) + '...');
       return result;
-    } catch (error) {
-      console.error('OpenAI API Error:', error);
-      return '';
+    } catch (error: any) {
+      console.error('❌ OpenAI API Error:', error.message || error);
+      throw error;
     }
   }
 
   private async callClaudeForImprovement(prompt: string): Promise<string> {
-    const anthropic = await getAnthropicClient();
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3
-    });
-    return response.content[0].text || '';
+    try {
+      console.log('📤 Calling Claude API...');
+      const anthropic = await getAnthropicClient();
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3
+      });
+      
+      const result = response.content[0]?.text || '';
+      
+      if (!result || result.trim() === '') {
+        throw new Error('Claude returned empty response');
+      }
+      
+      console.log('✅ Claude Response:', result.substring(0, 100) + '...');
+      return result;
+    } catch (error: any) {
+      console.error('❌ Claude API Error:', error.message || error);
+      throw error;
+    }
   }
 
   private async callGrokForImprovement(prompt: string): Promise<string> {
-    const grok = getGrokClient();
-    const response = await grok.chat.completions.create({
-      model: 'grok-2-1212',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 500,
-      temperature: 0.3
-    });
-    return response.choices[0].message.content || '';
+    try {
+      console.log('📤 Calling Grok API...');
+      const grok = getGrokClient();
+      const response = await grok.chat.completions.create({
+        model: 'grok-2-1212',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 500,
+        temperature: 0.3
+      });
+      
+      const result = response.choices[0]?.message?.content || '';
+      
+      if (!result || result.trim() === '') {
+        throw new Error('Grok returned empty response');
+      }
+      
+      console.log('✅ Grok Response:', result.substring(0, 100) + '...');
+      return result;
+    } catch (error: any) {
+      console.error('❌ Grok API Error:', error.message || error);
+      throw error;
+    }
   }
 
   private async callGeminiForImprovement(prompt: string): Promise<string> {
     try {
       if (!process.env.GEMINI_API_KEY) {
-        console.warn('Gemini API key not configured, using fallback');
-        return '';
+        const error = new Error('Gemini API key not configured');
+        console.error('❌', error.message);
+        throw error;
       }
       
+      console.log('📤 Calling Gemini API...');
       const ai = getGeminiClient();
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -1051,17 +1088,23 @@ INSTRUCCIONES:
       });
       
       const result = response.text || '';
-      console.log('Gemini Response:', result ? 'Success' : 'Empty response');
+      
+      if (!result || result.trim() === '') {
+        throw new Error('Gemini returned empty response');
+      }
+      
+      console.log('✅ Gemini Response:', result.substring(0, 100) + '...');
       return result;
-    } catch (error) {
-      console.error('Gemini API Error:', error);
-      return '';
+    } catch (error: any) {
+      console.error('❌ Gemini API Error:', error.message || error);
+      throw error;
     }
   }
 
   private async processFiltersWithAI(fieldValue: string, aiModel: string): Promise<string> {
     if (!fieldValue || fieldValue.trim() === '') {
-      return this.getDemoFieldImprovement('', fieldValue, 'filtersFromText');
+      console.log('⚠️ Empty field value, using smart filter generation');
+      return this.generateSmartFilters(fieldValue || 'general');
     }
 
     const prompt = `CUMPLE MINUTA ING vr19: Convierte esta descripción en filtros de búsqueda profesionales para un sistema bancario.
@@ -1083,6 +1126,7 @@ Fecha de registro desde
 Fecha de registro hasta`;
 
     try {
+      console.log(`📝 Processing filters for: "${fieldValue}" with ${aiModel}`);
       let response: string;
       
       switch (aiModel) {
@@ -1099,7 +1143,8 @@ Fecha de registro hasta`;
           response = await this.callGeminiForImprovement(prompt);
           break;
         default:
-          return this.getDemoFieldImprovement('', fieldValue, 'filtersFromText');
+          console.log('⚠️ Unknown AI model, using smart filter generation');
+          return this.generateSmartFilters(fieldValue);
       }
       
       // Clean and format the response
@@ -1108,17 +1153,21 @@ Fecha de registro hasta`;
         .filter(line => line && !line.toLowerCase().includes('filtros') && !line.includes(':'))
         .slice(0, 8); // Limit to 8 filters max
       
-      return lines.join('\n');
+      const result = lines.join('\n');
+      console.log(`✅ Generated ${lines.length} filters`);
+      return result;
       
-    } catch (error) {
-      console.error('Error processing filters with AI:', error);
-      return this.getDemoFieldImprovement('', fieldValue, 'filtersFromText');
+    } catch (error: any) {
+      console.error('❌ Error processing filters with AI:', error.message);
+      console.log('🔄 Falling back to smart filter generation');
+      return this.generateSmartFilters(fieldValue);
     }
   }
 
   private async processColumnsWithAI(fieldValue: string, aiModel: string): Promise<string> {
     if (!fieldValue || fieldValue.trim() === '') {
-      return this.getDemoFieldImprovement('', fieldValue, 'columnsFromText');
+      console.log('⚠️ Empty field value, using smart column generation');
+      return this.generateSmartColumns(fieldValue || 'general');
     }
 
     const prompt = `CUMPLE MINUTA ING vr19: Convierte esta descripción en columnas de resultado para una grilla de sistema bancario.
@@ -1141,6 +1190,7 @@ Estado
 Fecha Registro`;
 
     try {
+      console.log(`📝 Processing columns for: "${fieldValue}" with ${aiModel}`);
       let response: string;
       
       switch (aiModel) {
@@ -1157,7 +1207,8 @@ Fecha Registro`;
           response = await this.callGeminiForImprovement(prompt);
           break;
         default:
-          return this.getDemoFieldImprovement('', fieldValue, 'columnsFromText');
+          console.log('⚠️ Unknown AI model, using smart column generation');
+          return this.generateSmartColumns(fieldValue);
       }
       
       // Clean and format the response
@@ -1166,11 +1217,14 @@ Fecha Registro`;
         .filter(line => line && !line.toLowerCase().includes('columnas') && !line.includes(':'))
         .slice(0, 10); // Limit to 10 columns max
       
-      return lines.join('\n');
+      const result = lines.join('\n');
+      console.log(`✅ Generated ${lines.length} columns`);
+      return result;
       
-    } catch (error) {
-      console.error('Error processing columns with AI:', error);
-      return this.getDemoFieldImprovement('', fieldValue, 'columnsFromText');
+    } catch (error: any) {
+      console.error('❌ Error processing columns with AI:', error.message);
+      console.log('🔄 Falling back to smart column generation');
+      return this.generateSmartColumns(fieldValue);
     }
   }
 
