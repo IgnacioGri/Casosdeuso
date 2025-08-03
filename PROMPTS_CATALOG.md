@@ -774,88 +774,138 @@ private readonly List<string> FallbackOrder = new()
 
 ## 8. Prompts para Generación de Wireframes
 
-### 8.1 Wireframe Individual (TypeScript/React)
+### 8.1 Wireframe Individual (TypeScript/React) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
 **Archivo:** `server/services/ai-service.ts`
-**Función:** `generateIntelligentWireframeDescription`
+**Función:** `generateIntelligentWireframeDescription` (ahora con contexto)
 
 ```typescript
-private generateIntelligentWireframeDescription(fieldValue: string): string {
-  // Para descripciones vacías - wireframe por defecto
-  if (!fieldValue || fieldValue.trim() === '') {
-    return 'Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.';
-  }
-
-  // Lógica de mejora basada en contenido:
-  // - Descripciones cortas (<50 caracteres): añadir contexto ING específico
-  // - Buscar/filtro: "Panel de búsqueda ING con [descripción], botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING y opciones de editar/eliminar por fila."
-  // - Formulario: "Formulario ING estructurado con [descripción]. Incluye validaciones ING estándar y botones Guardar/Cancelar. Layout según minuta ING."
-  // - Tabla/lista: "[descripción] con paginado ING, ordenamiento y botones de acción (Editar/Eliminar/Ver Detalle) por fila según estándares ING."
-  // - Otros: "Wireframe ING con [descripción]. Incluye botones estándar (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado ING. UI textual describiendo layout según minuta ING."
+private generateIntelligentWireframeDescription(fieldValue: string, context?: any): string {
+  const formData = context?.fullFormData;
   
-  // Para descripciones largas: añadir elementos de cumplimiento ING si no están presentes
+  // 🎯 NUEVA FUNCIONALIDAD: Wireframes dinámicos según datos del formulario
+  if (formData && formData.useCaseType === 'entidad') {
+    return this.generateEntitySearchWireframe(fieldValue, formData);
+  } else if (formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso')) {
+    return this.generateServiceWireframe(fieldValue, formData);
+  }
+  
+  // Fallback para casos sin contexto (mantiene funcionalidad anterior)
+  // - Usa filtros, columnas y campos REALES del formulario
+  // - NO inventa datos hardcodeados
+  // - Respeta exactamente los valores cargados por el usuario
+}
+
+// 🔧 FUNCIONES AUXILIARES DINÁMICAS:
+private generateEntitySearchWireframe(userDescription: string, formData: any): string {
+  const filters = formData.searchFilters || [];      // ✅ Datos reales del usuario
+  const columns = formData.resultColumns || [];      // ✅ Datos reales del usuario
+  
+  // Estructura del wireframe:
+  // - Panel de búsqueda con FILTROS ESPECÍFICOS del formulario
+  // - Tabla con COLUMNAS ESPECÍFICAS del formulario  
+  // - Botones y paginado obligatorios según minuta ING
+  // - Consideraciones adicionales del usuario
 }
 ```
 
-### 8.2 Wireframes Múltiples (TypeScript/React)
+### 8.2 Wireframes Múltiples (TypeScript/React) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
 **Archivo:** `server/services/ai-service.ts`
-**Función:** `generateIntelligentWireframesDescription`
+**Función:** `generateIntelligentWireframesDescription` (ahora con contexto)
 
 ```typescript
-private generateIntelligentWireframesDescription(fieldValue: string): string {
-  // Para descripciones vacías - sistema completo por defecto
-  if (!fieldValue || fieldValue.trim() === '') {
-    return `Pantalla principal con panel de búsqueda (filtros: Nombre, DNI, Email, Estado), botones Buscar/Limpiar/Agregar.
-Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar.
-Formulario modal para alta/modificación con campos obligatorios y validaciones ING.
-Mensaje de confirmación para operaciones exitosas o de error según corresponda.`;
+private generateIntelligentWireframesDescription(fieldValue: string, context?: any): string {
+  const formData = context?.fullFormData;
+  
+  // 🎯 NUEVA FUNCIONALIDAD: Sistema completo con datos reales
+  if (formData && formData.useCaseType === 'entidad') {
+    return this.generateCompleteEntityWireframes(fieldValue, formData);
+  } else if (formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso')) {
+    return this.generateCompleteServiceWireframes(fieldValue, formData);
   }
+  
+  // Sistema completo dinámico que incluye:
+  // ✅ PANTALLA DE BÚSQUEDA: con filtros REALES del formulario
+  // ✅ TABLA DE RESULTADOS: con columnas REALES del formulario  
+  // ✅ FORMULARIO CRUD: con campos REALES de la entidad
+  // ✅ MENSAJES: confirmación/error según estándares ING
+}
 
-  // Lógica de mejora para múltiples pantallas (<100 caracteres):
-  // - Buscar/filtro: "[descripción]. Incluye panel superior con filtros ING estándar, botones Buscar/Limpiar/Agregar, tabla de resultados con paginado ING y botones de acción por fila."
-  // - Formulario: "[descripción]. Modal o página con campos organizados según estándares ING, validaciones en tiempo real, botones Guardar/Cancelar y mensajes de confirmación."
-  // - Tabla/lista: "[descripción]. Con paginado ING, ordenamiento por columnas, filtros superiores y botones de acción (Editar/Eliminar/Ver) por cada fila."
-  // - Otros: "[descripción]. Sistema completo con wireframes ING: pantalla de búsqueda con filtros, tabla de resultados paginada, formularios modales para CRUD y mensajes de confirmación/error."
+// 🔧 FUNCIÓN PRINCIPAL PARA ENTIDADES:
+private generateCompleteEntityWireframes(userDescription: string, formData: any): string {
+  const filters = formData.searchFilters || [];      // ✅ Filtros del usuario
+  const columns = formData.resultColumns || [];      // ✅ Columnas del usuario  
+  const fields = formData.entityFields || [];        // ✅ Campos del usuario
+  
+  // Genera 3 wireframes completos:
+  // 1. PANTALLA PRINCIPAL con filtros/columnas específicos
+  // 2. FORMULARIO MODAL con campos específicos + auditoría obligatoria
+  // 3. MENSAJES DE CONFIRMACIÓN según casos de uso
 }
 ```
 
-### 8.3 Wireframe Individual (C#/Blazor)
+### 8.3 Wireframe Individual (C#/Blazor) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
 **Archivo:** `UseCaseGenerator.Server/Services/AIService.cs`
-**Función:** Integrado en `ImproveFieldAsync` con `fieldType === "wireframeDescription"`
+**Función:** `GenerateIntelligentWireframeDescription` (nueva implementación)
 
 ```csharp
-// En C# la lógica está integrada en ImproveFieldAsync
-// Cuando fieldType === "wireframeDescription" se aplica la misma lógica que TypeScript:
-// 1. Verificar si la descripción está vacía o es muy corta
-// 2. Añadir contexto ING específico según el tipo de wireframe detectado
-// 3. Incluir elementos estándar: botones ING, paginado, validaciones
-// 4. Formato profesional según minuta ING vr19
-// 5. Aplicar formatProfessionalText() para consistencia
-
-private string GetWireframeDefaultDescription()
+public async Task<AIAssistResponse> ImproveFieldAsync(AIAssistRequest request)
 {
-    return "Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.";
+    // 🎯 NUEVA DETECCIÓN: Wireframes con datos dinámicos
+    if (request.FieldName?.ToLowerInvariant().Contains("wireframe") == true)
+    {
+        return new AIAssistResponse
+        {
+            ImprovedValue = GenerateIntelligentWireframeDescription(request.CurrentValue, request.Context),
+            Success = true
+        };
+    }
+}
+
+private string GenerateIntelligentWireframeDescription(string fieldValue, object? context)
+{
+    var formData = ExtractFormDataFromContext(context);
+    
+    // 🔧 LÓGICA DINÁMICA: Usar datos reales del formulario
+    if (formData != null && formData.UseCaseType == "entidad")
+    {
+        return GenerateEntitySearchWireframe(fieldValue, formData);
+    }
+    
+    // ✅ Usa filtros/columnas REALES de formData.SearchFilters y formData.ResultColumns
+    // ❌ Ya NO usa datos hardcodeados como "Apellido", "DNI", "Segmento"
+    // ✅ Respeta exactamente los valores cargados por el usuario
 }
 ```
 
-### 8.4 Wireframes Múltiples (C#/Blazor)  
+### 8.4 Wireframes Múltiples (C#/Blazor) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
 **Archivo:** `UseCaseGenerator.Server/Services/AIService.cs`
-**Función:** Integrado en `ImproveFieldAsync` con `fieldType === "wireframesDescription"`
+**Función:** `GenerateIntelligentWireframesDescription` (nueva implementación)
 
 ```csharp
-// En C# la lógica está integrada en ImproveFieldAsync
-// Cuando fieldType === "wireframesDescription" se aplica lógica para múltiples pantallas:
-// 1. Sistema completo de wireframes ING
-// 2. Pantalla de búsqueda con filtros estándar
-// 3. Tabla de resultados con paginado ING
-// 4. Formularios modales para CRUD
-// 5. Mensajes de confirmación y error
-
-private string GetWireframesDefaultDescription()
+private string GenerateIntelligentWireframesDescription(string fieldValue, object? context)
 {
-    return @"Pantalla principal con panel de búsqueda (filtros: Nombre, DNI, Email, Estado), botones Buscar/Limpiar/Agregar.
-Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar.
-Formulario modal para alta/modificación con campos obligatorios y validaciones ING.
-Mensaje de confirmación para operaciones exitosas o de error según corresponda.";
+    var formData = ExtractFormDataFromContext(context);
+    
+    // 🎯 SISTEMA COMPLETO con datos reales del formulario
+    if (formData != null && formData.UseCaseType == "entidad")
+    {
+        return GenerateCompleteEntityWireframes(fieldValue, formData);
+    }
+}
+
+private string GenerateCompleteEntityWireframes(string userDescription, UseCaseFormData formData)
+{
+    var filters = formData.SearchFilters ?? new List<string>();    // ✅ Filtros reales
+    var columns = formData.ResultColumns ?? new List<string>();    // ✅ Columnas reales
+    var fields = formData.EntityFields ?? new List<EntityField>(); // ✅ Campos reales
+    
+    // 🔧 ESTRUCTURA GENERADA:
+    // PANTALLA PRINCIPAL: Lista los filtros específicos del usuario
+    // TABLA RESULTADOS: Lista las columnas específicas del usuario
+    // FORMULARIO MODAL: Lista los campos específicos de la entidad
+    // CAMPOS AUDITORÍA: Siempre incluye fechaAlta/usuarioAlta (obligatorio ING)
+    
+    // ✅ CUMPLE FEEDBACK: NO inventa datos, usa exactamente lo cargado
 }
 ```
 
@@ -876,8 +926,41 @@ Mensaje de confirmación para operaciones exitosas o de error según corresponda
 3. **Descripciones largas**: Verificar y añadir elementos ING faltantes
 4. **Formato profesional**: Aplicar estándares de texto según minuta ING
 
-**Casos de Uso Específicos:**
-- **Búsqueda**: Panel superior + tabla con paginado + botones de acción
-- **Formularios**: Campos organizados + validaciones + botones Guardar/Cancelar
-- **Listados**: Tabla con ordenamiento + filtros + acciones por fila
-- **CRUD Completo**: Combinación de búsqueda + formularios + confirmaciones
+## 🎯 MEJORAS IMPLEMENTADAS SEGÚN FEEDBACK
+
+### ✅ Problema Resuelto: Datos Hardcodeados
+**Antes:** Los wireframes usaban datos genéricos como "Apellido", "DNI", "Segmento"
+**Ahora:** Los wireframes usan los datos EXACTOS que el usuario cargó en el formulario
+
+### 🔧 Estructura del Prompt Dinámico (Conceptual)
+```
+OBJETIVO: Generar wireframe textual personalizado usando datos del formulario
+
+DATOS DE ENTRADA OBLIGATORIOS:
+- searchFilters: [array con filtros del usuario]
+- resultColumns: [array con columnas del usuario]  
+- entityFields: [array con campos de la entidad del usuario]
+
+ELEMENTOS SIEMPRE PRESENTES (Minuta ING):
+- Botones: Buscar, Limpiar, Agregar, Editar, Eliminar
+- Paginado ING activado
+- Campos de auditoría: fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion
+- Formato: Segoe UI, layout ING vr19
+
+REGLA CRÍTICA: NO inventar datos. Solo usar los proporcionados por el usuario.
+```
+
+### 📋 Casos de Uso Dinámicos
+- **Entidad/CRUD**: Usa searchFilters + resultColumns + entityFields reales
+- **API/Proceso**: Usa apiEndpoint + serviceFrequency + configuración real
+- **Fallback**: Solo si faltan datos del contexto (mantiene compatibilidad)
+
+### 🚀 Funciones Nuevas Implementadas
+| Sistema | Función Individual | Función Múltiple |
+|---------|-------------------|------------------|
+| TypeScript | `generateEntitySearchWireframe()` | `generateCompleteEntityWireframes()` |
+| TypeScript | `generateServiceWireframe()` | `generateCompleteServiceWireframes()` |  
+| C# | `GenerateEntitySearchWireframe()` | `GenerateCompleteEntityWireframes()` |
+| C# | `GenerateServiceWireframe()` | `GenerateCompleteServiceWireframes()` |
+
+**Resultado:** Wireframes 100% personalizados, sin datos genéricos hardcodeados

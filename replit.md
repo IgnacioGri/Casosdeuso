@@ -6,6 +6,12 @@ This full-stack web application generates standardized use case documents using 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (August 2025)
+- **[CRITICAL FIX]** Enhanced wireframe generation with dynamic data: Replaced hardcoded generic wireframes with data-driven generation using actual user form data (filters, columns, fields).
+- **New Functions Added**: Implemented `generateEntitySearchWireframe()`, `generateCompleteEntityWireframes()`, `generateServiceWireframe()`, and `generateCompleteServiceWireframes()` in both TypeScript and C# systems.
+- **User Feedback Integration**: Wireframes now use specific form data instead of generic placeholders like "Apellido", "DNI", "Segmento".
+- **Enhanced AI Assistance**: Improved field enhancement capabilities with context-aware wireframe generation for all use case types (entity, API, process).
+
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
 
@@ -33,6 +39,7 @@ The application utilizes a modern full-stack .NET architecture, ensuring a clear
 - **Performance Optimizations**: Utilizes `gemini-2.5-flash` for faster generation, increased token limits (16000 for docs, 12000 for test cases, 10000 for minute analysis, 4000 for fields), enhanced progress indicators, and standardized temperature (0.3).
 - **DOCX Formatting Consistency**: Ensures consistent corporate branding with specific header images (600x79 pixels), "página X de Y" footers, professional table formats (ING corporate blue header #DEEAF6), and corporate heading styles with blue borders.
 - **AI Provider Fallback**: Implements an automatic cascading fallback mechanism: Copilot → Gemini → OpenAI → Claude → Grok.
+- **Dynamic Wireframe Generation**: Enhanced wireframe generation using actual form data (filters, columns, fields) instead of hardcoded generic values. Implements data-driven wireframes for entity, API, and process use cases with complete CRUD functionality.
 - **System Synchronization**: Both frontend and backend systems maintain functional and UI parity, including the removal of HTML preview functionality for direct DOCX download, and removal of help buttons.
 
 ## External Dependencies

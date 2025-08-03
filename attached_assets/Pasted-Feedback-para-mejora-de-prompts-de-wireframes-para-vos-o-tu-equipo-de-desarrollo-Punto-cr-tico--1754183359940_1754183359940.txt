@@ -1,0 +1,43 @@
+Feedback para mejora de prompts de wireframes (para vos o tu equipo de desarrollo)
+🎯 Punto crítico
+El objetivo del prompt es generar un wireframe textual que obligatoriamente incluya lo indicado en la minuta (paginado, botones, fecha/usuario, etc.), pero que personalice los filtros, columnas, campos con los valores ya cargados por el usuario en el caso de uso.
+✍️ Sugerencia de cómo redactar el prompt (estructura conceptual)
+⚠️ Esto no es código, sino una plantilla lógica para el prompt final, que puede ser interpolada dinámicamente por tu backend.
+🟦 Wireframe de buscador de entidades (prompt conceptual)
+Generá un wireframe textual simplificado de la interfaz de usuario del buscador de entidades, siguiendo el estilo ING.
+
+El wireframe debe incluir OBLIGATORIAMENTE:
+- Un panel de búsqueda con los filtros indicados en el campo "searchFilters"
+- Botones Buscar, Limpiar y Agregar
+- Una tabla de resultados con las columnas indicadas en "resultColumns"
+- Botones Editar y Eliminar en cada fila
+- Paginado activado
+
+Además, debe detallar explícitamente:
+- La lista de filtros con su nombre
+- La lista de columnas con su nombre
+- Que la tabla debe tener paginado
+
+El resultado debe estar redactado como una descripción textual profesional y lista para convertir a DOCX en estilo Microsoft (fuente Segoe UI, formato ING). NO inventes filtros ni columnas: usá exactamente los valores provistos por el usuario en el formulario.
+🟨 Wireframe de alta/modificación (prompt conceptual)
+Generá un wireframe textual simplificado de la pantalla para agregar o modificar una entidad, siguiendo el estilo ING.
+
+Debe incluir OBLIGATORIAMENTE:
+- Botones Aceptar y Cancelar
+- Campos de auditoría: Fecha de alta, Usuario de alta, Fecha de modificación, Usuario de modificación
+
+Debe detallar para CADA campo provisto en el array "entityFields":
+- Nombre del campo
+- Tipo de dato
+- Si es obligatorio
+- Longitud
+- Requerimientos especiales (si tiene)
+
+El resultado debe ser una descripción textual clara, profesional, lista para convertir a DOCX. NO inventes campos. Usá únicamente los campos definidos por el usuario en el caso de uso actual.
+🖼️ Sugerencia para cierre del prompt
+Finalmente, preguntá si se desea generar una imagen tipo wireframe en estilo Microsoft para esta interfaz.
+📌 Conclusión del feedback
+✅ Lo obligatorio viene de la minuta y debe estar siempre presente.
+✅ Lo variable (filtros, columnas, campos) debe venir del input del usuario.
+❌ Nunca debe hardcodearse contenido de dominio específico como "Apellido", "DNI" o "Segmento".
+✅ Los prompts deben instruir a la IA a respetar los datos cargados, no asumir o completar.

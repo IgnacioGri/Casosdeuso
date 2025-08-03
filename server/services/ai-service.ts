@@ -772,7 +772,7 @@ INSTRUCCIONES:
     try {
       // Handle specialized field types FIRST (works for both AI and demo modes)
       if (fieldType === 'wireframeDescription') {
-        return this.generateIntelligentWireframeDescription(fieldValue);
+        return this.generateIntelligentWireframeDescription(fieldValue, context);
       }
       if (fieldType === 'alternativeFlow') {
         return this.generateIntelligentAlternativeFlow(fieldValue);
@@ -784,7 +784,7 @@ INSTRUCCIONES:
         return this.generateIntelligentSpecialRequirements(fieldValue);
       }
       if (fieldType === 'wireframesDescription') {
-        return this.generateIntelligentWireframesDescription(fieldValue);
+        return this.generateIntelligentWireframesDescription(fieldValue, context);
       }
       if (fieldType === 'alternativeFlowsDescription') {
         return this.generateIntelligentAlternativeFlowsDescription(fieldValue);
@@ -1383,9 +1383,19 @@ Reglas ING:
     return text;
   }
 
-  private generateIntelligentWireframeDescription(fieldValue: string): string {
+  private generateIntelligentWireframeDescription(fieldValue: string, context?: any): string {
+    const formData = context?.fullFormData;
+    
+    // Generate dynamic wireframe based on actual form data
+    if (formData && formData.useCaseType === 'entidad') {
+      return this.generateEntitySearchWireframe(fieldValue, formData);
+    } else if (formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso')) {
+      return this.generateServiceWireframe(fieldValue, formData);
+    }
+    
+    // Fallback for missing context or basic description enhancement
     if (!fieldValue || fieldValue.trim() === '') {
-      return 'Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI, Segmento, Estado, Fecha de alta), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando ID Cliente, Nombre Completo, Email, Teléfono, Estado y botones Editar/Eliminar por fila. UI textual según minuta ING.';
+      return 'Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar por fila. UI textual según minuta ING.';
     }
 
     let description = this.cleanInputText(fieldValue);
@@ -1393,7 +1403,6 @@ Reglas ING:
 
     // Enhance basic descriptions with ING-specific details
     if (text.length < 50) {
-      // Add ING context if description is too short
       if (text.includes('buscar') || text.includes('filtro')) {
         description = `Panel de búsqueda ING con ${description}, botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING y opciones de editar/eliminar por fila.`;
       } else if (text.includes('formulario') || text.includes('form')) {
@@ -1404,13 +1413,153 @@ Reglas ING:
         description = `Wireframe ING con ${description}. Incluye botones estándar (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado ING. UI textual describiendo layout según minuta ING.`;
       }
     } else {
-      // For longer descriptions, add ING compliance elements
       if (!text.includes('ing') && !text.includes('boton') && !text.includes('paginado')) {
         description += '. Incluye botones estándar ING (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado según minuta ING';
       }
     }
 
     return this.formatProfessionalText(description);
+  }
+
+  private generateEntitySearchWireframe(userDescription: string, formData: any): string {
+    const filters = formData.searchFilters || [];
+    const columns = formData.resultColumns || [];
+    
+    const baseDescription = userDescription && userDescription.trim() ? this.cleanInputText(userDescription) : '';
+    
+    const wireframe = `Wireframe textual ING para buscador de entidades ${formData.useCaseName || 'entidad'}.
+
+Panel de búsqueda superior con los siguientes filtros${filters.length > 0 ? ':' : ' (a definir por el usuario):'}
+${filters.length > 0 ? filters.map((filter: string) => `- ${filter}`).join('\n') : '- (Filtros especificados en el formulario)'}
+
+Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
+
+Tabla de resultados con paginado ING activado, mostrando las siguientes columnas${columns.length > 0 ? ':' : ' (a definir por el usuario):'}
+${columns.length > 0 ? columns.map((column: string) => `- ${column}`).join('\n') : '- (Columnas especificadas en el formulario)'}
+
+Cada fila incluye botones Editar y Eliminar al final.
+
+${baseDescription ? `Consideraciones adicionales: ${baseDescription}` : ''}
+
+Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).`;
+
+    return this.formatProfessionalText(wireframe);
+  }
+
+  private generateServiceWireframe(userDescription: string, formData: any): string {
+    const baseDescription = userDescription && userDescription.trim() ? this.cleanInputText(userDescription) : '';
+    
+    const wireframe = `Wireframe textual ING para ${formData.useCaseType === 'api' ? 'interfaz de API' : 'proceso automático'} ${formData.useCaseName || 'servicio'}.
+
+Panel de configuración con:
+- Parámetros de ejecución ${formData.apiEndpoint ? `(Endpoint: ${formData.apiEndpoint})` : ''}
+- Configuración de frecuencia ${formData.serviceFrequency ? `(${formData.serviceFrequency})` : ''}
+- Botones: Ejecutar, Configurar, Ver Logs
+
+Panel de monitoreo con:
+- Estado de ejecución en tiempo real
+- Log de actividades
+- Métricas de rendimiento
+
+Panel de resultados con:
+- Datos de salida formateados
+- Códigos de respuesta
+- Mensajes de error/éxito
+
+${baseDescription ? `Consideraciones adicionales: ${baseDescription}` : ''}
+
+Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).`;
+
+    return this.formatProfessionalText(wireframe);
+  }
+
+  private generateCompleteEntityWireframes(userDescription: string, formData: any): string {
+    const filters = formData.searchFilters || [];
+    const columns = formData.resultColumns || [];
+    const fields = formData.entityFields || [];
+    
+    const baseDescription = userDescription && userDescription.trim() ? this.cleanInputText(userDescription) : '';
+    
+    const wireframes = `Sistema completo de wireframes ING para gestión de ${formData.useCaseName || 'entidad'}.
+
+PANTALLA PRINCIPAL - BÚSQUEDA:
+Panel superior con filtros${filters.length > 0 ? ':' : ' (definidos por el usuario):'}
+${filters.length > 0 ? filters.map((filter: string) => `- ${filter}`).join('\n') : '- (Filtros especificados en el caso de uso)'}
+Botones: Buscar, Limpiar, Agregar.
+
+Tabla de resultados con paginado ING, columnas${columns.length > 0 ? ':' : ' (definidas por el usuario):'}
+${columns.length > 0 ? columns.map((column: string) => `- ${column}`).join('\n') : '- (Columnas especificadas en el caso de uso)'}
+Botones Editar/Eliminar por fila.
+
+FORMULARIO MODAL - ALTA/MODIFICACIÓN:
+Campos organizados según estándares ING${fields.length > 0 ? ':' : ' (definidos por el usuario):'}
+${fields.length > 0 ? fields.map((field: any) => `- ${field.name || field} (${field.type || 'text'})${field.mandatory ? ' - Obligatorio' : ''}`).join('\n') : '- (Campos especificados en la entidad)'}
+
+Campos de auditoría obligatorios:
+- Fecha de alta (automático)
+- Usuario de alta (automático) 
+- Fecha de modificación (automático)
+- Usuario de modificación (automático)
+
+Botones: Aceptar, Cancelar.
+
+MENSAJES DE CONFIRMACIÓN:
+- Operaciones exitosas
+- Errores de validación
+- Confirmaciones de eliminación
+
+${baseDescription ? `Consideraciones adicionales: ${baseDescription}` : ''}
+
+Formato estilo Microsoft (fuente Segoe UI, layout según minuta ING vr19).`;
+
+    return this.formatProfessionalText(wireframes);
+  }
+
+  private generateCompleteServiceWireframes(userDescription: string, formData: any): string {
+    const baseDescription = userDescription && userDescription.trim() ? this.cleanInputText(userDescription) : '';
+    
+    const wireframes = `Sistema completo de wireframes ING para ${formData.useCaseType === 'api' ? 'API/Web Service' : 'Proceso Automático'} ${formData.useCaseName || 'servicio'}.
+
+PANTALLA DE CONFIGURACIÓN:
+Panel de parámetros${formData.apiEndpoint ? ` (Endpoint: ${formData.apiEndpoint})` : ''}:
+- URL/Endpoint de destino
+- Credenciales de autenticación
+- Headers requeridos
+- Timeout y reintentos
+
+Configuración de ejecución${formData.serviceFrequency ? ` (${formData.serviceFrequency})` : ''}:
+- Frecuencia programada
+- Condiciones de activación
+- Parámetros variables
+
+Botones: Guardar Configuración, Probar Conexión, Ejecutar Ahora.
+
+PANTALLA DE MONITOREO:
+Dashboard en tiempo real con:
+- Estado actual del servicio
+- Última ejecución exitosa
+- Próxima ejecución programada
+- Métricas de rendimiento
+
+Log de actividades:
+- Historial de ejecuciones
+- Mensajes de error/éxito
+- Tiempos de respuesta
+
+PANTALLA DE RESULTADOS:
+${formData.useCaseType === 'api' ? 'Request/Response detallado:' : 'Salida del proceso:'}
+- Datos de entrada formateados
+- Respuesta/resultado obtenido  
+- Códigos de estado
+- Datos procesados
+
+Botones: Exportar Resultados, Ver Detalles, Reejecutar.
+
+${baseDescription ? `Consideraciones adicionales: ${baseDescription}` : ''}
+
+Formato estilo Microsoft (fuente Segoe UI, layout según minuta ING vr19).`;
+
+    return this.formatProfessionalText(wireframes);
   }
 
   private generateIntelligentAlternativeFlow(fieldValue: string): string {
@@ -1443,20 +1592,28 @@ Reglas ING:
     return this.formatProfessionalText(flow);
   }
 
-  private generateIntelligentWireframesDescription(fieldValue: string): string {
+  private generateIntelligentWireframesDescription(fieldValue: string, context?: any): string {
+    const formData = context?.fullFormData;
+    
+    // Generate complete wireframe system based on actual form data
+    if (formData && formData.useCaseType === 'entidad') {
+      return this.generateCompleteEntityWireframes(fieldValue, formData);
+    } else if (formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso')) {
+      return this.generateCompleteServiceWireframes(fieldValue, formData);
+    }
+    
+    // Fallback for missing context
     if (!fieldValue || fieldValue.trim() === '') {
-      return `Pantalla principal con panel de búsqueda (filtros: Nombre, DNI, Email, Estado), botones Buscar/Limpiar/Agregar.
-Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar.
-Formulario modal para alta/modificación con campos obligatorios y validaciones ING.
+      return `Pantalla principal con panel de búsqueda (filtros definidos por el usuario), botones Buscar/Limpiar/Agregar.
+Tabla de resultados con paginado ING mostrando columnas especificadas en el caso de uso y botones Editar/Eliminar.
+Formulario modal para alta/modificación con campos definidos en la entidad y validaciones ING.
 Mensaje de confirmación para operaciones exitosas o de error según corresponda.`;
     }
 
     let description = this.cleanInputText(fieldValue);
     const text = description.toLowerCase();
 
-    // Enhance basic descriptions with ING-specific wireframe details
     if (text.length < 100) {
-      // Add comprehensive wireframe context if description is too short
       if (text.includes('buscar') || text.includes('filtro')) {
         description = `${description}. Incluye panel superior con filtros ING estándar, botones Buscar/Limpiar/Agregar, tabla de resultados con paginado ING y botones de acción por fila.`;
       } else if (text.includes('formulario') || text.includes('form')) {
@@ -1468,7 +1625,6 @@ Mensaje de confirmación para operaciones exitosas o de error según corresponda
       }
     }
 
-    // Ensure proper formatting and professional structure
     return this.formatProfessionalText(description);
   }
 

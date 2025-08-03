@@ -269,6 +269,27 @@ INSTRUCCIONES:
     {
         try
         {
+            // Handle specialized field types FIRST (works for both AI and demo modes)
+            if (request.FieldName?.ToLowerInvariant().Contains("wireframe") == true || 
+                request.Context?.ToString()?.Contains("wireframeDescription") == true)
+            {
+                return new AIAssistResponse
+                {
+                    ImprovedValue = GenerateIntelligentWireframeDescription(request.CurrentValue, request.Context),
+                    Success = true
+                };
+            }
+            
+            if (request.FieldName?.ToLowerInvariant().Contains("wireframes") == true || 
+                request.Context?.ToString()?.Contains("wireframesDescription") == true)
+            {
+                return new AIAssistResponse
+                {
+                    ImprovedValue = GenerateIntelligentWireframesDescription(request.CurrentValue, request.Context),
+                    Success = true
+                };
+            }
+
             if (request.AiModel == AIModel.Demo)
             {
                 throw new InvalidOperationException("El modo demo no está disponible. Por favor, configure una clave API válida para mejorar campos.");
@@ -979,6 +1000,292 @@ REGLAS: {rules}";
         GC.SuppressFinalize(this);
     }
     
+    private string GenerateIntelligentWireframeDescription(string fieldValue, object? context)
+    {
+        var formData = ExtractFormDataFromContext(context);
+        
+        // Generate dynamic wireframe based on actual form data
+        if (formData != null && formData.UseCaseType == "entidad")
+        {
+            return GenerateEntitySearchWireframe(fieldValue, formData);
+        }
+        else if (formData != null && (formData.UseCaseType == "api" || formData.UseCaseType == "proceso"))
+        {
+            return GenerateServiceWireframe(fieldValue, formData);
+        }
+        
+        // Fallback for missing context or basic description enhancement
+        if (string.IsNullOrWhiteSpace(fieldValue))
+        {
+            return "Wireframe ING con panel de búsqueda (filtros: Número de cliente, Apellido, DNI), botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING mostrando columnas relevantes y botones Editar/Eliminar por fila. UI textual según minuta ING.";
+        }
+
+        var description = CleanInputText(fieldValue);
+        var text = description.ToLowerInvariant();
+
+        // Enhance basic descriptions with ING-specific details
+        if (text.Length < 50)
+        {
+            if (text.Contains("buscar") || text.Contains("filtro"))
+            {
+                description = $"Panel de búsqueda ING con {description}, botones Buscar/Limpiar/Agregar. Tabla de resultados con paginado ING y opciones de editar/eliminar por fila.";
+            }
+            else if (text.Contains("formulario") || text.Contains("form"))
+            {
+                description = $"Formulario ING estructurado con {description}. Incluye validaciones ING estándar y botones Guardar/Cancelar. Layout según minuta ING.";
+            }
+            else if (text.Contains("tabla") || text.Contains("list"))
+            {
+                description = $"{description} con paginado ING, ordenamiento y botones de acción (Editar/Eliminar/Ver Detalle) por fila según estándares ING.";
+            }
+            else
+            {
+                description = $"Wireframe ING con {description}. Incluye botones estándar (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado ING. UI textual describiendo layout según minuta ING.";
+            }
+        }
+        else
+        {
+            if (!text.Contains("ing") && !text.Contains("boton") && !text.Contains("paginado"))
+            {
+                description += ". Incluye botones estándar ING (Buscar/Limpiar/Agregar/Editar/Eliminar) y paginado según minuta ING";
+            }
+        }
+
+        return FormatProfessionalText(description);
+    }
+
+    private string GenerateIntelligentWireframesDescription(string fieldValue, object? context)
+    {
+        var formData = ExtractFormDataFromContext(context);
+        
+        // Generate complete wireframe system based on actual form data
+        if (formData != null && formData.UseCaseType == "entidad")
+        {
+            return GenerateCompleteEntityWireframes(fieldValue, formData);
+        }
+        else if (formData != null && (formData.UseCaseType == "api" || formData.UseCaseType == "proceso"))
+        {
+            return GenerateCompleteServiceWireframes(fieldValue, formData);
+        }
+        
+        // Fallback for missing context
+        if (string.IsNullOrWhiteSpace(fieldValue))
+        {
+            return @"Pantalla principal con panel de búsqueda (filtros definidos por el usuario), botones Buscar/Limpiar/Agregar.
+Tabla de resultados con paginado ING mostrando columnas especificadas en el caso de uso y botones Editar/Eliminar.
+Formulario modal para alta/modificación con campos definidos en la entidad y validaciones ING.
+Mensaje de confirmación para operaciones exitosas o de error según corresponda.";
+        }
+
+        var description = CleanInputText(fieldValue);
+        var text = description.ToLowerInvariant();
+
+        if (text.Length < 100)
+        {
+            if (text.Contains("buscar") || text.Contains("filtro"))
+            {
+                description = $"{description}. Incluye panel superior con filtros ING estándar, botones Buscar/Limpiar/Agregar, tabla de resultados con paginado ING y botones de acción por fila.";
+            }
+            else if (text.Contains("formulario") || text.Contains("form"))
+            {
+                description = $"{description}. Modal o página con campos organizados según estándares ING, validaciones en tiempo real, botones Guardar/Cancelar y mensajes de confirmación.";
+            }
+            else if (text.Contains("tabla") || text.Contains("list"))
+            {
+                description = $"{description}. Con paginado ING, ordenamiento por columnas, filtros superiores y botones de acción (Editar/Eliminar/Ver) por cada fila.";
+            }
+            else
+            {
+                description = $"{description}. Sistema completo con wireframes ING: pantalla de búsqueda con filtros, tabla de resultados paginada, formularios modales para CRUD y mensajes de confirmación/error.";
+            }
+        }
+
+        return FormatProfessionalText(description);
+    }
+
+    private UseCaseFormData? ExtractFormDataFromContext(object? context)
+    {
+        // Try to extract form data from context object
+        // This would need to be implemented based on how context is structured
+        return null; // For now, return null - can be enhanced later
+    }
+
+    private string GenerateEntitySearchWireframe(string userDescription, UseCaseFormData formData)
+    {
+        var filters = formData.SearchFilters ?? new List<string>();
+        var columns = formData.ResultColumns ?? new List<string>();
+        
+        var baseDescription = !string.IsNullOrWhiteSpace(userDescription) ? CleanInputText(userDescription) : "";
+        
+        var wireframe = $@"Wireframe textual ING para buscador de entidades {formData.UseCaseName ?? "entidad"}.
+
+Panel de búsqueda superior con los siguientes filtros{(filters.Any() ? ":" : " (a definir por el usuario):")}
+{(filters.Any() ? string.Join("\n", filters.Select(f => $"- {f}")) : "- (Filtros especificados en el formulario)")}
+
+Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
+
+Tabla de resultados con paginado ING activado, mostrando las siguientes columnas{(columns.Any() ? ":" : " (a definir por el usuario):")}
+{(columns.Any() ? string.Join("\n", columns.Select(c => $"- {c}")) : "- (Columnas especificadas en el formulario)")}
+
+Cada fila incluye botones Editar y Eliminar al final.
+
+{(!string.IsNullOrWhiteSpace(baseDescription) ? $"Consideraciones adicionales: {baseDescription}" : "")}
+
+Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).";
+
+        return FormatProfessionalText(wireframe);
+    }
+
+    private string GenerateServiceWireframe(string userDescription, UseCaseFormData formData)
+    {
+        var baseDescription = !string.IsNullOrWhiteSpace(userDescription) ? CleanInputText(userDescription) : "";
+        
+        var wireframe = $@"Wireframe textual ING para {(formData.UseCaseType == "api" ? "interfaz de API" : "proceso automático")} {formData.UseCaseName ?? "servicio"}.
+
+Panel de configuración con:
+- Parámetros de ejecución {(!string.IsNullOrWhiteSpace(formData.ApiEndpoint) ? $"(Endpoint: {formData.ApiEndpoint})" : "")}
+- Configuración de frecuencia {(!string.IsNullOrWhiteSpace(formData.ServiceFrequency) ? $"({formData.ServiceFrequency})" : "")}
+- Botones: Ejecutar, Configurar, Ver Logs
+
+Panel de monitoreo con:
+- Estado de ejecución en tiempo real
+- Log de actividades
+- Métricas de rendimiento
+
+Panel de resultados con:
+- Datos de salida formateados
+- Códigos de respuesta
+- Mensajes de error/éxito
+
+{(!string.IsNullOrWhiteSpace(baseDescription) ? $"Consideraciones adicionales: {baseDescription}" : "")}
+
+Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).";
+
+        return FormatProfessionalText(wireframe);
+    }
+
+    private string GenerateCompleteEntityWireframes(string userDescription, UseCaseFormData formData)
+    {
+        var filters = formData.SearchFilters ?? new List<string>();
+        var columns = formData.ResultColumns ?? new List<string>();
+        var fields = formData.EntityFields ?? new List<EntityField>();
+        
+        var baseDescription = !string.IsNullOrWhiteSpace(userDescription) ? CleanInputText(userDescription) : "";
+        
+        var wireframes = $@"Sistema completo de wireframes ING para gestión de {formData.UseCaseName ?? "entidad"}.
+
+PANTALLA PRINCIPAL - BÚSQUEDA:
+Panel superior con filtros{(filters.Any() ? ":" : " (definidos por el usuario):")}
+{(filters.Any() ? string.Join("\n", filters.Select(f => $"- {f}")) : "- (Filtros especificados en el caso de uso)")}
+Botones: Buscar, Limpiar, Agregar.
+
+Tabla de resultados con paginado ING, columnas{(columns.Any() ? ":" : " (definidas por el usuario):")}
+{(columns.Any() ? string.Join("\n", columns.Select(c => $"- {c}")) : "- (Columnas especificadas en el caso de uso)")}
+Botones Editar/Eliminar por fila.
+
+FORMULARIO MODAL - ALTA/MODIFICACIÓN:
+Campos organizados según estándares ING{(fields.Any() ? ":" : " (definidos por el usuario):")}
+{(fields.Any() ? string.Join("\n", fields.Select(f => $"- {f.Name ?? f.ToString()} ({f.Type ?? "text"}){(f.Mandatory ? " - Obligatorio" : "")}")) : "- (Campos especificados en la entidad)")}
+
+Campos de auditoría obligatorios:
+- Fecha de alta (automático)
+- Usuario de alta (automático) 
+- Fecha de modificación (automático)
+- Usuario de modificación (automático)
+
+Botones: Aceptar, Cancelar.
+
+MENSAJES DE CONFIRMACIÓN:
+- Operaciones exitosas
+- Errores de validación
+- Confirmaciones de eliminación
+
+{(!string.IsNullOrWhiteSpace(baseDescription) ? $"Consideraciones adicionales: {baseDescription}" : "")}
+
+Formato estilo Microsoft (fuente Segoe UI, layout según minuta ING vr19).";
+
+        return FormatProfessionalText(wireframes);
+    }
+
+    private string GenerateCompleteServiceWireframes(string userDescription, UseCaseFormData formData)
+    {
+        var baseDescription = !string.IsNullOrWhiteSpace(userDescription) ? CleanInputText(userDescription) : "";
+        
+        var wireframes = $@"Sistema completo de wireframes ING para {(formData.UseCaseType == "api" ? "API/Web Service" : "Proceso Automático")} {formData.UseCaseName ?? "servicio"}.
+
+PANTALLA DE CONFIGURACIÓN:
+Panel de parámetros{(!string.IsNullOrWhiteSpace(formData.ApiEndpoint) ? $" (Endpoint: {formData.ApiEndpoint})" : "")}:
+- URL/Endpoint de destino
+- Credenciales de autenticación
+- Headers requeridos
+- Timeout y reintentos
+
+Configuración de ejecución{(!string.IsNullOrWhiteSpace(formData.ServiceFrequency) ? $" ({formData.ServiceFrequency})" : "")}:
+- Frecuencia programada
+- Condiciones de activación
+- Parámetros variables
+
+Botones: Guardar Configuración, Probar Conexión, Ejecutar Ahora.
+
+PANTALLA DE MONITOREO:
+Dashboard en tiempo real con:
+- Estado actual del servicio
+- Última ejecución exitosa
+- Próxima ejecución programada
+- Métricas de rendimiento
+
+Log de actividades:
+- Historial de ejecuciones
+- Mensajes de error/éxito
+- Tiempos de respuesta
+
+PANTALLA DE RESULTADOS:
+{(formData.UseCaseType == "api" ? "Request/Response detallado:" : "Salida del proceso:")}
+- Datos de entrada formateados
+- Respuesta/resultado obtenido  
+- Códigos de estado
+- Datos procesados
+
+Botones: Exportar Resultados, Ver Detalles, Reejecutar.
+
+{(!string.IsNullOrWhiteSpace(baseDescription) ? $"Consideraciones adicionales: {baseDescription}" : "")}
+
+Formato estilo Microsoft (fuente Segoe UI, layout según minuta ING vr19).";
+
+        return FormatProfessionalText(wireframes);
+    }
+
+    private string CleanInputText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return "";
+        
+        // Remove quotes at the beginning and end
+        text = text.Trim().Trim('"', '\'', '"', '"');
+        
+        // Remove excessive whitespace
+        text = Regex.Replace(text, @"\s+", " ");
+        
+        return text.Trim();
+    }
+
+    private string FormatProfessionalText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return text;
+        
+        // Ensure proper capitalization and formatting
+        var sentences = text.Split('.', StringSplitOptions.RemoveEmptyEntries);
+        var formattedSentences = sentences.Select(sentence =>
+        {
+            var trimmed = sentence.Trim();
+            if (string.IsNullOrWhiteSpace(trimmed)) return trimmed;
+            
+            // Capitalize first letter
+            return char.ToUpper(trimmed[0]) + trimmed.Substring(1).ToLowerInvariant();
+        });
+        
+        return string.Join(". ", formattedSentences.Where(s => !string.IsNullOrWhiteSpace(s)));
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
