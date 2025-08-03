@@ -209,14 +209,14 @@ ESTRUCTURA REQUERIDA:
       "action": "Acción específica a realizar",
       "inputData": "Datos de entrada exactos",
       "expectedResult": "Resultado esperado específico",
-      "observations": "Observaciones técnicas importantes. Estado (P/F): Placeholder para resultado de ejecución"
+      "observations": "Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba"
     },
     {
       "number": 2,
       "action": "Segunda acción a realizar",
       "inputData": "Datos de entrada para el segundo paso",
       "expectedResult": "Resultado esperado del segundo paso",
-      "observations": "Observaciones del segundo paso. Estado (P/F): Placeholder para resultado de ejecución"
+      "observations": "Consideraciones específicas del segundo paso, advertencias o información relevante para la ejecución"
     }
   ],
   "analysisNotes": "Análisis del contexto y cobertura de pruebas"

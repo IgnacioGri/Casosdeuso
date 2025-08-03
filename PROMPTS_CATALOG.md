@@ -525,7 +525,7 @@ FORMATO DE RESPUESTA OBLIGATORIO:
       "action": "Acción específica y clara",
       "inputData": "Datos de entrada detallados",
       "expectedResult": "Resultado esperado verificable",
-      "observations": "Consideraciones o puntos de atención. Estado (P/F): Placeholder para resultado de ejecución"
+      "observations": "Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba"
     }
   ],
   "analysisNotes": "Notas sobre cobertura, riesgos o consideraciones especiales"
@@ -573,7 +573,7 @@ FORMATO DE RESPUESTA OBLIGATORIO:
       ""action"": ""Acción específica y clara"",
       ""inputData"": ""Datos de entrada detallados"",
       ""expectedResult"": ""Resultado esperado verificable"",
-      ""observations"": ""Consideraciones o puntos de atención. Estado (P/F): Placeholder para resultado de ejecución""
+      ""observations"": ""Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba""
     }}
   ],
   ""analysisNotes"": ""Notas sobre cobertura, riesgos o consideraciones especiales""

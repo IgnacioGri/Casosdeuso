@@ -128,7 +128,7 @@ FORMATO JSON REQUERIDO:
       ""action"": ""string"",
       ""inputData"": ""string"",
       ""expectedResult"": ""string"",
-      ""observations"": ""string con Estado (P/F) como placeholder""
+      ""observations"": ""observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba""
     }}
   ],
   ""analysisNotes"": ""string""
