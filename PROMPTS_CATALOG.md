@@ -2,7 +2,7 @@
 
 Este documento contiene todos los prompts utilizados en el sistema, diferenciados por plataforma (React/TypeScript vs C#/Blazor).
 
-## ⚠️ CAMBIOS CRÍTICOS IMPLEMENTADOS (Enero 2025)
+## ⚠️ CAMBIOS CRÍTICOS IMPLEMENTADOS (Agosto 2025)
 
 ### Mejoras de Robustez en Prompts
 - **CRÍTICO**: Todos los ejemplos ahora están marcados como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
