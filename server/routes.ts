@@ -323,7 +323,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           : req.body.businessRules,
         specialRequirements: Array.isArray(req.body.specialRequirements) 
           ? req.body.specialRequirements.join('\n') 
-          : req.body.specialRequirements
+          : req.body.specialRequirements,
+        // Clean up entity fields - convert null values to empty strings
+        entityFields: req.body.entityFields?.map((field: any) => ({
+          ...field,
+          description: field.description || '',
+          validationRules: field.validationRules || '',
+          message: field.message || '',
+          length: field.length || null
+        })) || []
       };
       
       const validatedData = useCaseFormSchema.parse(requestData);
