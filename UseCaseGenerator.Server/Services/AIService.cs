@@ -827,6 +827,12 @@ Eres un experto en documentación de casos de uso bancarios/empresariales. Tu ta
 
 IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
 
+INSTRUCCIONES CRÍTICAS SOBRE EL USO DE EJEMPLOS Y DATOS:
+1. NUNCA uses valores por defecto o genéricos como ""Apellido"", ""DNI"", ""Segmento"" salvo que sean EXACTAMENTE los especificados en los datos del formulario.
+2. Cualquier ejemplo en este prompt está marcado como: ""Ejemplo ilustrativo, no debe reproducirse salvo que aplique al caso específico"".
+3. SIEMPRE usa los valores EXACTOS proporcionados en formData (filtros, columnas, campos).
+4. Si formData no especifica un valor, NO lo inventes. Indica ""no especificado por el usuario"".
+
 INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
 - Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
 - Segundo párrafo: Beneficios clave, valor para el negocio, mejoras que aporta, problemas que resuelve.
@@ -846,9 +852,13 @@ FORMATO ESTRUCTURADO REQUERIDO:
 
 3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
+INSTRUCCIONES PARA ACTORES:
+- Si no hay actor explícito en los datos, usar: ""Actor no identificado""
+- NUNCA inventes actores como ""Empleado Bancario"" si no están especificados
+
 {rules}
 
-DATOS DEL FORMULARIO COMPLETOS:
+DATOS DEL FORMULARIO COMPLETOS (usar EXACTAMENTE estos valores):
 - Tipo de caso de uso: {formData.UseCaseType}
 - Cliente: {formData.ClientName}
 - Proyecto: {formData.ProjectName}
@@ -856,8 +866,8 @@ DATOS DEL FORMULARIO COMPLETOS:
 - Nombre: {formData.UseCaseName}
 - Archivo: {formData.FileName}
 - Descripción: {formData.Description}
-- Filtros de búsqueda: {(formData.SearchFilters?.Any() == true ? string.Join(", ", formData.SearchFilters) : "Ninguno")}
-- Columnas de resultado: {(formData.ResultColumns?.Any() == true ? string.Join(", ", formData.ResultColumns) : "Ninguna")}
+- Filtros de búsqueda: {(formData.SearchFilters?.Any() == true ? string.Join(", ", formData.SearchFilters) : "Ninguno especificado")}
+- Columnas de resultado: {(formData.ResultColumns?.Any() == true ? string.Join(", ", formData.ResultColumns) : "Ninguna especificada")}
 - Campos de entidad: {entityFieldsDescription}
 - Reglas de negocio: {formData.BusinessRules ?? "Ninguna específica"}
 - Requerimientos especiales: {formData.SpecialRequirements ?? "Ninguno"}
@@ -871,6 +881,7 @@ INSTRUCCIONES FINALES:
 - Asegúrate de que la descripción sea detallada y profesional
 - Incluye título en MAYÚSCULAS con color azul RGB(0,112,192) en la sección inicial
 - El documento debe estar listo para convertirse a DOCX con formato corporativo ING
+- CRÍTICO: Usa SOLO los datos exactos proporcionados en formData
 ";
     }
 
@@ -1148,13 +1159,15 @@ Mensaje de confirmación para operaciones exitosas o de error según corresponda
         
         var wireframe = $@"Wireframe textual ING para buscador de entidades {formData.UseCaseName ?? "entidad"}.
 
-Panel de búsqueda superior con los siguientes filtros{(filters.Any() ? ":" : " (a definir por el usuario):")}
-{(filters.Any() ? string.Join("\n", filters.Select(f => $"- {f}")) : "- (Filtros especificados en el formulario)")}
+IMPORTANTE: Este wireframe usa EXACTAMENTE los datos provistos en el formulario. NO sustituir con valores genéricos.
+
+Panel de búsqueda superior con los siguientes filtros{(filters.Any() ? ":" : " (no especificados por el usuario):")}
+{(filters.Any() ? string.Join("\n", filters.Select(f => $"- {f}")) : "- (El usuario no especificó filtros)")}
 
 Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
 
-Tabla de resultados con paginado ING activado, mostrando las siguientes columnas{(columns.Any() ? ":" : " (a definir por el usuario):")}
-{(columns.Any() ? string.Join("\n", columns.Select(c => $"- {c}")) : "- (Columnas especificadas en el formulario)")}
+Tabla de resultados con paginado ING activado, mostrando las siguientes columnas{(columns.Any() ? ":" : " (no especificadas por el usuario):")}
+{(columns.Any() ? string.Join("\n", columns.Select(c => $"- {c}")) : "- (El usuario no especificó columnas)")}
 
 Cada fila incluye botones Editar y Eliminar al final.
 

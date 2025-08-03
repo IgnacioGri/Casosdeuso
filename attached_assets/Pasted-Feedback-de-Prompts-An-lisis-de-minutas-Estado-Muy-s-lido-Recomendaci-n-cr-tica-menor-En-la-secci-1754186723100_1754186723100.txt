@@ -1,0 +1,26 @@
+Feedback de Prompts:
+Análisis de minutas
+Estado: Muy sólido
+Recomendación crítica menor:
+En la sección "actorName": "actor principal del caso de uso", podrías incluir un fallback:
+"Si no hay actor explícito, dejar como 'actor no identificado'"
+Esto previene errores en modelos como Claude, que tienden a alucinar.
+Configuración de modelos AI
+Estado: Muy bien definida
+Recomendación de performance:
+Evaluar si podés usar distintas temperaturas por tarea. Ej:
+description: 0.4 (más creatividad controlada)
+testSteps: 0.2 (más factual y determinista)
+editUseCase: 0.3 (neutro)
+Esto mejora la precisión por tipo de prompt sin complicar el código.
+2. Edición de Casos de Uso
+Opinión: Conciso y seguro: Aplica solo cambios solicitados, preservando estructura ING. Token alto (16000) es adecuado para docs completos, temperature 0.3 para precisión.
+Alineación con Minuta ING: Buena: Mantiene formatos (jerárquicos, indentados) durante ediciones.
+Sugerencias de Mejora: Añade al final de INSTRUCCIONES (ambos stacks): "Asegura indentación 0.2 pulgadas en listas editadas (1-a-i para flujos)."
+Por Qué: Minuta exige indent 0.2 para niveles (números/letras/romanos en flujos). Beneficio: Evita inconsistencias en ediciones de listas, mejorando export DOCX (docx.js maneja indents). Estabilidad: Aditivo e implícito en "Mantén estructura"—no obliga reescritura, solo refuerza regla existente sin impactar iteraciones.
+3. Asistencia AI para Campos Individuales
+Opinión: Granular y mejorado: Contextos separados, prompts específicos con ejemplos concretos, token bajo (4000) para eficiencia. Inclusión de flujos indentados en descripción y multi-nivel en reglas es un acierto.
+Alineación con Minuta ING: Alta: Verbo infinitivo en nombre CU, descripciones con alcance/flujos, reglas verificables, requerimientos no funcionales.
+Sugerencias de Mejora: En "Campo: Requerimientos Especiales" (ambos stacks): Añade "Para procesos automáticos, incluye configurables (path archivos, usuario/clave/URL web services)."
+Por Qué: Minuta iii-iv lo obliga para procesos (configurable path/URL/creds). Beneficio: Refuerza especialidades condicionalmente, reduciendo ediciones manuales. Estabilidad: Aditivo a ejemplos—no cambia tono o longitud, solo guía si aplica, respetando iteraciones.
+Resto: Óptimos.

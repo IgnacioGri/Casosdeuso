@@ -74,48 +74,48 @@ IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido sin explicaciones ad
     return `
 Para casos de uso tipo ENTIDAD, extrae y estructura la siguiente información:
 
+INSTRUCCIONES CRÍTICAS:
+- NUNCA uses valores genéricos o por defecto
+- TODO ejemplo mostrado abajo es "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+- SIEMPRE extrae datos EXACTOS del texto de la minuta
+- Si algún dato no está en la minuta, devuelve null o array vacío según corresponda
+- Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
+
 {
-  "clientName": "Nombre del cliente/banco (ej: Banco Provincia)",
-  "projectName": "Nombre del proyecto (ej: Sistema de Gestión Integral)",
-  "useCaseCode": "Código del caso de uso (ej: UC001, BP005, etc.)",
+  "clientName": "Nombre del cliente/banco (Ejemplo ilustrativo: Banco Provincia)",
+  "projectName": "Nombre del proyecto (Ejemplo ilustrativo: Sistema de Gestión Integral)",
+  "useCaseCode": "Código del caso de uso (Ejemplo ilustrativo: UC001, BP005)",
   "useCaseName": "Nombre descriptivo del caso de uso empezando con verbo infinitivo",
   "fileName": "Nombre de archivo siguiendo patrón: 2letras+3números+descripción",
   "description": "Descripción detallada del objetivo del caso de uso",
-  "searchFilters": ["filtro1", "filtro2", "filtro3"],
+  "actorName": "actor principal del caso de uso o 'Actor no identificado' si no está explícito",
+  "searchFilters": ["usar SOLO filtros mencionados en la minuta"],
   "filtersDescription": "Descripción de los filtros de búsqueda necesarios",
-  "resultColumns": ["columna1", "columna2", "columna3"],
+  "resultColumns": ["usar SOLO columnas mencionadas en la minuta"],
   "columnsDescription": "Descripción de las columnas que se mostrarán en resultados",
   "entityFields": [
     {
-      "name": "campo1",
-      "type": "text",
+      "name": "usar SOLO campos mencionados en la minuta",
+      "type": "tipo según el campo",
       "mandatory": true,
       "length": 50,
       "description": "Descripción clara del propósito del campo",
       "validationRules": "Reglas de validación específicas"
-    },
-    {
-      "name": "campo2",
-      "type": "number",
-      "mandatory": false,
-      "length": 10,
-      "description": "Descripción del campo numérico",
-      "validationRules": "Solo números positivos"
     }
   ],
   "fieldsDescription": "Descripción de los campos de la entidad",
-  "wireframeDescriptions": ["Pantalla de búsqueda", "Grilla de resultados", "Detalle"],
+  "wireframeDescriptions": ["usar SOLO pantallas mencionadas en la minuta"],
   "wireframesDescription": "Descripción de las pantallas necesarias",
-  "alternativeFlows": ["Flujo alternativo 1", "Flujo alternativo 2"],
+  "alternativeFlows": ["usar SOLO flujos alternativos mencionados en la minuta"],
   "alternativeFlowsDescription": "Descripción de flujos alternativos y errores",
-  "businessRules": ["1. Regla de negocio 1", "2. Regla de negocio 2"],
-  "specialRequirements": ["1. Requerimiento especial 1", "2. Requerimiento especial 2"],
+  "businessRules": ["usar SOLO reglas mencionadas en la minuta"],
+  "specialRequirements": ["usar SOLO requerimientos mencionados en la minuta"],
   "isAIGenerated": true
 }
 
 REGLAS ESPECÍFICAS:
 - useCaseName debe empezar con verbo infinitivo (Gestionar, Consultar, Procesar, etc.)
-- fileName sigue patrón: 2 letras + 3 números + descripción (ej: BP005GestionarClientes)
+- fileName sigue patrón: 2 letras + 3 números + descripción (Ejemplo ilustrativo: BP005GestionarClientes)
 - entityFields debe incluir TODOS los campos obligatorios del schema: name, type, mandatory, length, description, validationRules
 - Tipos válidos: "text", "number", "decimal", "date", "datetime", "boolean", "email"
 - Para montos usar tipo "decimal", para IDs usar "number"
@@ -124,7 +124,7 @@ REGLAS ESPECÍFICAS:
   * usuarioAlta (text, mandatory: true, length: 50, description: "Usuario que creó el registro", validationRules: "Usuario del sistema")
   * fechaModificacion (date, mandatory: false, description: "Fecha de última modificación", validationRules: "Fecha válida")
   * usuarioModificacion (text, mandatory: false, length: 50, description: "Usuario que modificó", validationRules: "Usuario del sistema")
-- Extraer información específica del texto, no inventar datos genéricos
+- Extraer información específica del texto, NUNCA inventar datos genéricos
 `;
   }
 
@@ -132,14 +132,22 @@ REGLAS ESPECÍFICAS:
     return `
 Para casos de uso tipo API/WEB SERVICE, extrae y estructura la siguiente información:
 
+INSTRUCCIONES CRÍTICAS:
+- NUNCA uses valores genéricos o por defecto
+- TODO ejemplo mostrado abajo es "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+- SIEMPRE extrae datos EXACTOS del texto de la minuta
+- Si algún dato no está en la minuta, devuelve null o array vacío según corresponda
+- Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
+
 {
   "clientName": "Nombre del cliente/organización",
   "projectName": "Nombre del proyecto o sistema",
-  "useCaseCode": "Código del caso de uso (ej: API001, WS002)",
+  "useCaseCode": "Código del caso de uso (Ejemplo ilustrativo: API001, WS002)",
   "useCaseName": "Nombre del servicio empezando con verbo infinitivo",
   "fileName": "Nombre de archivo siguiendo patrón: 2letras+3números+descripción",
   "description": "Descripción del propósito del API/servicio",
-  "apiEndpoint": "URL del endpoint (ej: /api/v1/consulta-saldo)",
+  "actorName": "actor principal del caso de uso o 'Actor no identificado' si no está explícito",
+  "apiEndpoint": "URL del endpoint (Ejemplo ilustrativo: /api/v1/consulta-saldo)",
   "httpMethod": "Método HTTP (GET, POST, PUT, DELETE)",
   "requestFormat": "Formato de request con ejemplos",
   "responseFormat": "Formato de response con ejemplos",

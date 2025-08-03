@@ -173,6 +173,17 @@ FORMATO ESTRUCTURADO REQUERIDO:
 
 ${rules}
 
+INSTRUCCIONES CRÍTICAS PARA PREVENIR ERRORES:
+- NUNCA uses valores por defecto o genéricos como "Apellido", "DNI", "Segmento" - estos son SOLO ejemplos ilustrativos
+- SIEMPRE usa EXACTAMENTE los datos provistos en el formulario
+- Para filtros de búsqueda: usa SOLO los valores exactos provistos en formData.searchFilters
+- Para columnas de resultado: usa SOLO los valores exactos en formData.resultColumns  
+- Para campos de entidad: usa SOLO los campos exactos en formData.entityFields con sus propiedades (tipo, requerido, longitud)
+- Si no hay datos provistos, indica "No especificado" pero NO inventes valores
+- TODO ejemplo en el documento debe ser marcado como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+- Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
+- Para procesos automáticos: incluir configurables (path archivos, usuario/clave/URL web services)
+
 DATOS DEL FORMULARIO COMPLETOS:
 - Tipo de caso de uso: ${formData.useCaseType}
 - Cliente: ${formData.clientName}
@@ -195,7 +206,8 @@ INSTRUCCIONES FINALES:
 - Incluye TODAS las secciones requeridas
 - Asegúrate de que la descripción sea detallada y profesional
 - Incluye título en MAYÚSCULAS con color azul RGB(0,112,192) en la sección inicial
-- El documento debe estar listo para convertirse a DOCX con formato corporativo ING`;
+- El documento debe estar listo para convertirse a DOCX con formato corporativo ING
+- Asegura indentación de 0.2 pulgadas en listas editadas (1-a-i para flujos)`;
   }
 
   static cleanAIResponse(content: string): string {
@@ -1429,13 +1441,15 @@ Reglas ING:
     
     const wireframe = `Wireframe textual ING para buscador de entidades ${formData.useCaseName || 'entidad'}.
 
-Panel de búsqueda superior con los siguientes filtros${filters.length > 0 ? ':' : ' (a definir por el usuario):'}
-${filters.length > 0 ? filters.map((filter: string) => `- ${filter}`).join('\n') : '- (Filtros especificados en el formulario)'}
+IMPORTANTE: Este wireframe usa EXACTAMENTE los datos provistos en el formulario. NO sustituir con valores genéricos.
+
+Panel de búsqueda superior con los siguientes filtros${filters.length > 0 ? ':' : ' (no especificados por el usuario):'}
+${filters.length > 0 ? filters.map((filter: string) => `- ${filter}`).join('\n') : '- (El usuario no especificó filtros)'}
 
 Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
 
-Tabla de resultados con paginado ING activado, mostrando las siguientes columnas${columns.length > 0 ? ':' : ' (a definir por el usuario):'}
-${columns.length > 0 ? columns.map((column: string) => `- ${column}`).join('\n') : '- (Columnas especificadas en el formulario)'}
+Tabla de resultados con paginado ING activado, mostrando las siguientes columnas${columns.length > 0 ? ':' : ' (no especificadas por el usuario):'}
+${columns.length > 0 ? columns.map((column: string) => `- ${column}`).join('\n') : '- (El usuario no especificó columnas)'}
 
 Cada fila incluye botones Editar y Eliminar al final.
 
@@ -1707,9 +1721,18 @@ Validación fallida: Si fallan las validaciones de negocio, resaltar campos inco
     return items.join('\n');
   }
 
-  private generateIntelligentSpecialRequirements(fieldValue: string): string {
+  private generateIntelligentSpecialRequirements(fieldValue: string, context?: any): string {
+    const formData = context?.fullFormData;
+    const isProcess = formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso');
+    
     if (!fieldValue || fieldValue.trim() === '') {
-      return '1. Integración con servicio externo de scoring crediticio al momento del alta\n   a. Definir formato de intercambio de datos\n   b. Configurar timeout de respuesta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n   a. Cache local para mejorar performance\n   b. Actualización automática cada 24 horas\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
+      let defaultRequirements = '1. Integración con servicio externo de scoring crediticio al momento del alta\n   a. Definir formato de intercambio de datos\n   b. Configurar timeout de respuesta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n   a. Cache local para mejorar performance\n   b. Actualización automática cada 24 horas\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
+      
+      if (isProcess) {
+        defaultRequirements += '\n6. Para procesos automáticos, incluir configurables:\n   a. Path de archivos de entrada/salida\n   b. Usuario/clave de servicios web\n   c. URL de web services externos';
+      }
+      
+      return defaultRequirements;
     }
 
     // Clean and split input into meaningful bullet points
