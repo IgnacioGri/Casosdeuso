@@ -870,7 +870,13 @@ INSTRUCCIONES:
         console.log('---\n');
       }
 
-      return improvedValue || fieldValue;
+      // If AI returned empty value, use fallback
+      if (!improvedValue || improvedValue.trim() === '') {
+        console.log('AI returned empty, falling back to demo mode for field:', fieldName);
+        return this.getDemoFieldImprovement(fieldName, fieldValue, fieldType);
+      }
+      
+      return improvedValue;
       
     } catch (error) {
       console.error('Error improving field:', error);
@@ -982,14 +988,27 @@ INSTRUCCIONES:
   }
 
   private async callOpenAIForImprovement(prompt: string): Promise<string> {
-    const openai = getOpenAIClient();
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 500,
-      temperature: 0.3
-    });
-    return response.choices[0].message.content || '';
+    try {
+      if (!process.env.OPENAI_API_KEY) {
+        console.warn('OpenAI API key not configured, using fallback');
+        return '';
+      }
+      
+      const openai = getOpenAIClient();
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 500,
+        temperature: 0.3
+      });
+      
+      const result = response.choices[0].message.content || '';
+      console.log('OpenAI Response:', result ? 'Success' : 'Empty response');
+      return result;
+    } catch (error) {
+      console.error('OpenAI API Error:', error);
+      return '';
+    }
   }
 
   private async callClaudeForImprovement(prompt: string): Promise<string> {
@@ -1015,16 +1034,29 @@ INSTRUCCIONES:
   }
 
   private async callGeminiForImprovement(prompt: string): Promise<string> {
-    const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        maxOutputTokens: 1000,
-        temperature: 0.3
+    try {
+      if (!process.env.GEMINI_API_KEY) {
+        console.warn('Gemini API key not configured, using fallback');
+        return '';
       }
-    });
-    return response.text || '';
+      
+      const ai = getGeminiClient();
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt,
+        config: {
+          maxOutputTokens: 1000,
+          temperature: 0.3
+        }
+      });
+      
+      const result = response.text || '';
+      console.log('Gemini Response:', result ? 'Success' : 'Empty response');
+      return result;
+    } catch (error) {
+      console.error('Gemini API Error:', error);
+      return '';
+    }
   }
 
   private async processFiltersWithAI(fieldValue: string, aiModel: string): Promise<string> {
@@ -1316,6 +1348,66 @@ Reglas ING:
     fields.push(...ingFields);
 
     return JSON.stringify(fields, null, 2);
+  }
+
+  private generateSmartFilters(description: string): string {
+    const keywords = description.toLowerCase();
+    
+    let filters: string[] = [];
+    
+    // Analizar el texto de descripción para generar filtros inteligentes
+    if (keywords.includes('cliente') || keywords.includes('usuario')) {
+      filters.push('Número de cliente', 'Nombre completo', 'Email', 'Estado del cliente');
+    }
+    
+    if (keywords.includes('cuenta') || keywords.includes('banking')) {
+      filters.push('Número de cuenta', 'Tipo de cuenta', 'Estado de cuenta');
+    }
+    
+    if (keywords.includes('producto') || keywords.includes('servicio')) {
+      filters.push('Código de producto', 'Nombre del producto', 'Categoría');
+    }
+    
+    if (keywords.includes('fecha') || keywords.includes('periodo') || keywords.includes('tiempo')) {
+      filters.push('Fecha desde', 'Fecha hasta');
+    }
+    
+    if (keywords.includes('estado') || keywords.includes('status')) {
+      filters.push('Estado', 'Estado operativo');
+    }
+    
+    if (keywords.includes('transaccion') || keywords.includes('movimiento')) {
+      filters.push('Tipo de transacción', 'Monto desde', 'Monto hasta');
+    }
+    
+    // Si no se detectan patrones específicos, usar filtros genéricos
+    if (filters.length === 0) {
+      filters = ['Código', 'Nombre', 'Estado', 'Fecha de creación desde', 'Fecha de creación hasta'];
+    }
+    
+    return filters.slice(0, 6).join('\n'); // Máximo 6 filtros
+  }
+
+  private generateSmartColumns(description: string): string {
+    const keywords = description.toLowerCase();
+    
+    let columns: string[] = ['ID']; // Siempre incluir ID
+    
+    // Analizar el texto de descripción para generar columnas inteligentes
+    if (keywords.includes('cliente') || keywords.includes('usuario')) {
+      columns.push('Nombre Completo', 'Email', 'Teléfono', 'Estado', 'Fecha de Registro');
+    } else if (keywords.includes('cuenta')) {
+      columns.push('Número de Cuenta', 'Tipo', 'Saldo', 'Estado', 'Fecha de Apertura');
+    } else if (keywords.includes('producto')) {
+      columns.push('Código', 'Nombre del Producto', 'Categoría', 'Estado', 'Precio');
+    } else if (keywords.includes('transaccion') || keywords.includes('movimiento')) {
+      columns.push('Fecha', 'Tipo', 'Monto', 'Cuenta Origen', 'Cuenta Destino', 'Estado');
+    } else {
+      // Columnas genéricas
+      columns.push('Nombre', 'Descripción', 'Estado', 'Fecha de Creación', 'Último Modificado');
+    }
+    
+    return columns.slice(0, 8).join('\n'); // Máximo 8 columnas
   }
 
   private generateDefaultEntityFieldsWithINGCompliance(): string {
@@ -1973,10 +2065,10 @@ CONTENIDO MEJORADO:`;
         return '{\n  "success": "boolean",\n  "data": {\n    "id": "number",\n    "cliente": "object"\n  },\n  "status": 200\n}';
       }
       if (fieldType === 'filtersFromText') {
-        return 'Número de cliente\nNombre completo\nEstado del cliente\nFecha de registro';
+        return this.generateSmartFilters(valueStr);
       }
       if (fieldType === 'columnsFromText') {
-        return 'ID Cliente\nNombre Completo\nEmail\nTeléfono\nEstado';
+        return this.generateSmartColumns(valueStr);
       }
       if (fieldType === 'fieldsFromText') {
         return this.generateDefaultEntityFieldsWithINGCompliance();
