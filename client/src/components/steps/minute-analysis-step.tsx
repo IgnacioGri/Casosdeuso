@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, FileText, Loader2, Brain, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +22,7 @@ export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious 
   const [dragActive, setDragActive] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
+  const [dots, setDots] = useState('...');
   const { toast } = useToast();
 
   const analyzeMinuteMutation = useMutation({
@@ -74,6 +75,22 @@ export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious 
       });
     }
   });
+
+  // Animate dots while processing
+  useEffect(() => {
+    if (analyzeMinuteMutation.isPending) {
+      const interval = setInterval(() => {
+        setDots(prev => {
+          if (prev === '...') return '....';
+          if (prev === '....') return '.....';
+          if (prev === '.....') return '......';
+          return '...';
+        });
+      }, 400);
+      
+      return () => clearInterval(interval);
+    }
+  }, [analyzeMinuteMutation.isPending]);
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -375,13 +392,13 @@ CRITERIOS DE ACEPTACIÓN:
           <Button
             onClick={handleAnalyze}
             disabled={analyzeMinuteMutation.isPending || !minuteText.trim()}
-            className="bg-ms-blue hover:bg-ms-blue/90 text-white px-6"
+            className={`${analyzeMinuteMutation.isPending ? 'thinking-button' : 'bg-ms-blue hover:bg-ms-blue/90'} text-white px-6`}
           >
             {analyzeMinuteMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analizando con IA...
-              </>
+              <div className="thinking-button-content">
+                <div className="thinking-pulse"></div>
+                <span className="thinking-text">Pensando<span className="thinking-dots">{dots}</span></span>
+              </div>
             ) : (
               <>
                 <Brain className="mr-2 h-4 w-4" />
@@ -420,35 +437,7 @@ CRITERIOS DE ACEPTACIÓN:
       </CardContent>
     </Card>
     
-    {/* Progress Indicator */}
-    {/* Adaptive Loading for Minute Analysis */}
-    {analyzeMinuteMutation.isPending && (
-      <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-96 border border-gray-200 dark:border-gray-700 z-50">
-        <AdaptiveProgressSteps
-          stages={[
-            { stage: "Preparando análisis", message: "Iniciando procesamiento de minuta" },
-            { stage: "Extrayendo datos", message: "Identificando información relevante" },
-            { stage: "Aplicando IA", message: "Procesando con inteligencia artificial" },
-            { stage: "Completando formulario", message: "Aplicando datos extraídos" }
-          ]}
-          currentStage={
-            progress < 25 ? 0 :
-            progress < 50 ? 1 :
-            progress < 75 ? 2 : 3
-          }
-        />
-        <div className="mt-4">
-          <AdaptiveLoading
-            context="minute-analysis"
-            isLoading={true}
-            progress={progress}
-            message={progressMessage}
-            submessage="Analizando minuta con IA"
-            variant="inline"
-          />
-        </div>
-      </div>
-    )}
+
     </>
   );
 }

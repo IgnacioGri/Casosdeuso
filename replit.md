@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
   - MinuteAnalysis: Replaced MudProgressCircular with AdaptiveLoading using professional pulse animation
   - TestCasesStep: Updated to use AdaptiveLoading with spin animation for test generation
   - EntityFieldsStep: Implemented AdaptiveLoading with pulse animation for field generation
+- **Minute Analysis Animation Update**: Modified both React and Blazor versions to replace progress step list with "Pensando..." button animation featuring violet pulse effect (#6b5b95) and animated dots that cycle through "..." → "...." → "....." → "......" every 400ms
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

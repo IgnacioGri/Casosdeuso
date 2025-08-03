@@ -397,3 +397,47 @@ button[role="combobox"][data-state="closed"] {
   height: auto !important;
   min-height: 3.5rem !important;
 }
+
+/* Thinking Button Animation */
+.thinking-button {
+  background-color: #6b5b95 !important; /* Professional violet */
+  position: relative;
+  overflow: hidden;
+}
+
+.thinking-button-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.thinking-pulse {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+  animation: thinking-pulse 2s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.thinking-text {
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.thinking-dots {
+  display: inline-block;
+  min-width: 48px;
+  text-align: left;
+}
