@@ -211,7 +211,8 @@ export default function FormSteps({
             </h3>
           </div>
           
-          <div className="space-y-4">
+          <div className="wide-form-section">
+            <div className="wide-layout-grid">
             <div>
               <div className="flex items-baseline gap-1 mb-1">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -305,6 +306,7 @@ export default function FormSteps({
                 useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.useCaseCode} type="required" label="Código del Caso de Uso" />
+            </div>
             </div>
           </div>
         </CardContent>

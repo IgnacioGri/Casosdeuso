@@ -15,7 +15,7 @@
 
 <PageTitle>Generador de Casos de Uso - ING</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pa-4">
+<MudContainer MaxWidth="MaxWidth.False" Class="wide-layout-container pa-4">
     <MudPaper Class="pa-6" Elevation="3">
         
         <MudGrid AlignItems="Center" Spacing="2" GutterBottom="true">
@@ -35,11 +35,11 @@
             </MudItem>
         </MudGrid>
         
-        <MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+        <MudContainer MaxWidth="MaxWidth.False" Class="wide-layout-container pa-4">
             <MudGrid>
                 <MudItem xs="12">
                     <EnhancedProgressIndicator CurrentStep="@currentStep" TotalSteps="@maxSteps" UseCaseType="@formData.UseCaseType" />
-                    <MudPaper Class="pa-4" Elevation="2">
+                    <MudPaper Class="wide-card-content" Elevation="2">
                         
                         @if (currentStep == 1)
                         {

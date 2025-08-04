@@ -345,7 +345,7 @@ export default function UseCaseGenerator() {
       <div className="min-h-screen bg-ms-gray">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-ms-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-none xl:max-w-7xl 2xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
               {customHeaderImage ? (
@@ -420,7 +420,7 @@ export default function UseCaseGenerator() {
         className="hidden"
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-none xl:max-w-7xl 2xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-8">
         {/* Form Section - Always full width */}
         <div className="w-full">
           <EnhancedProgressIndicator 

@@ -6,17 +6,16 @@
 @inject IAIAssistService AIAssistService
 @inject ISnackbar Snackbar
 
-<MudGrid>
-    <MudItem xs="12">
-        <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
-            Información Básica del Caso de Uso
-        </MudText>
-        <MudText Typo="Typo.body1" Class="mb-4">
-            Completa la información fundamental que identifica el caso de uso en el proyecto.
-        </MudText>
-    </MudItem>
+<div class="wide-form-section">
+    <MudText Typo="Typo.h5" GutterBottom="true" Color="Color.Primary">
+        Información Básica del Caso de Uso
+    </MudText>
+    <MudText Typo="Typo.body1" Class="mb-4">
+        Completa la información fundamental que identifica el caso de uso en el proyecto.
+    </MudText>
     
-    <MudItem xs="12" md="6">
+    <div class="wide-form-grid">
+    <div>
         <div class="d-flex align-items-baseline gap-1 mb-1">
             <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Cliente</MudText>
             <ContextualTooltip
@@ -31,9 +30,9 @@
             Placeholder="Ej: Banco Provincia"
             Suggestions="@clientSuggestions"
             Class="w-full" />
-    </MudItem>
+    </div>
     
-    <MudItem xs="12" md="6">
+    <div>
         <div class="d-flex align-items-baseline gap-1 mb-1">
             <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Proyecto</MudText>
             <ContextualTooltip
@@ -48,9 +47,9 @@
             Placeholder="Ej: Sistema de Gestión Integral"
             Suggestions="@projectSuggestions"
             Class="w-full" />
-    </MudItem>
+    </div>
     
-    <MudItem xs="12" md="6">
+    <div>
         <div class="d-flex align-items-baseline gap-1 mb-1">
             <MudText Typo="Typo.body1" Class="text-subtitle">Código del Caso de Uso</MudText>
             <ContextualTooltip
@@ -65,9 +64,9 @@
                       Required="true"
                       Placeholder="Ej: BP001"
                       Class="mb-2" />
-    </MudItem>
+    </div>
     
-    <MudItem xs="12" md="6">
+    <div>
         <div class="d-flex align-items-baseline gap-1 mb-1">
             <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Caso de Uso</MudText>
             <ContextualTooltip
@@ -82,9 +81,10 @@
             Placeholder="Ej: Gestionar Clientes Premium"
             Suggestions="@useCaseSuggestions"
             Class="w-full" />
-    </MudItem>
+    </div>
+    </div>
     
-    <MudItem xs="12">
+    <div class="mt-4">
         <div class="d-flex align-items-baseline gap-1 mb-1">
             <MudText Typo="Typo.body1" Class="text-subtitle">Nombre del Archivo</MudText>
             <ContextualTooltip
@@ -99,17 +99,17 @@
                       Required="true"
                       Placeholder="Ej: BP001GestionarClientes"
                       Class="mb-2" />
-    </MudItem>
+    </div>
     
-    <MudItem xs="12">
+    <div class="mt-4">
         <MudAlert Severity="Severity.Info" Dense="true">
             <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Class="mr-2" />
             <strong>Validaciones automáticas:</strong> El sistema verificará que el código siga el formato correcto 
             y que el nombre del caso de uso comience con un verbo en infinitivo según estándares ING.
         </MudAlert>
-    </MudItem>
+    </div>
     
-    <MudItem xs="12">
+    <div class="mt-4">
         <MudButton Variant="Variant.Outlined" 
                    Color="Color.Secondary" 
                    StartIcon="@Icons.Material.Filled.AutoFixHigh"
@@ -117,8 +117,8 @@
                    Class="mt-2">
             Cargar Ejemplo: Cliente Premium Bancario
         </MudButton>
-    </MudItem>
-</MudGrid>
+    </div>
+</div>
 
 @code {
     [Parameter] public UseCaseFormData FormData { get; set; } = new();
