@@ -5,6 +5,26 @@
 @inject HttpClient Http
 @inject ISnackbar Snackbar
 
+<style>
+.step-number-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #003f5f;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif;
+}
+
+.test-steps-container {
+    margin-top: 16px;
+}
+</style>
+
 <MudGrid>
     <MudItem xs="12">
         <div class="d-flex justify-space-between align-center mb-4">
@@ -60,14 +80,24 @@
         <MudItem xs="12" md="6">
             <MudText Typo="Typo.h6" Class="mb-3">Configuración de Pruebas</MudText>
             
-            <MudTextField @bind-Value="FormData.TestCaseObjective"
-                          Label="Objetivo de las pruebas"
-                          Variant="Variant.Outlined"
-                          Lines="3"
-                          Placeholder="Ej: Verificar el correcto funcionamiento del módulo de gestión de clientes..."
-                          Class="mb-3" />
+            <BulletTextarea @bind-Value="FormData.TestCaseObjective"
+                            Label="Objetivo de las pruebas"
+                            Lines="4"
+                            Placeholder="Describe el objetivo con bullet points. Ej:
+• Validar la funcionalidad completa de gestión de usuarios
+• Verificar controles de seguridad y permisos
+• Comprobar integridad de datos en todas las operaciones..."
+                            Class="mb-3" />
             
-            <StructuredPreconditions @bind-Value="FormData.TestCasePreconditions" />
+            <BulletTextarea @bind-Value="FormData.TestCasePreconditions"
+                            Label="Precondiciones de prueba"
+                            Lines="5"
+                            Placeholder="Describe las precondiciones con bullet points. Ej:
+• Usuario autenticado con permisos adecuados
+• Datos de prueba cargados en el sistema
+• Conexión a base de datos disponible
+• Ambiente de pruebas configurado correctamente..."
+                            Class="mb-3" />
         </MudItem>
         
         <!-- Test Steps -->
@@ -89,74 +119,92 @@
             
             @if (FormData.TestSteps.Any())
             {
-                <MudTable Items="@FormData.TestSteps.OrderBy(s => s.Number)" 
-                          Class="ing-table-styled" 
-                          Hover="true" 
-                          Bordered="true"
-                          Striped="true"
-                          Elevation="1">
-                    <HeaderContent>
-                        <MudTh Class="text-center" Style="width: 50px;">#</MudTh>
-                        <MudTh Style="min-width: 200px;">Acción</MudTh>
-                        <MudTh Style="min-width: 200px;">Datos de Entrada</MudTh>
-                        <MudTh Style="min-width: 200px;">Resultado Esperado</MudTh>
-                        <MudTh Style="min-width: 200px;">Observaciones</MudTh>
-                        <MudTh Class="text-center" Style="width: 120px;">Estado (P/F)</MudTh>
-                        <MudTh Class="text-center" Style="width: 100px;"></MudTh>
-                    </HeaderContent>
-                    <RowTemplate Context="step">
-                        <MudTd DataLabel="#" Class="text-center">@step.Number</MudTd>
-                        <MudTd DataLabel="Acción">
-                            <MudTextField @bind-Value="step.Action"
-                                          Variant="Variant.Outlined"
-                                          Dense="true"
-                                          Lines="2"
-                                          Placeholder="Describir la acción a realizar..."
-                                          Class="my-1" />
-                        </MudTd>
-                        <MudTd DataLabel="Datos de Entrada">
-                            <MudTextField @bind-Value="step.InputData"
-                                          Variant="Variant.Outlined"
-                                          Dense="true"
-                                          Lines="2"
-                                          Placeholder="Datos o información necesaria..."
-                                          Class="my-1" />
-                        </MudTd>
-                        <MudTd DataLabel="Resultado Esperado">
-                            <MudTextField @bind-Value="step.ExpectedResult"
-                                          Variant="Variant.Outlined"
-                                          Dense="true"
-                                          Lines="2"
-                                          Placeholder="Resultado que se espera obtener..."
-                                          Class="my-1" />
-                        </MudTd>
-                        <MudTd DataLabel="Observaciones">
-                            <MudTextField @bind-Value="step.Observations"
-                                          Variant="Variant.Outlined"
-                                          Dense="true"
-                                          Lines="2"
-                                          Placeholder="Notas adicionales o consideraciones..."
-                                          Class="my-1" />
-                        </MudTd>
-                        <MudTd DataLabel="Estado" Class="text-center">
-                            <MudSelect @bind-Value="step.Status"
-                                       Variant="Variant.Outlined"
-                                       Dense="true"
-                                       Placeholder="---"
-                                       Class="my-1">
-                                <MudSelectItem Value="@TestStepStatus.Empty">---</MudSelectItem>
-                                <MudSelectItem Value="@TestStepStatus.Passed">P</MudSelectItem>
-                                <MudSelectItem Value="@TestStepStatus.Failed">F</MudSelectItem>
-                            </MudSelect>
-                        </MudTd>
-                        <MudTd DataLabel="Acciones" Class="text-center">
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
-                                           Color="Color.Error"
-                                           Size="Size.Small"
-                                           OnClick="() => RemoveTestStep(step)" />
-                        </MudTd>
-                    </RowTemplate>
-                </MudTable>
+                <div class="test-steps-container">
+                    @foreach (var step in FormData.TestSteps.OrderBy(s => s.Number))
+                    {
+                        <MudCard Class="mb-4" Style="border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <div class="d-flex align-center justify-space-between">
+                                        <div class="d-flex align-center">
+                                            <div class="step-number-badge">
+                                                @step.Number
+                                            </div>
+                                            <MudText Typo="Typo.h6" Class="ml-2">
+                                                Paso @step.Number
+                                            </MudText>
+                                        </div>
+                                        <div class="d-flex align-center">
+                                            <MudSelect @bind-Value="step.Status"
+                                                       Variant="Variant.Outlined"
+                                                       Dense="true"
+                                                       Placeholder="---"
+                                                       Style="width: 80px; margin-right: 8px;">
+                                                <MudSelectItem Value="@TestStepStatus.Empty">---</MudSelectItem>
+                                                <MudSelectItem Value="@TestStepStatus.Passed">P</MudSelectItem>
+                                                <MudSelectItem Value="@TestStepStatus.Failed">F</MudSelectItem>
+                                            </MudSelect>
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                                           Color="Color.Error"
+                                                           Size="Size.Small"
+                                                           OnClick="() => RemoveTestStep(step)" />
+                                        </div>
+                                    </div>
+                                </CardHeaderContent>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudGrid>
+                                    <MudItem xs="12">
+                                        <BulletTextarea @bind-Value="step.Action"
+                                                        Label="Acción"
+                                                        Lines="3"
+                                                        Placeholder="Describe la acción con bullet points. Ej:
+• Acceder al módulo de gestión de usuarios
+• Hacer clic en el botón 'Nuevo Usuario'
+• Completar formulario con datos válidos..."
+                                                        Class="mb-3" />
+                                    </MudItem>
+                                    
+                                    <MudItem xs="12">
+                                        <BulletTextarea @bind-Value="step.InputData"
+                                                        Label="Datos de Entrada"
+                                                        Lines="3"
+                                                        Placeholder="Especifica los datos necesarios con bullet points. Ej:
+• Nombre: Juan Pérez
+• DNI: 12345678
+• Email: juan.perez@example.com
+• Rol: Usuario estándar..."
+                                                        Class="mb-3" />
+                                    </MudItem>
+                                    
+                                    <MudItem xs="12">
+                                        <BulletTextarea @bind-Value="step.ExpectedResult"
+                                                        Label="Resultado Esperado"
+                                                        Lines="3"
+                                                        Placeholder="Define el resultado esperado con bullet points. Ej:
+• Usuario creado exitosamente en el sistema
+• Mensaje de confirmación mostrado
+• Usuario visible en la grilla de usuarios
+• Email de bienvenida enviado automáticamente..."
+                                                        Class="mb-3" />
+                                    </MudItem>
+                                    
+                                    <MudItem xs="12">
+                                        <BulletTextarea @bind-Value="step.Observations"
+                                                        Label="Observaciones"
+                                                        Lines="3"
+                                                        Placeholder="Agrega observaciones importantes con bullet points. Ej:
+• Verificar validación de formato de email
+• Comprobar unicidad del DNI
+• Validar permisos del usuario actual
+• Registrar operación en log de auditoría..."
+                                                        Class="mb-3" />
+                                    </MudItem>
+                                </MudGrid>
+                            </MudCardContent>
+                        </MudCard>
+                    }
+                </div>
             }
             else
             {

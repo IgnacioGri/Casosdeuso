@@ -223,61 +223,23 @@ export function TestCaseStep({
           )}
 
           {testSteps.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="text-center w-16">#</th>
-                    <th className="text-left min-w-[200px]">Acción</th>
-                    <th className="text-left min-w-[200px]">Datos de Entrada</th>
-                    <th className="text-left min-w-[200px]">Resultado Esperado</th>
-                    <th className="text-left min-w-[200px]">Observaciones</th>
-                    <th className="text-center w-32">Estado (P/F)</th>
-                    <th className="text-center w-16"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {testSteps.map((step, index) => (
-                    <tr key={index}>
-                      <td className="text-center font-medium">{step.number}</td>
-                      <td className="p-2">
-                        <Textarea
-                          value={step.action}
-                          onChange={(e) => onUpdateTestStep(index, 'action', e.target.value)}
-                          placeholder="Describir la acción a realizar..."
-                          className="min-h-16 resize-y w-full"
-                        />
-                      </td>
-                      <td className="p-2">
-                        <Textarea
-                          value={step.inputData}
-                          onChange={(e) => onUpdateTestStep(index, 'inputData', e.target.value)}
-                          placeholder="Datos o información necesaria..."
-                          className="min-h-16 resize-y w-full"
-                        />
-                      </td>
-                      <td className="p-2">
-                        <Textarea
-                          value={step.expectedResult}
-                          onChange={(e) => onUpdateTestStep(index, 'expectedResult', e.target.value)}
-                          placeholder="Resultado que se espera obtener..."
-                          className="min-h-16 resize-y w-full"
-                        />
-                      </td>
-                      <td className="p-2">
-                        <Textarea
-                          value={step.observations}
-                          onChange={(e) => onUpdateTestStep(index, 'observations', e.target.value)}
-                          placeholder="Notas adicionales o consideraciones..."
-                          className="min-h-16 resize-y w-full"
-                        />
-                      </td>
-                      <td className="text-center p-2">
+            <div className="space-y-4">
+              {testSteps.map((step, index) => (
+                <Card key={index} className="border border-gray-200 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-ms-blue text-white text-sm font-medium">
+                          {step.number}
+                        </div>
+                        Paso {step.number}
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
                         <Select
                           value={step.status}
                           onValueChange={(value) => onUpdateTestStep(index, 'status', value)}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="w-24">
                             <SelectValue placeholder="---" />
                           </SelectTrigger>
                           <SelectContent>
@@ -286,8 +248,6 @@ export function TestCaseStep({
                             <SelectItem value="F">F</SelectItem>
                           </SelectContent>
                         </Select>
-                      </td>
-                      <td className="text-center p-2">
                         <Button
                           onClick={() => onRemoveTestStep(index)}
                           variant="ghost"
@@ -296,11 +256,75 @@ export function TestCaseStep({
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Acción
+                      </Label>
+                      <BulletTextarea
+                        value={step.action}
+                        onChange={(value) => onUpdateTestStep(index, 'action', value)}
+                        placeholder="Describe la acción con bullet points. Ej:
+• Acceder al módulo de gestión de usuarios
+• Hacer clic en el botón 'Nuevo Usuario'
+• Completar formulario con datos válidos..."
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Datos de Entrada
+                      </Label>
+                      <BulletTextarea
+                        value={step.inputData}
+                        onChange={(value) => onUpdateTestStep(index, 'inputData', value)}
+                        placeholder="Especifica los datos necesarios con bullet points. Ej:
+• Nombre: Juan Pérez
+• DNI: 12345678
+• Email: juan.perez@example.com
+• Rol: Usuario estándar..."
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Resultado Esperado
+                      </Label>
+                      <BulletTextarea
+                        value={step.expectedResult}
+                        onChange={(value) => onUpdateTestStep(index, 'expectedResult', value)}
+                        placeholder="Define el resultado esperado con bullet points. Ej:
+• Usuario creado exitosamente en el sistema
+• Mensaje de confirmación mostrado
+• Usuario visible en la grilla de usuarios
+• Email de bienvenida enviado automáticamente..."
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                        Observaciones
+                      </Label>
+                      <BulletTextarea
+                        value={step.observations}
+                        onChange={(value) => onUpdateTestStep(index, 'observations', value)}
+                        placeholder="Agrega observaciones importantes con bullet points. Ej:
+• Verificar validación de formato de email
+• Comprobar unicidad del DNI
+• Validar permisos del usuario actual
+• Registrar operación en log de auditoría..."
+                        rows={3}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           )}
         </div>

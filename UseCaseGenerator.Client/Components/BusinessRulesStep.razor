@@ -39,13 +39,17 @@
             </MudButton>
         </div>
         
-        <MudTextField @bind-Value="FormData.BusinessRules"
-                      Label="Reglas de negocio"
-                      Variant="Variant.Outlined"
-                      Lines="8"
-                      Placeholder="Describe las reglas que debe cumplir el sistema..."
-                      HelperText="Usa texto libre, la IA las convertirá en listas numeradas"
-                      Class="mb-4" />
+        <BulletTextarea @bind-Value="FormData.BusinessRules"
+                        Label="Reglas de negocio"
+                        Lines="8"
+                        Placeholder="Describe las reglas con bullet points. Ej:
+• El DNI debe ser único en el sistema y validar formato correcto
+• No se puede eliminar un cliente con productos activos
+• El email debe tener formato válido
+• Solo usuarios con rol Supervisor pueden eliminar clientes
+• Registro automático en bitácora de todas las operaciones..."
+                        HelperText="Usa bullet points para organizar las reglas de negocio"
+                        Class="mb-4" />
         
         <MudExpansionPanels Elevation="1" Class="mb-3">
             <MudExpansionPanel Text="Ejemplo: Reglas de Cliente Bancario">
@@ -87,13 +91,17 @@
             </MudButton>
         </div>
         
-        <MudTextField @bind-Value="FormData.SpecialRequirements"
-                      Label="Requerimientos especiales"
-                      Variant="Variant.Outlined"
-                      Lines="8"
-                      Placeholder="Describe requerimientos técnicos especiales..."
-                      HelperText="Incluye integraciones, performance, seguridad, etc."
-                      Class="mb-4" />
+        <BulletTextarea @bind-Value="FormData.SpecialRequirements"
+                        Label="Requerimientos especiales"
+                        Lines="8"
+                        Placeholder="Describe los requerimientos especiales con bullet points. Ej:
+• Debe integrarse con servicio externo de validación
+• Tiempos de respuesta menores a 3 segundos
+• Validaciones de seguridad HTTPS obligatorias
+• Auditoría completa de todas las operaciones
+• Combo Segmento cargado dinámicamente desde tabla paramétrica..."
+                        HelperText="Incluye integraciones, performance, seguridad, etc."
+                        Class="mb-4" />
         
         <MudExpansionPanels Elevation="1" Class="mb-3">
             <MudExpansionPanel Text="Ejemplo: Requerimientos Bancarios">

@@ -1,0 +1,119 @@
+@using Microsoft.AspNetCore.Components.Web
+@inject IJSRuntime JSRuntime
+
+<MudTextField @bind-Value="@CurrentValue"
+              @onkeydown="OnKeyDown"
+              @onblur="OnBlur"
+              @onfocus="OnFocus"
+              Variant="@Variant"
+              Lines="@Lines"
+              Placeholder="@Placeholder"
+              Label="@Label"
+              Class="@($"bullet-textarea {Class}")"
+              HelperText="@HelperText"
+              Disabled="@Disabled"
+              Style="@Style" />
+
+@code {
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public string? HelperText { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public int Lines { get; set; } = 3;
+    [Parameter] public Variant Variant { get; set; } = Variant.Outlined;
+
+    private string CurrentValue
+    {
+        get => Value ?? "";
+        set
+        {
+            if (Value != value)
+            {
+                Value = value;
+                ValueChanged.InvokeAsync(value);
+            }
+        }
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            // Prevent default to stop normal Enter behavior
+            await JSRuntime.InvokeVoidAsync("preventDefault", e);
+            
+            var currentValue = CurrentValue ?? "";
+            var lines = currentValue.Split('\n').ToList();
+            
+            // Find cursor position (simplified - add at end)
+            if (!string.IsNullOrEmpty(currentValue) && !currentValue.EndsWith("\n"))
+            {
+                lines.Add("• ");
+                CurrentValue = string.Join("\n", lines);
+            }
+            else if (currentValue.EndsWith("\n"))
+            {
+                CurrentValue = currentValue + "• ";
+            }
+            else
+            {
+                CurrentValue = "• ";
+            }
+        }
+    }
+
+    private void OnBlur()
+    {
+        // Auto-format existing text to add bullets if needed
+        AutoFormatBullets();
+    }
+
+    private void OnFocus()
+    {
+        // Ensure we start with a bullet if empty
+        if (string.IsNullOrWhiteSpace(CurrentValue))
+        {
+            CurrentValue = "• ";
+        }
+    }
+
+    private void AutoFormatBullets()
+    {
+        if (string.IsNullOrWhiteSpace(CurrentValue))
+            return;
+
+        var lines = CurrentValue.Split('\n')
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrEmpty(line))
+            .Select(line => line.StartsWith("•") ? line : $"• {line}")
+            .ToList();
+
+        if (lines.Any())
+        {
+            CurrentValue = string.Join("\n", lines);
+        }
+    }
+}
+
+<style>
+.bullet-textarea .mud-input {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    line-height: 1.5;
+}
+
+.bullet-textarea .mud-input-slot {
+    padding-left: 8px;
+}
+</style>
+
+<script>
+window.preventDefault = function(event) {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
+};
+</script>
