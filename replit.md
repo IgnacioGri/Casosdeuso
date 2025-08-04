@@ -23,6 +23,7 @@ Preferred communication style: Simple, everyday language.
 - **Minute Analysis Animation Update**: Modified both React and Blazor versions to replace progress step list with "Pensando..." button animation featuring violet pulse effect (#6b5b95) and animated dots that cycle through "..." → "...." → "....." → "......" every 400ms
 - **[CRITICAL FIX]** Fixed null reference errors in SmartAutocomplete components: Both React and Blazor versions now properly handle null values in input fields, preventing crashes when minute analysis returns null values for fields like clientName or projectName
 - **[CRITICAL FIX]** Enhanced description expansion prompts: After client feedback showing descriptions weren't expanding to required 2 paragraphs (150+ words), reinforced AI instructions with warning emojis (⚠️), explicit word count requirements per paragraph (75+ words each), and specific examples of the problem (e.g., "Mostrar proveedores"). Updated both React and Blazor systems with identical enhanced prompts.
+- **[CRITICAL FIX]** Implemented automatic description expansion: Added a pre-processing step that detects short descriptions (<50 words) and expands them using a dedicated AI prompt before generating the full document. This ensures descriptions always meet the 2-paragraph requirement regardless of the AI model's response to the main prompt. Implemented in both React and Blazor systems.
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

@@ -79,6 +79,19 @@ public class AIService : IAIService, IDisposable
                 throw new InvalidOperationException("El modo demo no está disponible. Por favor, configure una clave API válida para usar el generador.");
             }
 
+            // Check if description needs expansion (less than 50 words)
+            var wordCount = request.FormData.Description?.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+            if (wordCount < 50)
+            {
+                _logger.LogInformation($"Description is short ({wordCount} words), expanding it first...");
+                var expandedDescription = await ExpandDescriptionAsync(request.FormData, request.FormData.AiModel);
+                if (!string.IsNullOrEmpty(expandedDescription))
+                {
+                    request.FormData.Description = expandedDescription;
+                    _logger.LogInformation("Description expanded successfully");
+                }
+            }
+
             var prompt = BuildPrompt(request.FormData, request.Rules);
             var content = await GenerateWithAI(prompt, request.FormData.AiModel);
             var cleanedContent = CleanAIResponse(content);
@@ -812,6 +825,38 @@ INSTRUCCIONES:
             _logger.LogError(ex, "Error calling Microsoft Copilot API for field processing");
             return fieldValue; // Return original if error
         }
+    }
+
+    private async Task<string> ExpandDescriptionAsync(UseCaseFormData formData, AIModel aiModel)
+    {
+        var expandPrompt = $@"Como experto en documentación bancaria/empresarial, expande la siguiente descripción de caso de uso a exactamente 2 párrafos profesionales:
+
+Descripción original: ""{formData.Description}""
+Caso de uso: {formData.UseCaseName}
+Cliente: {formData.ClientName}
+Proyecto: {formData.ProjectName}
+
+INSTRUCCIONES OBLIGATORIAS:
+1. Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos abarca, qué área del negocio atiende, cómo se integra en el sistema.
+2. Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado, mejoras operativas, problemas que resuelve, impacto en eficiencia.
+
+IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato adicional. Usa contexto profesional relevante del sector {(formData.ClientName?.Contains("Banco") == true ? "bancario" : "empresarial")}.";
+
+        try
+        {
+            var expandedText = await GenerateWithAI(expandPrompt, aiModel);
+            if (!string.IsNullOrEmpty(expandedText))
+            {
+                // Clean any HTML or formatting
+                return Regex.Replace(expandedText, @"<[^>]*>", "").Trim();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error expanding description");
+        }
+        
+        return null;
     }
 
     private string BuildPrompt(UseCaseFormData formData, string rules)

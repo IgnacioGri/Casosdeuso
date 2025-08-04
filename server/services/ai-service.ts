@@ -78,6 +78,17 @@ export class AIService {
     }
 
     try {
+      // Check if description needs expansion (less than 50 words)
+      const wordCount = formData.description?.split(/\s+/).length || 0;
+      if (wordCount < 50) {
+        console.log(`Description is short (${wordCount} words), expanding it first...`);
+        const expandedDescription = await this.expandDescription(formData, aiModel);
+        if (expandedDescription) {
+          formData.description = expandedDescription;
+          console.log('Description expanded successfully');
+        }
+      }
+      
       const prompt = this.buildPrompt(formData, rules);
       
       // Try to generate with selected model first, then fallback to others if it fails
@@ -145,6 +156,61 @@ export class AIService {
         error: error instanceof Error ? error.message : 'Error desconocido'
       };
     }
+  }
+
+  private static async expandDescription(formData: any, aiModel: string): Promise<string | null> {
+    const expandPrompt = `Como experto en documentación bancaria/empresarial, expande la siguiente descripción de caso de uso a exactamente 2 párrafos profesionales:
+
+Descripción original: "${formData.description}"
+Caso de uso: ${formData.useCaseName}
+Cliente: ${formData.clientName}
+Proyecto: ${formData.projectName}
+
+INSTRUCCIONES OBLIGATORIAS:
+1. Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos abarca, qué área del negocio atiende, cómo se integra en el sistema.
+2. Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado, mejoras operativas, problemas que resuelve, impacto en eficiencia.
+
+IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato adicional. Usa contexto profesional relevante del sector ${formData.clientName?.includes('Banco') ? 'bancario' : 'empresarial'}.`;
+
+    try {
+      const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
+      const modelOrder = [aiModel, ...aiModels.filter(m => m !== aiModel)];
+      
+      for (const model of modelOrder) {
+        try {
+          let expandedText = null;
+          
+          switch (model) {
+            case 'openai':
+              expandedText = await this.generateWithOpenAI(expandPrompt);
+              break;
+            case 'claude':
+              expandedText = await this.generateWithClaude(expandPrompt);
+              break;
+            case 'grok':
+              expandedText = await this.generateWithGrok(expandPrompt);
+              break;
+            case 'gemini':
+              expandedText = await this.generateWithGemini(expandPrompt);
+              break;
+            case 'copilot':
+              expandedText = await this.generateWithCopilot(expandPrompt);
+              break;
+          }
+          
+          if (expandedText) {
+            // Clean any HTML or formatting
+            return expandedText.replace(/<[^>]*>/g, '').trim();
+          }
+        } catch (error) {
+          console.error(`Failed to expand description with ${model}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('Error expanding description:', error);
+    }
+    
+    return null;
   }
 
   private static buildPrompt(formData: any, rules: string): string {
