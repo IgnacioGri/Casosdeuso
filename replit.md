@@ -37,6 +37,12 @@ Preferred communication style: Simple, everyday language.
   - Blazor: Replaced AddTestCasesTable with AddTestCasesList using NumberingProperties for bullets
   - Format: Each test step becomes a main bullet with "Paso X" followed by sub-bullets for Acción, Datos de entrada, Resultado esperado, Observaciones, and Estado
   - Both systems maintain identical formatting and structure for consistency
+- **[CRITICAL SYNC]** AI assist prompts now generate bullet-formatted content across both systems:
+  - React: Updated getFieldRules(), generateIntelligentBusinessRules(), and generateIntelligentSpecialRequirements() to output bullet format (•) instead of numbered lists
+  - Blazor: Updated GetFieldRules() with bullet formatting rules for businessRules, specialRequirements, testCaseObjective, and testCasePreconditions fields
+  - Enhanced with warning emojis (⚠️) and explicit format requirements to ensure AI compliance
+  - Both systems now generate consistent bullet-point content that matches BulletTextarea component behavior
+  - Improved user experience: AI suggestions automatically match the expected format in forms
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

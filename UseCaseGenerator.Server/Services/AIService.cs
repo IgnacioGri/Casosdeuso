@@ -1002,12 +1002,22 @@ INSTRUCCIONES FINALES:
         
         if (fieldNameLower.Contains("reglas") && fieldNameLower.Contains("negocio"))
         {
-            return $"{ingCompliance}\n- Cada regla debe ser clara, específica y verificable\n- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:\n  1. Regla principal\n    a. Sub-regla o detalle\n    i. Especificación adicional\n- Incluye validaciones, restricciones y políticas\n- Considera aspectos regulatorios si aplica\n- Para modificar/eliminar: incluir verificaciones\n- Ejemplo: \"1. El monto máximo por transferencia es de $50,000\"";
+            return $"{ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas\n- Cada regla como bullet point separado: • Texto de la regla\n- Cada regla debe ser clara, específica y verificable\n- Incluye validaciones, restricciones y políticas\n- Considera aspectos regulatorios si aplica\n- Para modificar/eliminar: incluir verificaciones\nEjemplo correcto:\n• El DNI debe ser único en el sistema y validar formato correcto\n• No se puede eliminar un cliente con productos activos\n• Solo usuarios con rol Supervisor pueden eliminar clientes\n• Registro automático en bitácora de todas las operaciones";
         }
         
         if (fieldNameLower.Contains("requerimientos"))
         {
-            return $"{ingCompliance}\n- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)\n- Especifica métricas cuando sea posible\n- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos\n- Considera integraciones con otros sistemas\n- Ejemplo: \"El sistema debe procesar 1000 transacciones por minuto\"";
+            return $"{ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas\n- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)\n- Especifica métricas cuando sea posible\n- Cada requerimiento como bullet point separado: • Texto del requerimiento\n- Considera integraciones con otros sistemas\nEjemplo correcto:\n• El sistema debe procesar 1000 transacciones por minuto\n• Tiempo de respuesta máximo de 3 segundos para búsquedas\n• Validación HTTPS obligatoria para todas las transacciones\n• Auditoria completa de cambios con timestamp y usuario";
+        }
+
+        if (fieldNameLower.Contains("objetivo") && fieldNameLower.Contains("caso"))
+        {
+            return $"{ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas\n- Define claramente qué se va a probar en el caso de uso\n- Especifica los objetivos de las pruebas de forma concisa\n- Cada objetivo como bullet point separado: • Texto del objetivo\nEjemplo correcto:\n• Verificar que el sistema permita buscar clientes por DNI\n• Validar que se muestren los resultados correctos en la grilla\n• Comprobar que los botones de edición y eliminación funcionen correctamente\n• Asegurar que las validaciones se ejecuten según las reglas de negocio";
+        }
+
+        if (fieldNameLower.Contains("precondiciones") || (fieldNameLower.Contains("precondicion") && fieldNameLower.Contains("caso")))
+        {
+            return $"{ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas\n- Define el estado necesario del sistema antes de ejecutar las pruebas\n- Especifica datos, permisos y configuraciones necesarias\n- Cada precondición como bullet point separado: • Texto de la precondición\nEjemplo correcto:\n• Usuario con permisos de consulta debe estar logueado en el sistema\n• Base de datos debe contener al menos 10 registros de prueba\n• Sistema debe estar conectado a los servicios externos\n• Cache del sistema debe estar limpio para evitar resultados previos";
         }
         
         if (fieldType == "searchFilter")

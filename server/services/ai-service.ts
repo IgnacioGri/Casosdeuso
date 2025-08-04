@@ -999,11 +999,19 @@ INSTRUCCIONES:
     }
     
     if (fieldName_lower.includes('reglas') && fieldName_lower.includes('negocio')) {
-      return `${ingCompliance}\n- Cada regla debe ser clara, específica y verificable\n- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:\n  1. Regla principal\n    a. Sub-regla o detalle\n    i. Especificación adicional\n- Incluye validaciones, restricciones y políticas\n- Considera aspectos regulatorios si aplica\n- Para modificar/eliminar: incluir verificaciones\n- Ejemplo: "1. El monto máximo por transferencia es de $50,000"`;
+      return `${ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas\n- Cada regla como bullet point separado: • Texto de la regla\n- Cada regla debe ser clara, específica y verificable\n- Incluye validaciones, restricciones y políticas\n- Considera aspectos regulatorios si aplica\n- Para modificar/eliminar: incluir verificaciones\nEjemplo correcto:\n• El DNI debe ser único en el sistema y validar formato correcto\n• No se puede eliminar un cliente con productos activos\n• Solo usuarios con rol Supervisor pueden eliminar clientes\n• Registro automático en bitácora de todas las operaciones`;
     }
     
     if (fieldName_lower.includes('requerimientos')) {
-      return `${ingCompliance}\n- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)\n- Especifica métricas cuando sea posible\n- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos\n- Considera integraciones con otros sistemas\n- Ejemplo: "El sistema debe procesar 1000 transacciones por minuto"`;
+      return `${ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas\n- Cada requerimiento como bullet point separado: • Texto del requerimiento\n- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)\n- Especifica métricas cuando sea posible\n- Considera integraciones con otros sistemas\nEjemplo correcto:\n• Integración con servicio externo de validación\n• Tiempos de respuesta menores a 3 segundos\n• Validaciones de seguridad HTTPS obligatorias\n• El sistema debe procesar más de 1000 transacciones por minuto`;
+    }
+    
+    if (fieldName_lower.includes('objetivo') && (fieldName_lower.includes('prueba') || fieldName_lower.includes('test') || fieldType === 'testCaseObjective')) {
+      return `${ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente\n- Cada objetivo como bullet point separado: • Texto del objetivo\n- Enfocarse en validación de funcionalidades específicas\n- Incluir verificación de controles de seguridad\n- Mencionar integridad de datos\n- Ser específico del caso de uso\nEjemplo correcto:\n• Validar la funcionalidad completa de gestión de usuarios\n• Verificar controles de seguridad y permisos de acceso\n• Comprobar integridad de datos en todas las operaciones\n• Confirmar manejo correcto de errores y validaciones`;
+    }
+    
+    if (fieldName_lower.includes('precondiciones') && (fieldName_lower.includes('prueba') || fieldName_lower.includes('test') || fieldType === 'testCasePreconditions')) {
+      return `${ingCompliance}\n⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente\n- Cada precondición como bullet point separado: • Texto de la precondición\n- Incluir estado de usuarios y permisos necesarios\n- Mencionar datos de prueba requeridos\n- Especificar infraestructura y configuración\n- Listar dependencias del sistema\nEjemplo correcto:\n• Usuario autenticado con permisos adecuados para realizar operaciones\n• Datos de prueba cargados en el sistema de desarrollo\n• Conexión a base de datos disponible y configurada\n• Ambiente de pruebas desplegado y accesible`;
     }
     
     if (fieldType === 'searchFilter') {
@@ -1903,19 +1911,14 @@ Validación fallida: Si fallan las validaciones de negocio, resaltar campos inco
 
   private generateIntelligentBusinessRules(fieldValue: string): string {
     if (!fieldValue || fieldValue.trim() === '') {
-      return '1. El DNI debe ser único en el sistema\n   a. Validar formato correcto\n   b. Verificar no duplicación\n2. No se puede eliminar un cliente con productos activos\n   a. Validar productos asociados\n   b. Mostrar mensaje informativo\n3. El email debe tener formato válido\n4. Solo usuarios con rol "Supervisor" pueden eliminar clientes\n5. Registro automático en bitácora de alta/modificación/eliminación';
+      return '• El DNI debe ser único en el sistema y validar formato correcto\n• No se puede eliminar un cliente con productos activos\n• El email debe tener formato válido\n• Solo usuarios con rol "Supervisor" pueden eliminar clientes\n• Registro automático en bitácora de alta/modificación/eliminación';
     }
 
     // Clean and split input into meaningful business rules
     let text = this.cleanInputText(fieldValue);
     
-    // Split by numbered items with bullet points - this preserves the existing structure
-    let lines = text.split(/(?:\n\d+\.\s*•\s*|\n\d+\.\s*)/m).filter(line => line.trim() !== '');
-    
-    // If no numbered structure is found, try splitting by plain bullet points or line breaks
-    if (lines.length <= 1) {
-      lines = text.split(/(?:•\s*|^\s*-\s*|\n)/m).filter(line => line.trim() !== '');
-    }
+    // Split by existing bullets, numbered items, or line breaks
+    let lines = text.split(/(?:\n•\s*|\n\d+\.\s*|\n-\s*|\n)/m).filter(line => line.trim() !== '');
     
     if (lines.length === 0) {
       lines = [text]; // Fallback to treat as single rule
@@ -1934,16 +1937,16 @@ Validación fallida: Si fallan las validaciones de negocio, resaltar campos inco
       // Clean the rule text
       item = this.cleanInputText(item);
       
-      // Format as numbered item
-      let mainItem = `${items.length + 1}. ${item}`;
+      // Format as bullet point (not numbered)
+      let bulletItem = `• ${item}`;
       
-      // Add to items list - simplified to avoid complex formatting issues
-      items.push(this.formatProfessionalText(mainItem));
+      // Add to items list
+      items.push(this.formatProfessionalText(bulletItem));
     });
 
     // If no items were processed, return a basic formatted version
     if (items.length === 0) {
-      return `1. ${this.formatProfessionalText(text)}`;
+      return `• ${this.formatProfessionalText(text)}`;
     }
 
     return items.join('\n');
@@ -1954,10 +1957,10 @@ Validación fallida: Si fallan las validaciones de negocio, resaltar campos inco
     const isProcess = formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso');
     
     if (!fieldValue || fieldValue.trim() === '') {
-      let defaultRequirements = '1. Integración con servicio externo de scoring crediticio al momento del alta\n   a. Definir formato de intercambio de datos\n   b. Configurar timeout de respuesta\n2. Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n   a. Cache local para mejorar performance\n   b. Actualización automática cada 24 horas\n3. Tiempo de respuesta máximo: 3 segundos para búsquedas\n4. Validación HTTPS obligatoria para todas las transacciones\n5. Auditoria completa de cambios con timestamp y usuario';
+      let defaultRequirements = '• Integración con servicio externo de scoring crediticio al momento del alta\n• Combo "Segmento" cargado dinámicamente desde tabla paramétrica\n• Tiempo de respuesta máximo: 3 segundos para búsquedas\n• Validación HTTPS obligatoria para todas las transacciones\n• Auditoria completa de cambios con timestamp y usuario';
       
       if (isProcess) {
-        defaultRequirements += '\n6. Para procesos automáticos, incluir configurables:\n   a. Path de archivos de entrada/salida\n   b. Usuario/clave de servicios web\n   c. URL de web services externos';
+        defaultRequirements += '\n• Para procesos automáticos, incluir configurables de paths y credenciales\n• Usuario/clave de servicios web configurables\n• URL de web services externos parametrizables';
       }
       
       return defaultRequirements;
@@ -1986,16 +1989,16 @@ Validación fallida: Si fallan las validaciones de negocio, resaltar campos inco
       // Clean the requirement text
       item = this.cleanInputText(item);
       
-      // Format as numbered item
-      let mainItem = `${items.length + 1}. ${item}`;
+      // Format as bullet point (not numbered)
+      let bulletItem = `• ${item}`;
       
-      // Add to items list - no sub-items to avoid complex nesting issues
-      items.push(this.formatProfessionalText(mainItem));
+      // Add to items list
+      items.push(this.formatProfessionalText(bulletItem));
     });
 
     // If no items were processed, return a basic formatted version
     if (items.length === 0) {
-      return `1. ${this.formatProfessionalText(text)}`;
+      return `• ${this.formatProfessionalText(text)}`;
     }
 
     return items.join('\n');
