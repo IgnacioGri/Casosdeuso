@@ -32,6 +32,11 @@ Preferred communication style: Simple, everyday language.
   - React: Changed table width to 100% and all column widths from fixed DXA units to percentages (5%, 25%, 20%, 25%, 18%, 7%)
   - Blazor: Updated table to use percentage-based widths matching React system
   - Tables now properly expand rows vertically when text is long instead of cutting off content
+- **[ENHANCEMENT]** Converted test case tables to bullet/sub-bullet format for improved readability:
+  - React: Replaced table structure with bullet points using document library's bullet property
+  - Blazor: Replaced AddTestCasesTable with AddTestCasesList using NumberingProperties for bullets
+  - Format: Each test step becomes a main bullet with "Paso X" followed by sub-bullets for Acción, Datos de entrada, Resultado esperado, Observaciones, and Estado
+  - Both systems maintain identical formatting and structure for consistency
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

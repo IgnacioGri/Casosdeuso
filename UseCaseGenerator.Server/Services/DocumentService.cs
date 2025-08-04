@@ -393,7 +393,7 @@ public class DocumentService : IDocumentService
 
             // Test Steps Table
             AddSubHeading(body, "Pasos de Prueba:");
-            AddTestCasesTable(body, useCase.TestSteps);
+            AddTestCasesList(body, useCase.TestSteps);
         }
     }
 
@@ -532,102 +532,101 @@ public class DocumentService : IDocumentService
         runProps.AppendChild(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
     }
 
-    private void AddTestCasesTable(Body body, List<TestStep> testSteps)
+    private void AddTestCasesList(Body body, List<TestStep> testSteps)
     {
-        var table = new Table();
-        
-        // Table properties
-        var tblPr = new TableProperties();
-        tblPr.Append(new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct }); // 100% of page width
-        tblPr.Append(new TableBorders(
-            new TopBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
-            new BottomBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
-            new LeftBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
-            new RightBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
-            new InsideHorizontalBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
-            new InsideVerticalBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 }
-        ));
-        table.Append(tblPr);
-        
-        // Header row
-        var headerRow = new TableRow();
-        
-        // # column
-        var cell1 = new TableCell();
-        cell1.Append(new TableCellProperties(
-            new TableCellWidth() { Width = "250", Type = TableWidthUnitValues.Pct }, // 5% of table width
-            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
-        ));
-        var para1 = new Paragraph();
-        var paraProps1 = new ParagraphProperties();
-        paraProps1.Append(new Justification() { Val = JustificationValues.Center });
-        para1.Append(paraProps1);
-        var run1 = new Run();
-        var runProps1 = new RunProperties();
-        runProps1.Append(new Bold());
-        runProps1.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
-        run1.Append(runProps1);
-        run1.Append(new Text("#"));
-        para1.Append(run1);
-        cell1.Append(para1);
-        headerRow.Append(cell1);
-        
-        // Acción column
-        var cell2 = CreateHeaderCellPct("Acción", "1250"); // 25%
-        headerRow.Append(cell2);
-        
-        // Datos de entrada column
-        var cell3 = CreateHeaderCellPct("Datos de entrada", "1000"); // 20%
-        headerRow.Append(cell3);
-        
-        // Resultado esperado column
-        var cell4 = CreateHeaderCellPct("Resultado esperado", "1250"); // 25%
-        headerRow.Append(cell4);
-        
-        // Observaciones column
-        var cell5 = CreateHeaderCellPct("Observaciones", "900"); // 18%
-        headerRow.Append(cell5);
-        
-        // Estado (P/F) column
-        var cell6 = CreateHeaderCellPct("Estado\n(P/F)", "350"); // 7%
-        headerRow.Append(cell6);
-        
-        table.Append(headerRow);
-        
-        // Data rows
         foreach (var step in testSteps)
         {
-            var row = new TableRow();
+            // Main bullet with step number
+            var mainPara = new Paragraph();
+            var mainParaProps = new ParagraphProperties();
             
-            // # cell
-            row.Append(CreateDataCellPct(step.Number.ToString(), "250", true)); // 5%
+            // Create numbered list style for main bullets
+            var numberingProps = new NumberingProperties();
+            numberingProps.Append(new NumberingLevelReference() { Val = 0 });
+            numberingProps.Append(new NumberingId() { Val = 1 });
+            mainParaProps.Append(numberingProps);
+            mainParaProps.Append(new SpacingBetweenLines() { Before = "120", After = "60" });
+            mainPara.Append(mainParaProps);
             
-            // Acción cell
-            row.Append(CreateDataCellPct(step.Action, "1250")); // 25%
+            var mainRun = new Run();
+            var mainRunProps = new RunProperties();
+            mainRunProps.Append(new Bold());
+            mainRunProps.Append(new FontSize() { Val = "22" });
+            mainRunProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+            mainRun.Append(mainRunProps);
+            mainRun.Append(new Text($"Paso {step.Number}"));
+            mainPara.Append(mainRun);
+            body.Append(mainPara);
             
-            // Datos de entrada cell
-            row.Append(CreateDataCellPct(step.InputData, "1000")); // 20%
+            // Sub-bullets for each detail
+            if (!string.IsNullOrEmpty(step.Action))
+            {
+                var actionPara = CreateSubBulletParagraph("Acción: ", step.Action);
+                body.Append(actionPara);
+            }
             
-            // Resultado esperado cell
-            row.Append(CreateDataCellPct(step.ExpectedResult, "1250")); // 25%
+            if (!string.IsNullOrEmpty(step.InputData))
+            {
+                var inputPara = CreateSubBulletParagraph("Datos de entrada: ", step.InputData);
+                body.Append(inputPara);
+            }
             
-            // Observaciones cell
-            row.Append(CreateDataCellPct(step.Observations, "900")); // 18%
+            if (!string.IsNullOrEmpty(step.ExpectedResult))
+            {
+                var resultPara = CreateSubBulletParagraph("Resultado esperado: ", step.ExpectedResult);
+                body.Append(resultPara);
+            }
             
-            // Estado cell
-            row.Append(CreateDataCellPct("Pendiente", "350", true)); // 7%
+            if (!string.IsNullOrEmpty(step.Observations))
+            {
+                var observationsPara = CreateSubBulletParagraph("Observaciones: ", step.Observations);
+                body.Append(observationsPara);
+            }
             
-            table.Append(row);
+            // Estado - always show
+            var estadoPara = CreateSubBulletParagraph("Estado: ", "Pendiente", true);
+            body.Append(estadoPara);
         }
         
-        body.Append(table);
-        
-        // Add spacing after table
+        // Add spacing after list
         var spacingPara = new Paragraph();
         var spacingProps = new ParagraphProperties();
         spacingProps.Append(new SpacingBetweenLines() { After = "240" });
         spacingPara.Append(spacingProps);
         body.Append(spacingPara);
+    }
+    
+    private Paragraph CreateSubBulletParagraph(string label, string content, bool isLast = false)
+    {
+        var para = new Paragraph();
+        var paraProps = new ParagraphProperties();
+        
+        // Create bulleted list style for sub-bullets
+        var numberingProps = new NumberingProperties();
+        numberingProps.Append(new NumberingLevelReference() { Val = 1 });
+        numberingProps.Append(new NumberingId() { Val = 2 });
+        paraProps.Append(numberingProps);
+        paraProps.Append(new SpacingBetweenLines() { After = isLast ? "60" : "30" });
+        para.Append(paraProps);
+        
+        // Label (bold)
+        var labelRun = new Run();
+        var labelRunProps = new RunProperties();
+        labelRunProps.Append(new Bold());
+        labelRunProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        labelRun.Append(labelRunProps);
+        labelRun.Append(new Text(label));
+        para.Append(labelRun);
+        
+        // Content (normal)
+        var contentRun = new Run();
+        var contentRunProps = new RunProperties();
+        contentRunProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        contentRun.Append(contentRunProps);
+        contentRun.Append(new Text(content));
+        para.Append(contentRun);
+        
+        return para;
     }
     
     private TableCell CreateHeaderCell(string text, string width)

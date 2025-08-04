@@ -682,156 +682,110 @@ export class DocumentService {
         })]
       }));
       
-      const testStepsTable = new Table({
-        width: {
-          size: 100,
-          type: WidthType.PERCENTAGE
-        },
-        rows: [
-          // Header row
-          new TableRow({
+      // Test Cases Steps as bulleted list
+      formData.testSteps.forEach((testStep: any, index: number) => {
+        // Main bullet with step number
+        sections.push(new Paragraph({
+          bullet: { level: 0 },
+          spacing: { before: 120, after: 60 },
+          children: [new TextRun({
+            text: `Paso ${testStep.number || index + 1}`,
+            bold: true,
+            font: "Segoe UI Semilight",
+            size: 22
+          })]
+        }));
+        
+        // Sub-bullets for each detail
+        if (testStep.action) {
+          sections.push(new Paragraph({
+            bullet: { level: 1 },
+            spacing: { after: 30 },
             children: [
-              new TableCell({
-                children: [new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [new TextRun({
-                    text: "#",
-                    bold: true,
-                    font: "Segoe UI Semilight"
-                  })]
-                })],
-                shading: { fill: "DEEAF6" },
-                width: { size: 5, type: WidthType.PERCENTAGE }
+              new TextRun({
+                text: "Acción: ",
+                bold: true,
+                font: "Segoe UI Semilight"
               }),
-              new TableCell({
-                children: [new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [new TextRun({
-                    text: "Acción",
-                    bold: true,
-                    font: "Segoe UI Semilight"
-                  })]
-                })],
-                shading: { fill: "DEEAF6" },
-                width: { size: 25, type: WidthType.PERCENTAGE }
-              }),
-              new TableCell({
-                children: [new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [new TextRun({
-                    text: "Datos de entrada",
-                    bold: true,
-                    font: "Segoe UI Semilight"
-                  })]
-                })],
-                shading: { fill: "DEEAF6" },
-                width: { size: 20, type: WidthType.PERCENTAGE }
-              }),
-              new TableCell({
-                children: [new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [new TextRun({
-                    text: "Resultado esperado",
-                    bold: true,
-                    font: "Segoe UI Semilight"
-                  })]
-                })],
-                shading: { fill: "DEEAF6" },
-                width: { size: 25, type: WidthType.PERCENTAGE }
-              }),
-              new TableCell({
-                children: [new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [new TextRun({
-                    text: "Observaciones",
-                    bold: true,
-                    font: "Segoe UI Semilight"
-                  })]
-                })],
-                shading: { fill: "DEEAF6" },
-                width: { size: 18, type: WidthType.PERCENTAGE }
-              }),
-              new TableCell({
-                children: [new Paragraph({
-                  alignment: AlignmentType.CENTER,
-                  children: [new TextRun({
-                    text: "Estado\n(P/F)",
-                    bold: true,
-                    font: "Segoe UI Semilight"
-                  })]
-                })],
-                shading: { fill: "DEEAF6" },
-                width: { size: 7, type: WidthType.PERCENTAGE }
+              new TextRun({
+                text: testStep.action,
+                font: "Segoe UI Semilight"
               })
             ]
-          }),
-          // Data rows
-          ...formData.testSteps.map((testStep: any, index: number) => 
-            new TableRow({
-              children: [
-                new TableCell({
-                  children: [new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({
-                      text: String(testStep.number || index + 1),
-                      font: "Segoe UI Semilight"
-                    })]
-                  })],
-                  width: { size: 5, type: WidthType.PERCENTAGE }
-                }),
-                new TableCell({
-                  children: [new Paragraph({
-                    children: [new TextRun({
-                      text: testStep.action || '',
-                      font: "Segoe UI Semilight"
-                    })]
-                  })],
-                  width: { size: 25, type: WidthType.PERCENTAGE }
-                }),
-                new TableCell({
-                  children: [new Paragraph({
-                    children: [new TextRun({
-                      text: testStep.inputData || '',
-                      font: "Segoe UI Semilight"
-                    })]
-                  })],
-                  width: { size: 20, type: WidthType.PERCENTAGE }
-                }),
-                new TableCell({
-                  children: [new Paragraph({
-                    children: [new TextRun({
-                      text: testStep.expectedResult || '',
-                      font: "Segoe UI Semilight"
-                    })]
-                  })],
-                  width: { size: 25, type: WidthType.PERCENTAGE }
-                }),
-                new TableCell({
-                  children: [new Paragraph({
-                    children: [new TextRun({
-                      text: testStep.observations || '',
-                      font: "Segoe UI Semilight"
-                    })]
-                  })],
-                  width: { size: 18, type: WidthType.PERCENTAGE }
-                }),
-                new TableCell({
-                  children: [new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    children: [new TextRun({
-                      text: "Pendiente",
-                      font: "Segoe UI Semilight"
-                    })]
-                  })],
-                  width: { size: 7, type: WidthType.PERCENTAGE }
-                })
-              ]
+          }));
+        }
+        
+        if (testStep.inputData) {
+          sections.push(new Paragraph({
+            bullet: { level: 1 },
+            spacing: { after: 30 },
+            children: [
+              new TextRun({
+                text: "Datos de entrada: ",
+                bold: true,
+                font: "Segoe UI Semilight"
+              }),
+              new TextRun({
+                text: testStep.inputData,
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+        
+        if (testStep.expectedResult) {
+          sections.push(new Paragraph({
+            bullet: { level: 1 },
+            spacing: { after: 30 },
+            children: [
+              new TextRun({
+                text: "Resultado esperado: ",
+                bold: true,
+                font: "Segoe UI Semilight"
+              }),
+              new TextRun({
+                text: testStep.expectedResult,
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+        
+        if (testStep.observations) {
+          sections.push(new Paragraph({
+            bullet: { level: 1 },
+            spacing: { after: 30 },
+            children: [
+              new TextRun({
+                text: "Observaciones: ",
+                bold: true,
+                font: "Segoe UI Semilight"
+              }),
+              new TextRun({
+                text: testStep.observations,
+                font: "Segoe UI Semilight"
+              })
+            ]
+          }));
+        }
+        
+        // Estado - always show
+        sections.push(new Paragraph({
+          bullet: { level: 1 },
+          spacing: { after: 60 },
+          children: [
+            new TextRun({
+              text: "Estado: ",
+              bold: true,
+              font: "Segoe UI Semilight"
+            }),
+            new TextRun({
+              text: "Pendiente",
+              font: "Segoe UI Semilight"
             })
-          )
-        ]
+          ]
+        }));
       });
-      
-      sections.push(testStepsTable);
     }
     
     return sections;
