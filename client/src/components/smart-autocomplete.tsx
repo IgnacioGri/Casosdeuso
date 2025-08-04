@@ -137,7 +137,7 @@ export function SmartAutocomplete({
         )}
         <Input
           ref={inputRef}
-          value={inputValue}
+          value={inputValue || ''}
           onChange={(e) => {
             setInputValue(e.target.value);
             onChange(e.target.value);
