@@ -84,11 +84,17 @@ public class AIService : IAIService, IDisposable
             if (wordCount < 50)
             {
                 _logger.LogInformation($"Description is short ({wordCount} words), expanding it first...");
+                _logger.LogInformation($"Original description: \"{request.FormData.Description}\"");
                 var expandedDescription = await ExpandDescriptionAsync(request.FormData, request.FormData.AiModel);
                 if (!string.IsNullOrEmpty(expandedDescription))
                 {
                     request.FormData.Description = expandedDescription;
                     _logger.LogInformation("Description expanded successfully");
+                    _logger.LogInformation($"Expanded description (first 200 chars): \"{request.FormData.Description.Substring(0, Math.Min(200, request.FormData.Description.Length))}...\"");
+                }
+                else
+                {
+                    _logger.LogInformation("Failed to expand description, keeping original");
                 }
             }
 
@@ -861,6 +867,9 @@ IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato ad
 
     private string BuildPrompt(UseCaseFormData formData, string rules)
     {
+        _logger.LogInformation($"Building prompt with description: \"{formData.Description?.Substring(0, Math.Min(100, formData.Description?.Length ?? 0))}...\"");
+        _logger.LogInformation($"Description length: {formData.Description?.Length ?? 0} characters");
+        
         // Build the comprehensive prompt for use case generation - synchronized with TypeScript version
         var entityFieldsDescription = formData.EntityFields?.Any() == true
             ? string.Join("; ", formData.EntityFields.Select(f => 
@@ -879,14 +888,14 @@ INSTRUCCIONES CRÍTICAS SOBRE EL USO DE EJEMPLOS Y DATOS:
 4. Si formData no especifica un valor, NO lo inventes. Indica ""no especificado por el usuario"".
 
 ⚠️ INSTRUCCIÓN CRÍTICA Y OBLIGATORIA PARA DESCRIPCIÓN ⚠️
-La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 2 párrafos completos (MÍNIMO 150 PALABRAS TOTAL).
-IMPORTANTE: Si la descripción proporcionada es corta (ej: "Mostrar los proveedores"), DEBES EXPANDIRLA COMPLETAMENTE.
+La sección de DESCRIPCIÓN debe contener EXACTAMENTE el texto proporcionado en formData.Description.
+NO modifiques, resumas o cambies la descripción proporcionada.
+USA LITERALMENTE el contenido de formData.Description tal como viene.
 
-ESTRUCTURA OBLIGATORIA DE LA DESCRIPCIÓN:
-- Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos específicos abarca, qué área del negocio atiende, cómo se integra en el sistema general.
-- Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado que aporta, mejoras operativas que introduce, problemas específicos que resuelve, impacto en la eficiencia.
-
-REGLA ABSOLUTA: NUNCA generar descripciones de una sola línea o un solo párrafo. SIEMPRE expandir con contexto profesional bancario/empresarial relevante.
+IMPORTANTE: La descripción ya viene procesada y expandida cuando es necesario.
+- Si es larga (2 párrafos), úsala completa tal cual
+- Si es corta, úsala tal cual (el sistema ya la procesó)
+- NUNCA la modifiques o reescribas
 
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos

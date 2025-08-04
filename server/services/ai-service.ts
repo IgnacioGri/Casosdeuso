@@ -82,10 +82,14 @@ export class AIService {
       const wordCount = formData.description?.split(/\s+/).length || 0;
       if (wordCount < 50) {
         console.log(`Description is short (${wordCount} words), expanding it first...`);
+        console.log(`Original description: "${formData.description}"`);
         const expandedDescription = await this.expandDescription(formData, aiModel);
         if (expandedDescription) {
           formData.description = expandedDescription;
           console.log('Description expanded successfully');
+          console.log(`Expanded description (first 200 chars): "${formData.description.substring(0, 200)}..."`);
+        } else {
+          console.log('Failed to expand description, keeping original');
         }
       }
       
@@ -214,19 +218,22 @@ IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato ad
   }
 
   private static buildPrompt(formData: any, rules: string): string {
+    console.log(`Building prompt with description: "${formData.description?.substring(0, 100)}..."`);
+    console.log(`Description length: ${formData.description?.length} characters`);
+    
     return `Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
 
 IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
 
 ⚠️ INSTRUCCIÓN CRÍTICA Y OBLIGATORIA PARA DESCRIPCIÓN ⚠️
-La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 2 párrafos completos (MÍNIMO 150 PALABRAS TOTAL).
-IMPORTANTE: Si la descripción proporcionada es corta (ej: "Mostrar los proveedores"), DEBES EXPANDIRLA COMPLETAMENTE.
+La sección de DESCRIPCIÓN debe contener EXACTAMENTE el texto proporcionado en formData.description.
+NO modifiques, resumas o cambies la descripción proporcionada.
+USA LITERALMENTE el contenido de formData.description tal como viene.
 
-ESTRUCTURA OBLIGATORIA DE LA DESCRIPCIÓN:
-- Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos específicos abarca, qué área del negocio atiende, cómo se integra en el sistema general.
-- Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado que aporta, mejoras operativas que introduce, problemas específicos que resuelve, impacto en la eficiencia.
-
-REGLA ABSOLUTA: NUNCA generar descripciones de una sola línea o un solo párrafo. SIEMPRE expandir con contexto profesional bancario/empresarial relevante.
+IMPORTANTE: La descripción ya viene procesada y expandida cuando es necesario.
+- Si es larga (2 párrafos), úsala completa tal cual
+- Si es corta, úsala tal cual (el sistema ya la procesó)
+- NUNCA la modifiques o reescribas
 
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
