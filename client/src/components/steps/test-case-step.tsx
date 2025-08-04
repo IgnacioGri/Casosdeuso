@@ -7,6 +7,7 @@ import { TestStep } from "@/types/use-case";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AIAssistButton } from "@/components/ai-assist-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BulletTextarea } from "@/components/bullet-textarea";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { ProgressIndicator } from "@/components/progress-indicator";
@@ -162,12 +163,14 @@ export function TestCaseStep({
               onImprovement={onUpdateObjective}
             />
           </div>
-          <Textarea
-            id="testCaseObjective"
+          <BulletTextarea
             value={testCaseObjective}
-            onChange={(e) => onUpdateObjective(e.target.value)}
-            placeholder="Ej: Validar que el sistema permita realizar la búsqueda, alta, modificación y eliminación de usuarios con los controles de seguridad apropiados..."
-            className="min-h-20 resize-y"
+            onChange={onUpdateObjective}
+            placeholder="Describe el objetivo con bullet points. Ej:
+• Validar la funcionalidad completa de gestión de usuarios
+• Verificar controles de seguridad y permisos
+• Comprobar integridad de datos en todas las operaciones..."
+            rows={4}
           />
         </div>
 
@@ -188,12 +191,15 @@ export function TestCaseStep({
               onImprovement={onUpdatePreconditions}
             />
           </div>
-          <Textarea
-            id="testCasePreconditions"
+          <BulletTextarea
             value={testCasePreconditions}
-            onChange={(e) => onUpdatePreconditions(e.target.value)}
-            placeholder="Ej: • Usuario autenticado con permisos adecuados&#10;• Datos de prueba cargados en el sistema&#10;• Conexión a base de datos disponible"
-            className="min-h-32 resize-y font-mono text-sm"
+            onChange={onUpdatePreconditions}
+            placeholder="Describe las precondiciones con bullet points. Ej:
+• Usuario autenticado con permisos adecuados
+• Datos de prueba cargados en el sistema
+• Conexión a base de datos disponible
+• Ambiente de pruebas configurado correctamente..."
+            rows={5}
           />
           <p className="text-xs text-gray-500 mt-1">
             Use el botón AI para estructurar las precondiciones con formato profesional

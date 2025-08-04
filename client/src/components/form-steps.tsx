@@ -14,6 +14,7 @@ import { AIGeneratedTag } from "@/components/ai-generated-tag";
 import { SmartAutocomplete } from './smart-autocomplete';
 import { ContextualTooltip, fieldTooltips } from './contextual-tooltip';
 import { AnimatedField, AddFieldButton, SmoothButton } from './micro-interactions';
+import { BulletTextarea } from '@/components/bullet-textarea';
 
 interface FormStepsProps {
   currentStep: number;
@@ -1043,12 +1044,15 @@ export default function FormSteps({
                 Reglas de negocio adicionales
               </label>
               <div className="relative">
-                <textarea 
-                  value={formData.businessRules}
-                  onChange={(e) => handleInputChange('businessRules', e.target.value)}
-                  rows={5} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
-                  placeholder="Describe las reglas de negocio en lenguaje natural. Ej: Los clientes no se pueden eliminar si tienen productos activos, el DNI debe ser único, solo supervisores pueden hacer ciertas operaciones..."
+                <BulletTextarea
+                  value={formData.businessRules || ''}
+                  onChange={(value) => handleInputChange('businessRules', value)}
+                  rows={5}
+                  className="pr-20"
+                  placeholder="Describe las reglas de negocio con bullet points. Ej:
+• Los clientes no se pueden eliminar si tienen productos activos
+• El DNI debe ser único en el sistema
+• Solo supervisores pueden autorizar operaciones especiales..."
                 />
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
@@ -1069,12 +1073,16 @@ export default function FormSteps({
                 Requerimientos especiales
               </label>
               <div className="relative">
-                <textarea 
-                  value={formData.specialRequirements}
-                  onChange={(e) => handleInputChange('specialRequirements', e.target.value)}
-                  rows={5} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 resize-y" 
-                  placeholder="Describe los requerimientos especiales en lenguaje natural. Ej: Debe integrarse con servicio externo, tiempos de respuesta específicos, validaciones HTTPS, auditoria completa..."
+                <BulletTextarea
+                  value={formData.specialRequirements || ''}
+                  onChange={(value) => handleInputChange('specialRequirements', value)}
+                  rows={5}
+                  className="pr-20"
+                  placeholder="Describe los requerimientos especiales con bullet points. Ej:
+• Debe integrarse con servicio externo de validación
+• Tiempos de respuesta menores a 3 segundos
+• Validaciones de seguridad HTTPS obligatorias
+• Auditoría completa de todas las operaciones..."
                 />
                 <div className="absolute top-2 right-2">
                   <AIAssistButton
