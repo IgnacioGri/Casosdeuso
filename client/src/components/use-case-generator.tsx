@@ -73,8 +73,27 @@ export default function UseCaseGenerator() {
       
       clearInterval(progressInterval);
       
+      console.log('Generated data response:', {
+        success: generatedData.success,
+        hasUseCase: !!generatedData.useCase,
+        hasExpandedDescription: !!generatedData.expandedDescription,
+        expandedDescriptionLength: generatedData.expandedDescription?.length,
+        originalDescriptionLength: data.description?.length
+      });
+      
       if (!generatedData.success || !generatedData.useCase) {
         throw new Error(generatedData.error || 'Error generando el caso de uso');
+      }
+      
+      // Update form data with expanded description if available
+      if (generatedData.expandedDescription && generatedData.expandedDescription !== data.description) {
+        console.log('Updating form with expanded description:', generatedData.expandedDescription.substring(0, 100) + '...');
+        updateFormData({ description: generatedData.expandedDescription });
+      } else {
+        console.log('Not updating description:', {
+          hasExpandedDescription: !!generatedData.expandedDescription,
+          areEqual: generatedData.expandedDescription === data.description
+        });
       }
       
       setProgressPercentage(80);
@@ -87,6 +106,11 @@ export default function UseCaseGenerator() {
         hasFormData: !!data
       });
       
+      // Update the data with the expanded description if available
+      const exportData = generatedData.expandedDescription ? 
+        { ...data, description: generatedData.expandedDescription } : 
+        data;
+      
       // Use fetch directly to handle binary response properly
       const exportResponse = await fetch('/api/export-docx', {
         method: 'POST',
@@ -95,7 +119,7 @@ export default function UseCaseGenerator() {
           content: generatedData.content,
           fileName: generatedData.useCase.fileName,
           useCaseName: generatedData.useCase.useCaseName,
-          formData: data,
+          formData: exportData,
           customHeaderImage: customHeaderImage
         }),
         credentials: 'include'

@@ -191,6 +191,14 @@
             if (response.Success)
             {
                 generatedResponse = response;
+                
+                // Update form data with expanded description if available
+                if (!string.IsNullOrEmpty(response.ExpandedDescription) && response.ExpandedDescription != formData.Description)
+                {
+                    formData.Description = response.ExpandedDescription;
+                    StateHasChanged();
+                }
+                
                 // Generate and download DOCX directly
                 await ExportDocx();
             }
