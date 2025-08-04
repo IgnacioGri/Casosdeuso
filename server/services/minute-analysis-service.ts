@@ -74,20 +74,41 @@ IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido sin explicaciones ad
     return `
 Para casos de uso tipo ENTIDAD, extrae y estructura la siguiente información:
 
-INSTRUCCIONES CRÍTICAS:
-- NUNCA uses valores genéricos o por defecto
-- TODO ejemplo mostrado abajo es "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
-- SIEMPRE extrae datos EXACTOS del texto de la minuta
-- Si algún dato no está en la minuta, devuelve null o array vacío según corresponda
-- Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
+INSTRUCCIONES CRÍTICAS DE EXTRACCIÓN:
+1. clientName: Es el nombre de la EMPRESA/BANCO/ORGANIZACIÓN cliente (NO el nombre del caso de uso)
+   - Buscar palabras como "Banco", "Cohen", "Macro", "Provincia", nombres de empresas
+   - Ejemplo correcto: "Cohen Aliados Financieros", "Banco Macro", "Banco Provincia"
+   
+2. projectName: Es el nombre del PROYECTO o SISTEMA (NO el caso de uso)
+   - Buscar frases como "Sistema de", "Módulo de", "Plataforma de"
+   - Si no está explícito, inferir del contexto (ej: si habla de proveedores, podría ser "Sistema de Gestión de Proveedores")
+   - NO dejar vacío si se puede inferir del contexto
+   
+3. useCaseCode: Es el CÓDIGO alfanumérico del caso de uso
+   - Formato: letras+números (ej: PV003, BP005, UC001)
+   - NO confundir con nombres o descripciones
+   
+4. useCaseName: Es el NOMBRE del caso de uso (acción + entidad)
+   - DEBE empezar con verbo infinitivo
+   - Ejemplo: "Gestionar Clientes", "Mostrar proveedores", "Consultar Saldos"
+   - NO poner aquí el nombre del cliente ni proyecto
+
+5. description: Descripción del QUÉ HACE el caso de uso
+   - Si viene muy corta (menos de 10 palabras), devolver tal cual viene
+   - NO expandir aquí, solo extraer lo que dice la minuta
+
+NUNCA MEZCLAR:
+- NO poner el nombre del cliente en useCaseName
+- NO poner el nombre del caso de uso en clientName
+- NO dejar projectName vacío si se puede inferir
 
 {
-  "clientName": "Nombre del cliente/banco (Ejemplo ilustrativo: Banco Provincia)",
-  "projectName": "Nombre del proyecto (Ejemplo ilustrativo: Sistema de Gestión Integral)",
-  "useCaseCode": "Código del caso de uso (Ejemplo ilustrativo: UC001, BP005)",
-  "useCaseName": "Nombre descriptivo del caso de uso empezando con verbo infinitivo",
-  "fileName": "Nombre de archivo siguiendo patrón: 2letras+3números+descripción",
-  "description": "Descripción detallada del objetivo del caso de uso",
+  "clientName": "Nombre de la empresa/banco cliente",
+  "projectName": "Nombre del proyecto o sistema",
+  "useCaseCode": "Código alfanumérico del caso de uso", 
+  "useCaseName": "Nombre del caso de uso con verbo infinitivo",
+  "fileName": "Nombre de archivo siguiendo patrón: código+descripción",
+  "description": "Descripción del objetivo del caso de uso tal como viene en la minuta",
   "actorName": "actor principal del caso de uso o 'Actor no identificado' si no está explícito",
   "searchFilters": ["usar SOLO filtros mencionados en la minuta"],
   "filtersDescription": "Descripción de los filtros de búsqueda necesarios",
@@ -203,9 +224,49 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
 
       const parsed = JSON.parse(cleanedResult);
       
+      // Validation and correction of common AI parsing errors
+      let correctedData = { ...parsed };
+      
+      // Check if clientName contains a verb (likely mixed with useCaseName)
+      const infinitiveVerbs = ['gestionar', 'crear', 'mostrar', 'consultar', 'ver', 'actualizar', 'eliminar', 'procesar'];
+      if (correctedData.clientName && infinitiveVerbs.some(verb => correctedData.clientName.toLowerCase().includes(verb))) {
+        console.warn('⚠️ clientName contains a verb, likely mixed with useCaseName');
+        // Swap if needed
+        if (correctedData.useCaseName && !infinitiveVerbs.some(verb => correctedData.useCaseName.toLowerCase().startsWith(verb))) {
+          const temp = correctedData.clientName;
+          correctedData.clientName = correctedData.useCaseName;
+          correctedData.useCaseName = temp;
+          console.log('✓ Swapped clientName and useCaseName');
+        }
+      }
+      
+      // Validate useCaseName starts with infinitive verb
+      if (correctedData.useCaseName && !infinitiveVerbs.some(verb => correctedData.useCaseName.toLowerCase().startsWith(verb))) {
+        console.error('⚠️ useCaseName does not start with infinitive verb:', correctedData.useCaseName);
+        // Try to fix common patterns
+        if (correctedData.description && correctedData.description.toLowerCase().startsWith('mostrar')) {
+          correctedData.useCaseName = correctedData.description;
+          console.log('✓ Fixed useCaseName from description');
+        }
+      }
+      
+      // Check if projectName is empty but can be inferred
+      if (!correctedData.projectName || correctedData.projectName === null) {
+        console.warn('⚠️ projectName is empty, trying to infer...');
+        // Try to infer from context
+        if (correctedData.useCaseName && correctedData.useCaseName.toLowerCase().includes('proveedores')) {
+          correctedData.projectName = 'Sistema de Gestión de Proveedores';
+        } else if (correctedData.useCaseName && correctedData.useCaseName.toLowerCase().includes('clientes')) {
+          correctedData.projectName = 'Sistema de Gestión de Clientes';
+        } else {
+          correctedData.projectName = 'Sistema de Gestión';
+        }
+        console.log('✓ Inferred projectName:', correctedData.projectName);
+      }
+      
       // Ensure the result includes the use case type and AI generated flag
       return {
-        ...parsed,
+        ...correctedData,
         useCaseType,
         isAIGenerated: true
       };

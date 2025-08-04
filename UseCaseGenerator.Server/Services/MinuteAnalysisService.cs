@@ -47,7 +47,35 @@ public class MinuteAnalysisService : IMinuteAnalysisService
         return @"
 ANÁLISIS DE MINUTA DE CASO DE USO
 
-Analiza el siguiente documento y extrae la información del caso de uso en formato JSON.
+Analiza el siguiente documento y extrae la información del caso de uso.
+
+INSTRUCCIONES CRÍTICAS DE EXTRACCIÓN:
+1. clientName: Es el nombre de la EMPRESA/BANCO/ORGANIZACIÓN cliente (NO el nombre del caso de uso)
+   - Buscar palabras como ""Banco"", ""Cohen"", ""Macro"", ""Provincia"", nombres de empresas
+   - Ejemplo correcto: ""Cohen Aliados Financieros"", ""Banco Macro"", ""Banco Provincia""
+   
+2. projectName: Es el nombre del PROYECTO o SISTEMA (NO el caso de uso)
+   - Buscar frases como ""Sistema de"", ""Módulo de"", ""Plataforma de""
+   - Si no está explícito, inferir del contexto (ej: si habla de proveedores, podría ser ""Sistema de Gestión de Proveedores"")
+   - NO dejar vacío si se puede inferir del contexto
+   
+3. useCaseCode: Es el CÓDIGO alfanumérico del caso de uso
+   - Formato: letras+números (ej: PV003, BP005, UC001)
+   - NO confundir con nombres o descripciones
+   
+4. useCaseName: Es el NOMBRE del caso de uso (acción + entidad)
+   - DEBE empezar con verbo infinitivo
+   - Ejemplo: ""Gestionar Clientes"", ""Mostrar proveedores"", ""Consultar Saldos""
+   - NO poner aquí el nombre del cliente ni proyecto
+
+5. description: Descripción del QUÉ HACE el caso de uso
+   - Si viene muy corta (menos de 10 palabras), devolver tal cual viene
+   - NO expandir aquí, solo extraer lo que dice la minuta
+
+NUNCA MEZCLAR:
+- NO poner el nombre del cliente en useCaseName
+- NO poner el nombre del caso de uso en clientName
+- NO dejar projectName vacío si se puede inferir
 
 Estructura JSON requerida:
 {
@@ -95,6 +123,62 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
                 Description = GetStringProperty(root, "description", ""),
                 IsAIGenerated = GetBoolProperty(root, "isAIGenerated", true)
             };
+            
+            // Validation and correction of common AI parsing errors
+            var infinitiveVerbs = new[] { "gestionar", "crear", "mostrar", "consultar", "ver", "actualizar", "eliminar", "procesar" };
+            
+            // Check if clientName contains a verb (likely mixed with useCaseName)
+            if (!string.IsNullOrEmpty(formData.ClientName) && 
+                infinitiveVerbs.Any(verb => formData.ClientName.ToLower().Contains(verb)))
+            {
+                _logger.LogWarning("⚠️ clientName contains a verb, likely mixed with useCaseName");
+                // Swap if needed
+                if (!string.IsNullOrEmpty(formData.UseCaseName) && 
+                    !infinitiveVerbs.Any(verb => formData.UseCaseName.ToLower().StartsWith(verb)))
+                {
+                    var temp = formData.ClientName;
+                    formData.ClientName = formData.UseCaseName;
+                    formData.UseCaseName = temp;
+                    _logger.LogInformation("✓ Swapped clientName and useCaseName");
+                }
+            }
+            
+            // Validate useCaseName starts with infinitive verb
+            if (!string.IsNullOrEmpty(formData.UseCaseName) && 
+                !infinitiveVerbs.Any(verb => formData.UseCaseName.ToLower().StartsWith(verb)))
+            {
+                _logger.LogError("⚠️ useCaseName does not start with infinitive verb: {UseCaseName}", formData.UseCaseName);
+                // Try to fix common patterns
+                if (!string.IsNullOrEmpty(formData.Description) && 
+                    formData.Description.ToLower().StartsWith("mostrar"))
+                {
+                    formData.UseCaseName = formData.Description;
+                    _logger.LogInformation("✓ Fixed useCaseName from description");
+                }
+            }
+            
+            // Check if projectName is empty but can be inferred
+            if (string.IsNullOrEmpty(formData.ProjectName))
+            {
+                _logger.LogWarning("⚠️ projectName is empty, trying to infer...");
+                // Try to infer from context
+                if (!string.IsNullOrEmpty(formData.UseCaseName))
+                {
+                    if (formData.UseCaseName.ToLower().Contains("proveedores"))
+                    {
+                        formData.ProjectName = "Sistema de Gestión de Proveedores";
+                    }
+                    else if (formData.UseCaseName.ToLower().Contains("clientes"))
+                    {
+                        formData.ProjectName = "Sistema de Gestión de Clientes";
+                    }
+                    else
+                    {
+                        formData.ProjectName = "Sistema de Gestión";
+                    }
+                    _logger.LogInformation("✓ Inferred projectName: {ProjectName}", formData.ProjectName);
+                }
+            }
 
             // Parse search filters
             if (root.TryGetProperty("searchFilters", out var filtersElement) && filtersElement.ValueKind == JsonValueKind.Array)
