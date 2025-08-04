@@ -683,6 +683,10 @@ export class DocumentService {
       }));
       
       const testStepsTable = new Table({
+        width: {
+          size: 100,
+          type: WidthType.PERCENTAGE
+        },
         rows: [
           // Header row
           new TableRow({
@@ -697,7 +701,7 @@ export class DocumentService {
                   })]
                 })],
                 shading: { fill: "DEEAF6" },
-                width: { size: 600, type: WidthType.DXA }
+                width: { size: 5, type: WidthType.PERCENTAGE }
               }),
               new TableCell({
                 children: [new Paragraph({
@@ -709,7 +713,7 @@ export class DocumentService {
                   })]
                 })],
                 shading: { fill: "DEEAF6" },
-                width: { size: 2500, type: WidthType.DXA }
+                width: { size: 25, type: WidthType.PERCENTAGE }
               }),
               new TableCell({
                 children: [new Paragraph({
@@ -721,7 +725,7 @@ export class DocumentService {
                   })]
                 })],
                 shading: { fill: "DEEAF6" },
-                width: { size: 2000, type: WidthType.DXA }
+                width: { size: 20, type: WidthType.PERCENTAGE }
               }),
               new TableCell({
                 children: [new Paragraph({
@@ -733,7 +737,7 @@ export class DocumentService {
                   })]
                 })],
                 shading: { fill: "DEEAF6" },
-                width: { size: 2500, type: WidthType.DXA }
+                width: { size: 25, type: WidthType.PERCENTAGE }
               }),
               new TableCell({
                 children: [new Paragraph({
@@ -745,7 +749,7 @@ export class DocumentService {
                   })]
                 })],
                 shading: { fill: "DEEAF6" },
-                width: { size: 1500, type: WidthType.DXA }
+                width: { size: 18, type: WidthType.PERCENTAGE }
               }),
               new TableCell({
                 children: [new Paragraph({
@@ -757,7 +761,7 @@ export class DocumentService {
                   })]
                 })],
                 shading: { fill: "DEEAF6" },
-                width: { size: 700, type: WidthType.DXA }
+                width: { size: 7, type: WidthType.PERCENTAGE }
               })
             ]
           }),
@@ -773,7 +777,7 @@ export class DocumentService {
                       font: "Segoe UI Semilight"
                     })]
                   })],
-                  width: { size: 600, type: WidthType.DXA }
+                  width: { size: 5, type: WidthType.PERCENTAGE }
                 }),
                 new TableCell({
                   children: [new Paragraph({
@@ -782,7 +786,7 @@ export class DocumentService {
                       font: "Segoe UI Semilight"
                     })]
                   })],
-                  width: { size: 2500, type: WidthType.DXA }
+                  width: { size: 25, type: WidthType.PERCENTAGE }
                 }),
                 new TableCell({
                   children: [new Paragraph({
@@ -791,7 +795,7 @@ export class DocumentService {
                       font: "Segoe UI Semilight"
                     })]
                   })],
-                  width: { size: 2000, type: WidthType.DXA }
+                  width: { size: 20, type: WidthType.PERCENTAGE }
                 }),
                 new TableCell({
                   children: [new Paragraph({
@@ -800,7 +804,7 @@ export class DocumentService {
                       font: "Segoe UI Semilight"
                     })]
                   })],
-                  width: { size: 2500, type: WidthType.DXA }
+                  width: { size: 25, type: WidthType.PERCENTAGE }
                 }),
                 new TableCell({
                   children: [new Paragraph({
@@ -809,7 +813,7 @@ export class DocumentService {
                       font: "Segoe UI Semilight"
                     })]
                   })],
-                  width: { size: 1500, type: WidthType.DXA }
+                  width: { size: 18, type: WidthType.PERCENTAGE }
                 }),
                 new TableCell({
                   children: [new Paragraph({
@@ -819,22 +823,12 @@ export class DocumentService {
                       font: "Segoe UI Semilight"
                     })]
                   })],
-                  width: { size: 700, type: WidthType.DXA }
+                  width: { size: 7, type: WidthType.PERCENTAGE }
                 })
               ]
             })
           )
-        ],
-        width: {
-          size: 9800,
-          type: WidthType.DXA
-        },
-        margins: {
-          top: 72,
-          bottom: 72,
-          right: 72,
-          left: 72
-        }
+        ]
       });
       
       sections.push(testStepsTable);

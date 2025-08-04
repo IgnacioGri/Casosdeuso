@@ -28,6 +28,10 @@ Preferred communication style: Simple, everyday language.
   - React: Updated mutation to capture expandedDescription from response and update both form state and DOCX export data
   - Blazor: Added ExpandedDescription property to response DTO and updated Generator.razor to handle it
   - Both systems now properly display expanded descriptions in UI and generate DOCX with full 2-paragraph content
+- **[CRITICAL FIX]** Fixed test case table formatting issue: Tables were getting cut off when containing extensive text. Fixed by:
+  - React: Changed table width to 100% and all column widths from fixed DXA units to percentages (5%, 25%, 20%, 25%, 18%, 7%)
+  - Blazor: Updated table to use percentage-based widths matching React system
+  - Tables now properly expand rows vertically when text is long instead of cutting off content
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

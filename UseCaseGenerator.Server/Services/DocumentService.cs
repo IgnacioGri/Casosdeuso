@@ -538,7 +538,7 @@ public class DocumentService : IDocumentService
         
         // Table properties
         var tblPr = new TableProperties();
-        tblPr.Append(new TableWidth() { Width = "9800", Type = TableWidthUnitValues.Dxa });
+        tblPr.Append(new TableWidth() { Width = "5000", Type = TableWidthUnitValues.Pct }); // 100% of page width
         tblPr.Append(new TableBorders(
             new TopBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
             new BottomBorder() { Val = BorderValues.Single, Color = "999999", Size = 4 },
@@ -555,7 +555,7 @@ public class DocumentService : IDocumentService
         // # column
         var cell1 = new TableCell();
         cell1.Append(new TableCellProperties(
-            new TableCellWidth() { Width = "600", Type = TableWidthUnitValues.Dxa },
+            new TableCellWidth() { Width = "250", Type = TableWidthUnitValues.Pct }, // 5% of table width
             new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
         ));
         var para1 = new Paragraph();
@@ -573,23 +573,23 @@ public class DocumentService : IDocumentService
         headerRow.Append(cell1);
         
         // Acción column
-        var cell2 = CreateHeaderCell("Acción", "2500");
+        var cell2 = CreateHeaderCellPct("Acción", "1250"); // 25%
         headerRow.Append(cell2);
         
         // Datos de entrada column
-        var cell3 = CreateHeaderCell("Datos de entrada", "2000");
+        var cell3 = CreateHeaderCellPct("Datos de entrada", "1000"); // 20%
         headerRow.Append(cell3);
         
         // Resultado esperado column
-        var cell4 = CreateHeaderCell("Resultado esperado", "2500");
+        var cell4 = CreateHeaderCellPct("Resultado esperado", "1250"); // 25%
         headerRow.Append(cell4);
         
         // Observaciones column
-        var cell5 = CreateHeaderCell("Observaciones", "1500");
+        var cell5 = CreateHeaderCellPct("Observaciones", "900"); // 18%
         headerRow.Append(cell5);
         
         // Estado (P/F) column
-        var cell6 = CreateHeaderCell("Estado\n(P/F)", "700");
+        var cell6 = CreateHeaderCellPct("Estado\n(P/F)", "350"); // 7%
         headerRow.Append(cell6);
         
         table.Append(headerRow);
@@ -600,22 +600,22 @@ public class DocumentService : IDocumentService
             var row = new TableRow();
             
             // # cell
-            row.Append(CreateDataCell(step.Number.ToString(), "600", true));
+            row.Append(CreateDataCellPct(step.Number.ToString(), "250", true)); // 5%
             
             // Acción cell
-            row.Append(CreateDataCell(step.Action, "2500"));
+            row.Append(CreateDataCellPct(step.Action, "1250")); // 25%
             
             // Datos de entrada cell
-            row.Append(CreateDataCell(step.InputData, "2000"));
+            row.Append(CreateDataCellPct(step.InputData, "1000")); // 20%
             
             // Resultado esperado cell
-            row.Append(CreateDataCell(step.ExpectedResult, "2500"));
+            row.Append(CreateDataCellPct(step.ExpectedResult, "1250")); // 25%
             
             // Observaciones cell
-            row.Append(CreateDataCell(step.Observations, "1500"));
+            row.Append(CreateDataCellPct(step.Observations, "900")); // 18%
             
             // Estado cell
-            row.Append(CreateDataCell("Pendiente", "700", true));
+            row.Append(CreateDataCellPct("Pendiente", "350", true)); // 7%
             
             table.Append(row);
         }
@@ -655,11 +655,62 @@ public class DocumentService : IDocumentService
         return cell;
     }
     
+    private TableCell CreateHeaderCellPct(string text, string width)
+    {
+        var cell = new TableCell();
+        cell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = width, Type = TableWidthUnitValues.Pct },
+            new Shading() { Val = ShadingPatternValues.Clear, Fill = "DEEAF6" }
+        ));
+        
+        var para = new Paragraph();
+        var paraProps = new ParagraphProperties();
+        paraProps.Append(new Justification() { Val = JustificationValues.Center });
+        para.Append(paraProps);
+        
+        var run = new Run();
+        var runProps = new RunProperties();
+        runProps.Append(new Bold());
+        runProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        run.Append(runProps);
+        run.Append(new Text(text));
+        para.Append(run);
+        cell.Append(para);
+        
+        return cell;
+    }
+    
     private TableCell CreateDataCell(string text, string width, bool center = false)
     {
         var cell = new TableCell();
         cell.Append(new TableCellProperties(
             new TableCellWidth() { Width = width, Type = TableWidthUnitValues.Dxa }
+        ));
+        
+        var para = new Paragraph();
+        if (center)
+        {
+            var paraProps = new ParagraphProperties();
+            paraProps.Append(new Justification() { Val = JustificationValues.Center });
+            para.Append(paraProps);
+        }
+        
+        var run = new Run();
+        var runProps = new RunProperties();
+        runProps.Append(new RunFonts() { Ascii = "Segoe UI Semilight", HighAnsi = "Segoe UI Semilight" });
+        run.Append(runProps);
+        run.Append(new Text(text ?? ""));
+        para.Append(run);
+        cell.Append(para);
+        
+        return cell;
+    }
+    
+    private TableCell CreateDataCellPct(string text, string width, bool center = false)
+    {
+        var cell = new TableCell();
+        cell.Append(new TableCellProperties(
+            new TableCellWidth() { Width = width, Type = TableWidthUnitValues.Pct }
         ));
         
         var para = new Paragraph();
