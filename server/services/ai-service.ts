@@ -152,10 +152,15 @@ export class AIService {
 
 IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
 
-INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
-- Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
-- Segundo párrafo: Beneficios clave, valor para el negocio, mejoras que aporta, problemas que resuelve.
-NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción proporcionada con contexto relevante del negocio bancario/empresarial.
+⚠️ INSTRUCCIÓN CRÍTICA Y OBLIGATORIA PARA DESCRIPCIÓN ⚠️
+La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 2 párrafos completos (MÍNIMO 150 PALABRAS TOTAL).
+IMPORTANTE: Si la descripción proporcionada es corta (ej: "Mostrar los proveedores"), DEBES EXPANDIRLA COMPLETAMENTE.
+
+ESTRUCTURA OBLIGATORIA DE LA DESCRIPCIÓN:
+- Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos específicos abarca, qué área del negocio atiende, cómo se integra en el sistema general.
+- Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado que aporta, mejoras operativas que introduce, problemas específicos que resuelve, impacto en la eficiencia.
+
+REGLA ABSOLUTA: NUNCA generar descripciones de una sola línea o un solo párrafo. SIEMPRE expandir con contexto profesional bancario/empresarial relevante.
 
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
@@ -913,7 +918,7 @@ INSTRUCCIONES:
     }
     
     if (fieldName_lower.includes('descripcion')) {
-      return `${ingCompliance}\n- Expandir a 1-2 párrafos completos (mínimo 150 palabras)\n- Primer párrafo: explica QUÉ hace el caso de uso y su propósito\n- Segundo párrafo: describe los BENEFICIOS y valor de negocio\n- Incluye explicación de alcance/objetivo como en minuta ING\n- Si aplica, menciona flujos principales con lista indentada (1-a-i):\n  1. Flujo principal (ej. Buscar [entidad])\n    a. Detallar filtros y columnas\n    i. Criterios de búsqueda\n- Usa un tono profesional pero claro\n- Incluye contexto relevante del negocio\n${this.getUseCaseTypeSpecificRules(useCaseType)}`;
+      return `${ingCompliance}\n⚠️ EXPANSIÓN OBLIGATORIA ⚠️\n- SIEMPRE expandir a 2 párrafos completos (MÍNIMO 150 palabras total)\n- Primer párrafo (75+ palabras): QUÉ hace el caso de uso, propósito principal, procesos que abarca, área de negocio que atiende\n- Segundo párrafo (75+ palabras): BENEFICIOS clave, valor agregado, mejoras operativas, problemas que resuelve\n- Si la descripción es corta (ej: "Mostrar proveedores"), EXPANDIRLA COMPLETAMENTE con contexto profesional\n- Incluir alcance/objetivo como en minuta ING\n- Si aplica, menciona flujos principales con lista indentada (1-a-i):\n  1. Flujo principal (ej. Buscar [entidad])\n    a. Detallar filtros y columnas\n    i. Criterios de búsqueda\n- Tono profesional y claro\n- Contexto relevante del negocio bancario/empresarial\n${this.getUseCaseTypeSpecificRules(useCaseType)}`;
     }
     
     if (fieldName_lower.includes('reglas') && fieldName_lower.includes('negocio')) {

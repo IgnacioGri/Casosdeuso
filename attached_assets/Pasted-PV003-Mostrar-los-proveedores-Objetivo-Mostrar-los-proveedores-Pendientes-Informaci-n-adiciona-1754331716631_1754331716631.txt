@@ -1,0 +1,61 @@
+PV003 Mostrar los proveedores 
+Objetivo	Mostrar los proveedores
+Pendientes 	
+Información adicional	
+
+
+#	Acción
+1.		El sistema muestra los siguientes filtros de búsqueda.
+
+	Filtro	Referencia
+	Descripción	Texto
+	Estado	Lista de selección única con las siguientes opciones:
+Todos, Activo, Inactivo
+Por defecto se encuentra seleccionado Todos.
+2.	El sistema habilita la visualización de los botones “Buscar”, “Limpiar”, “Agregar”, “de acuerdo a la seguridad del usuario identificado en el BackOffice.
+3.	El usuario ingresa si desea los filtros y selecciona la opción para iniciar la búsqueda
+4.	El sistema lista los proveedores
+La lista estará compuesta por las siguientes columnas ordenadas por razón social:
+
+	Columna	Referencia
+	ID	Id del proveedor
+	Razón social	Razón social del proveedor
+	Nombre fantasía	Nombre fantasía del proveedor
+	Tipo indentificador impositivo	Tipo de identificador impositivo del proveedor
+	Número identificador impositivo	Número de identificador impositivo del proveedor
+	Condición IVA	Condición de iva del proveedor
+	Cuenta Bancaria - Banco	Banco asignado a la cuenta bancaria del proveedor
+	Cuenta Bancaria - CBU	Número de CBU correspondiente a la cuenta bancaria del proveedor
+	Cuenta Bancaria - Identificador Impositivo Tipo	Tipo de identificador impositivo relacionado a la cuenta bancaria del proveedor
+	Cuenta Bancaria - Identificador Impositivo Nro.	Número de identificador impositivo relacionado a la cuenta bancaria del proveedor
+	Cuenta Bancaria - Moneda	Moneda de la cuenta bancaria relacionada a la cuenta bancaria de proveedor
+	Medio de pago	Medio de pago seleccionado para el proveedor
+
+Puede ser “Todos” o el medio de pago especifico
+
+	Extranjero	check
+	Activo	Check
+5.	a. El sistema habilita la visualización de los botones para cada línea de acuerdo a la configuración del usuario:
+
+“Editar”,
+“Ver”,
+“Bitácora”,
+“Eliminar”
+
+b.El sistema habilita la visualización de los botones “Excel”, “PDF” de acuerdo a la seguridad del usuario identificado en el BackOffice.
+
+6.	a.	El usuario selecciona la opción para visualizar un ítem 
+b.	El sistema llama CU # PV001 Actualizar un proveedor
+
+	Variación de las Acciones 
+3a	a.	El usuario selecciona la opción para limpiar los datos de la búsqueda realizada
+b.	El sistema muestra nuevamente los filtros sin los datos ingresados y limpia el resultado de la búsqueda.
+3b	a.	El usuario selecciona la opción para Agregar un ítem.
+b.	El sistema ejecuta el CU # PV001 Actualizar un proveedor
+6a	a.	El usuario selecciona la opción para editar un ítem.
+b.	El sistema ejecuta CU # PV001 Actualizar un proveedor
+6b	a.	El usuario selecciona la opción para eliminar un ítem.
+b.	El sistema verifica si no tiene datos relacionados.
+c.	El sistema elimina el ítem
+6c	a.	El usuario selecciona la opción para visualizar la bitácora.
+b.	El sistema muestra la bitácora del ítem.
