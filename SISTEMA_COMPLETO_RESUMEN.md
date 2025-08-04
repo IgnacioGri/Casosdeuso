@@ -2,73 +2,107 @@
 
 ## 🎯 Visión General del Sistema
 
-Este es un **generador avanzado de casos de uso impulsado por IA** que permite crear documentación técnica profesional siguiendo estrictamente las especificaciones de ING (Ingematica). El sistema combina un enfoque híbrido: **asistencia de IA por campo individual** para mejorar la calidad de entrada + **generación completa de documentos** con formato Microsoft Word perfecto.
+Este es un **generador avanzado de casos de uso impulsado por IA** que permite crear documentación técnica profesional siguiendo estrictamente las especificaciones de ING (Ingematica). El sistema mantiene **dos implementaciones paralelas idénticas**: React/TypeScript y Blazor WebAssembly, ambas con funcionalidad completa y sincronizadas.
 
 ### Características Distintivas
 
-- **Revolucionario sistema de "AI Assist"**: Botones de mejora inteligente en cada campo del formulario
-- **Soporte para 4 proveedores de IA**: OpenAI GPT-4, Claude Sonnet 4, Google Gemini, Grok X.AI
+- **Sistema Dual Mantenido**: React y Blazor WebAssembly funcionando en paralelo
+- **Análisis de Minutas con IA**: Extracción inteligente de información desde documentos
+- **Generación de Wireframes Dinámicos**: Creación automática basada en datos del formulario
+- **Casos de Prueba Inteligentes**: Generación contextual con objetivos y precondiciones
+- **Soporte para 5 proveedores de IA**: OpenAI GPT-4o, Claude Sonnet 4, Google Gemini 2.5, Grok 2, y Copilot
 - **Modo Demo funcional**: Opera completamente sin APIs para evaluación y pruebas
 - **Exportación DOCX perfecta**: Documentos con formato Microsoft profesional
-- **Cumplimiento estricto ING**: Especificación técnica completa implementada
+- **UI Mejorada**: Componentes avanzados con animaciones profesionales
 
 ---
 
 ## 🏗️ Arquitectura del Sistema
 
-### Stack Tecnológico
+### Sistema Dual - Stack Tecnológico
+
+**Sistema React (Mantenido)**
 - **Frontend**: React 18 + TypeScript + Vite
-- **Backend**: Node.js + Express + TypeScript
 - **UI**: Radix UI + Tailwind CSS + Shadcn/ui
 - **Estado**: React Query (TanStack Query) + React Hook Form
-- **IA**: OpenAI, Anthropic, Google Gemini, X.AI APIs
+
+**Sistema Blazor (Principal)**
+- **Frontend**: Blazor WebAssembly con .NET 8
+- **UI**: MudBlazor + CSS personalizado con ING branding
+- **Estado**: State management integrado de Blazor
+
+**Compartido entre ambos sistemas**
+- **Backend**: Node.js + Express + TypeScript (API unificada)
+- **IA**: OpenAI, Anthropic, Google Gemini, X.AI, Copilot APIs
 - **Documentos**: docx.js para generación de Word
 - **Base de Datos**: Preparado para PostgreSQL con Drizzle ORM (actualmente in-memory)
 
-### Patrones Arquitectónicos
-- **Separación clara Frontend/Backend**: API RESTful con JSON
-- **Componentes modulares**: Sistema de componentes reutilizables
-- **Validación tipo-segura**: Zod schemas en cliente y servidor
-- **Manejo de estado reactivo**: React Query para server state
-- **Principios Microsoft**: Diseño y colores corporativos
+### Principios de Sincronización
+- **Paridad Funcional**: Toda característica debe implementarse en ambos sistemas
+- **UI Idéntica**: Misma experiencia de usuario en React y Blazor
+- **API Compartida**: Backend único sirve a ambos frontends
+- **Validación Duplicada**: Reglas de negocio idénticas en ambos
 
 ---
 
 ## 📋 Funcionalidades del Sistema
 
-### 1. Sistema de Formulario Multi-Paso Inteligente
+### 1. Análisis de Minutas con IA 🆕
+
+**Capacidades de Extracción**:
+- Soporte para archivos DOCX, XLSX, PPTX
+- Análisis inteligente de contenido con IA
+- Extracción automática de campos del formulario
+- Botón animado "Pensando..." con efecto violeta pulsante
+- Manejo robusto de valores null en campos extraídos
+
+**Formatos Soportados**:
+- Microsoft Word (.docx) - Extracción con mammoth
+- Microsoft Excel (.xlsx, .xls) - Todas las hojas
+- Microsoft PowerPoint (.pptx) - Diapositivas y notas
+- Tamaño máximo: 10MB por archivo
+
+### 2. Sistema de Formulario Multi-Paso Inteligente
 
 **Paso 1: Configuración de IA**
-- Selector de modelo de IA (OpenAI, Claude, Grok, Gemini, Demo)
+- Selector de modelo de IA (OpenAI, Claude, Grok, Gemini, Copilot, Demo)
+- Sistema de fallback en cascada: Copilot → Gemini → OpenAI → Claude → Grok
 - Información transparente sobre cada proveedor
 - Modo Demo funcional sin necesidad de API keys
 
-**Paso 2: Tipo de Caso de Uso**
-- **Gestión de Entidades**: CRUD completo con wireframes opcionales
+**Paso 2: Análisis de Minuta (Opcional)** 🆕
+- Carga de documentos Office
+- Extracción automática de información
+- Pre-llenado inteligente del formulario
+- Validación de datos extraídos
+
+**Paso 3: Tipo de Caso de Uso**
+- **Gestión de Entidades**: CRUD completo con wireframes dinámicos
 - **Servicios/Procesos**: Automatización y integración de sistemas
 - **APIs**: Endpoints y configuraciones técnicas
 - Previsualizaciones interactivas de cada tipo
 - Botón de autocompletado con ejemplo bancario complejo
 
-**Paso 3: Información Básica** ⭐ *CON AI ASSIST*
-- Nombre del Cliente (con validación y sugerencias IA)
-- Nombre del Proyecto (contextual al cliente)
+**Paso 4: Información Básica** ⭐ *CON AI ASSIST Y SMART AUTOCOMPLETE*
+- Nombre del Cliente (con sugerencias contextuales inteligentes)
+- Nombre del Proyecto (autocomplete basado en contexto)
 - Código del Caso de Uso (formato XX000 validado)
 
-**Paso 4: Detalles del Caso de Uso** ⭐ *CON AI ASSIST*
+**Paso 5: Detalles del Caso de Uso** ⭐ *CON AI ASSIST*
 - Nombre del Caso de Uso (debe comenzar con verbo infinitivo)
 - Nombre del Archivo (formato específico sin espacios)
 - Descripción detallada (50-200 palabras, técnica)
-- Opción de wireframes para entidades
+- Opción de wireframes dinámicos para entidades
 
-**Pasos 5-9: Configuración Avanzada** ⭐ *CON AI ASSIST EN LISTAS*
-- Filtros de búsqueda personalizables
-- Columnas de resultado configurables
-- Campos de entidad con tipos y validación
+**Pasos 6-10: Configuración Avanzada** ⭐ *CON AI ASSIST Y UI MEJORADA*
+- Filtros de búsqueda con Smart Autocomplete
+- Columnas de resultado con sugerencias contextuales
+- Campos de entidad con validación y tooltips informativos
 - Reglas de negocio específicas
 - Requerimientos especiales técnicos
+- Generación de casos de prueba inteligentes
 
-### 2. Sistema Revolucionario "AI Assist" 🚀
+### 3. Sistema Revolucionario "AI Assist" 🚀
 
 **Concepto**: En lugar de solo generar documentos completos, cada campo tiene su propio botón de mejora IA.
 
@@ -80,6 +114,15 @@ Este es un **generador avanzado de casos de uso impulsado por IA** que permite c
 - ✅ Nombre del Archivo
 - ✅ Descripción
 - ✅ Filtros de Búsqueda
+- ✅ Columnas de Resultado
+- ✅ Campos de Entidad (con mejora de JSON completo)
+
+**Componentes UI Avanzados Implementados** 🆕:
+- **SmartAutocomplete**: Sugerencias contextuales inteligentes
+- **ContextualTooltip**: Tooltips con estilo ING corporativo
+- **MicroInteractions**: Animaciones sutiles profesionales
+- **AdaptiveLoading**: Estados de carga adaptativos (pulse, spin)
+- **ThinkingLoader**: Animación "Pensando..." con puntos cíclicos
 
 **Reglas Específicas por Campo**:
 - **Cliente**: Nombres de empresas reales, formato profesional
@@ -89,45 +132,78 @@ Este es un **generador avanzado de casos de uso impulsado por IA** que permite c
 - **Archivo**: Sin espacios, formato específico de naming
 - **Descripción**: 50-200 palabras técnicas pero comprensibles
 - **Filtros**: Campos lógicos de entidad sin tipos de dato
+- **Campos de Entidad**: JSON estructurado con tipos, longitudes y validaciones
 
 **Funcionalidad AI Assist**:
 - Corrección automática de formatos
-- Sugerencias contextuales
+- Sugerencias contextuales por tipo de caso de uso
 - Ejemplos apropiados para campos vacíos
 - Aplicación de reglas ING específicas
 - Toast notifications de éxito/error
 - Loading states durante procesamiento
+- Manejo robusto de valores null
 
-### 3. Motor de Generación de Documentos
+### 4. Generación de Wireframes Dinámicos
+
+**Características**:
+- Generación basada en datos reales del formulario
+- Wireframes específicos por tipo de caso de uso
+- Diseño responsivo y profesional
+- Integración directa en documentos DOCX
+
+**Funciones Implementadas**:
+- `generateEntitySearchWireframe()`: Interfaz de búsqueda con filtros reales
+- `generateCompleteEntityWireframes()`: CRUD completo para entidades
+- `generateServiceWireframe()`: Interfaz de servicio/proceso
+- `generateCompleteServiceWireframes()`: Flujo completo de servicio
+
+### 5. Sistema de Casos de Prueba Inteligentes
+
+**Generación Contextual**:
+- Análisis del tipo de caso de uso
+- Generación de objetivos específicos
+- Precondiciones detalladas
+- Pasos de prueba con datos reales
+
+**Estructura de Casos de Prueba**:
+- Número secuencial
+- Acción detallada
+- Datos de entrada específicos
+- Resultado esperado
+- Observaciones y validaciones
+
+### 6. Motor de Generación de Documentos
 
 **Procesamiento de Contenido**:
 - Prompts engineering avanzado por tipo de caso de uso
 - Limpieza inteligente de respuestas IA (elimina texto explicativo)
 - Aplicación estricta de reglas de formato ING
-- Generación de contenido estructurado en HTML
+- Generación de contenido estructurado
 
 **Reglas ING Implementadas**:
 - Font: Segoe UI Semilight para todo el documento
 - Colores: RGB(0,112,192) para títulos principales
-- Listas multinivel: 1, a, i con sangría específica
+- Listas multinivel: 1, a, i con sangría específica (0.2 pulgadas)
 - Tabla obligatoria "Historia de Revisiones y Aprobaciones"
 - Formato Microsoft Word profesional
 - Interlineado y espaciado específico
+- Footer: "página X de Y"
+- Header: Logo Ingematica (600x79 pixels)
 
-### 4. Sistema de Exportación DOCX
+### 7. Sistema de Exportación DOCX
 
 **Características Técnicas**:
-- Parsing HTML línea por línea para preservar estructura
-- Manejo inteligente de indentación jerárquica
-- Preservación de texto en negrita (\<strong>, \<b>)
-- Eliminación de duplicados en tablas
-- Detección inteligente de títulos principales
-- Headers con logo Ingematica incorporado
+- Generación directa desde formData (sin conversión HTML)
+- Preservación perfecta de estructura
+- Incrustación de wireframes como imágenes
+- Tablas con formato ING (header azul #DEEAF6)
+- Manejo de casos de prueba con formato profesional
 
-**Formatos Soportados**:
-- Descarga DOCX para Microsoft Word
-- Vista previa HTML en tiempo real
-- Estructura mantenida entre ambos formatos
+**Límites de Tokens por Sección**:
+- Documentos: 16000 tokens
+- Casos de prueba: 12000 tokens
+- Análisis de minuta: 10000 tokens
+- Campos de entidad: 4000 tokens
 
 ---
 
@@ -228,64 +304,129 @@ Este es un **generador avanzado de casos de uso impulsado por IA** que permite c
 ## 📈 Métricas y Capacidades Actuales
 
 ### Casos de Uso Soportados
-- **Entidades**: CRUD completo con wireframes
-- **Servicios**: Procesos automatizados
-- **APIs**: Endpoints con configuraciones
+- **Entidades**: CRUD completo con wireframes dinámicos basados en datos
+- **Servicios**: Procesos automatizados con configuración avanzada
+- **APIs**: Endpoints con formatos de request/response
 
 ### Proveedores IA Integrados
-- **OpenAI**: GPT-4o (más reciente)
-- **Anthropic**: Claude Sonnet 4
-- **Google**: Gemini 2.5
-- **X.AI**: Grok 2.0
+- **OpenAI**: GPT-4o (última versión)
+- **Anthropic**: Claude Sonnet 4 (20250514)
+- **Google**: Gemini 2.5 Flash/Pro
+- **X.AI**: Grok 2 Vision/Text
+- **Microsoft**: Copilot
 - **Demo**: Funcional sin APIs
 
 ### Formatos de Salida
-- **HTML**: Preview en tiempo real
-- **DOCX**: Microsoft Word nativo
-- **Estructura**: Jerárquica mantenida
+- **DOCX**: Microsoft Word nativo con formato ING perfecto
+- **Wireframes**: Imágenes PNG incrustadas en documentos
+- **Casos de Prueba**: Tablas profesionales integradas
 
 ---
 
-## 🚀 Estado de Desarrollo y Próximos Pasos
+## 🚀 Estado de Desarrollo Actual
 
-### Completamente Implementado ✅
-- Sistema de formulario multi-paso
-- AI Assist en campos principales
-- Generación de documentos HTML
-- Exportación DOCX con formato perfecto
-- Múltiples proveedores de IA
-- Modo demo funcional
-- Validación completa del formulario
-- UI/UX profesional Microsoft-style
+### Completamente Implementado
+- Sistema dual React/Blazor WebAssembly mantenido en paralelo
+- Análisis de minutas con extracción inteligente
+- Generación de wireframes dinámicos basados en datos
+- Casos de prueba inteligentes con objetivos y precondiciones
+- Sistema de fallback en cascada para proveedores IA
+- UI avanzada con componentes profesionales
+- Smart Autocomplete con sugerencias contextuales
+- Tooltips informativos con estilo ING
+- Animaciones profesionales (pulse, spin)
+- Manejo robusto de valores null
+- Exportación DOCX directa sin conversión HTML
+- Validación completa con doble verificación
 
-### Funcionalidades Destacadas 🌟
-- **AI Assist Revolucionario**: Mejora campo por campo
-- **Ejemplo Premium**: Autocompletado bancario complejo
-- **Formato ING Perfecto**: Cumplimiento estricto de especificaciones
-- **Multi-IA**: Flexibilidad total de proveedores
+### Cambios Recientes Críticos
+- **Migración Completa a Blazor**: Sistema dual funcionando
+- **Corrección de Null References**: SmartAutocomplete protegido
+- **Animación "Pensando..."**: Efecto violeta pulsante (#6b5b95)
+- **Wireframes Dinámicos**: Uso de datos reales del formulario
+- **Sincronización de Prompts**: Idénticos en ambos sistemas
+- **Limpieza de Datos**: Conversión null a string vacío antes de validación
 
-### Oportunidades de Mejora 💡
-- **Más campos con AI Assist**: Expandir a todos los campos
-- **AI Assist para listas**: Mejorar elementos de arrays
-- **Validación IA**: Verificación inteligente de reglas de negocio
-- **Templates IA**: Generación de plantillas contextuales
-- **Analytics**: Métricas de uso de AI Assist
-- **Colaboración**: Compartir y colaborar en casos de uso
-- **Versionado**: Control de versiones de documentos
-- **API REST**: Integración con otros sistemas
+### Arquitectura de Fallback IA
+1. **Copilot** (primera opción)
+2. **Gemini** (fallback primario)
+3. **OpenAI** (fallback secundario)
+4. **Claude** (fallback terciario)
+5. **Grok** (última opción)
+6. **Demo** (siempre disponible)
 
 ---
 
-## 💡 Filosofía del Sistema
+---
 
-### Principio Central
-**"IA como Asistente Inteligente, no como Reemplazo"**: El sistema no reemplaza al usuario sino que lo potencia con inteligencia artificial contextual en cada paso del proceso.
+## 🔧 Características Técnicas del Sistema Dual
 
-### Ventajas Clave
-1. **Control Total**: Usuario mantiene control absoluto del contenido
-2. **Calidad Garantizada**: AI Assist asegura cumplimiento de reglas ING
-3. **Flexibilidad**: Funciona con y sin IA según necesidades
-4. **Escalabilidad**: Preparado para crecer y expandirse
-5. **Profesionalidad**: Documentos de calidad enterprise siempre
+### Sincronización React-Blazor
+- **Componentes Espejo**: Cada componente React tiene su equivalente en Blazor
+- **API Unificada**: Backend único sirve a ambos frontends
+- **Prompts Idénticos**: Mismos prompts IA en ambos sistemas
+- **UI Consistente**: Experiencia de usuario idéntica
 
-Este sistema representa un nuevo paradigma en generación de documentación técnica, combinando la inteligencia artificial con control humano para crear documentos de calidad profesional con eficiencia máxima.
+### Componentes Clave Sincronizados
+1. **SmartAutocomplete** (React/Blazor)
+2. **ContextualTooltip** (React/Blazor)
+3. **MicroInteractions** (React/Blazor)
+4. **AdaptiveLoading** (React/Blazor)
+5. **ThinkingLoader** (React/Blazor)
+
+### Manejo de Errores Robusto
+- Protección contra valores null en todos los componentes
+- Validación previa a esquemas Zod
+- Fallback automático en proveedores IA
+- Mensajes de error descriptivos
+
+---
+
+## 💡 Flujos de Trabajo Principales
+
+### Flujo 1: Generación desde Cero
+1. Selección de modelo IA
+2. Elección de tipo de caso de uso
+3. Llenado de formulario con AI Assist
+4. Generación de documento
+5. Descarga de DOCX
+
+### Flujo 2: Análisis de Minuta
+1. Carga de documento Office
+2. Extracción automática con IA
+3. Revisión y ajuste de datos
+4. Completar campos faltantes
+5. Generación y descarga
+
+### Flujo 3: Ejemplo Bancario Rápido
+1. Click en "Cargar Ejemplo Bancario"
+2. Revisión de datos pre-llenados
+3. Ajustes personalizados
+4. Generación inmediata
+
+---
+
+## 📦 Estructura del Proyecto
+
+### Frontend React
+- `/client/src/components` - Componentes UI
+- `/client/src/pages` - Páginas de la aplicación
+- `/shared/schema.ts` - Esquemas compartidos
+
+### Frontend Blazor
+- `/UseCaseGenerator.Client` - Proyecto Blazor WebAssembly
+- `/UseCaseGenerator.Server` - Servidor ASP.NET Core
+- `/UseCaseGenerator.Shared` - Modelos compartidos
+
+### Backend Unificado
+- `/server` - API Node.js/Express
+- `/server/services` - Servicios de IA y documentos
+- `/server/routes.ts` - Endpoints API
+
+---
+
+## 🎯 Conclusión
+
+El sistema representa una solución empresarial completa para la generación de documentación técnica, manteniendo dos implementaciones paralelas (React y Blazor) que garantizan flexibilidad y robustez. La integración de múltiples proveedores de IA con fallback automático, junto con características avanzadas como análisis de minutas y generación de wireframes dinámicos, lo convierten en una herramienta única en su categoría.
+
+La arquitectura dual permite evolución gradual mientras se mantiene estabilidad, y el enfoque en la experiencia del usuario con componentes UI avanzados asegura productividad máxima.
