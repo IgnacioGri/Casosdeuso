@@ -491,10 +491,10 @@ INSTRUCCIONES:
             <p><strong>Descripción:</strong> {formData.Description}</p>
             
             <h2 style='color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;'>Reglas de Negocio</h2>
-            <p>{formData.BusinessRules ?? "Los datos obligatorios deben ser validados antes de guardar."}</p>
+            <p>{formData.BusinessRules ?? "• Los datos obligatorios deben ser validados antes de guardar<br>• El DNI debe ser único en el sistema<br>• Registro automático en bitácora de operaciones"}</p>
             
             <h2 style='color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 20px 0 12px 0;'>Requerimientos Especiales</h2>
-            <p>{formData.SpecialRequirements ?? "El sistema debe responder en menos de 3 segundos."}</p>
+            <p>{formData.SpecialRequirements ?? "• El sistema debe responder en menos de 3 segundos<br>• Validación HTTPS obligatoria<br>• Auditoria completa de operaciones"}</p>
         </div>";
     }
 

@@ -129,8 +129,8 @@ NUNCA MEZCLAR:
   "wireframesDescription": "Descripción de las pantallas necesarias",
   "alternativeFlows": ["usar SOLO flujos alternativos mencionados en la minuta"],
   "alternativeFlowsDescription": "Descripción de flujos alternativos y errores",
-  "businessRules": ["usar SOLO reglas mencionadas en la minuta"],
-  "specialRequirements": ["usar SOLO requerimientos mencionados en la minuta"],
+  "businessRules": "⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas. Usar SOLO reglas mencionadas en la minuta. Ejemplo: • Regla de validación • Regla de acceso",
+  "specialRequirements": "⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas. Usar SOLO requerimientos mencionados en la minuta. Ejemplo: • Tiempo de respuesta < 3s • Validación HTTPS",
   "isAIGenerated": true
 }
 
@@ -173,8 +173,8 @@ INSTRUCCIONES CRÍTICAS:
   "requestFormat": "Formato de request con ejemplos",
   "responseFormat": "Formato de response con ejemplos",
   "alternativeFlows": ["Error de autenticación", "Timeout", "Datos no encontrados"],
-  "businessRules": ["1. Regla de autenticación", "2. Regla de validación"],
-  "specialRequirements": ["1. Seguridad SSL", "2. Rate limiting"],
+  "businessRules": "• Regla de autenticación extraída de la minuta • Regla de validación específica mencionada",
+  "specialRequirements": "• Seguridad SSL obligatoria • Rate limiting según requerimientos",
   "isAIGenerated": true
 }
 `;
@@ -194,8 +194,8 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
   "serviceConfig": "Configuración del servicio (horarios, frecuencia, etc.)",
   "cronExpression": "Expresión cron si es proceso programado",
   "alternativeFlows": ["Fallo en el proceso", "Reintentos", "Notificaciones"],
-  "businessRules": ["1. Regla de ejecución", "2. Regla de monitoreo"],
-  "specialRequirements": ["1. Logging", "2. Alertas", "3. Recuperación"],
+  "businessRules": "• Regla de ejecución del proceso • Regla de monitoreo según la minuta",
+  "specialRequirements": "• Logging detallado de ejecución • Alertas por fallo • Mecanismo de recuperación automático",
   "isAIGenerated": true
 }
 `;

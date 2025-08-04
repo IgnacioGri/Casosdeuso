@@ -673,18 +673,13 @@ INSTRUCCIONES:
     if (aiModel === 'demo') {
       return JSON.stringify({
         objective: `Verificar el funcionamiento completo del caso de uso: ${context.basicInfo?.useCaseName || 'Gestión de entidades'}`,
-        preconditions: `• Usuarios de prueba:
-  - Usuario QA_OPERADOR con perfil autorizado para realizar operaciones
-  - Usuario QA_SUPERVISOR para validar auditoría
-
-• Datos de prueba:
-  - Cliente con DNI 25123456, CUIT 20251234561 en estado activo
-  - Datos de prueba válidos según reglas de negocio del caso de uso
-
-• Infraestructura:
-  - Sistema de ${context.basicInfo?.projectName || 'Gestión'} desplegado y accesible
-  - Base de datos con datos de prueba disponible
-  - Servicios externos simulados o disponibles`,
+        preconditions: `• Usuario QA_OPERADOR con perfil autorizado para realizar operaciones
+• Usuario QA_SUPERVISOR para validar auditoría
+• Cliente con DNI 25123456, CUIT 20251234561 en estado activo
+• Datos de prueba válidos según reglas de negocio del caso de uso
+• Sistema de ${context.basicInfo?.projectName || 'Gestión'} desplegado y accesible
+• Base de datos con datos de prueba disponible
+• Servicios externos simulados o disponibles`,
         testSteps: [
           {
             number: 1,

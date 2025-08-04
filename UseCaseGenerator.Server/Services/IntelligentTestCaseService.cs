@@ -140,6 +140,8 @@ REGLAS:
 - Considerar flujos alternativos y manejo de errores
 - Usar terminología bancaria profesional
 - Incluir datos de prueba específicos y realistas
+- ⚠️ FORMATO OBLIGATORIO para preconditions: Usar BULLETS (•) exclusivamente, NO listas numeradas
+- Ejemplo preconditions: "• Usuario con permisos logueado • Base de datos con datos de prueba • Sistema en ambiente UAT"
 
 Responde ÚNICAMENTE con el JSON válido.
 ";

@@ -543,28 +543,23 @@ CONTEXTO BANCARIO ING:
     const projectName = formData.projectName || 'Sistema';
     const useCaseName = formData.useCaseName || 'Gestión';
     
-    let preconditions = `1. Usuarios de prueba
-   a. Usuario con perfil autorizado: Usuario con permisos completos para ejecutar las operaciones del caso de uso
-   b. Usuario sin permisos: Usuario válido pero sin acceso a esta funcionalidad específica
-
-2. Datos de prueba
-   a. Datos válidos: Registros de prueba que cumplen con todas las validaciones y reglas de negocio
-   b. Datos inválidos: Registros diseñados para probar validaciones y manejo de errores
-
-3. Infraestructura y configuración
-   a. Sistema ${projectName} desplegado en ambiente de pruebas (UAT)
-   b. Base de datos con datos de prueba precargados
-   c. Servicios externos simulados o disponibles según requerimientos`;
+    let preconditions = `• Usuario con perfil autorizado con permisos completos para ejecutar las operaciones del caso de uso
+• Usuario sin permisos válido pero sin acceso a esta funcionalidad específica
+• Datos válidos de prueba que cumplen con todas las validaciones y reglas de negocio
+• Datos inválidos diseñados para probar validaciones y manejo de errores
+• Sistema ${projectName} desplegado en ambiente de pruebas (UAT)
+• Base de datos con datos de prueba precargados
+• Servicios externos simulados o disponibles según requerimientos`;
 
     // Add specific preconditions based on use case type
     if (formData.useCaseType === 'api') {
       preconditions += `
-   d. Endpoint API configurado y accesible: ${formData.apiEndpoint || '/api/endpoint'}
-   e. Herramientas de prueba API (Postman, curl) disponibles`;
+• Endpoint API configurado y accesible: ${formData.apiEndpoint || '/api/endpoint'}
+• Herramientas de prueba API (Postman, curl) disponibles`;
     } else if (formData.useCaseType === 'service') {
       preconditions += `
-   d. Servicio programado configurado con frecuencia: ${formData.serviceFrequency || 'Diaria'}
-   e. Logs y monitoreo habilitados para verificación`;
+• Servicio programado configurado con frecuencia: ${formData.serviceFrequency || 'Diaria'}
+• Logs y monitoreo habilitados para verificación`;
     }
 
     return preconditions;

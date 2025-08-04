@@ -97,8 +97,8 @@ Estructura JSON requerida:
       ""validationRules"": ""string""
     }
   ],
-  ""businessRules"": [""string""],
-  ""specialRequirements"": [""string""],
+  ""businessRules"": ""⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas. Ejemplo: • Regla de validación • Regla de acceso"",
+  ""specialRequirements"": ""⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas. Ejemplo: • Tiempo de respuesta < 3s • Validación HTTPS"",
   ""isAIGenerated"": true
 }
 
