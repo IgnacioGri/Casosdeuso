@@ -122,6 +122,7 @@ public class GenerateUseCaseResponse
     public string Content { get; set; } = string.Empty;
     public UseCase? UseCase { get; set; }
     public GeneratedWireframes? GeneratedWireframes { get; set; }
+    public string? ExpandedDescription { get; set; }
 }
 
 public class GeneratedWireframes

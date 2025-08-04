@@ -81,11 +81,13 @@ public class AIService : IAIService, IDisposable
 
             // Check if description needs expansion (less than 50 words)
             var wordCount = request.FormData.Description?.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+            string? expandedDescription = null;
+            
             if (wordCount < 50)
             {
                 _logger.LogInformation($"Description is short ({wordCount} words), expanding it first...");
                 _logger.LogInformation($"Original description: \"{request.FormData.Description}\"");
-                var expandedDescription = await ExpandDescriptionAsync(request.FormData, request.FormData.AiModel);
+                expandedDescription = await ExpandDescriptionAsync(request.FormData, request.FormData.AiModel);
                 if (!string.IsNullOrEmpty(expandedDescription))
                 {
                     request.FormData.Description = expandedDescription;
@@ -236,7 +238,8 @@ public class AIService : IAIService, IDisposable
                         SearchWireframe = "/attached_assets/generated_images/Search_interface_wireframe_59d3b735.png",
                         FormWireframe = "/attached_assets/generated_images/Form_interface_wireframe_bf6aaf30.png"
                     }
-                    : null
+                    : null,
+                ExpandedDescription = expandedDescription ?? request.FormData.Description
             };
         }
         catch (Exception ex)

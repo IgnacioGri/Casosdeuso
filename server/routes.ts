@@ -432,7 +432,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({
         success: true,
         useCase,
-        content: finalContent
+        content: finalContent,
+        expandedDescription: response.expandedDescription
       });
     } catch (error) {
       console.error("Error generating use case:", error);

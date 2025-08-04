@@ -64,6 +64,7 @@ export interface GenerateUseCaseResponse {
   content: string;
   success: boolean;
   error?: string;
+  expandedDescription?: string;
 }
 
 export class AIService {
@@ -80,10 +81,12 @@ export class AIService {
     try {
       // Check if description needs expansion (less than 50 words)
       const wordCount = formData.description?.split(/\s+/).length || 0;
+      let expandedDescription: string | null = null;
+      
       if (wordCount < 50) {
         console.log(`Description is short (${wordCount} words), expanding it first...`);
         console.log(`Original description: "${formData.description}"`);
-        const expandedDescription = await this.expandDescription(formData, aiModel);
+        expandedDescription = await this.expandDescription(formData, aiModel);
         if (expandedDescription) {
           formData.description = expandedDescription;
           console.log('Description expanded successfully');
@@ -150,7 +153,8 @@ export class AIService {
       
       return {
         content: cleanedContent,
-        success: true
+        success: true,
+        expandedDescription: expandedDescription || formData.description
       };
     } catch (error) {
       console.error('Error generating use case:', error);

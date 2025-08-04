@@ -130,6 +130,11 @@ export default function UseCaseGenerator() {
     onSuccess: (data) => {
       setGeneratedUseCase(data.useCase);
       
+      // Update form data with expanded description if available
+      if (data.expandedDescription) {
+        updateFormData({ description: data.expandedDescription });
+      }
+      
       // Reset progress after a brief delay
       setTimeout(() => {
         setGenerationProgress("");
