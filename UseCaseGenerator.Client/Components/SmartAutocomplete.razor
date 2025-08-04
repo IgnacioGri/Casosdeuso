@@ -210,7 +210,8 @@
     {
         var baseSuggestions = new List<string>(Suggestions);
         
-        if (UseCaseType == "entity" && InputValue.ToLower().Contains("banc"))
+        // Protect against null values
+        if (UseCaseType == "entity" && !string.IsNullOrEmpty(InputValue) && InputValue.ToLower().Contains("banc"))
         {
             baseSuggestions.AddRange(contextualSuggestions["entity_banking"]);
         }

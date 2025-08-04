@@ -59,7 +59,8 @@ export function SmartAutocomplete({
   const getContextualSuggestions = () => {
     const basesuggestions = [...suggestions];
     
-    if (useCaseType === 'entity' && value.toLowerCase().includes('banc')) {
+    // Protect against null/undefined values
+    if (useCaseType === 'entity' && value && value.toLowerCase().includes('banc')) {
       basesuggestions.push(...contextualSuggestions.entity_banking);
     } else if (contextualSuggestions[useCaseType || '']) {
       basesuggestions.push(...contextualSuggestions[useCaseType || '']);
@@ -73,7 +74,7 @@ export function SmartAutocomplete({
   useEffect(() => {
     const allSuggestions = getContextualSuggestions();
     const filtered = allSuggestions.filter(suggestion =>
-      suggestion.toLowerCase().includes(inputValue.toLowerCase())
+      suggestion.toLowerCase().includes((inputValue || '').toLowerCase())
     );
     setFilteredSuggestions(filtered);
   }, [inputValue, suggestions, useCaseType]);

@@ -21,6 +21,7 @@ Preferred communication style: Simple, everyday language.
   - TestCasesStep: Updated to use AdaptiveLoading with spin animation for test generation
   - EntityFieldsStep: Implemented AdaptiveLoading with pulse animation for field generation
 - **Minute Analysis Animation Update**: Modified both React and Blazor versions to replace progress step list with "Pensando..." button animation featuring violet pulse effect (#6b5b95) and animated dots that cycle through "..." → "...." → "....." → "......" every 400ms
+- **[CRITICAL FIX]** Fixed null reference errors in SmartAutocomplete components: Both React and Blazor versions now properly handle null values in input fields, preventing crashes when minute analysis returns null values for fields like clientName or projectName
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

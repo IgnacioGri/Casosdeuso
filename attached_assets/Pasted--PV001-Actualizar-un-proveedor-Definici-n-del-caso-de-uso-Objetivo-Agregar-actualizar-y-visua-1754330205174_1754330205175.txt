@@ -1,0 +1,124 @@
+	PV001 Actualizar un proveedor 
+ Definición del caso de uso
+
+Objetivo	Agregar, actualizar y visualizar los proveedores
+Si el usuario selecciono visualizar, los datos no se deben poder editar
+Pendientes 	
+Información adicional	
+
+
+#	Acción
+1.		El sistema muestra los siguientes datos para su edición 
+
+	Dato	Clasificación	Referencia
+	Datos Generales
+	Razón Social	Obligatorio	Campo tipo input. Razón Social del proveedor. Ej: ARCOR S.A.I.C.
+	Nombre de Fantasía	Obligatorio	Campo tipo input. Nombre de fantasía del proveedor. Ej: ARCOR
+	Tipo de Identificador Impositivo	Obligatorio	Lista de selección única de tipos de identificador impositivo.
+Si está agregando muestra solo los activos.
+	Número de Identificador Impositivo	Obligatorio	Numérico de 11 números
+	Condición de IVA	Obligatorio	Lista de selección única de condición de IVA.
+Si está agregando muestra solo los activos.
+	Tipo situación IIBB	Obligatorio	Lista de selección única de situaciones de IIBB.
+Si está agregando muestra solo los activos.
+	Numero Inscripción IIBB		Numérico
+	Todos los medios de pago	Opcional	Check, por defecto está seleccionado
+	Medio de pago	Obligatorio	Solo se visualiza si Todos los medios de pago = False 
+
+Lista de medios de pago de proveedores activos que no sean Retención ordenados alfabeticamente.
+ 
+	Extranjero	Opcional	Check, por defecto no está seleccionado
+	Activo		Check, por defecto seleccionado
+	Percepciones
+	Percepción de ganancias		Check Box. Indica si se le percibe el impuesto al proveedor. Por defecto viene desmarcado
+	Percepción de IVA		Check Box. Indica si se le percibe el impuesto al proveedor. Por defecto viene desmarcado
+	Percepción de IIBB Capital		Check Box. Indica si se le percibe el impuesto al proveedor. Por defecto viene desmarcado
+	Percepción de IIBB Provincia		Check Box. Indica si se le percibe el impuesto al proveedor. Por defecto viene marcado
+	Contactos
+El sistema muestra una lista de los contactos asignados al proveedor.
+•	Tipo
+•	Descripción
+	a.	El usuario presiona el botón para agregar un contacto 
+b.	El sistema llama al CU # PV002 Asignar un contacto
+	a.	El usuario presiona el botón para eliminar un contacto 
+b.	El sistema elimina el contacto
+	Domicilio 
+El sistema muestra una lista de los domicilios asignados a la entidad proveedor detallando:
+•	Tipo
+•	País 
+•	Provincia
+•	Localidad
+•	Calle
+•	Numero
+•	Teléfono
+•	Activo 
+	a.	El usuario presiona el botón para agregar un domicilio o modificar un domicilio 
+b.	El sistema llama al CU # PV010 Asignar un domicilio
+	a.	El usuario presiona el botón para eliminar un domicilio 
+b.	Si no está relacionado el elemento, el sistema elimina el Domicilio.
+	Teléfono
+El sistema muestra una lista de los teléfonos asignados la entidad proveedor detallando 
+
+•	Tipo
+•	Teléfono 
+•	Activo 
+	a.	El usuario presiona el botón para agregar o modificar un teléfono
+b.	El sistema llama al CU # PV011 Asignar un teléfono 
+	a.	El usuario presiona el botón para eliminar un teléfono 
+b.	Si no está relacionado el elemento, el sistema elimina el teléfono 
+	E-Mail 
+El sistema muestra una lista de los Email asignados la entidad proveedor detallando 
+
+•	Tipo 
+•	Email 
+•	Activo 
+	a.	El usuario presiona el botón para agregar o modificar un email 
+b.	El sistema llama al CU # PV012 Asignar un email
+	a.	El usuario presiona el botón para eliminar un email 
+b.	Si no está relacionado el elemento, el sistema elimina el email
+	Cuentas Bancarias
+El sistema muestra una lista de las cuentas bancarias asignadas al proveedor detallando
+•	Banco
+•	Tipo de Cuenta
+•	Moneda
+•	Sucursal
+•	Cuenta
+•	CBU
+•	Titular 
+•	Tipo  y Nro de Identificador impositivo
+•	Transfiere
+•	Recibe
+•	Activo
+	a.	El usuario presiona el botón para agregar o modificar una cuenta bancaria
+b.	El sistema llama al CU # PV013 Asignar una cuenta bancaria	
+	a.	El usuario presiona el botón para eliminar una cuenta bancaria
+b.	Si no está relacionado el elemento, el sistema elimina la cuenta bancaria
+	Rubros
+El sistema muestra una lista de los rubros asignados al proveedor detallando 
+•	Rubro
+•	Cuenta contable
+	a.	El usuario presiona el botón para asignar o modificar un rubro
+b.	El sistema llama al CU # PV004 Asignar un rubro	
+	a.	El usuario presiona el botón para eliminar un rubro
+b.	Si no está relacionado el elemento, el sistema elimina el rubro
+	Tipos de retenciones
+El sistema muestra una lista de los tipos de retenciones asignados al proveedor detallando 
+•	Tipo de retención
+	a.	El usuario presiona el botón para asignar o modificar un tipo de retención
+b.	El sistema llama al CU # PV007 Asignar un tipo de retención	
+	a.	El usuario presiona el botón para eliminar un tipo de retención
+b.	Si no está relacionado el elemento, el sistema elimina el tipo de retención
+2.		El sistema habilita la visualización de los botones “Guardar”, “Aplicar”, “Guardar y Agregar Nuevo”, “Cancelar”, de acuerdo a la seguridad del usuario identificado en el BackOffice.
+3.		El usuario completa los datos. 
+4.		El usuario selecciona la opción para aceptar los datos.
+5.		El sistema verifica que:
+a.	No existan dos proveedores con la misma razón social.
+b.	Los campos obligatorios hayan sido completados.
+6.		El sistema registra los datos, muestra un mensaje de grabación exitosa y regresa al CU que lo ejecutó.
+
+#	Variación de las Acciones
+1a	Si está agregando, el sistema traerá los campos vacíos.
+4a	a.	El usuario selecciona la opción para cancelar la transacción.
+b.	El sistema retorna al CU que lo llamo.
+5a	Si los datos obligatorios no fueron ingresados, el sistema muestra un mensaje de advertencia.
+6a	Si la registración no es exitosa, el sistema informa el motivo del impedimento.
