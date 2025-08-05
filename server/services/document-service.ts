@@ -535,6 +535,11 @@ export class DocumentService {
             }
           }
           
+          // Calculate dimensions based on search wireframe aspect ratio (800x600 compressed from 1000x600)
+          // Original aspect ratio is roughly 4:3, so use 450x338 (maintains 4:3 ratio)
+          const searchWidth = 450;
+          const searchHeight = 338;
+          
           sections.push(new Paragraph({
             spacing: { after: 120 },
             alignment: AlignmentType.CENTER,
@@ -543,8 +548,8 @@ export class DocumentService {
                 type: "png",
                 data: imageData,
                 transformation: {
-                  width: 450,  // 6.25 inches
-                  height: 338  // Maintain aspect ratio (4:3)
+                  width: searchWidth,
+                  height: searchHeight
                 }
               })
             ]
@@ -591,6 +596,12 @@ export class DocumentService {
             }
           }
           
+          // Calculate dimensions based on form wireframe aspect ratio (600x800 compressed from 800x800)
+          // Original aspect ratio is 1:1 (square), but compressed to maintain readability
+          // Use same width as search but taller height to preserve form content
+          const formWidth = 450;
+          const formHeight = 450; // Square aspect ratio for form wireframes
+          
           sections.push(new Paragraph({
             spacing: { after: 120 },
             alignment: AlignmentType.CENTER,
@@ -599,8 +610,8 @@ export class DocumentService {
                 type: "png",
                 data: imageData,
                 transformation: {
-                  width: 450,  // 6.25 inches
-                  height: 338  // Maintain aspect ratio (4:3)
+                  width: formWidth,
+                  height: formHeight
                 }
               })
             ]

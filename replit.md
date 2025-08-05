@@ -73,8 +73,9 @@ Preferred communication style: Simple, everyday language.
   - Wireframes were generating correctly as base64 data URLs but not appearing in exported DOCX
   - Modified DocumentService to handle both base64 data URLs and file paths for wireframe images
   - Added proper base64 decoding logic to extract image data from data URLs
-  - Wireframes now properly embed in DOCX exports with correct dimensions (450x338px)
-  - Fixed both search and form wireframe embedding with identical logic
+  - Fixed aspect ratio distortion: Search wireframes use 450x338px (4:3 ratio), Form wireframes use 450x450px (1:1 ratio)
+  - Each wireframe type now maintains its natural proportions without vertical compression
+  - Wireframes properly embed in DOCX exports with correct dimensions and no distortion
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
