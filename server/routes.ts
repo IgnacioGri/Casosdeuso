@@ -197,14 +197,18 @@ FORMATO HTML CRÍTICO:
   
   if (useCaseType === 'api') {
     return `
-⚠️⚠️⚠️ REGLAS OBLIGATORIAS PARA API - LEER PRIMERO ⚠️⚠️⚠️
+💥💥💥 CRÍTICO: PARA API DEBES INCLUIR EXACTAMENTE ESTOS TÍTULOS H2 💥💥💥
 
-🚨 MANDATORIO: DESPUÉS DE "REQUERIMIENTOS ESPECIALES" INCLUIR EXACTAMENTE ESTAS DOS SECCIONES:
+⚡ FLUJO PRINCIPAL DE EVENTOS ⚡
+⚡ FLUJOS ALTERNATIVOS ⚡
 
-1. FLUJO PRINCIPAL DE EVENTOS (este título exacto como Heading 2, color azul RGB(0,112,192))
-2. FLUJOS ALTERNATIVOS (este título exacto como Heading 2, color azul RGB(0,112,192))
+ESTOS TÍTULOS DEBEN APARECER COMO H2 CON EL ESTILO EXACTO:
+<h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">FLUJO PRINCIPAL DE EVENTOS</h2>
 
-💥 SI NO INCLUYES ESTAS DOS SECCIONES EL DOCUMENTO ESTÁ INCOMPLETO 💥
+<h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">FLUJOS ALTERNATIVOS</h2>
+
+💥 NO USES OTROS TÍTULOS - COPIA LOS H2 EXACTOS DE ARRIBA 💥
+🚨 SI NO INCLUYES ESTAS DOS SECCIONES H2, EL DOCUMENTO SERÁ INVÁLIDO 🚨
 
 INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
 
@@ -457,6 +461,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create specific rules based on use case type
       const specificRules = getSpecificRules(validatedData.useCaseType, validatedData);
+      
+      // DEBUG: Log use case type and rules for API cases
+      console.log(`🔍 Generating use case with type: ${validatedData.useCaseType}`);
+      if (validatedData.useCaseType === 'api') {
+        console.log('🚨 API rules should include FLUJO PRINCIPAL DE EVENTOS and FLUJOS ALTERNATIVOS');
+        console.log(`📝 Rules length: ${(USE_CASE_RULES + "\n\n" + specificRules).length} characters`);
+      }
       
       const response = await AIService.generateUseCase({
         aiModel: validatedData.aiModel,

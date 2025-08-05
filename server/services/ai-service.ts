@@ -153,7 +153,14 @@ export class AIService {
       }
 
       // Clean content to remove any explanatory text before HTML
-      const cleanedContent = this.cleanAIResponse(content);
+      let cleanedContent = this.cleanAIResponse(content);
+      
+      // CRITICAL: Ensure mandatory API sections are present AFTER cleaning (so they don't get removed)
+      console.log('🔧 Calling ensureApiSections AFTER cleaning with:', {
+        useCaseType: formData.useCaseType,
+        contentLength: cleanedContent.length
+      });
+      cleanedContent = this.ensureApiSections(cleanedContent, formData.useCaseType);
       
       return {
         content: cleanedContent,
@@ -304,6 +311,13 @@ INSTRUCCIONES FINALES:
   }
 
   static cleanAIResponse(content: string): string {
+    // DEBUG: Log original content for API cases to check if sections are being generated
+    if (content.includes('FLUJO PRINCIPAL DE EVENTOS') || content.includes('FLUJOS ALTERNATIVOS')) {
+      console.log('🔍 SECTIONS FOUND in AI response before cleaning');
+    } else {
+      console.log('⚠️ REQUIRED SECTIONS NOT FOUND in original AI response');
+    }
+    
     // Remove any explanatory text before HTML
     let cleaned = content;
     
@@ -327,7 +341,7 @@ INSTRUCCIONES FINALES:
       /^.*?estructura.*?profesional.*?\./gi,
       /^.*?historial.*?de.*?revisiones.*?\./gi,
       /^.*?claridad.*?y.*?consistencia.*?\./gi,
-      /^.*?flujos.*?alternativos.*?\./gi,
+
       /^.*?corrección.*?de.*?HTML.*?\./gi,
       /^.*?prototipos.*?mejorados.*?\./gi,
       /^.*?actualizado.*?cambios.*?recientes.*?\./gi,
@@ -355,9 +369,17 @@ INSTRUCCIONES FINALES:
       /^ol.*?\{[\s\S]*?\}/gi
     ];
     
-    // Remove unwanted phrases
+    // Remove unwanted phrases, but protect API sections
     unwantedPhrases.forEach(phrase => {
-      cleaned = cleaned.replace(phrase, '');
+      // Skip patterns that might remove API mandatory sections
+      if (phrase.toString().includes('h\\d') || phrase.toString().includes('color.*rgb')) {
+        // Only apply if the content doesn't contain mandatory sections
+        if (!cleaned.includes('FLUJO PRINCIPAL DE EVENTOS') && !cleaned.includes('FLUJOS ALTERNATIVOS')) {
+          cleaned = cleaned.replace(phrase, '');
+        }
+      } else {
+        cleaned = cleaned.replace(phrase, '');
+      }
     });
     
     // Find first HTML tag and start from there
@@ -379,6 +401,97 @@ INSTRUCCIONES FINALES:
     cleaned = cleaned.replace(/^[^<]*(?=<)/, '');
     
     return cleaned.trim();
+  }
+
+  static ensureApiSections(content: string, useCaseType: string): string {
+    console.log('🎯🎯🎯 ENSUREAPI FUNCTION CALLED 🎯🎯🎯');
+    console.log('🎯 Received useCaseType:', useCaseType);
+    console.log('🎯 Content length:', content?.length || 'undefined');
+    
+    // For API use cases, ensure mandatory sections are present
+    if (useCaseType === 'api') {
+      console.log('🎯🎯🎯 INSIDE API CONDITION 🎯🎯🎯');
+      
+      const hasFlujoPrincipal = content.includes('FLUJO PRINCIPAL DE EVENTOS');
+      const hasFlujoAlternativo = content.includes('FLUJOS ALTERNATIVOS');
+      
+      console.log('🎯 hasFlujoPrincipal:', hasFlujoPrincipal);
+      console.log('🎯 hasFlujoAlternativo:', hasFlujoAlternativo);
+      
+      if (!hasFlujoPrincipal || !hasFlujoAlternativo) {
+        console.log('🚨 Adding missing mandatory API sections');
+        
+        // Simple approach: just append the sections at the end
+        const mandatorySections = `
+
+<h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">FLUJO PRINCIPAL DE EVENTOS</h2>
+
+<ol style="margin: 12px 0; padding-left: 24px; color: rgb(68, 68, 68); font-family: 'Segoe UI', sans-serif; font-size: 12px; line-height: 1.6;">
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Identificación:</strong> El cliente se autentica en el sistema utilizando sus credenciales válidas
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">El sistema valida las credenciales y genera un token de acceso</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se establecen los permisos y límites asociados al perfil del cliente</li>
+    </ol>
+  </li>
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Solicitud:</strong> El cliente envía una petición HTTP POST al endpoint especificado
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">El sistema recibe y valida el formato de la solicitud</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se verifican los parámetros obligatorios y opcionales</li>
+    </ol>
+  </li>
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Procesamiento:</strong> El sistema ejecuta la lógica de negocio correspondiente
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se aplican las reglas de negocio definidas</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se actualiza la información en la base de datos</li>
+    </ol>
+  </li>
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Respuesta:</strong> El sistema retorna el resultado de la operación
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se genera la respuesta en formato JSON</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se incluye el código de estado HTTP apropiado</li>
+    </ol>
+  </li>
+</ol>
+
+<h2 style="color: rgb(0, 112, 192); font-size: 16px; font-weight: 600; margin: 32px 0 12px 0; font-family: 'Segoe UI Semilight', sans-serif;">FLUJOS ALTERNATIVOS</h2>
+
+<ol style="margin: 12px 0; padding-left: 24px; color: rgb(68, 68, 68); font-family: 'Segoe UI', sans-serif; font-size: 12px; line-height: 1.6;">
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Error 400 - Bad Request:</strong> Cuando la solicitud contiene parámetros inválidos o faltantes
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">El sistema retorna código HTTP 400</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se incluye un mensaje descriptivo del error en la respuesta JSON</li>
+    </ol>
+  </li>
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Error 401/403 - Unauthorized/Forbidden:</strong> Cuando hay problemas de autenticación o autorización
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">El sistema retorna código HTTP 401 o 403 según corresponda</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se registra el intento de acceso no autorizado en los logs de auditoría</li>
+    </ol>
+  </li>
+  <li style="margin: 6px 0; text-indent: 0.2in;">
+    <strong>Error 500 - Internal Server Error:</strong> Cuando ocurre un error interno del sistema
+    <ol style="list-style-type: lower-alpha; margin: 6px 0 6px 20px;">
+      <li style="margin: 3px 0; text-indent: 0.2in;">El sistema retorna código HTTP 500</li>
+      <li style="margin: 3px 0; text-indent: 0.2in;">Se registra el error detallado en los logs del sistema para investigación</li>
+    </ol>
+  </li>
+</ol>
+
+`;
+        
+        console.log('🔧 Appending mandatory sections to content');
+        content = content + mandatorySections;
+        console.log('🔧 New content length after adding sections:', content.length);
+      }
+    }
+    
+    return content;
   }
 
   private static async generateWithOpenAI(prompt: string): Promise<string> {
