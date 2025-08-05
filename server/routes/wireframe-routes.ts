@@ -341,7 +341,7 @@ function generateFormWireframeHTML(data: WireframeData): string {
     }
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
     .form-group {
@@ -422,6 +422,10 @@ function generateFormWireframeHTML(data: WireframeData): string {
     }
     .btn-secondary {
       background: #666;
+      color: white;
+    }
+    .btn-danger {
+      background: #D13438;
       color: white;
     }
   </style>
@@ -528,8 +532,10 @@ function generateFormWireframeHTML(data: WireframeData): string {
       </div>
 
       <div class="buttons">
-        <button class="btn btn-secondary">Cancelar</button>
-        <button class="btn btn-primary">Aceptar</button>
+        <button class="btn btn-danger">Cancelar</button>
+        <button class="btn btn-primary">Aplicar</button>
+        <button class="btn btn-primary">Guardar</button>
+        <button class="btn btn-primary">Guardar y Agregar Nuevo</button>
       </div>
     </div>
   </div>
