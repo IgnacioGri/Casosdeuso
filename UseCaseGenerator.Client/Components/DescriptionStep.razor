@@ -42,7 +42,15 @@
                       Lines="6"
                       Required="true"
                       HelperText="Explica qué hace el caso de uso, quién lo utiliza y en qué contexto"
-                      Class="mb-4" />
+                      Class="mb-4"
+                      UserAttributes="@(new Dictionary<string, object> { 
+                          {"autocomplete", "nope"}, 
+                          {"autocorrect", "off"}, 
+                          {"autocapitalize", "off"}, 
+                          {"spellcheck", "false"},
+                          {"data-lpignore", "true"},
+                          {"data-form-type", "other"}
+                      })" />
     </MudItem>
     
     <MudItem xs="12">

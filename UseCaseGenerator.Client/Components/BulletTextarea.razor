@@ -12,7 +12,15 @@
               Class="@($"bullet-textarea {Class}")"
               HelperText="@HelperText"
               Disabled="@Disabled"
-              Style="@Style" />
+              Style="@Style"
+              UserAttributes="@(new Dictionary<string, object> { 
+                  {"autocomplete", "nope"}, 
+                  {"autocorrect", "off"}, 
+                  {"autocapitalize", "off"}, 
+                  {"spellcheck", "false"},
+                  {"data-lpignore", "true"},
+                  {"data-form-type", "other"}
+              })" />
 
 @code {
     [Parameter] public string Value { get; set; } = "";

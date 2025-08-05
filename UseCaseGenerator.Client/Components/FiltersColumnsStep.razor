@@ -36,7 +36,15 @@
                               Variant="Variant.Outlined"
                               Lines="3"
                               Placeholder="Ej: necesito filtros para buscar clientes por DNI, apellido, email y número de cliente"
-                              Class="mb-3" />
+                              Class="mb-3"
+                              UserAttributes="@(new Dictionary<string, object> { 
+                                  {"autocomplete", "nope"}, 
+                                  {"autocorrect", "off"}, 
+                                  {"autocapitalize", "off"}, 
+                                  {"spellcheck", "false"},
+                                  {"data-lpignore", "true"},
+                                  {"data-form-type", "other"}
+                              })" />
                 <MudButton Variant="Variant.Filled" 
                            Color="Color.Primary" 
                            Size="Size.Small"
@@ -117,7 +125,15 @@
                               Variant="Variant.Outlined"
                               Lines="3"
                               Placeholder="Ej: necesito mostrar ID cliente, apellido y nombres, documento, email y estado"
-                              Class="mb-3" />
+                              Class="mb-3"
+                              UserAttributes="@(new Dictionary<string, object> { 
+                                  {"autocomplete", "nope"}, 
+                                  {"autocorrect", "off"}, 
+                                  {"autocapitalize", "off"}, 
+                                  {"spellcheck", "false"},
+                                  {"data-lpignore", "true"},
+                                  {"data-form-type", "other"}
+                              })" />
                 <MudButton Variant="Variant.Filled" 
                            Color="Color.Primary" 
                            Size="Size.Small"

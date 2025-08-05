@@ -14,7 +14,13 @@
                @oninput="OnInputChanged"
                @onfocus="OnInputFocus"
                @onblur="OnInputBlur"
-               placeholder="@Placeholder" />
+               placeholder="@Placeholder"
+               autocomplete="nope"
+               autocorrect="off"
+               autocapitalize="off"
+               spellcheck="false"
+               data-lpignore="true"
+               data-form-type="other" />
         @if (ShowSuggestions && FilteredSuggestions.Any())
         {
             <span class="dropdown-indicator">

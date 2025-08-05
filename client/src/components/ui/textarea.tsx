@@ -13,6 +13,12 @@ const Textarea = React.forwardRef<
         className
       )}
       ref={ref}
+      autoComplete="nope"
+      autoCorrect="off"
+      autoCapitalize="off"
+      spellCheck="false"
+      data-lpignore="true"
+      data-form-type="other"
       {...props}
     />
   )

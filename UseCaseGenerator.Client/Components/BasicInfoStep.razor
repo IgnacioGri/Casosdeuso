@@ -63,7 +63,15 @@
                       Variant="Variant.Outlined"
                       Required="true"
                       Placeholder="Ej: BP001"
-                      Class="mb-2" />
+                      Class="mb-2"
+                      UserAttributes="@(new Dictionary<string, object> { 
+                          {"autocomplete", "nope"}, 
+                          {"autocorrect", "off"}, 
+                          {"autocapitalize", "off"}, 
+                          {"spellcheck", "false"},
+                          {"data-lpignore", "true"},
+                          {"data-form-type", "other"}
+                      })" />
     </div>
     
     <div>
@@ -98,7 +106,15 @@
                       Variant="Variant.Outlined"
                       Required="true"
                       Placeholder="Ej: BP001GestionarClientes"
-                      Class="mb-2" />
+                      Class="mb-2"
+                      UserAttributes="@(new Dictionary<string, object> { 
+                          {"autocomplete", "nope"}, 
+                          {"autocorrect", "off"}, 
+                          {"autocapitalize", "off"}, 
+                          {"spellcheck", "false"},
+                          {"data-lpignore", "true"},
+                          {"data-form-type", "other"}
+                      })" />
     </div>
     
     <div class="mt-4">

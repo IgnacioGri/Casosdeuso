@@ -28,7 +28,15 @@
                                       Variant="Variant.Outlined"
                                       Lines="4"
                                       Placeholder="Ej: necesito campos para un cliente bancario: nombre, apellido, DNI, email, teléfono, fecha de nacimiento, dirección, estado civil"
-                                      Class="mb-3" />
+                                      Class="mb-3"
+                                      UserAttributes="@(new Dictionary<string, object> { 
+                                          {"autocomplete", "nope"}, 
+                                          {"autocorrect", "off"}, 
+                                          {"autocapitalize", "off"}, 
+                                          {"spellcheck", "false"},
+                                          {"data-lpignore", "true"},
+                                          {"data-form-type", "other"}
+                                      })" />
                     </MudItem>
                     <MudItem xs="12">
                         <MudButton Variant="Variant.Filled" 
@@ -130,7 +138,15 @@
         <MudTextField @bind-Value="editingField.Name"
                       Label="Nombre del Campo"
                       Variant="Variant.Outlined"
-                      Class="mb-3" />
+                      Class="mb-3"
+                      UserAttributes="@(new Dictionary<string, object> { 
+                          {"autocomplete", "nope"}, 
+                          {"autocorrect", "off"}, 
+                          {"autocapitalize", "off"}, 
+                          {"spellcheck", "false"},
+                          {"data-lpignore", "true"},
+                          {"data-form-type", "other"}
+                      })" />
         
         <MudSelect @bind-Value="editingField.Type"
                    Label="Tipo de Dato"
@@ -152,14 +168,30 @@
                       Label="Descripción del campo (propósito/contexto)"
                       Variant="Variant.Outlined"
                       Lines="2"
-                      Class="mb-3" />
+                      Class="mb-3"
+                      UserAttributes="@(new Dictionary<string, object> { 
+                          {"autocomplete", "nope"}, 
+                          {"autocorrect", "off"}, 
+                          {"autocapitalize", "off"}, 
+                          {"spellcheck", "false"},
+                          {"data-lpignore", "true"},
+                          {"data-form-type", "other"}
+                      })" />
         
         <MudTextField @bind-Value="editingField.ValidationRules"
                       Label="Reglas de validación (opcional)"
                       Variant="Variant.Outlined"
                       HelperText="Ej: 'Solo números', 'Longitud mínima 5 caracteres', 'Formato YYYY-MM-DD'"
                       Lines="2"
-                      Class="mb-3" />
+                      Class="mb-3"
+                      UserAttributes="@(new Dictionary<string, object> { 
+                          {"autocomplete", "nope"}, 
+                          {"autocorrect", "off"}, 
+                          {"autocapitalize", "off"}, 
+                          {"spellcheck", "false"},
+                          {"data-lpignore", "true"},
+                          {"data-form-type", "other"}
+                      })" />
         
         <MudCheckBox @bind-Value="editingField.Mandatory"
                      Label="Campo obligatorio" T="bool" />

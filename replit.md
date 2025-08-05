@@ -32,6 +32,10 @@ Preferred communication style: Simple, everyday language.
   - React: Changed table width to 100% and all column widths from fixed DXA units to percentages (5%, 25%, 20%, 25%, 18%, 7%)
   - Blazor: Updated table to use percentage-based widths matching React system
   - Tables now properly expand rows vertically when text is long instead of cutting off content
+- **[CRITICAL FIX]** Completely eliminated browser autocomplete from ALL input fields in both systems:
+  - React: Added aggressive anti-autocomplete attributes to Input and Textarea components (autocomplete="nope", autocorrect="off", autocapitalize="off", spellcheck="false", data-lpignore="true", data-form-type="other")
+  - Blazor: Added UserAttributes dictionary with same anti-autocomplete settings to ALL MudTextField and SmartAutocomplete components
+  - Applied to every single text input field across the entire application to prevent browser suggestions
 - **[ENHANCEMENT]** Converted test case tables to bullet/sub-bullet format for improved readability:
   - React: Replaced table structure with bullet points using document library's bullet property
   - Blazor: Replaced AddTestCasesTable with AddTestCasesList using NumberingProperties for bullets
