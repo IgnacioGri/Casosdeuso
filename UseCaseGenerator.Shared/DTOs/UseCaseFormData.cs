@@ -50,14 +50,14 @@ public class UseCaseFormData
     
     // AI configuration
     public bool IsAIGenerated { get; set; }
-    public AIModel AiModel { get; set; } = AIModel.Demo;
+    public AIModel AiModel { get; set; } = AIModel.Gemini;
 }
 
 public class EditUseCaseRequest
 {
     public string Content { get; set; } = string.Empty;
     public string Instructions { get; set; } = string.Empty;
-    public AIModel AiModel { get; set; } = AIModel.Demo;
+    public AIModel AiModel { get; set; } = AIModel.Gemini;
 }
 
 public class GenerateDocxRequest
@@ -77,7 +77,7 @@ public class ConvertToHtmlRequest
 public class IntelligentTestCaseRequest
 {
     public UseCaseFormData FormData { get; set; } = new();
-    public AIModel AiModel { get; set; } = AIModel.Demo;
+    public AIModel AiModel { get; set; } = AIModel.Gemini;
 }
 
 public class IntelligentTestCaseResponse
@@ -93,13 +93,13 @@ public class IntelligentTestCaseResponse
 public class AnalyzeForTestCasesRequest
 {
     public UseCaseFormData FormData { get; set; } = new();
-    public AIModel AiModel { get; set; } = AIModel.Demo;
+    public AIModel AiModel { get; set; } = AIModel.Gemini;
 }
 
 public class MinuteAnalysisRequest
 {
     public string Content { get; set; } = string.Empty;
-    public AIModel AiModel { get; set; } = AIModel.Demo;
+    public AIModel AiModel { get; set; } = AIModel.Gemini;
 }
 
 public class MinuteAnalysisResponse
@@ -136,7 +136,7 @@ public class AIAssistRequest
     public string FieldName { get; set; } = string.Empty;
     public string CurrentValue { get; set; } = string.Empty;
     public string Context { get; set; } = string.Empty;
-    public AIModel AiModel { get; set; } = AIModel.Demo;
+    public AIModel AiModel { get; set; } = AIModel.Gemini;
 }
 
 public class AIAssistResponse

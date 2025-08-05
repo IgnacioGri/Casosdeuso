@@ -43,7 +43,7 @@ export function useUseCaseForm() {
     testCaseObjective: '',
     testCasePreconditions: '',
     testSteps: [],
-    aiModel: 'demo'
+    aiModel: 'gemini'
   });
 
   const updateFormData = useCallback((updates: Partial<UseCaseFormData>) => {
@@ -540,7 +540,7 @@ Códigos de Error:
       testCaseObjective: '',
       testCasePreconditions: '',
       testSteps: [],
-      aiModel: 'demo'
+      aiModel: 'gemini'
     });
     setCurrentStep(1);
   }, []);
