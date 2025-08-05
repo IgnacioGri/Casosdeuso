@@ -76,16 +76,26 @@ public class UseCaseFormValidator
         if (string.IsNullOrEmpty(useCaseName))
             return false;
 
-        var infinitiveVerbs = new string[] {
-            "gestionar", "crear", "actualizar", "eliminar", "consultar", "registrar", 
-            "modificar", "validar", "procesar", "generar", "obtener", "establecer", 
-            "configurar", "sincronizar", "enviar", "recibir", "ver", "mostrar", 
-            "listar", "buscar", "filtrar", "exportar", "importar", "calcular", 
-            "analizar", "reportar", "administrar", "mantener", "controlar", "supervisar"
+        // Extract first word from use case name
+        var firstWord = useCaseName.Split(' ')[0].ToLower();
+        
+        // Regex pattern for Spanish infinitive verbs: -ar, -er, -ir endings
+        var infinitivePattern = @"^[a-záéíóúñ]+(ar|er|ir)$";
+        var regex = new System.Text.RegularExpressions.Regex(infinitivePattern);
+        
+        // Irregular verbs that don't follow the pattern
+        var irregularVerbs = new string[] { "ver", "ser", "ir" };
+        
+        // Service-oriented verbs for processes (added for parity with React)
+        var serviceVerbs = new string[] { 
+            "conciliar", "ejecutar", "monitorear", 
+            "supervisar", "automatizar" 
         };
         
-        return infinitiveVerbs.Any(verb => 
-            useCaseName.ToLower().StartsWith(verb));
+        // Check if it matches the regex pattern or is an irregular/service verb
+        return regex.IsMatch(firstWord) || 
+               irregularVerbs.Contains(firstWord) || 
+               serviceVerbs.Contains(firstWord);
     }
 
     private static bool HaveAtLeastOneFieldWithName(List<Models.EntityField> entityFields)
