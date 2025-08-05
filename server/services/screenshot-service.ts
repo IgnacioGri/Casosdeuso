@@ -15,7 +15,7 @@ export class ScreenshotService {
   async initialize() {
     if (!this.browser) {
       this.browser = await puppeteer.launch({
-        headless: 'new',
+        headless: true,
         executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
         args: [
           '--no-sandbox',
@@ -56,11 +56,13 @@ export class ScreenshotService {
         waitUntil: 'networkidle0'
       });
 
-      // Take screenshot
+      // Take screenshot with optimized settings
       const screenshot = await page.screenshot({
         type: 'png',
         fullPage: true,
-        encoding: 'binary'
+        encoding: 'binary',
+        quality: 80,
+        optimizeForSpeed: true
       });
 
       // Cleanup temp file

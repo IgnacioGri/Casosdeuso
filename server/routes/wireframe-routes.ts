@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getScreenshotService } from '../services/screenshot-service';
+import sharp from 'sharp';
 
 // Since we're in the server, we need to define the template functions here
 interface WireframeData {
@@ -453,15 +454,28 @@ router.post('/api/generate-wireframe', async (req, res) => {
       ? generateSearchWireframeHTML(data)
       : generateFormWireframeHTML(data);
 
-    // Capture screenshot
+    // Capture screenshot with smaller dimensions to reduce file size
     const imageBuffer = await screenshotService.captureHTMLAsImage({
       html,
-      width: data.type === 'search' ? 1200 : 900,
-      height: data.type === 'search' ? 800 : 1000
+      width: data.type === 'search' ? 1000 : 800,
+      height: data.type === 'search' ? 600 : 800
     });
 
+    // Compress image using Sharp to reduce size further
+    const compressedBuffer = await sharp(imageBuffer)
+      .png({ 
+        quality: 70,
+        compressionLevel: 9,
+        adaptiveFiltering: true
+      })
+      .resize(data.type === 'search' ? 800 : 600, null, { 
+        withoutEnlargement: true,
+        fit: 'inside'
+      })
+      .toBuffer();
+
     // Convert to base64
-    const base64Image = imageBuffer.toString('base64');
+    const base64Image = compressedBuffer.toString('base64');
     const imageUrl = `data:image/png;base64,${base64Image}`;
 
     res.json({
