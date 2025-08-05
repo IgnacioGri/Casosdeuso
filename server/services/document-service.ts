@@ -231,9 +231,9 @@ export class DocumentService {
   private static addFormDataSections(formData: any, aiGeneratedContent?: string): (Paragraph | Table)[] {
     const sections: (Paragraph | Table)[] = [];
     
-    // For API/Service use cases, generate sections directly like we do for entities
-    if (formData.useCaseType === 'api' || formData.useCaseType === 'service') {
-      console.log('📄 Generating API/Service sections directly from formData');
+    // For API use cases, generate sections for API endpoints
+    if (formData.useCaseType === 'api') {
+      console.log('📄 Generating API sections directly from formData');
       
       // FLUJO PRINCIPAL DE EVENTOS - Generate directly like entity type
       sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
@@ -468,7 +468,319 @@ export class DocumentService {
         })]
       }));
       
-      // Return early for API/Service to skip entity-specific sections
+      // Return early for API to skip entity-specific sections
+      return sections;
+    }
+    
+    // For Service/Process use cases, generate sections with frequency and execution details
+    if (formData.useCaseType === 'service') {
+      console.log('📄 Generating Service/Process sections directly from formData');
+      
+      // FLUJO PRINCIPAL DE EVENTOS - Include frequency and execution time
+      sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
+      
+      // 1. Service execution schedule
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: `1. El servicio se ejecuta ${formData.serviceFrequency || 'Diariamente'} a las ${formData.executionTime || '02:00 AM'}`,
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Add details about the execution frequency
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: `a. Frecuencia de ejecución: ${formData.serviceFrequency || 'Cada 24 horas'}`,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: `b. Hora programada: ${formData.executionTime || '02:00 AM (configuración estándar)'}`,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 2. Process initialization
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "2. El proceso inicia automáticamente según la programación establecida",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Check if it processes files
+      if (formData.configurationPaths) {
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: "a. Captura archivos desde rutas configurables:",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 576 },
+          children: [new TextRun({
+            text: formData.configurationPaths || "Las rutas deben ser configurables en el sistema",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      // Check if it calls web services
+      if (formData.webServiceCredentials) {
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: "b. Conecta con web services externos:",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 576 },
+          children: [new TextRun({
+            text: formData.webServiceCredentials || "Usuario, clave y URL deben ser configurables",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      // 3. Data processing
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "3. El sistema procesa los datos según las reglas de negocio",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. Valida la integridad de los datos",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Aplica las transformaciones necesarias",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "c. Registra el progreso en el log de auditoría",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 4. Results generation
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "4. El proceso genera los resultados y notificaciones",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. Genera archivos de salida o actualiza base de datos",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Envía notificaciones de finalización",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // FLUJOS ALTERNATIVOS - Error handling for service processes
+      sections.push(this.createStyledHeading("FLUJOS ALTERNATIVOS"));
+      
+      // 1. File not found error
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "1. Error en captura de archivos",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. El sistema no encuentra archivos en la ruta configurada",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Se registra el error y se notifica al administrador",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 2. Web service connection error
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "2. Error de conexión con web service",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. Falla la conexión con el servicio externo",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Se intenta reconectar según política de reintentos",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 3. Processing error
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "3. Error en procesamiento de datos",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. Se detecta inconsistencia en los datos",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Se genera reporte de errores y se detiene el proceso",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Add Business Rules for Service
+      if (formData.businessRules) {
+        sections.push(this.createStyledHeading("Reglas de Negocio"));
+        let rules: string[] = [];
+        if (typeof formData.businessRules === 'string') {
+          rules = formData.businessRules.split('\n').filter((r: string) => r.trim());
+        } else if (Array.isArray(formData.businessRules)) {
+          rules = formData.businessRules.filter((r: any) => r && r.toString().trim());
+        }
+        
+        rules.forEach((rule: string, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 288 },
+            children: [new TextRun({
+              text: `${index + 1}. ${rule.toString().trim()}`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
+      }
+      
+      // Add Special Requirements for Service - Include configurable paths and credentials
+      sections.push(this.createStyledHeading("Requerimientos Especiales"));
+      
+      // Always add configuration requirements for services
+      const serviceRequirements: string[] = [];
+      
+      if (formData.configurationPaths) {
+        serviceRequirements.push("Las rutas de captura de archivos deben ser configurables");
+      }
+      
+      if (formData.webServiceCredentials) {
+        serviceRequirements.push("El usuario, clave y URL del web service deben ser configurables");
+      }
+      
+      // Add frequency configuration requirement
+      serviceRequirements.push("La frecuencia y hora de ejecución deben ser configurables");
+      
+      // Add any additional requirements from formData
+      if (formData.specialRequirements) {
+        let additionalReqs: string[] = [];
+        if (typeof formData.specialRequirements === 'string') {
+          additionalReqs = formData.specialRequirements.split('\n').filter((r: string) => r.trim());
+        } else if (Array.isArray(formData.specialRequirements)) {
+          additionalReqs = formData.specialRequirements.filter((r: any) => r && r.toString().trim());
+        }
+        serviceRequirements.push(...additionalReqs);
+      }
+      
+      serviceRequirements.forEach((req: string, index: number) => {
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: `${index + 1}. ${req}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      });
+      
+      // Add Preconditions for Service
+      sections.push(this.createStyledHeading("Precondiciones"));
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        children: [new TextRun({
+          text: formData.preconditions || "El servicio debe estar configurado correctamente con las credenciales y rutas necesarias para su ejecución automática.",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Add Postconditions for Service
+      sections.push(this.createStyledHeading("Postcondiciones"));
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        children: [new TextRun({
+          text: formData.postconditions || "El proceso se completa exitosamente y genera los archivos de salida o actualizaciones correspondientes, registrando toda la actividad en el log.",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Return early for Service to skip entity-specific sections
       return sections;
     }
     
