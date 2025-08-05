@@ -151,6 +151,9 @@ export function SmartAutocomplete({
             icon && "pl-10",
             open && "ring-2 ring-ms-blue ring-opacity-30"
           )}
+          autoComplete="new-password"
+          name={`field_${Math.random().toString(36).substr(2, 9)}`}
+          id={`field_${Math.random().toString(36).substr(2, 9)}`}
         />
         <motion.button
           type="button"

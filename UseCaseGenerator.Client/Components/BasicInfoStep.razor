@@ -65,12 +65,14 @@
                       Placeholder="Ej: BP001"
                       Class="mb-2"
                       UserAttributes="@(new Dictionary<string, object> { 
-                          {"autocomplete", "nope"}, 
+                          {"autocomplete", "new-password"}, 
                           {"autocorrect", "off"}, 
                           {"autocapitalize", "off"}, 
                           {"spellcheck", "false"},
                           {"data-lpignore", "true"},
-                          {"data-form-type", "other"}
+                          {"data-form-type", "other"},
+                          {"name", $"field_{Guid.NewGuid():N}"},
+                          {"id", $"field_{Guid.NewGuid():N}"}
                       })" />
     </div>
     
@@ -108,12 +110,14 @@
                       Placeholder="Ej: BP001GestionarClientes"
                       Class="mb-2"
                       UserAttributes="@(new Dictionary<string, object> { 
-                          {"autocomplete", "nope"}, 
+                          {"autocomplete", "new-password"}, 
                           {"autocorrect", "off"}, 
                           {"autocapitalize", "off"}, 
                           {"spellcheck", "false"},
                           {"data-lpignore", "true"},
-                          {"data-form-type", "other"}
+                          {"data-form-type", "other"},
+                          {"name", $"field_{Guid.NewGuid():N}"},
+                          {"id", $"field_{Guid.NewGuid():N}"}
                       })" />
     </div>
     

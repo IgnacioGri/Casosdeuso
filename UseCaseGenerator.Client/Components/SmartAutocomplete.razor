@@ -15,12 +15,14 @@
                @onfocus="OnInputFocus"
                @onblur="OnInputBlur"
                placeholder="@Placeholder"
-               autocomplete="nope"
+               autocomplete="new-password"
                autocorrect="off"
                autocapitalize="off"
                spellcheck="false"
                data-lpignore="true"
-               data-form-type="other" />
+               data-form-type="other"
+               name="@($"field_{Guid.NewGuid():N}")"
+               id="@($"field_{Guid.NewGuid():N}")" />
         @if (ShowSuggestions && FilteredSuggestions.Any())
         {
             <span class="dropdown-indicator">
