@@ -840,7 +840,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Extract test cases from formData if they exist
       const testCases = formData.testSteps || [];
-      const docxBuffer = await DocumentService.generateDirectFromFormData(formData, testCases, customHeaderImage);
+      
+      // Pass the generated content (which includes API sections) to the document service
+      const docxBuffer = await DocumentService.generateDirectFromFormData(
+        formData, 
+        testCases, 
+        customHeaderImage,
+        content // Pass the AI-generated content with API sections
+      );
 
       // Add cache control headers to prevent browser caching
       res.set({

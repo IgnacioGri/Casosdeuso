@@ -44,7 +44,7 @@ export class DocumentService {
   }
 
   // Generate DOCX directly from form data - no HTML conversion needed
-  static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string): Promise<Buffer> {
+  static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string, aiGeneratedContent?: string): Promise<Buffer> {
     // Use custom header image if provided, otherwise use official Ingematica header
     let headerImagePath = path.join(process.cwd(), 'attached_assets', 'Header oficial Ingematica  _1754166268982.png');
     
@@ -137,7 +137,7 @@ export class DocumentService {
           }),
           
           // Add remaining sections based on form data (includes test cases)
-          ...this.addFormDataSections(formData),
+          ...this.addFormDataSections(formData, aiGeneratedContent),
           
           // History table
           ...this.createHistorySection()
@@ -228,8 +228,186 @@ export class DocumentService {
     return await Packer.toBuffer(doc);
   }
   
-  private static addFormDataSections(formData: any): (Paragraph | Table)[] {
+  private static addFormDataSections(formData: any, aiGeneratedContent?: string): (Paragraph | Table)[] {
     const sections: (Paragraph | Table)[] = [];
+    
+    // For API/Service use cases, use the AI-generated content which includes mandatory sections
+    if ((formData.useCaseType === 'api' || formData.useCaseType === 'service') && aiGeneratedContent) {
+      console.log('📄 Using AI-generated content for API/Service sections');
+      console.log('🔍 AI Content length:', aiGeneratedContent.length);
+      console.log('🔍 AI Content preview:', aiGeneratedContent.substring(0, 500));
+      
+      // Parse the AI content to extract the mandatory sections
+      // The content already includes FLUJO PRINCIPAL DE EVENTOS and FLUJOS ALTERNATIVOS
+      const flujoPrincipalMatch = aiGeneratedContent.match(/<h2[^>]*>FLUJO PRINCIPAL DE EVENTOS<\/h2>([\s\S]*?)(?=<h2|$)/i);
+      const flujoAlternativoMatch = aiGeneratedContent.match(/<h2[^>]*>FLUJOS ALTERNATIVOS<\/h2>([\s\S]*?)(?=<h2|$)/i);
+      
+      console.log('✅ Found FLUJO PRINCIPAL:', !!flujoPrincipalMatch);
+      console.log('✅ Found FLUJOS ALTERNATIVOS:', !!flujoAlternativoMatch);
+      
+      // Add FLUJO PRINCIPAL DE EVENTOS
+      if (flujoPrincipalMatch) {
+        sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
+        // Parse and add the content after the heading
+        const contentHtml = flujoPrincipalMatch[1];
+        sections.push(...this.parseHtmlContent(contentHtml));
+      } else {
+        // Fallback: Add a basic structure if not found
+        console.log('⚠️ FLUJO PRINCIPAL not found in AI content, adding basic structure');
+        sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          children: [new TextRun({
+            text: `1. El cliente realiza una petición HTTP ${formData.httpMethod || 'POST'} al endpoint ${formData.endpoint || '/api/endpoint'}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          children: [new TextRun({
+            text: `2. El sistema valida los datos de entrada según el formato especificado`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          children: [new TextRun({
+            text: `3. El sistema procesa la solicitud y genera la respuesta`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        sections.push(new Paragraph({
+          spacing: { after: 120 },
+          children: [new TextRun({
+            text: `4. El sistema retorna la respuesta en formato JSON`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+      
+      // Add FLUJOS ALTERNATIVOS
+      if (flujoAlternativoMatch) {
+        sections.push(this.createStyledHeading("FLUJOS ALTERNATIVOS"));
+        // Parse and add the content after the heading
+        const contentHtml = flujoAlternativoMatch[1];
+        sections.push(...this.parseHtmlContent(contentHtml));
+      } else {
+        // Fallback: Add a basic structure if not found
+        console.log('⚠️ FLUJOS ALTERNATIVOS not found in AI content, adding basic structure');
+        sections.push(this.createStyledHeading("FLUJOS ALTERNATIVOS"));
+        
+        // Add error codes if available
+        if (formData.errorCodes && formData.errorCodes.length > 0) {
+          formData.errorCodes.forEach((code: string, index: number) => {
+            sections.push(new Paragraph({
+              spacing: { after: 80 },
+              children: [new TextRun({
+                text: `${index + 1}. Error ${code}: ${
+                  code === '400' ? 'Solicitud incorrecta - datos de entrada inválidos' :
+                  code === '401' ? 'No autorizado - credenciales inválidas' :
+                  code === '403' ? 'Prohibido - sin permisos suficientes' :
+                  code === '404' ? 'No encontrado - recurso no existe' :
+                  code === '500' ? 'Error interno del servidor' :
+                  `Error de aplicación`
+                }`,
+                font: "Segoe UI Semilight"
+              })]
+            }));
+          });
+        } else {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            children: [new TextRun({
+              text: "1. Error 400: Solicitud incorrecta - datos de entrada inválidos",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            children: [new TextRun({
+              text: "2. Error 401/403: No autorizado o sin permisos",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+          sections.push(new Paragraph({
+            spacing: { after: 120 },
+            children: [new TextRun({
+              text: "3. Error 500: Error interno del servidor",
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        }
+      }
+      
+      // Add Business Rules for API/Service
+      if (formData.businessRules) {
+        sections.push(this.createStyledHeading("Reglas de Negocio"));
+        let rules: string[] = [];
+        if (typeof formData.businessRules === 'string') {
+          rules = formData.businessRules.split('\n').filter((r: string) => r.trim());
+        } else if (Array.isArray(formData.businessRules)) {
+          rules = formData.businessRules.filter((r: any) => r && r.toString().trim());
+        }
+        
+        rules.forEach((rule: string, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 288 },
+            children: [new TextRun({
+              text: `${index + 1}. ${rule.toString().trim()}`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
+      }
+      
+      // Add Special Requirements for API/Service
+      if (formData.specialRequirements) {
+        sections.push(this.createStyledHeading("Requerimientos Especiales"));
+        let requirements: string[] = [];
+        if (typeof formData.specialRequirements === 'string') {
+          requirements = formData.specialRequirements.split('\n').filter((r: string) => r.trim());
+        } else if (Array.isArray(formData.specialRequirements)) {
+          requirements = formData.specialRequirements.filter((r: any) => r && r.toString().trim());
+        } else {
+          requirements = [String(formData.specialRequirements)];
+        }
+        
+        requirements.forEach((req: string, index: number) => {
+          sections.push(new Paragraph({
+            spacing: { after: 80 },
+            indent: { left: 288 },
+            children: [new TextRun({
+              text: `${index + 1}. ${req.toString().trim()}`,
+              font: "Segoe UI Semilight"
+            })]
+          }));
+        });
+      }
+      
+      // Add Preconditions for API/Service
+      sections.push(this.createStyledHeading("Precondiciones"));
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        children: [new TextRun({
+          text: formData.preconditions || "El cliente debe tener credenciales válidas de autenticación API y los permisos necesarios para acceder al endpoint.",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Add Postconditions for API/Service
+      sections.push(this.createStyledHeading("Postcondiciones"));
+      sections.push(new Paragraph({
+        spacing: { after: 120 },
+        children: [new TextRun({
+          text: formData.postconditions || "La operación se completa exitosamente y se registra en el log de auditoría del sistema.",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Return early for API/Service to skip entity-specific sections
+      return sections;
+    }
     
     // Main Flow (Flujo Principal) - for entity use cases
     if (formData.useCaseType === 'entity') {
@@ -828,6 +1006,45 @@ export class DocumentService {
     }
     
     return sections;
+  }
+  
+  private static parseHtmlContent(html: string): Paragraph[] {
+    const paragraphs: Paragraph[] = [];
+    
+    // Simple HTML parsing - extract text content
+    // Remove HTML tags but preserve structure
+    const cleanText = html
+      .replace(/<ol[^>]*>/gi, '')
+      .replace(/<\/ol>/gi, '')
+      .replace(/<ul[^>]*>/gi, '')
+      .replace(/<\/ul>/gi, '')
+      .replace(/<li[^>]*>/gi, '• ')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<p[^>]*>/gi, '')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<strong>/gi, '')
+      .replace(/<\/strong>/gi, '')
+      .replace(/<[^>]+>/g, '')
+      .trim();
+    
+    // Split by newlines and create paragraphs
+    const lines = cleanText.split('\n').filter(line => line.trim());
+    
+    lines.forEach(line => {
+      const trimmedLine = line.trim();
+      if (trimmedLine) {
+        paragraphs.push(new Paragraph({
+          spacing: { after: 80 },
+          indent: { left: trimmedLine.startsWith('•') ? 288 : 0 },
+          children: [new TextRun({
+            text: trimmedLine,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      }
+    });
+    
+    return paragraphs;
   }
   
   private static toRomanNumeral(num: number): string {
