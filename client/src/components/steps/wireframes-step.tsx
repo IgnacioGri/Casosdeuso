@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { UseCaseFormData, AIModelForWireframes } from '@/types/use-case';
+import { UseCaseFormData } from '@/types/use-case';
 import { ImageIcon, RefreshCw, Loader2 } from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { AdaptiveLoading } from '@/components/adaptive-loading';
 
-// Demo wireframe images
-import demoSearchWireframe from '@assets/generated_images/Search_interface_wireframe_59d3b735.png';
-import demoFormWireframe from '@assets/generated_images/Form_interface_wireframe_bf6aaf30.png';
+
 
 interface WireframesStepProps {
   formData: UseCaseFormData;
@@ -27,7 +25,6 @@ interface WireframeGenerationRequest {
   useCaseName: string;
   description: string;
   additionalDescription?: string;
-  aiModel: AIModelForWireframes;
   wireframeType: 'search' | 'form';
 }
 
@@ -62,31 +59,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
   });
 
   const handleGenerateWireframe = async (type: 'search' | 'form') => {
-    if (!formData.aiModelForWireframes || formData.aiModelForWireframes === 'demo') {
-      // For demo mode, use pre-generated example images
-      if (type === 'search') {
-        onUpdateFormData({
-          generatedWireframes: {
-            ...formData.generatedWireframes,
-            searchWireframe: demoSearchWireframe
-          }
-        });
-      } else {
-        onUpdateFormData({
-          generatedWireframes: {
-            ...formData.generatedWireframes,
-            formWireframe: demoFormWireframe
-          }
-        });
-      }
-      toast({
-        title: "Demo",
-        description: `Wireframe de ${type === 'search' ? 'búsqueda' : 'formulario'} de ejemplo mostrado`,
-      });
-      return;
-    }
-
-    // Generate AI-powered wireframe image
+    // Generate HTML-based wireframe
     if (type === 'search') {
       setIsGeneratingSearch(true);
     } else {
@@ -128,7 +101,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
         
         toast({
           title: "Wireframe generado",
-          description: `Se generó exitosamente el wireframe de ${type === 'search' ? 'búsqueda' : 'formulario'} usando IA`,
+          description: `Se generó exitosamente el wireframe de ${type === 'search' ? 'búsqueda' : 'formulario'}`,
         });
       } else {
         toast({
@@ -154,11 +127,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
 
 
 
-  const modelLabels: Record<AIModelForWireframes, string> = {
-    'demo': 'Demo',
-    'openai': 'OpenAI (DALL-E 3)',
-    'gemini': 'Gemini (Imagen)',
-  };
+
 
   return (
     <div className="space-y-6">
@@ -169,30 +138,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
         </p>
       </div>
 
-      {/* AI Model Selector for Wireframes */}
-      <div className="space-y-2">
-        <Label htmlFor="aiModelForWireframes">Modelo de IA para Wireframes</Label>
-        <Select
-          value={formData.aiModelForWireframes || 'gemini'}
-          onValueChange={(value: AIModelForWireframes) => 
-            onUpdateFormData({ aiModelForWireframes: value })
-          }
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona un modelo" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(modelLabels).map(([value, label]) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <p className="text-xs text-gray-500">
-          Solo OpenAI y Gemini soportan generación de imágenes
-        </p>
-      </div>
+
 
       {/* Generate Wireframes Checkbox */}
       <div className="flex items-center space-x-2">
@@ -219,7 +165,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
               id="wireframesDescription"
               value={formData.wireframesDescription || ''}
               onChange={(e) => onUpdateFormData({ wireframesDescription: e.target.value })}
-              placeholder="Ej: Estilo minimalista, colores corporativos azul y blanco, diseño moderno..."
+              placeholder=""
               rows={3}
             />
           </div>

@@ -61,6 +61,14 @@ Preferred communication style: Simple, everyday language.
   - Added Sharp image compression to reduce payload size and prevent 413 errors
   - Increased server payload limits to 50MB for handling large DOCX files with embedded images
   - System now generates professional wireframes instantly and free vs expensive AI image generation
+- **[CODE CLEANUP COMPLETED]** Comprehensive removal of orphaned wireframe-related code:
+  - Removed AI model selector dropdown from wireframes step (now uses global header selection)
+  - Cleaned up wireframe description field to be empty by default (user fills optionally)
+  - Removed orphaned AIModelForWireframes type and all references
+  - Deleted legacy AI image generation code and interfaces (GenerateImageRequest/Response)
+  - Removed unused imports and demo wireframe image references
+  - Simplified wireframe generation logic to only use HTML templates
+  - Code is now clean, efficient, and focused on HTML-based wireframe generation
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

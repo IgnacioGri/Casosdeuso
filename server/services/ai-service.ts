@@ -69,17 +69,7 @@ export interface GenerateUseCaseResponse {
   expandedDescription?: string;
 }
 
-export interface GenerateImageRequest {
-  prompt: string;
-  fileName?: string;
-}
 
-export interface GenerateImageResponse {
-  success: boolean;
-  error?: string;
-  imageUrl?: string;
-  imagePath?: string;
-}
 
 export class AIService {
   
@@ -2490,87 +2480,5 @@ CONTENIDO MEJORADO:`;
     return response.choices[0]?.message?.content || "No response from Microsoft Copilot";
   }
 
-  // Image generation functionality using Gemini
-  static async generateImage(request: GenerateImageRequest): Promise<GenerateImageResponse> {
-    try {
-      if (!process.env.GEMINI_API_KEY) {
-        return {
-          success: false,
-          error: "Gemini API key no está configurada"
-        };
-      }
 
-      const client = getGeminiClient();
-      const fileName = request.fileName || `generated_image_${Date.now()}.png`;
-      const imagePath = path.join('attached_assets/generated_images', fileName);
-      
-      // Ensure directory exists
-      const imageDir = path.dirname(imagePath);
-      if (!fs.existsSync(imageDir)) {
-        fs.mkdirSync(imageDir, { recursive: true });
-      }
-
-      // IMPORTANT: only this gemini model supports image generation
-      const response = await client.models.generateContent({
-        model: "gemini-2.0-flash-preview-image-generation",
-        contents: [{ role: "user", parts: [{ text: request.prompt }] }],
-        config: {
-          responseModalities: [Modality.TEXT, Modality.IMAGE],
-        },
-      });
-
-      const candidates = response.candidates;
-      if (!candidates || candidates.length === 0) {
-        return {
-          success: false,
-          error: "No se generó ninguna imagen"
-        };
-      }
-
-      const content = candidates[0].content;
-      if (!content || !content.parts) {
-        return {
-          success: false,
-          error: "Respuesta inválida del modelo"
-        };
-      }
-
-      let imageGenerated = false;
-      let textResponse = "";
-
-      for (const part of content.parts) {
-        if (part.text) {
-          textResponse += part.text;
-          console.log('Gemini response:', part.text);
-        } else if (part.inlineData && part.inlineData.data) {
-          const imageData = Buffer.from(part.inlineData.data, "base64");
-          fs.writeFileSync(imagePath, imageData);
-          console.log(`Image saved as ${imagePath}`);
-          imageGenerated = true;
-        }
-      }
-
-      if (imageGenerated) {
-        // Return relative path for frontend access
-        const imageUrl = `/attached_assets/generated_images/${fileName}`;
-        return {
-          success: true,
-          imageUrl,
-          imagePath
-        };
-      } else {
-        return {
-          success: false,
-          error: "No se pudo generar la imagen"
-        };
-      }
-
-    } catch (error) {
-      console.error('Error generating image:', error);
-      return {
-        success: false,
-        error: `Error al generar imagen: ${error instanceof Error ? error.message : String(error)}`
-      };
-    }
-  }
 }
