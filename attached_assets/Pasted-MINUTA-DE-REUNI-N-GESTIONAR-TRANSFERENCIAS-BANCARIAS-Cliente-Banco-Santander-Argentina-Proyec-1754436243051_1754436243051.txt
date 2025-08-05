@@ -1,0 +1,110 @@
+MINUTA DE REUNIÓN - GESTIONAR TRANSFERENCIAS BANCARIAS
+
+Cliente: Banco Santander Argentina
+Proyecto: Sistema de Gestión de Transferencias Electrónicas
+Código: ST003
+Fecha: 28 de enero de 2025
+Participantes: Equipo de desarrollo, Analistas funcionales, Product Owner
+
+OBJETIVO DEL CASO DE USO:
+Desarrollar un caso de uso para gestionar transferencias bancarias electrónicas entre cuentas propias y de terceros, incluyendo validaciones de seguridad, límites operativos y trazabilidad completa de todas las operaciones.
+
+ALCANCE Y DESCRIPCIÓN:
+El sistema debe permitir a los clientes realizar transferencias de dinero de forma segura y eficiente, con validaciones automáticas de fondos, límites diarios, y cumplimiento de normativas del Banco Central. Debe incluir funcionalidades para programar transferencias futuras y generar comprobantes.
+
+REQUISITOS FUNCIONALES IDENTIFICADOS:
+1. Buscar cuenta origen por CBU, alias o número de cuenta
+2. Validar saldo disponible y límites operativos del cliente
+3. Ingresar datos de cuenta destino (CBU, alias, titular)
+4. Validar cuenta destino contra base de datos bancaria
+5. Aplicar comisiones según tipo de transferencia y banco destino
+6. Generar token de seguridad para autorización
+7. Procesar transferencia y actualizar saldos
+8. Generar comprobante con número de operación único
+9. Registrar operación en auditoría para cumplimiento normativo
+
+FILTROS DE BÚSQUEDA NECESARIOS:
+- CBU de cuenta origen (22 dígitos)
+- Alias de cuenta (máximo 20 caracteres alfanuméricos)
+- Número de cuenta tradicional
+- DNI/CUIT del titular
+- Fecha de operación (rango)
+- Estado de transferencia (Pendiente/Procesada/Rechazada/Cancelada)
+- Monto (rango mínimo y máximo)
+- Banco destino
+
+COLUMNAS PARA MOSTRAR EN RESULTADOS:
+- Número de Operación
+- Fecha y Hora
+- Cuenta Origen (últimos 4 dígitos)
+- Cuenta Destino (últimos 4 dígitos)
+- Titular Destino
+- Monto Transferido
+- Comisión Aplicada
+- Estado Actual
+- Banco Destino
+
+CAMPOS DE LA ENTIDAD TRANSFERENCIA:
+- numeroOperacion: numérico, obligatorio, único, 15 dígitos
+- cbuOrigen: texto, obligatorio, 22 caracteres, formato CBU válido
+- cbuDestino: texto, obligatorio, 22 caracteres, formato CBU válido
+- titularDestino: texto, obligatorio, máximo 100 caracteres
+- montoTransferencia: decimal, obligatorio, 2 decimales, mayor a 0
+- comisionAplicada: decimal, obligatorio, 2 decimales
+- conceptoTransferencia: texto, opcional, máximo 200 caracteres
+- estadoOperacion: texto, obligatorio, valores: PENDIENTE/PROCESADA/RECHAZADA/CANCELADA
+- codigoAutorizacion: texto, obligatorio, 8 caracteres alfanuméricos
+- bancoDestino: texto, obligatorio, máximo 50 caracteres
+- fechaOperacion: fecha y hora, obligatorio
+- fechaProcesamiento: fecha y hora, opcional
+- motivoRechazo: texto, opcional, máximo 500 caracteres
+- ipCliente: texto, obligatorio, formato IP válido
+- dispositivoOrigen: texto, obligatorio, máximo 100 caracteres
+- fechaAlta: fecha y hora, obligatorio, automático
+- usuarioAlta: texto, obligatorio, máximo 50 caracteres
+- fechaModificacion: fecha y hora, opcional, automático
+- usuarioModificacion: texto, opcional, máximo 50 caracteres
+
+PANTALLAS Y WIREFRAMES IDENTIFICADOS:
+- Pantalla de búsqueda de cuenta origen con validación CBU/Alias
+- Formulario de datos de transferencia con calculadora de comisiones
+- Pantalla de confirmación con resumen de operación
+- Grilla de resultados de transferencias con filtros avanzados
+- Detalle de transferencia individual con timeline de estados
+- Pantalla de programación de transferencias futuras
+- Formulario de autorización con token de seguridad
+
+REGLAS DE NEGOCIO ESTABLECIDAS:
+1. Solo clientes con cuentas activas pueden realizar transferencias
+2. Validar saldo suficiente incluyendo comisiones antes de procesar
+3. Aplicar límites diarios según perfil del cliente (Estándar: $500.000, Premium: $2.000.000)
+4. Transferencias superiores a $100.000 requieren doble autenticación
+5. Comisión del 0.5% para bancos externos, gratis para cuentas propias
+6. Todas las operaciones deben registrarse para cumplimiento BCRA
+7. Transferencias programadas se procesan a las 9:00 AM del día seleccionado
+8. Timeout de sesión de 10 minutos por seguridad durante el proceso
+
+FLUJOS ALTERNATIVOS Y MANEJO DE ERRORES:
+- Saldo insuficiente: mostrar saldo disponible y sugerir monto máximo
+- CBU destino inválido: validar formato y existencia en sistema bancario
+- Límite diario excedido: mostrar límite actual y monto disponible
+- Error de conectividad: guardar borrador y permitir reintento
+- Rechazo del banco receptor: notificar motivo y reversar operación
+- Token de seguridad expirado: generar nuevo token automáticamente
+- Cuenta origen bloqueada: derivar a atención al cliente
+
+REQUERIMIENTOS ESPECIALES Y TÉCNICOS:
+1. Integración con API del Banco Central para validación de CBU
+2. Encriptación de datos sensibles con algoritmo AES-256
+3. Registro completo de auditoría para cumplimiento normativo
+4. Notificaciones SMS/email para transferencias superiores a $50.000
+5. Backup automático de operaciones cada 5 minutos
+6. Monitoreo en tiempo real de operaciones sospechosas
+7. Interfaz accesible compatible con lectores de pantalla
+
+CRITERIOS DE ACEPTACIÓN:
+- Tiempo de respuesta menor a 3 segundos para validaciones
+- Disponibilidad del sistema 99.9% durante horario bancario
+- Cumplimiento de normativas PCI-DSS para seguridad de datos
+- Integración exitosa con 15 bancos principales del país
+- Capacidad de procesar 10.000 transferencias simultáneas
