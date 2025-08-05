@@ -373,6 +373,7 @@ export default function FormSteps({
                 onChange={(e) => handleInputChange('fileName', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: AB123GestionarUsuarios"
+                autoComplete="off"
               />
               <LiveValidation value={formData.fileName} type="fileName" />
             </div>
@@ -389,6 +390,7 @@ export default function FormSteps({
                 rows={4} 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Describa el alcance y objetivo del caso de uso..."
+                autoComplete="off"
               />
               <LiveValidation value={formData.description} type="required" label="Descripción" />
             </div>
@@ -413,17 +415,10 @@ export default function FormSteps({
           <div className="space-y-6">
             {/* Campo superior para texto libre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Describe los filtros de búsqueda (opcional)
-              </label>
-              <textarea
-                value={formData.filtersDescription || ''}
-                onChange={(e) => handleInputChange('filtersDescription', e.target.value)}
-                placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-              />
-              <div className="mt-2">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Describe los filtros de búsqueda (opcional)
+                </label>
                 <AIAssistButton
                   fieldName="searchFiltersDescription"
                   fieldValue={formData.filtersDescription || ''}
@@ -449,6 +444,14 @@ export default function FormSteps({
                   size="sm"
                 />
               </div>
+              <textarea
+                value={formData.filtersDescription || ''}
+                onChange={(e) => handleInputChange('filtersDescription', e.target.value)}
+                placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+                autoComplete="off"
+              />
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en filtros estructurados
               </p>
@@ -518,17 +521,10 @@ export default function FormSteps({
           <div className="space-y-6">
             {/* Campo superior para texto libre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Describe las columnas de resultado (opcional)
-              </label>
-              <textarea
-                value={formData.columnsDescription || ''}
-                onChange={(e) => handleInputChange('columnsDescription', e.target.value)}
-                placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-              />
-              <div className="mt-2">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Describe las columnas de resultado (opcional)
+                </label>
                 <AIAssistButton
                   fieldName="resultColumnsDescription"
                   fieldValue={formData.columnsDescription || ''}
@@ -554,6 +550,14 @@ export default function FormSteps({
                   size="sm"
                 />
               </div>
+              <textarea
+                value={formData.columnsDescription || ''}
+                onChange={(e) => handleInputChange('columnsDescription', e.target.value)}
+                placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+                autoComplete="off"
+              />
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en columnas estructuradas
               </p>
@@ -623,17 +627,10 @@ export default function FormSteps({
           <div className="space-y-6">
             {/* Campo superior para texto libre */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Describe los campos de la entidad (opcional)
-              </label>
-              <textarea
-                value={formData.fieldsDescription || ''}
-                onChange={(e) => handleInputChange('fieldsDescription', e.target.value)}
-                placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
-                rows={6}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-              />
-              <div className="mt-2">
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Describe los campos de la entidad (opcional)
+                </label>
                 <AIAssistButton
                   fieldName="entityFieldsDescription"
                   fieldValue={formData.fieldsDescription || ''}
@@ -707,6 +704,14 @@ export default function FormSteps({
                   size="sm"
                 />
               </div>
+              <textarea
+                value={formData.fieldsDescription || ''}
+                onChange={(e) => handleInputChange('fieldsDescription', e.target.value)}
+                placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
+                rows={6}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+                autoComplete="off"
+              />
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en campos estructurados con tipos y validaciones
               </p>
@@ -772,6 +777,7 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Long."
+                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
@@ -789,6 +795,7 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Descripción del campo"
+                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1">
@@ -798,6 +805,7 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Validaciones"
+                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
@@ -1022,59 +1030,31 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Reglas de negocio adicionales
               </label>
-              <div className="relative">
-                <BulletTextarea
-                  value={formData.businessRules || ''}
-                  onChange={(value) => handleInputChange('businessRules', value)}
-                  rows={5}
-                  className="pr-20"
-                  placeholder="Describe las reglas de negocio con bullet points. Ej:
+              <BulletTextarea
+                value={formData.businessRules || ''}
+                onChange={(value) => handleInputChange('businessRules', value)}
+                rows={5}
+                placeholder="Describe las reglas de negocio con bullet points. Ej:
 • Los clientes no se pueden eliminar si tienen productos activos
 • El DNI debe ser único en el sistema
 • Solo supervisores pueden autorizar operaciones especiales..."
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="businessRules"
-                    fieldValue={formData.businessRules || ''}
-                    fieldType="businessRules"
-                    context={{ step: 8, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => handleInputChange('businessRules', value)}
-                    size="sm"
-                    aiModel={formData.aiModel}
-                  />
-                </div>
-              </div>
+              />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Requerimientos especiales
               </label>
-              <div className="relative">
-                <BulletTextarea
-                  value={formData.specialRequirements || ''}
-                  onChange={(value) => handleInputChange('specialRequirements', value)}
-                  rows={5}
-                  className="pr-20"
-                  placeholder="Describe los requerimientos especiales con bullet points. Ej:
+              <BulletTextarea
+                value={formData.specialRequirements || ''}
+                onChange={(value) => handleInputChange('specialRequirements', value)}
+                rows={5}
+                placeholder="Describe los requerimientos especiales con bullet points. Ej:
 • Debe integrarse con servicio externo de validación
 • Tiempos de respuesta menores a 3 segundos
 • Validaciones de seguridad HTTPS obligatorias
 • Auditoría completa de todas las operaciones..."
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="specialRequirements"
-                    fieldValue={formData.specialRequirements || ''}
-                    fieldType="specialRequirements"
-                    context={{ step: 8, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => handleInputChange('specialRequirements', value)}
-                    size="sm"
-                    aiModel={formData.aiModel}
-                  />
-                </div>
-              </div>
+              />
             </div>
           </div>
         </CardContent>

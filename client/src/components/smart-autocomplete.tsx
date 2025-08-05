@@ -146,6 +146,7 @@ export function SmartAutocomplete({
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          autoComplete="off"
           className={cn(
             "pr-8 transition-all duration-200",
             icon && "pl-10",
