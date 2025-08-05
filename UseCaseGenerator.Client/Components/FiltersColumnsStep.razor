@@ -83,16 +83,17 @@
             <MudList Dense="true" T="string">
                 @foreach (var filter in FormData.SearchFilters.ToList())
                 {
+                    var currentFilter = filter; // Captura local para evitar closure issues
                     <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
-                            <MudText>@filter</MudText>
+                            <MudText>@currentFilter</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Close" 
                                            Color="Color.Error" 
                                            Size="Size.Small"
                                            Variant="Variant.Filled"
                                            Style="border-radius: 50%; background-color: #ef4444; color: white;"
                                            Title="Eliminar filtro"
-                                           OnClick="() => RemoveFilter(filter)" />
+                                           OnClick="() => RemoveFilter(currentFilter)" />
                         </div>
                     </MudListItem>
                 }
@@ -172,16 +173,17 @@
             <MudList Dense="true" T="string">
                 @foreach (var column in FormData.ResultColumns.ToList())
                 {
+                    var currentColumn = column; // Captura local para evitar closure issues
                     <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
-                            <MudText>@column</MudText>
+                            <MudText>@currentColumn</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Close" 
                                            Color="Color.Error" 
                                            Size="Size.Small"
                                            Variant="Variant.Filled"
                                            Style="border-radius: 50%; background-color: #ef4444; color: white;"
                                            Title="Eliminar columna"
-                                           OnClick="() => RemoveColumn(column)" />
+                                           OnClick="() => RemoveColumn(currentColumn)" />
                         </div>
                     </MudListItem>
                 }
