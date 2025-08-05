@@ -105,7 +105,7 @@ export function AnimatedField({ children, index, onRemove, showRemove = true }: 
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={onRemove}
-          className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white rounded-full p-1 shadow-md"
+          className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white rounded-full p-1 shadow-md z-10"
         >
           <X className="h-3 w-3" />
         </motion.button>

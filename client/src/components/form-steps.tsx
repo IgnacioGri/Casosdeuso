@@ -339,46 +339,27 @@ export default function FormSteps({
                   className="ml-0.5"
                 />
               </div>
-              <div className="relative">
-                <SmartAutocomplete
-                  value={formData.useCaseName}
-                  onChange={(value) => handleInputChange('useCaseName', value)}
-                  placeholder="Ej: Gestionar Usuarios del Sistema"
-                  suggestions={[
-                    'Gestionar Clientes',
-                    'Gestionar Usuarios',
-                    'Gestionar Cuentas Bancarias',
-                    'Gestionar Préstamos',
-                    'Gestionar Transferencias',
-                    'Gestionar Pagos',
-                    'Gestionar Inversiones',
-                    'Consultar Saldos',
-                    'Consultar Movimientos',
-                    'Generar Reportes',
-                    'Procesar Transacciones',
-                    'Validar Documentos',
-                    'Autorizar Operaciones'
-                  ]}
-                  useCaseType={formData.useCaseType}
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="useCaseName"
-                    fieldValue={formData.useCaseName}
-                    fieldType="useCaseName"
-                    context={{ 
-                      step: 4, 
-                      useCaseType: formData.useCaseType,
-                      clientName: formData.clientName,
-                      projectName: formData.projectName,
-                      description: formData.description
-                    }}
-                    onImprovement={(value) => handleInputChange('useCaseName', value)}
-                    aiModel={formData.aiModel}
-                    size="sm"
-                  />
-                </div>
-              </div>
+              <SmartAutocomplete
+                value={formData.useCaseName}
+                onChange={(value) => handleInputChange('useCaseName', value)}
+                placeholder="Ej: Gestionar Usuarios del Sistema"
+                suggestions={[
+                  'Gestionar Clientes',
+                  'Gestionar Usuarios',
+                  'Gestionar Cuentas Bancarias',
+                  'Gestionar Préstamos',
+                  'Gestionar Transferencias',
+                  'Gestionar Pagos',
+                  'Gestionar Inversiones',
+                  'Consultar Saldos',
+                  'Consultar Movimientos',
+                  'Generar Reportes',
+                  'Procesar Transacciones',
+                  'Validar Documentos',
+                  'Autorizar Operaciones'
+                ]}
+                useCaseType={formData.useCaseType}
+              />
               <LiveValidation value={formData.useCaseName} type="useCaseName" />
             </div>
             
@@ -402,30 +383,13 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Descripción *
               </label>
-              <div className="relative">
-                <textarea 
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  rows={4} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
-                  placeholder="Describa el alcance y objetivo del caso de uso..."
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="description"
-                    fieldValue={formData.description}
-                    fieldType="textarea"
-                    context={{ 
-                      step: 4, 
-                      useCaseName: formData.useCaseName,
-                      useCaseType: formData.useCaseType,
-                      clientName: formData.clientName 
-                    }}
-                    onImprovement={(value) => handleInputChange('description', value)}
-                    aiModel={formData.aiModel}
-                  />
-                </div>
-              </div>
+              <textarea 
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                rows={4} 
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
+                placeholder="Describa el alcance y objetivo del caso de uso..."
+              />
               <LiveValidation value={formData.description} type="required" label="Descripción" />
             </div>
           </div>
@@ -452,41 +416,38 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Describe los filtros de búsqueda (opcional)
               </label>
-              <div className="relative">
-                <textarea
-                  value={formData.filtersDescription || ''}
-                  onChange={(e) => handleInputChange('filtersDescription', e.target.value)}
-                  placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
-                  rows={4}
-                  autoComplete="off"
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+              <textarea
+                value={formData.filtersDescription || ''}
+                onChange={(e) => handleInputChange('filtersDescription', e.target.value)}
+                placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+              />
+              <div className="mt-2">
+                <AIAssistButton
+                  fieldName="searchFiltersDescription"
+                  fieldValue={formData.filtersDescription || ''}
+                  fieldType="filtersFromText"
+                  context={{ step: 5, useCaseType: formData.useCaseType }}
+                  onImprovement={(value) => {
+                    // Procesar el texto y crear filtros automáticamente
+                    const filters = value.split('\n').filter(f => f.trim()).map(f => f.trim());
+                    
+                    // Limpiar filtros existentes vacíos
+                    const cleanedFilters = formData.searchFilters.filter(f => f.trim() !== '');
+                    
+                    // Crear la nueva lista de filtros
+                    const allFilters = [...cleanedFilters, ...filters];
+                    
+                    // Actualizar el estado con todos los filtros de una vez
+                    onUpdateFormData({ 
+                      searchFilters: allFilters,
+                      filtersDescription: value 
+                    });
+                  }}
+                  aiModel={formData.aiModel}
+                  size="sm"
                 />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="searchFiltersDescription"
-                    fieldValue={formData.filtersDescription || ''}
-                    fieldType="filtersFromText"
-                    context={{ step: 5, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => {
-                      // Procesar el texto y crear filtros automáticamente
-                      const filters = value.split('\n').filter(f => f.trim()).map(f => f.trim());
-                      
-                      // Limpiar filtros existentes vacíos
-                      const cleanedFilters = formData.searchFilters.filter(f => f.trim() !== '');
-                      
-                      // Crear la nueva lista de filtros
-                      const allFilters = [...cleanedFilters, ...filters];
-                      
-                      // Actualizar el estado con todos los filtros de una vez
-                      onUpdateFormData({ 
-                        searchFilters: allFilters,
-                        filtersDescription: value 
-                      });
-                    }}
-                    aiModel={formData.aiModel}
-                    size="sm"
-                  />
-                </div>
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en filtros estructurados
@@ -560,41 +521,38 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Describe las columnas de resultado (opcional)
               </label>
-              <div className="relative">
-                <textarea
-                  value={formData.columnsDescription || ''}
-                  onChange={(e) => handleInputChange('columnsDescription', e.target.value)}
-                  placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
-                  rows={4}
-                  autoComplete="off"
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+              <textarea
+                value={formData.columnsDescription || ''}
+                onChange={(e) => handleInputChange('columnsDescription', e.target.value)}
+                placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+              />
+              <div className="mt-2">
+                <AIAssistButton
+                  fieldName="resultColumnsDescription"
+                  fieldValue={formData.columnsDescription || ''}
+                  fieldType="columnsFromText"
+                  context={{ step: 6, useCaseType: formData.useCaseType }}
+                  onImprovement={(value) => {
+                    // Procesar el texto y crear columnas automáticamente
+                    const columns = value.split('\n').filter(c => c.trim()).map(c => c.trim());
+                    
+                    // Limpiar columnas existentes vacías
+                    const cleanedColumns = formData.resultColumns.filter(c => c.trim() !== '');
+                    
+                    // Crear la nueva lista de columnas
+                    const allColumns = [...cleanedColumns, ...columns];
+                    
+                    // Actualizar el estado con todas las columnas de una vez
+                    onUpdateFormData({ 
+                      resultColumns: allColumns,
+                      columnsDescription: value 
+                    });
+                  }}
+                  aiModel={formData.aiModel}
+                  size="sm"
                 />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="resultColumnsDescription"
-                    fieldValue={formData.columnsDescription || ''}
-                    fieldType="columnsFromText"
-                    context={{ step: 6, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => {
-                      // Procesar el texto y crear columnas automáticamente
-                      const columns = value.split('\n').filter(c => c.trim()).map(c => c.trim());
-                      
-                      // Limpiar columnas existentes vacías
-                      const cleanedColumns = formData.resultColumns.filter(c => c.trim() !== '');
-                      
-                      // Crear la nueva lista de columnas
-                      const allColumns = [...cleanedColumns, ...columns];
-                      
-                      // Actualizar el estado con todas las columnas de una vez
-                      onUpdateFormData({ 
-                        resultColumns: allColumns,
-                        columnsDescription: value 
-                      });
-                    }}
-                    aiModel={formData.aiModel}
-                    size="sm"
-                  />
-                </div>
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en columnas estructuradas
@@ -668,88 +626,86 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Describe los campos de la entidad (opcional)
               </label>
-              <div className="relative">
-                <textarea
-                  value={formData.fieldsDescription || ''}
-                  onChange={(e) => handleInputChange('fieldsDescription', e.target.value)}
-                  placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
-                  rows={6}
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="entityFieldsDescription"
-                    fieldValue={formData.fieldsDescription || ''}
-                    fieldType="fieldsFromText"
-                    context={{ step: 7, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => {
-                      // Procesar JSON y crear campos de entidad automáticamente
-                      try {
-                        const fields = JSON.parse(value);
-                        if (Array.isArray(fields)) {
-                          // Limpiar campos existentes vacíos
-                          const cleanedFields = formData.entityFields.filter(f => f.name.trim() !== '');
-                          
-                          // Crear la nueva lista de campos
-                          const allFields = [...cleanedFields];
-                          
-                          // Crear texto estructurado para el feedback visual
-                          const structuredText = fields.map(field => {
-                            const typeText = field.type === 'text' ? 'texto' : 
-                                           field.type === 'email' ? 'email' : 
-                                           field.type === 'number' ? 'número' : 
-                                           field.type === 'date' ? 'fecha' : 
-                                           field.type === 'boolean' ? 'booleano' : field.type;
-                            
-                            const mandatoryText = field.mandatory ? 'obligatorio' : 'opcional';
-                            const lengthText = field.length ? `, máximo ${field.length} caracteres` : '';
-                            
-                            return `• ${field.name} (${typeText}, ${mandatoryText}${lengthText})`;
-                          }).join('\n');
-                          
-                          fields.forEach(field => {
-                            allFields.push({
-                              name: field.name || '',
-                              type: field.type || 'text',
-                              mandatory: field.mandatory ?? false,
-                              length: field.length
-                            });
-                          });
-                          
-                          // Actualizar tanto el texto estructurado como los campos
-                          onUpdateFormData({ 
-                            entityFields: allFields,
-                            fieldsDescription: structuredText
-                          });
-                        }
-                      } catch (error) {
-                        console.error('Error parsing entity fields JSON:', error);
-                        // Fallback: treat as text lines
-                        const fieldNames = value.split('\n').filter(f => f.trim()).map(f => f.trim());
+              <textarea
+                value={formData.fieldsDescription || ''}
+                onChange={(e) => handleInputChange('fieldsDescription', e.target.value)}
+                placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
+                rows={6}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
+              />
+              <div className="mt-2">
+                <AIAssistButton
+                  fieldName="entityFieldsDescription"
+                  fieldValue={formData.fieldsDescription || ''}
+                  fieldType="fieldsFromText"
+                  context={{ step: 7, useCaseType: formData.useCaseType }}
+                  onImprovement={(value) => {
+                    // Procesar JSON y crear campos de entidad automáticamente
+                    try {
+                      const fields = JSON.parse(value);
+                      if (Array.isArray(fields)) {
+                        // Limpiar campos existentes vacíos
                         const cleanedFields = formData.entityFields.filter(f => f.name.trim() !== '');
+                        
+                        // Crear la nueva lista de campos
                         const allFields = [...cleanedFields];
                         
-                        const structuredText = fieldNames.map(name => `• ${name} (texto, opcional)`).join('\n');
+                        // Crear texto estructurado para el feedback visual
+                        const structuredText = fields.map(field => {
+                          const typeText = field.type === 'text' ? 'texto' : 
+                                         field.type === 'email' ? 'email' : 
+                                         field.type === 'number' ? 'número' : 
+                                         field.type === 'date' ? 'fecha' : 
+                                         field.type === 'boolean' ? 'booleano' : field.type;
+                          
+                          const mandatoryText = field.mandatory ? 'obligatorio' : 'opcional';
+                          const lengthText = field.length ? `, máximo ${field.length} caracteres` : '';
+                          
+                          return `• ${field.name} (${typeText}, ${mandatoryText}${lengthText})`;
+                        }).join('\n');
                         
-                        fieldNames.forEach(fieldName => {
+                        fields.forEach(field => {
                           allFields.push({
-                            name: fieldName,
-                            type: 'text',
-                            mandatory: false,
-                            length: undefined
+                            name: field.name || '',
+                            type: field.type || 'text',
+                            mandatory: field.mandatory ?? false,
+                            length: field.length
                           });
                         });
                         
+                        // Actualizar tanto el texto estructurado como los campos
                         onUpdateFormData({ 
                           entityFields: allFields,
                           fieldsDescription: structuredText
                         });
                       }
-                    }}
-                    aiModel={formData.aiModel}
-                    size="sm"
-                  />
-                </div>
+                    } catch (error) {
+                      console.error('Error parsing entity fields JSON:', error);
+                      // Fallback: treat as text lines
+                      const fieldNames = value.split('\n').filter(f => f.trim()).map(f => f.trim());
+                      const cleanedFields = formData.entityFields.filter(f => f.name.trim() !== '');
+                      const allFields = [...cleanedFields];
+                      
+                      const structuredText = fieldNames.map(name => `• ${name} (texto, opcional)`).join('\n');
+                      
+                      fieldNames.forEach(fieldName => {
+                        allFields.push({
+                          name: fieldName,
+                          type: 'text',
+                          mandatory: false,
+                          length: undefined
+                        });
+                      });
+                      
+                      onUpdateFormData({ 
+                        entityFields: allFields,
+                        fieldsDescription: structuredText
+                      });
+                    }
+                  }}
+                  aiModel={formData.aiModel}
+                  size="sm"
+                />
               </div>
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en campos estructurados con tipos y validaciones
@@ -816,7 +772,6 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Long."
-                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
@@ -834,7 +789,6 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Descripción del campo"
-                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1">
@@ -844,7 +798,6 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Validaciones"
-                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
