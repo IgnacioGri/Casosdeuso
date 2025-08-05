@@ -71,7 +71,7 @@ const baseUseCaseFormSchema = z.object({
   useCaseCode: z.string().min(1, "El código del caso de uso es requerido"),
   useCaseName: z.string().min(1, "El nombre del caso de uso es requerido").refine(
     (val) => {
-      const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar'];
+      const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar', 'conciliar', 'ejecutar', 'monitorear', 'supervisar', 'automatizar'];
       return infinitiveVerbs.some(verb => val.toLowerCase().startsWith(verb));
     },
     "Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, etc.)"
