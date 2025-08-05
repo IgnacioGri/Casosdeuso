@@ -25,11 +25,10 @@
                 Side="top"
                 Class="ml-1" />
         </div>
-        <SmartAutocomplete
-            @bind-Value="FormData.ClientName"
-            Placeholder="Ej: Banco Provincia"
-            Suggestions="@clientSuggestions"
-            Class="w-full" />
+        <MudTextField @bind-Value="FormData.ClientName"
+                      Variant="Variant.Outlined"
+                      Placeholder="Ej: Banco Provincia"
+                      Class="w-full" />
     </div>
     
     <div>
@@ -42,11 +41,10 @@
                 Side="top"
                 Class="ml-1" />
         </div>
-        <SmartAutocomplete
-            @bind-Value="FormData.ProjectName"
-            Placeholder="Ej: Sistema de Gestión Integral"
-            Suggestions="@projectSuggestions"
-            Class="w-full" />
+        <MudTextField @bind-Value="FormData.ProjectName"
+                      Variant="Variant.Outlined"
+                      Placeholder="Ej: Sistema de Gestión Integral"
+                      Class="w-full" />
     </div>
     
     <div>
@@ -86,11 +84,10 @@
                 Side="top"
                 Class="ml-1" />
         </div>
-        <SmartAutocomplete
-            @bind-Value="FormData.UseCaseName"
-            Placeholder="Ej: Gestionar Clientes Premium"
-            Suggestions="@useCaseSuggestions"
-            Class="w-full" />
+        <MudTextField @bind-Value="FormData.UseCaseName"
+                      Variant="Variant.Outlined"
+                      Placeholder="Ej: Gestionar Clientes Premium"
+                      Class="w-full" />
     </div>
     </div>
     

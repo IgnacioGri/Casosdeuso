@@ -65,11 +65,10 @@
         </MudExpansionPanels>
         
         <div class="d-flex align-center mb-2">
-            <SmartAutocomplete @bind-Value="newFilter"
-                             Placeholder="Ingrese un filtro..."
-                             Suggestions="@filterSuggestions"
-                             UseCaseType="@FormData.UseCaseType"
-                             Class="flex-grow-1 mr-2" />
+            <MudTextField @bind-Value="newFilter"
+                         Placeholder="Ingrese un filtro..."
+                         Variant="Variant.Outlined"
+                         Class="flex-grow-1 mr-2" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddFilter"
@@ -81,19 +80,19 @@
         @if (FormData.SearchFilters.Any())
         {
             <MudList Dense="true" T="string">
-                @foreach (var filter in FormData.SearchFilters.ToList())
+                @for (int i = 0; i < FormData.SearchFilters.Count; i++)
                 {
-                    var currentFilter = filter; // Captura local para evitar closure issues
+                    var index = i; // Captura local del índice
                     <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
-                            <MudText>@currentFilter</MudText>
+                            <MudText>@FormData.SearchFilters[index]</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Close" 
                                            Color="Color.Error" 
                                            Size="Size.Small"
                                            Variant="Variant.Filled"
                                            Style="border-radius: 50%; background-color: #ef4444; color: white;"
                                            Title="Eliminar filtro"
-                                           OnClick="() => RemoveFilter(currentFilter)" />
+                                           OnClick="() => RemoveFilterByIndex(index)" />
                         </div>
                     </MudListItem>
                 }
@@ -155,11 +154,10 @@
         </MudExpansionPanels>
         
         <div class="d-flex align-center mb-2">
-            <SmartAutocomplete @bind-Value="newColumn"
-                             Placeholder="Ingrese una columna..."
-                             Suggestions="@columnSuggestions"
-                             UseCaseType="@FormData.UseCaseType"
-                             Class="flex-grow-1 mr-2" />
+            <MudTextField @bind-Value="newColumn"
+                         Placeholder="Ingrese una columna..."
+                         Variant="Variant.Outlined"
+                         Class="flex-grow-1 mr-2" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary"
                        OnClick="AddColumn"
@@ -171,19 +169,19 @@
         @if (FormData.ResultColumns.Any())
         {
             <MudList Dense="true" T="string">
-                @foreach (var column in FormData.ResultColumns.ToList())
+                @for (int i = 0; i < FormData.ResultColumns.Count; i++)
                 {
-                    var currentColumn = column; // Captura local para evitar closure issues
+                    var index = i; // Captura local del índice
                     <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
-                            <MudText>@currentColumn</MudText>
+                            <MudText>@FormData.ResultColumns[index]</MudText>
                             <MudIconButton Icon="@Icons.Material.Filled.Close" 
                                            Color="Color.Error" 
                                            Size="Size.Small"
                                            Variant="Variant.Filled"
                                            Style="border-radius: 50%; background-color: #ef4444; color: white;"
                                            Title="Eliminar columna"
-                                           OnClick="() => RemoveColumn(currentColumn)" />
+                                           OnClick="() => RemoveColumnByIndex(index)" />
                         </div>
                     </MudListItem>
                 }
@@ -246,10 +244,13 @@
         }
     }
 
-    private async Task RemoveFilter(string filter)
+    private async Task RemoveFilterByIndex(int index)
     {
-        FormData.SearchFilters.Remove(filter);
-        await FormDataChanged.InvokeAsync(FormData);
+        if (index >= 0 && index < FormData.SearchFilters.Count)
+        {
+            FormData.SearchFilters.RemoveAt(index);
+            await FormDataChanged.InvokeAsync(FormData);
+        }
     }
 
     private async Task AddColumn()
@@ -262,10 +263,13 @@
         }
     }
 
-    private async Task RemoveColumn(string column)
+    private async Task RemoveColumnByIndex(int index)
     {
-        FormData.ResultColumns.Remove(column);
-        await FormDataChanged.InvokeAsync(FormData);
+        if (index >= 0 && index < FormData.ResultColumns.Count)
+        {
+            FormData.ResultColumns.RemoveAt(index);
+            await FormDataChanged.InvokeAsync(FormData);
+        }
     }
 
     private async Task GenerateFiltersFromDescription()
