@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { Sparkles } from "lucide-react";
@@ -74,13 +74,11 @@ export function AIAssistButton({
   };
 
   return (
-    <Button
-      type="button"
-      variant={variant}
-      size={size}
+    <div
       onClick={handleImprove}
-      disabled={disabled || improveMutation.isPending}
-      className="ml-2 whitespace-nowrap"
+      className={`ml-2 whitespace-nowrap cursor-pointer inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+        disabled || improveMutation.isPending ? 'pointer-events-none opacity-50' : ''
+      }`}
       title={`Mejorar "${fieldName}" con IA según reglas ING`}
     >
       {improveMutation.isPending ? (
@@ -96,6 +94,6 @@ export function AIAssistButton({
           <span className="ml-1 hidden sm:inline">AI Assist</span>
         </>
       )}
-    </Button>
+    </div>
   );
 }
