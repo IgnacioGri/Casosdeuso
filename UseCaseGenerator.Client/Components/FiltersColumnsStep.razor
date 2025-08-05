@@ -78,9 +78,12 @@
                     <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
                             <MudText>@filter</MudText>
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                            <MudIconButton Icon="@Icons.Material.Filled.Close" 
                                            Color="Color.Error" 
                                            Size="Size.Small"
+                                           Variant="Variant.Filled"
+                                           Style="border-radius: 50%; background-color: #ef4444; color: white;"
+                                           Title="Eliminar filtro"
                                            OnClick="() => RemoveFilter(filter)" />
                         </div>
                     </MudListItem>
@@ -156,9 +159,12 @@
                     <MudListItem T="string">
                         <div class="d-flex justify-space-between align-center">
                             <MudText>@column</MudText>
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                            <MudIconButton Icon="@Icons.Material.Filled.Close" 
                                            Color="Color.Error" 
                                            Size="Size.Small"
+                                           Variant="Variant.Filled"
+                                           Style="border-radius: 50%; background-color: #ef4444; color: white;"
+                                           Title="Eliminar columna"
                                            OnClick="() => RemoveColumn(column)" />
                         </div>
                     </MudListItem>
