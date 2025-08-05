@@ -781,73 +781,39 @@ export default function FormSteps({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Endpoint de la API
               </label>
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="text" 
-                  value={formData.apiEndpoint || ''}
-                  onChange={(e) => handleInputChange('apiEndpoint', e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                  placeholder="Ej: https://api.ejemplo.com/v1/usuarios"
-                />
-                <AIAssistButton
-                  fieldName="apiEndpoint"
-                  fieldValue={formData.apiEndpoint || ''}
-                  fieldType="apiEndpoint"
-                  context={{ step: 5, useCaseType: formData.useCaseType }}
-                  onImprovement={(value) => handleInputChange('apiEndpoint', value)}
-                  aiModel={formData.aiModel}
-                />
-              </div>
+              <input 
+                type="text" 
+                value={formData.apiEndpoint || ''}
+                onChange={(e) => handleInputChange('apiEndpoint', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Ej: https://api.ejemplo.com/v1/usuarios"
+              />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Formato del Request
               </label>
-              <div className="relative">
-                <textarea 
-                  value={formData.requestFormat || ''}
-                  onChange={(e) => handleInputChange('requestFormat', e.target.value)}
-                  rows={4} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                  placeholder="Describir el formato del request JSON, parámetros requeridos, headers, etc."
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="requestFormat"
-                    fieldValue={formData.requestFormat || ''}
-                    fieldType="textarea"
-                    context={{ step: 5, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => handleInputChange('requestFormat', value)}
-                    aiModel={formData.aiModel}
-                  />
-                </div>
-              </div>
+              <textarea 
+                value={formData.requestFormat || ''}
+                onChange={(e) => handleInputChange('requestFormat', e.target.value)}
+                rows={4} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Describir el formato del request JSON, parámetros requeridos, headers, etc."
+              />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Formato del Response
               </label>
-              <div className="relative">
-                <textarea 
-                  value={formData.responseFormat || ''}
-                  onChange={(e) => handleInputChange('responseFormat', e.target.value)}
-                  rows={4} 
-                  className="w-full px-3 py-2 pr-20 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
-                  placeholder="Describir el formato del response JSON, códigos de estado, estructura de datos, etc."
-                />
-                <div className="absolute top-2 right-2">
-                  <AIAssistButton
-                    fieldName="responseFormat"
-                    fieldValue={formData.responseFormat || ''}
-                    fieldType="textarea"
-                    context={{ step: 5, useCaseType: formData.useCaseType }}
-                    onImprovement={(value) => handleInputChange('responseFormat', value)}
-                    aiModel={formData.aiModel}
-                  />
-                </div>
-              </div>
+              <textarea 
+                value={formData.responseFormat || ''}
+                onChange={(e) => handleInputChange('responseFormat', e.target.value)}
+                rows={4} 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10" 
+                placeholder="Describir el formato del response JSON, códigos de estado, estructura de datos, etc."
+              />
             </div>
           </div>
         </CardContent>
