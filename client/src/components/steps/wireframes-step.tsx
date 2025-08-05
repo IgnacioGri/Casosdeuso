@@ -36,9 +36,20 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
   const [isGeneratingForm, setIsGeneratingForm] = useState(false);
   const { toast } = useToast();
 
-  const generateImageMutation = useMutation({
-    mutationFn: async (request: { prompt: string; fileName?: string }) => {
-      const response = await apiRequest('POST', '/api/generate-image', request);
+  const generateWireframeMutation = useMutation({
+    mutationFn: async (request: {
+      type: 'search' | 'form';
+      title: string;
+      filters?: string[];
+      columns?: string[];
+      fields?: Array<{
+        name: string;
+        type: string;
+        mandatory?: boolean;
+        length?: number;
+      }>;
+    }) => {
+      const response = await apiRequest('POST', '/api/generate-wireframe', request);
       return response.json();
     },
     onError: (error: any) => {
@@ -83,13 +94,20 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
     }
 
     try {
-      const prompt = generateWireframePrompt(type);
-      const fileName = `wireframe_${type}_${formData.useCaseName?.replace(/\s+/g, '_') || 'entity'}_${Date.now()}.png`;
+      const requestData = {
+        type,
+        title: formData.useCaseName || 'Entity Management',
+        filters: formData.searchFilters?.filter(f => f.trim()) || [],
+        columns: formData.resultColumns?.filter(c => c.trim()) || [],
+        fields: formData.entityFields?.filter(f => f.name?.trim()).map(f => ({
+          name: f.name,
+          type: f.type,
+          mandatory: f.mandatory,
+          length: f.length
+        })) || []
+      };
       
-      const result = await generateImageMutation.mutateAsync({
-        prompt,
-        fileName
-      });
+      const result = await generateWireframeMutation.mutateAsync(requestData);
 
       if (result.success && result.imageUrl) {
         if (type === 'search') {
@@ -134,77 +152,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
     }
   };
 
-  const generateWireframePrompt = (type: 'search' | 'form'): string => {
-    const filters = formData.searchFilters?.filter(f => f.trim()) || [];
-    const columns = formData.resultColumns?.filter(c => c.trim()) || [];
-    const fields = formData.entityFields?.filter(f => f.name?.trim()) || [];
-    
-    const additionalDescription = formData.wireframesDescription ? 
-      ` Additional style requirements: ${formData.wireframesDescription}` : '';
 
-    if (type === 'search') {
-      const filtersText = filters.length > 0 ? 
-        filters.map(f => f.trim()).join(', ') : 
-        'standard search filters';
-      
-      const columnsText = columns.length > 0 ? 
-        columns.map(c => c.trim()).join(', ') : 
-        'result columns';
-
-      return `Generate a simplified graphical wireframe of an enterprise UI screen for searching and listing entities for "${formData.useCaseName || 'Entity Management'}".
-Follow these business rules and UI layout guidelines:
-
-🧭 Main UI Requirements
-– Add a search area at the top with various filters based on these fields: ${filtersText}
-– Below the filters, include three action buttons: Buscar (Search), Limpiar (Clear), and Agregar (Add new entry)
-– Below the search area, show a paginated table with results displaying these columns: ${columnsText}
-– Each row must include Edit and Delete buttons (icon buttons are acceptable)
-
-📑 Functionality Details
-– Clearly list and label each search filter using the provided fields
-– Clearly label columns in the results table, matching the most relevant fields
-– Indicate that pagination is required (show controls like "Previous, Next, Page X of Y")
-
-🎨 Styling & UI Rules
-– Follow Microsoft-style admin UI (flat design, minimal shadows, blue section headers, sans-serif fonts)
-– Prefer 2-column layout for filters if space allows
-– Align all elements cleanly with consistent spacing
-
-Generate a realistic wireframe image of the UI using Microsoft enterprise admin style.${additionalDescription}`;
-    } else {
-      const fieldsDetails = fields.map(f => 
-        `${f.name} (${f.type}${f.mandatory ? ' - required' : ''}${f.length ? ` - max ${f.length}` : ''})`
-      ).join(', ') || 'form input fields';
-
-      return `Generate a simplified graphical wireframe of an enterprise UI screen for adding or editing an entity for "${formData.useCaseName || 'Entity Management'}".
-Use the provided list of fields to determine the inputs and follow these business layout rules:
-
-🧭 Main UI Requirements
-– At the top or bottom, include action buttons: Aceptar (Save) and Cancelar (Cancel)
-– Include two metadata fields at the bottom or side:
-    • Fecha de alta (creation date)
-    • Usuario de alta (creator user)
-    • Fecha de modificación (modification date)
-    • Usuario de modificación (modifier user)
-
-📑 Functionality Details
-– For each field from the provided data, indicate:
-    Fields to include: ${fieldsDetails}
-    • Field label
-    • Type of input (text, number, date, etc.)
-    • If it is required (show with asterisk *)
-    • Max length (if applicable)
-    • Special requirements or validations
-
-🎨 Styling & UI Rules
-– Use a clean, Microsoft-like admin form layout
-– Group related fields into sections where possible
-– Use blue titles or dividers for sections
-– Fields should be placed in a 2- or 3-column grid when space allows
-
-Generate a realistic Microsoft-style wireframe image of the form interface.${additionalDescription}`;
-    }
-  };
 
   const modelLabels: Record<AIModelForWireframes, string> = {
     'demo': 'Demo',

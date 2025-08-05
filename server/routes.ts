@@ -9,6 +9,7 @@ import { IntelligentTestCaseService } from "./services/intelligent-test-case-ser
 import multer from "multer";
 import mammoth from "mammoth";
 import * as XLSX from "xlsx";
+import wireframeRoutes from './routes/wireframe-routes';
 
 const USE_CASE_RULES = `
 REGLAS PARA CASOS DE USO CON IA - SEGUIR ESTRICTAMENTE:
@@ -876,6 +877,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Add wireframe routes
+  app.use(wireframeRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
