@@ -232,53 +232,307 @@ export function useUseCaseForm() {
   }, [formData]);
 
   const loadDemoData = useCallback(() => {
-    setFormData(prev => ({
-      useCaseType: 'entity',
-      clientName: 'Banco Nacional de Argentina',
-      projectName: 'Sistema de Gestión de Usuarios',
-      useCaseCode: 'UC001',
-      useCaseName: 'Gestionar Usuarios del Sistema',
-      fileName: 'AB123GestionarUsuarios',
-      description: 'Este caso de uso permite la gestión completa de usuarios del sistema, incluyendo alta, baja, modificación y consulta de usuarios con diferentes roles y permisos.',
-      searchFilters: ['Nombre de Usuario', 'Email', 'Estado', 'Rol'],
-      resultColumns: ['ID', 'Nombre de Usuario', 'Email', 'Estado', 'Fecha de Alta', 'Último Acceso'],
-      entityFields: [
-        { name: 'Nombre de Usuario', type: 'text', length: 50, mandatory: true },
-        { name: 'Email', type: 'email', length: 100, mandatory: true },
-        { name: 'Contraseña', type: 'text', length: 255, mandatory: true },
-        { name: 'Nombre Completo', type: 'text', length: 100, mandatory: true },
-        { name: 'Teléfono', type: 'text', length: 20, mandatory: false },
-        { name: 'Estado', type: 'boolean', mandatory: true },
-      ],
-      businessRules: 'Los usuarios deben tener un email único en el sistema. Las contraseñas deben cumplir con políticas de seguridad mínimas.',
-      specialRequirements: 'El sistema debe soportar autenticación de dos factores y debe integrarse con Active Directory corporativo.',
-      generateWireframes: true,
-      wireframeDescriptions: [
-        'Pantalla principal de gestión con tabla de usuarios y botones de acción',
-        'Formulario de alta/edición de usuario con validaciones en tiempo real',
-        'Modal de confirmación para eliminación de usuarios'
-      ],
-      alternativeFlows: [
-        'Usuario intenta registrarse con email ya existente',
-        'Error de conexión con Active Directory durante autenticación',
-        'Sesión expira durante la edición de un usuario'
-      ],
-      // Campos específicos para tipos de casos de uso
-      apiEndpoint: '',
-      requestFormat: '',
-      responseFormat: '',
-      serviceFrequency: '',
-      executionTime: '',
-      configurationPaths: '',
-      webServiceCredentials: '',
-      generateTestCase: false,
-      testCaseObjective: '',
-      testCasePreconditions: '',
-      testSteps: [],
-      aiModel: prev.aiModel, // Mantiene el modelo seleccionado previamente
-      wireframesDescription: '',
-      alternativeFlowsDescription: ''
-    }));
+    setFormData(prev => {
+      // Si el tipo es servicio, cargar ejemplo de proceso automático
+      if (prev.useCaseType === 'service') {
+        return {
+          ...prev,
+          clientName: 'Banco Santander Argentina',
+          projectName: 'Sistema de Procesamiento Automático de Archivos',
+          useCaseCode: 'SP001',
+          useCaseName: 'Procesar Archivos de Transacciones Nocturnas',
+          fileName: 'SP001ProcesarTransaccionesNocturnas',
+          description: 'Proceso automático que se ejecuta diariamente para procesar archivos de transacciones bancarias, validar los datos, aplicar reglas de negocio, generar reportes consolidados y enviar notificaciones. El proceso captura archivos desde servidores SFTP, valida la integridad de los datos, aplica transformaciones necesarias, actualiza las bases de datos y genera archivos de salida para sistemas externos.',
+          // Campos específicos para servicio/proceso
+          serviceFrequency: 'Diariamente, Cada hora, Semanalmente los lunes',
+          executionTime: '02:00 AM, 18:30, 23:59',
+          configurationPaths: 'Si el proceso captura archivos, indicar que las rutas deben ser configurables:\n/sftp/incoming/transactions/\n/sftp/processed/\n/sftp/errors/',
+          webServiceCredentials: 'Si llama a web services, indicar que usuario, clave y URL deben ser configurables:\nUsuario: srv_proceso_transacciones\nURL: https://api.banco.com/v1/validate\nMétodo de autenticación: OAuth 2.0',
+          businessRules: `• Los archivos deben tener el formato: TRANS_YYYYMMDD_HHmmss.csv
+• Solo se procesan transacciones con montos superiores a $1,000
+• Las transacciones duplicadas se rechazan automáticamente
+• Se debe validar el CBU/CVU contra el servicio del BCRA
+• Los archivos procesados se mueven a carpeta histórica
+• Los archivos con errores se mueven a carpeta de rechazados
+• Se genera un log detallado de cada ejecución
+• Máximo 3 reintentos en caso de fallo de conexión`,
+          specialRequirements: `• Integración con servidor SFTP para captura de archivos
+• Conexión con base de datos Oracle para actualización de saldos
+• Integración con API del BCRA para validación de cuentas
+• Sistema de notificaciones por email para alertas
+• Generación de reportes en formato PDF y Excel
+• Encriptación AES-256 para archivos sensibles
+• Monitoreo en tiempo real del estado del proceso
+• Backup automático antes de cada procesamiento`,
+          alternativeFlows: [
+            'No se encuentran archivos en la ruta configurada',
+            'El archivo tiene formato incorrecto o está corrupto',
+            'Falla la conexión con el servidor SFTP',
+            'Error de conexión con la base de datos',
+            'Timeout en la validación con servicio del BCRA',
+            'El proceso anterior no finalizó correctamente',
+            'Se supera el límite de registros permitidos',
+            'Error al generar archivos de salida'
+          ],
+          generateWireframes: false,
+          wireframeDescriptions: [],
+          generateTestCase: true,
+          testCaseObjective: 'Verificar que el proceso automático ejecute correctamente todas las etapas de procesamiento de archivos',
+          testCasePreconditions: 'Archivos de prueba disponibles en ruta SFTP. Base de datos en estado consistente. Servicios externos disponibles.',
+          testSteps: [
+            { 
+              number: 1, 
+              action: 'Preparar archivo de prueba', 
+              inputData: 'Archivo TRANS_20250108_020000.csv con 100 transacciones de prueba', 
+              expectedResult: 'Archivo disponible en /sftp/incoming/', 
+              observations: 'Validar formato CSV y estructura de columnas', 
+              status: '' 
+            },
+            { 
+              number: 2, 
+              action: 'Ejecutar proceso automático', 
+              inputData: 'Comando: ./run_process.sh SP001 o esperar hora programada (02:00 AM)', 
+              expectedResult: 'Proceso inicia y muestra log de ejecución', 
+              observations: 'Verificar logs en /logs/SP001_20250108.log', 
+              status: '' 
+            },
+            { 
+              number: 3, 
+              action: 'Verificar captura de archivo', 
+              inputData: 'Consultar log de captura', 
+              expectedResult: 'Archivo TRANS_20250108_020000.csv detectado y leído correctamente', 
+              observations: 'Registro muestra cantidad de líneas procesadas', 
+              status: '' 
+            },
+            { 
+              number: 4, 
+              action: 'Validar procesamiento según reglas', 
+              inputData: 'Revisar aplicación de reglas de negocio', 
+              expectedResult: 'Transacciones > $1,000 procesadas, duplicadas rechazadas', 
+              observations: 'Verificar rechazos en /sftp/errors/', 
+              status: '' 
+            },
+            { 
+              number: 5, 
+              action: 'Confirmar actualización BD', 
+              inputData: 'SELECT COUNT(*) FROM transacciones WHERE fecha_proceso = TODAY', 
+              expectedResult: 'Registros insertados/actualizados en base de datos', 
+              observations: 'Validar integridad referencial y saldos', 
+              status: '' 
+            },
+            { 
+              number: 6, 
+              action: 'Verificar reportes generados', 
+              inputData: 'Revisar carpeta /reports/daily/', 
+              expectedResult: 'Archivos TRANS_REPORT_20250108.pdf y .xlsx generados', 
+              observations: 'Abrir y validar contenido de reportes', 
+              status: '' 
+            },
+            { 
+              number: 7, 
+              action: 'Confirmar notificaciones', 
+              inputData: 'Revisar bandeja de correo de prueba', 
+              expectedResult: 'Email con resumen del proceso enviado correctamente', 
+              observations: 'Verificar destinatarios y adjuntos', 
+              status: '' 
+            },
+            { 
+              number: 8, 
+              action: 'Validar movimiento de archivo', 
+              inputData: 'Verificar directorio /sftp/processed/', 
+              expectedResult: 'Archivo movido a /sftp/processed/TRANS_20250108_020000_PROCESSED.csv', 
+              observations: 'Archivo original no debe existir en /sftp/incoming/', 
+              status: '' 
+            }
+          ],
+          // Campos no usados en servicio
+          searchFilters: [],
+          resultColumns: [],
+          entityFields: [],
+          apiEndpoint: '',
+          requestFormat: '',
+          responseFormat: '',
+          httpMethod: '',
+          errorCodes: [],
+          wireframesDescription: '',
+          alternativeFlowsDescription: '',
+          aiModel: prev.aiModel
+        };
+      }
+      
+      // Si el tipo es API, cargar ejemplo de API
+      if (prev.useCaseType === 'api') {
+        return {
+          ...prev,
+          clientName: 'Banco Santander Argentina',
+          projectName: 'API de Servicios Bancarios',
+          useCaseCode: 'API003',
+          useCaseName: 'Gestionar Transferencias Bancarias',
+          fileName: 'API003GestionarTransferencias',
+          description: 'API REST para gestionar transferencias bancarias entre cuentas propias y de terceros. Permite realizar transferencias inmediatas y programadas, consultar el estado de transferencias, cancelar transferencias programadas y obtener el historial de movimientos. Incluye validaciones de seguridad, límites operativos y trazabilidad completa.',
+          apiEndpoint: '/api/v1/transfers',
+          httpMethod: 'POST',
+          requestFormat: `{
+  "sourceAccount": "string",
+  "destinationAccount": "string", 
+  "amount": "number",
+  "currency": "ARS|USD",
+  "concept": "string",
+  "scheduledDate": "datetime",
+  "beneficiaryName": "string",
+  "beneficiaryEmail": "string"
+}`,
+          responseFormat: `{
+  "transactionId": "string",
+  "status": "PENDING|COMPLETED|FAILED",
+  "timestamp": "datetime",
+  "sourceBalance": "number",
+  "fee": "number",
+  "exchangeRate": "number",
+  "estimatedArrival": "datetime"
+}`,
+          errorCodes: ['400', '401', '403', '404', '422', '429', '500', '503'],
+          businessRules: `• Validar fondos suficientes antes de procesar
+• Límite diario: $500,000 para clientes estándar
+• Transferencias > $100,000 requieren doble autenticación
+• Comisión 0.5% para otros bancos
+• Horario de procesamiento: 24/7 para mismo banco
+• Cut-off time: 15:00 hs para otros bancos
+• Máximo 10 transferencias por hora por cliente`,
+          specialRequirements: `• Autenticación OAuth 2.0 con JWT
+• Rate limiting: 100 requests por minuto
+• Encriptación TLS 1.3 obligatoria
+• Validación de CBU/CVU con servicio BCRA
+• Webhook para notificaciones de estado
+• Idempotencia con header X-Idempotency-Key
+• Logs de auditoría para compliance`,
+          alternativeFlows: [
+            'Fondos insuficientes en cuenta origen',
+            'CBU/CVU de destino inválido',
+            'Supera límite diario de transferencias',
+            'Token de autenticación expirado',
+            'Servicio BCRA no disponible',
+            'Rate limit excedido'
+          ],
+          // Campos no usados en API
+          searchFilters: [],
+          resultColumns: [],
+          entityFields: [],
+          serviceFrequency: '',
+          executionTime: '',
+          configurationPaths: '',
+          webServiceCredentials: '',
+          generateWireframes: false,
+          wireframeDescriptions: [],
+          generateTestCase: true,
+          testCaseObjective: 'Validar el funcionamiento completo del endpoint de transferencias',
+          testCasePreconditions: 'Usuario autenticado con token válido. Cuenta con fondos suficientes.',
+          testSteps: [
+            { 
+              number: 1, 
+              action: 'Autenticación OAuth', 
+              inputData: 'POST /auth/token con client_id, client_secret y grant_type=client_credentials', 
+              expectedResult: 'Token JWT válido con expiración de 3600 segundos', 
+              observations: 'Guardar token para siguientes requests', 
+              status: '' 
+            },
+            { 
+              number: 2, 
+              action: 'Enviar transferencia válida', 
+              inputData: 'POST /api/v1/transfers con JSON: {"sourceAccount":"123456","destinationAccount":"789012","amount":1000,"currency":"ARS"}', 
+              expectedResult: 'HTTP 201 Created con transactionId en respuesta', 
+              observations: 'Headers: Authorization: Bearer {token}, Content-Type: application/json', 
+              status: '' 
+            },
+            { 
+              number: 3, 
+              action: 'Validar estructura respuesta', 
+              inputData: 'Analizar JSON de respuesta', 
+              expectedResult: 'Contiene: transactionId, status=COMPLETED, timestamp, sourceBalance, fee', 
+              observations: 'Todos los campos obligatorios presentes', 
+              status: '' 
+            },
+            { 
+              number: 4, 
+              action: 'Verificar actualización saldos', 
+              inputData: 'GET /api/v1/accounts/123456/balance', 
+              expectedResult: 'Saldo disminuido en $1000 + comisión', 
+              observations: 'Comparar con saldo inicial antes de transferencia', 
+              status: '' 
+            },
+            { 
+              number: 5, 
+              action: 'Probar fondos insuficientes', 
+              inputData: 'POST con amount=999999999', 
+              expectedResult: 'HTTP 422 con mensaje "Fondos insuficientes"', 
+              observations: 'No debe actualizar saldos', 
+              status: '' 
+            },
+            { 
+              number: 6, 
+              action: 'Verificar log auditoría', 
+              inputData: 'Consultar logs del sistema', 
+              expectedResult: 'Registro completo de la transacción con IP, timestamp y usuario', 
+              observations: 'Verificar cumplimiento regulatorio', 
+              status: '' 
+            }
+          ],
+          wireframesDescription: '',
+          alternativeFlowsDescription: '',
+          aiModel: prev.aiModel
+        };
+      }
+      
+      // Por defecto, cargar ejemplo de entidad
+      return {
+        ...prev,
+        useCaseType: 'entity',
+        clientName: 'Banco Nacional de Argentina',
+        projectName: 'Sistema de Gestión de Usuarios',
+        useCaseCode: 'UC001',
+        useCaseName: 'Gestionar Usuarios del Sistema',
+        fileName: 'UC001GestionarUsuarios',
+        description: 'Este caso de uso permite la gestión completa de usuarios del sistema, incluyendo alta, baja, modificación y consulta de usuarios con diferentes roles y permisos.',
+        searchFilters: ['Nombre de Usuario', 'Email', 'Estado', 'Rol'],
+        resultColumns: ['ID', 'Nombre de Usuario', 'Email', 'Estado', 'Fecha de Alta', 'Último Acceso'],
+        entityFields: [
+          { name: 'Nombre de Usuario', type: 'text', length: 50, mandatory: true },
+          { name: 'Email', type: 'email', length: 100, mandatory: true },
+          { name: 'Contraseña', type: 'text', length: 255, mandatory: true },
+          { name: 'Nombre Completo', type: 'text', length: 100, mandatory: true },
+          { name: 'Teléfono', type: 'text', length: 20, mandatory: false },
+          { name: 'Estado', type: 'boolean', mandatory: true },
+        ],
+        businessRules: 'Los usuarios deben tener un email único en el sistema. Las contraseñas deben cumplir con políticas de seguridad mínimas.',
+        specialRequirements: 'El sistema debe soportar autenticación de dos factores y debe integrarse con Active Directory corporativo.',
+        generateWireframes: true,
+        wireframeDescriptions: [
+          'Pantalla principal de gestión con tabla de usuarios y botones de acción',
+          'Formulario de alta/edición de usuario con validaciones en tiempo real',
+          'Modal de confirmación para eliminación de usuarios'
+        ],
+        alternativeFlows: [
+          'Usuario intenta registrarse con email ya existente',
+          'Error de conexión con Active Directory durante autenticación',
+          'Sesión expira durante la edición de un usuario'
+        ],
+        // Campos específicos para tipos de casos de uso
+        apiEndpoint: '',
+        requestFormat: '',
+        responseFormat: '',
+        serviceFrequency: '',
+        executionTime: '',
+        configurationPaths: '',
+        webServiceCredentials: '',
+        generateTestCase: false,
+        testCaseObjective: '',
+        testCasePreconditions: '',
+        testSteps: [],
+        aiModel: prev.aiModel,
+        wireframesDescription: '',
+        alternativeFlowsDescription: ''
+      };
+    });
   }, []);
 
   const loadComplexExample = useCallback((type: UseCaseType) => {
