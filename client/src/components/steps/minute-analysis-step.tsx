@@ -32,15 +32,23 @@ export function MinuteAnalysisStep({
 
   const analyzeMinuteMutation = useMutation({
     mutationFn: async (data: { text: string; useCaseType: string; aiModel: string }) => {
-      const response = await apiRequest('POST', '/api/analyze-minute', {
-        minuteContent: data.text,
-        useCaseType: data.useCaseType,
-        aiModel: data.aiModel || 'demo'
-      });
-      return response.json();
+      try {
+        const response = await apiRequest('POST', '/api/analyze-minute', {
+          minuteContent: data.text,
+          useCaseType: data.useCaseType,
+          aiModel: data.aiModel || 'demo'
+        });
+        const jsonData = await response.json();
+        console.log('Analysis response:', jsonData);
+        return jsonData;
+      } catch (error) {
+        console.error('Error in mutationFn:', error);
+        throw error;
+      }
     },
     onSuccess: (response) => {
-      if (response.success && response.formData) {
+      console.log('onSuccess response:', response);
+      if (response && response.success && response.formData) {
         onDataExtracted(response.formData);
         toast({
           title: "✨ Análisis completado",
@@ -49,16 +57,16 @@ export function MinuteAnalysisStep({
       } else {
         toast({
           title: "Error en el análisis",
-          description: "No se pudo extraer información de la minuta",
+          description: response?.message || "No se pudo extraer información de la minuta",
           variant: "destructive"
         });
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error analyzing minute:', error);
       toast({
         title: "Error al analizar",
-        description: "Ocurrió un error al procesar la minuta. Por favor, intenta nuevamente.",
+        description: error?.message || "Ocurrió un error al procesar la minuta. Por favor, intenta nuevamente.",
         variant: "destructive"
       });
     }
