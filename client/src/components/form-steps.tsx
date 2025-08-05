@@ -458,6 +458,7 @@ export default function FormSteps({
                   onChange={(e) => handleInputChange('filtersDescription', e.target.value)}
                   placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
                   rows={4}
+                  autoComplete="off"
                   className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
                 />
                 <div className="absolute top-2 right-2">
@@ -565,6 +566,7 @@ export default function FormSteps({
                   onChange={(e) => handleInputChange('columnsDescription', e.target.value)}
                   placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
                   rows={4}
+                  autoComplete="off"
                   className="w-full px-3 py-2 pr-20 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
                 />
                 <div className="absolute top-2 right-2">
@@ -814,6 +816,7 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Long."
+                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
@@ -831,6 +834,7 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Descripción del campo"
+                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1">
@@ -840,6 +844,7 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Validaciones"
+                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">

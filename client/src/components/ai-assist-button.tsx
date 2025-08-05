@@ -73,5 +73,27 @@ export function AIAssistButton({
     });
   };
 
-  return null;
+  return (
+    <button
+      type="button"
+      onClick={handleImprove}
+      disabled={disabled || improveMutation.isPending}
+      className="ml-2 whitespace-nowrap inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+      title={`Mejorar "${fieldName}" con IA según reglas ING`}
+    >
+      {improveMutation.isPending ? (
+        <AdaptiveLoading
+          context="ai-assist"
+          isLoading={true}
+          size="sm"
+          variant="inline"
+        />
+      ) : (
+        <>
+          <Sparkles className="h-4 w-4" />
+          <span className="ml-1 hidden sm:inline">AI Assist</span>
+        </>
+      )}
+    </button>
+  );
 }

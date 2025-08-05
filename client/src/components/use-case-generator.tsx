@@ -369,12 +369,22 @@ export default function UseCaseGenerator() {
                   <img 
                     src="/ingematica-logo-full.png" 
                     alt="Ingematica Logo" 
-                    className="hidden sm:block h-10 object-contain"
+                    className="hidden sm:block h-10 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      setCurrentStep(1);
+                      handleReset();
+                    }}
+                    title="Volver al inicio"
                   />
                   <img 
                     src="/attached_assets/company-logo.png" 
                     alt="Ingematica Logo" 
-                    className="sm:hidden h-8 w-8 object-contain"
+                    className="sm:hidden h-8 w-8 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      setCurrentStep(1);
+                      handleReset();
+                    }}
+                    title="Volver al inicio"
                   />
                 </>
               )}
