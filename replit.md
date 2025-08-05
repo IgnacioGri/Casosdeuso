@@ -24,16 +24,15 @@ The application utilizes a modern full-stack .NET architecture, ensuring a clear
 
 ### Core Features
 - **Multi-step Form System**: Progressive forms (9 steps for entity, 6 for others) with dynamic fields and client-side validation.
-- **AI Integration Layer**: Abstracted `AIService` supports multiple AI providers, including a demo mode, with a cascading fallback mechanism (Copilot → Gemini → OpenAI → Claude → Grok).
-- **Document Generation**: AI-powered content generation with direct DOCX export using predefined Microsoft-style templates. Includes full wireframe embedding and AI-driven test case generation with professional table formatting. Ensures consistent corporate branding and specific document formatting.
-- **Data Management**: In-memory storage for development, with architecture defined for PostgreSQL integration.
-- **Prompt Synchronization & Optimization**: AI prompts are optimized for structured content generation, ensuring detailed descriptions, hierarchical formatting, and consistent field properties across both frontend and backend. Prompts include explicit format requirements and content cleaning.
-- **Performance Optimizations**: Utilizes `gemini-2.5-flash` for faster generation, increased token limits for various processes, enhanced progress indicators, and standardized temperature.
-- **Dynamic Wireframe Generation**: Generates professional, data-driven HTML-based wireframes instantly, using actual form data (filters, columns, fields), with Microsoft enterprise styling. Wireframes are embedded as images in DOCX documents with correct dimensions.
-- **System Synchronization**: Both frontend and backend systems maintain functional and UI parity.
-- **Description Expansion**: Automatically expands short descriptions using a dedicated AI prompt to meet minimum length requirements.
-- **API Use Case Structure**: Successfully enforces mandatory sections and detailed JSON examples for API use cases to match minute requirements. Includes specific "FLUJO PRINCIPAL DE EVENTOS" and "FLUJOS ALTERNATIVOS" sections with detailed request/response examples and error handling (400, 401/403, 500 codes). **RESOLVED 2025-01-05**: Critical missing sections issue fixed with enhanced AI prompt rules and robust backup function `ensureApiSections` that automatically adds missing mandatory sections after content cleaning. Workflow logs confirm function executes correctly, detecting missing sections and adding them (content growth verified 669→4560 characters). Solution operational with improved reliability.
-- **File Naming Protection**: Comprehensive prevention system for AI-generated inappropriate file extensions. Both document generation and minute analysis include explicit prompt rules, regex cleaning patterns, and post-processing validation to eliminate .json, .docx, .xml, and other extensions from fileName fields.
+- **AI Integration Layer**: Abstracted `AIService` supports multiple AI providers with cascading fallback (Copilot → Gemini → OpenAI → Claude → Grok). Models updated to latest versions: GPT-4o, Claude Sonnet 4-20250514, Gemini 2.5-flash, Grok 2-1212.
+- **Document Generation**: AI-powered content generation with direct DOCX export. Sections generated directly from formData without HTML parsing. Entity cases include search/CRUD flows, API cases include error codes (400/401/500), Service cases include frequency/execution time fields.
+- **Intelligent Validation**: Verb infinitive validation using regex `/^[a-záéíóúñ]+(ar|er|ir)$/` plus irregular verbs (ver, ser, ir). System recognizes any Spanish infinitive verb automatically.
+- **Minute Analysis**: Extracts fields specific to each use case type. Entity: filters/columns/fields. API: endpoint/request/response. Service: frequency/execution time/paths/credentials (4 specific fields).
+- **Description Expansion**: Automatically expands descriptions < 50 words to 2 professional paragraphs using dedicated AI prompt.
+- **Wireframe Generation**: HTML generation → Puppeteer screenshot → Sharp compression → DOCX embedding pipeline. Professional Microsoft-style tables with actual form data.
+- **Test Case Generation**: AI creates intelligent test cases with objectives, preconditions, and professional step tables (Nº, Action, Input, Expected Result, Observations, Status).
+- **File Naming Protection**: Comprehensive prevention of file extensions (.json, .docx, .xml) through prompt rules, regex cleaning, and post-processing validation.
+- **API Section Enforcement**: Function `ensureApiSections` adds missing mandatory sections post-AI generation. **RESOLVED 2025-01-06**: Validation error fixed by adding service-oriented verbs (conciliar, ejecutar, monitorear, supervisar, automatizar) to validation logic.
 
 ## External Dependencies
 

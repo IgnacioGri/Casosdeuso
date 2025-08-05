@@ -1,141 +1,211 @@
-# Catálogo de Prompts del Sistema de Generación de Casos de Uso
+# Catálogo de Prompts del Sistema
+**Actualizado: 6 de Enero 2025**
 
-Este documento contiene todos los prompts utilizados en el sistema, diferenciados por plataforma (React/TypeScript vs C#/Blazor).
+## 📚 Índice de Prompts
 
-## ⚠️ CAMBIOS CRÍTICOS IMPLEMENTADOS (Agosto 2025)
-
-### Mejoras de Robustez en Prompts
-- **CRÍTICO**: Todos los ejemplos ahora están marcados como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
-- **CRÍTICO**: Instrucciones explícitas para usar EXACTAMENTE los datos de formData y nunca valores genéricos como "Apellido", "DNI", "Segmento"
-- **Fallback para actores**: "Si no hay actor explícito, usar 'Actor no identificado'"
-- **Wireframes dinámicos**: Los wireframes ahora usan datos específicos del formulario en lugar de valores hardcoded
-- **Generación de Imágenes con IA**: Prompts profesionales para wireframes usando estilo Microsoft enterprise con emojis organizacionales (🧭 🎨 📑)
-
-## Índice
-1. [Generación Principal de Casos de Uso](#1-generación-principal-de-casos-de-uso)
-   - [TypeScript/React](#11-typescriptreact)
-   - [C#/Blazor](#12-csharp-blazor)
-2. [Edición de Casos de Uso](#2-edición-de-casos-de-uso)
-   - [TypeScript/React](#21-typescriptreact-1)
-   - [C#/Blazor](#22-csharp-blazor-1)
-3. [Asistencia AI para Campos Individuales](#3-asistencia-ai-para-campos-individuales)
-   - [TypeScript/React](#31-typescriptreact-2)
-   - [C#/Blazor](#32-csharp-blazor-2)
-4. [Análisis de Minutas](#4-análisis-de-minutas)
-   - [TypeScript/React](#41-typescriptreact-3)
-   - [C#/Blazor](#42-csharp-blazor-3)
-5. [Generación Inteligente de Casos de Prueba](#5-generación-inteligente-de-casos-de-prueba)
-   - [TypeScript/React](#51-typescriptreact-4)
-   - [C#/Blazor](#52-csharp-blazor-4)
-6. [Generación de Wireframes con IA](#6-generación-de-wireframes-con-ia)
-   - [TypeScript/React](#61-typescriptreact-5)
-   - [C#/Blazor](#62-csharp-blazor-5)
-7. [Prompts Específicos por Tipo de Caso de Uso](#7-prompts-específicos-por-tipo-de-caso-de-uso)
-8. [Configuración de Modelos AI](#8-configuración-de-modelos-ai)
+1. [Análisis de Minutas](#análisis-de-minutas)
+2. [Generación de Casos de Uso](#generación-de-casos-de-uso)
+3. [Expansión de Descripciones](#expansión-de-descripciones)
+4. [Casos de Prueba Inteligentes](#casos-de-prueba-inteligentes)
+5. [AI Assist por Campo](#ai-assist-por-campo)
 
 ---
 
-## 1. Generación Principal de Casos de Uso
+## 1. Análisis de Minutas
 
-### 1.1. TypeScript/React
+### Prompt Base
+```
+Eres un analista de sistemas experto en casos de uso según estándares ING.
+Analiza el texto de la minuta proporcionada y extrae la información relevante para completar automáticamente un formulario de caso de uso.
 
-**Ubicación**: `server/services/ai-service.ts` - método `buildPrompt()`
+IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido sin explicaciones adicionales.
+```
 
-```typescript
-// Prompt base en TypeScript (ACTUALIZADO - Enero 2025)
-const basePrompt = `
+### Análisis Entity
+```
+Para casos de uso tipo ENTIDAD, extrae y estructura la siguiente información:
+
+INSTRUCCIONES CRÍTICAS DE EXTRACCIÓN:
+1. clientName: Es el nombre de la EMPRESA/BANCO/ORGANIZACIÓN cliente (NO el nombre del caso de uso)
+   - Buscar palabras como "Banco", "Cohen", "Macro", "Provincia", nombres de empresas
+   - Ejemplo correcto: "Cohen Aliados Financieros", "Banco Macro", "Banco Provincia"
+   
+2. projectName: Es el nombre del PROYECTO o SISTEMA (NO el caso de uso)
+   - Buscar frases como "Sistema de", "Módulo de", "Plataforma de"
+   - Si no está explícito, inferir del contexto
+   - NO dejar vacío si se puede inferir del contexto
+   
+3. useCaseCode: Es el CÓDIGO alfanumérico del caso de uso
+   - Formato: letras+números (ej: PV003, BP005, UC001)
+   - NO confundir con nombres o descripciones
+   
+4. useCaseName: Es el NOMBRE del caso de uso (acción + entidad)
+   - DEBE empezar con verbo infinitivo
+   - Ejemplo: "Gestionar Clientes", "Mostrar proveedores", "Consultar Saldos"
+   - NO poner aquí el nombre del cliente ni proyecto
+
+5. description: Descripción del QUÉ HACE el caso de uso
+   - Si viene muy corta (menos de 10 palabras), devolver tal cual viene
+   - NO expandir aquí, solo extraer lo que dice la minuta
+
+NUNCA MEZCLAR:
+- NO poner el nombre del cliente en useCaseName
+- NO poner el nombre del caso de uso en clientName
+- NO dejar projectName vacío si se puede inferir
+
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "ST003GestionarTransferencias" (NO "ST003GestionarTransferencias.json")
+- Si encuentras extensiones, elimínalas completamente
+
+{
+  "clientName": "Nombre de la empresa/banco cliente",
+  "projectName": "Nombre del proyecto o sistema",
+  "useCaseCode": "Código alfanumérico del caso de uso", 
+  "useCaseName": "Nombre del caso de uso con verbo infinitivo",
+  "fileName": "Nombre de archivo siguiendo patrón: código+descripción",
+  "description": "Descripción del objetivo del caso de uso tal como viene en la minuta",
+  "actorName": "actor principal del caso de uso o 'Actor no identificado' si no está explícito",
+  "searchFilters": ["usar SOLO filtros mencionados en la minuta"],
+  "filtersDescription": "Descripción de los filtros de búsqueda necesarios",
+  "resultColumns": ["usar SOLO columnas mencionadas en la minuta"],
+  "columnsDescription": "Descripción de las columnas que se mostrarán en resultados",
+  "entityFields": [
+    {
+      "name": "usar SOLO campos mencionados en la minuta",
+      "type": "tipo según el campo",
+      "mandatory": true,
+      "length": 50,
+      "description": "Descripción clara del propósito del campo",
+      "validationRules": "Reglas de validación específicas"
+    }
+  ],
+  "fieldsDescription": "Descripción de los campos de la entidad",
+  "businessRules": "• Reglas de negocio mencionadas en la minuta",
+  "specialRequirements": "• Requerimientos específicos extraídos",
+  "generateTestCase": true,
+  "testCaseObjective": "Verificar el funcionamiento completo del caso de uso",
+  "testCasePreconditions": "Usuario autenticado. Permisos necesarios. Datos de prueba disponibles",
+  "isAIGenerated": true
+}
+```
+
+### Análisis API
+```
+Para casos de uso tipo API/WEB SERVICE, extrae y estructura la siguiente información:
+
+INSTRUCCIONES CRÍTICAS:
+- NUNCA uses valores genéricos o por defecto
+- TODO ejemplo mostrado abajo es "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+- SIEMPRE extrae datos EXACTOS del texto de la minuta
+- Si algún dato no está en la minuta, devuelve null o array vacío según corresponda
+- Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
+
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "API001ConsultarSaldo" (NO "API001ConsultarSaldo.json")
+- Si encuentras extensiones, elimínalas completamente
+
+{
+  "clientName": "Nombre del cliente/organización",
+  "projectName": "Nombre del proyecto o sistema",
+  "useCaseCode": "Código del caso de uso (Ejemplo ilustrativo: API001, WS002)",
+  "useCaseName": "Nombre del servicio empezando con verbo infinitivo",
+  "fileName": "Nombre de archivo siguiendo patrón: 2letras+3números+descripción",
+  "description": "Descripción del propósito del API/servicio",
+  "actorName": "actor principal del caso de uso o 'Actor no identificado' si no está explícito",
+  "apiEndpoint": "URL del endpoint (Ejemplo ilustrativo: /api/v1/consulta-saldo)",
+  "httpMethod": "Método HTTP (GET, POST, PUT, DELETE)",
+  "requestFormat": "Formato de request con ejemplos",
+  "responseFormat": "Formato de response con ejemplos",
+  "alternativeFlows": ["Error de autenticación", "Timeout", "Datos no encontrados"],
+  "businessRules": "• Regla de autenticación extraída de la minuta • Regla de validación específica mencionada",
+  "specialRequirements": "• Seguridad SSL obligatoria • Rate limiting según requerimientos",
+  "isAIGenerated": true
+}
+```
+
+### Análisis Service
+```
+Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente información:
+
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "SRV001ProcesarPagos" (NO "SRV001ProcesarPagos.json")
+- Si encuentras extensiones, elimínalas completamente
+
+📋 INSTRUCCIONES ESPECÍFICAS PARA SERVICIOS/PROCESOS AUTOMÁTICOS:
+- Busca información sobre frecuencia de ejecución (diario, semanal, mensual, cada hora, etc.)
+- Identifica horarios específicos de ejecución (02:00 AM, 18:30, etc.)
+- Detecta rutas de archivos o directorios que deben ser configurables
+- Identifica credenciales de web services, APIs o integraciones externas
+- Extrae flujos alternativos relacionados con fallos del proceso
+
+{
+  "clientName": "Nombre del cliente/organización",
+  "projectName": "Nombre del proyecto o sistema",
+  "useCaseCode": "Código del caso de uso (ej: SRV001, PROC002)",
+  "useCaseName": "Nombre del proceso empezando con verbo infinitivo",
+  "fileName": "Nombre de archivo siguiendo patrón: 2letras+3números+descripción",
+  "description": "Descripción completa del proceso automático y sus etapas",
+  "serviceFrequency": "Frecuencia de ejecución: Diariamente, Cada hora, Semanalmente, Mensualmente, etc. Si hay múltiples frecuencias, sepáralas con comas",
+  "executionTime": "Hora(s) de ejecución: 02:00 AM, 14:30, 23:59, etc. Si hay múltiples horarios, sepáralos con comas",
+  "configurationPaths": "Si el proceso captura o genera archivos, lista las rutas que deben ser configurables. Ejemplo: /sftp/incoming/, /sftp/processed/, /logs/. Si no hay rutas, devuelve cadena vacía",
+  "webServiceCredentials": "Si llama a web services o APIs externas, indica qué credenciales deben ser configurables. Ejemplo: Usuario: srv_proceso, URL: https://api.ejemplo.com, Método: OAuth 2.0. Si no hay servicios externos, devuelve cadena vacía",
+  "alternativeFlows": [
+    "No se encuentran archivos en la ruta configurada",
+    "Falla conexión con servicio externo",
+    "Error en procesamiento de datos",
+    "Timeout en operación",
+    "Proceso anterior no finalizó"
+  ],
+  "businessRules": "• Reglas de validación de datos • Límites de procesamiento • Horarios permitidos • Validaciones específicas del negocio",
+  "specialRequirements": "• Integración con sistemas externos • Monitoreo en tiempo real • Notificaciones por email • Backup automático • Encriptación de datos",
+  "generateTestCase": true,
+  "testCaseObjective": "Verificar que el proceso automático ejecute correctamente todas sus etapas",
+  "testCasePreconditions": "Archivos de prueba disponibles. Servicios externos accesibles. Base de datos en estado consistente",
+  "isAIGenerated": true
+}
+
+EJEMPLOS DE EXTRACCIÓN:
+- Si el documento menciona "El proceso se ejecuta todos los días a las 2 AM", extrae:
+  serviceFrequency: "Diariamente"
+  executionTime: "02:00 AM"
+  
+- Si dice "captura archivos desde servidor SFTP", extrae:
+  configurationPaths: "/sftp/incoming/, /sftp/processed/"
+  
+- Si menciona "llama al servicio de validación del BCRA con OAuth", extrae:
+  webServiceCredentials: "Servicio BCRA: Método OAuth 2.0, URL configurable"
+```
+
+---
+
+## 2. Generación de Casos de Uso
+
+### Prompt Principal
+```
 Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
 
 IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
 
-⚠️ INSTRUCCIONES CRÍTICAS SOBRE EL USO DE EJEMPLOS Y DATOS:
-1. NUNCA uses valores por defecto o genéricos como "Apellido", "DNI", "Segmento" salvo que sean EXACTAMENTE los especificados en los datos del formulario.
-2. Cualquier ejemplo en este prompt está marcado como: "Ejemplo ilustrativo, no debe reproducirse salvo que aplique al caso específico".
-3. SIEMPRE usa los valores EXACTOS proporcionados en formData (filtros, columnas, campos).
-4. Si formData no especifica un valor, NO lo inventes. Indica "no especificado por el usuario".
+⚠️ INSTRUCCIÓN CRÍTICA Y OBLIGATORIA PARA DESCRIPCIÓN ⚠️
+La sección de DESCRIPCIÓN debe contener EXACTAMENTE el texto proporcionado en formData.description.
+NO modifiques, resumas o cambies la descripción proporcionada.
+USA LITERALMENTE el contenido de formData.description tal como viene.
 
-INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
-- Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
-- Segundo párrafo: Beneficios clave, valor para el negocio, mejoras que aporta, problemas que resuelve.
-NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción proporcionada con contexto relevante del negocio bancario/empresarial.
-
-FORMATO ESTRUCTURADO REQUERIDO:
-1. Organiza la información en secciones claras con títulos y subtítulos
-2. Para flujos, usa numeración jerárquica profesional:
-   4. Flujo Básico (Ejemplo ilustrativo, no debe reproducirse salvo que aplique)
-     4.1 Menú principal
-     4.2 Subflujo: Búsqueda
-       4.2.1 Ingreso de filtros
-       4.2.2 Ejecución de búsqueda
-     4.3 Subflujo: Alta
-       4.3.1 Validación de datos
-       4.3.2 Confirmación
-
-3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
-
-INSTRUCCIONES PARA ACTORES:
-- Si no hay actor explícito en los datos, usar: "Actor no identificado"
-- NUNCA inventes actores como "Empleado Bancario" si no están especificados
-
-${rules}
-
-DATOS DEL FORMULARIO COMPLETOS (usar EXACTAMENTE estos valores):
-- Tipo de caso de uso: ${formData.useCaseType}
-- Cliente: ${formData.clientName}
-- Proyecto: ${formData.projectName}
-- Código: ${formData.useCaseCode}
-- Nombre: ${formData.useCaseName}
-- Archivo: ${formData.fileName}
-- Descripción: ${formData.description}
-- Filtros de búsqueda: ${formData.searchFilters?.length ? formData.searchFilters.join(", ") : "Ninguno especificado"}
-- Columnas de resultado: ${formData.resultColumns?.length ? formData.resultColumns.join(", ") : "Ninguna especificada"}
-- Campos de entidad: ${JSON.stringify(formData.entityFields)}
-- Reglas de negocio: ${formData.businessRules || "Ninguna específica"}
-- Requerimientos especiales: ${formData.specialRequirements || "Ninguno"}
-- Generar wireframes: ${formData.generateWireframes ? "Sí" : "No"}
-- Descripciones de wireframes: ${formData.wireframeDescriptions?.filter(w => w?.trim()).join("; ") || ""}
-
-INSTRUCCIONES FINALES:
-- Genera un documento completo y profesional
-- Mantén consistencia en la numeración y formato
-- Incluye TODAS las secciones requeridas
-- Asegúrate de que la descripción sea detallada y profesional
-- El documento debe estar listo para convertirse a DOCX con formato corporativo ING
-- CRÍTICO: Usa SOLO los datos exactos proporcionados en formData
-`;
-```
-
-**Mensaje de Sistema TypeScript**:
-```typescript
-const systemMessage = "Eres un experto en documentación de casos de uso. Genera documentos profesionales siguiendo exactamente las reglas proporcionadas.";
-```
-
-### 1.2. C#/Blazor
-
-**Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs` - método `BuildPrompt()`
-
-```csharp
-// Prompt base en C# (ACTUALIZADO - Enero 2025)
-var basePrompt = $@"
-Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
-
-IMPORTANTE: Este es un DOCUMENTO FORMAL DE CASO DE USO con secciones profesionales como: Metadatos, Descripción, Actores, Precondiciones, Flujo Básico, Flujos Alternativos, Postcondiciones, etc.
-
-⚠️ INSTRUCCIONES CRÍTICAS SOBRE EL USO DE EJEMPLOS Y DATOS:
-1. NUNCA uses valores por defecto o genéricos como ""Apellido"", ""DNI"", ""Segmento"" salvo que sean EXACTAMENTE los especificados en los datos del formulario.
-2. Cualquier ejemplo en este prompt está marcado como: ""Ejemplo ilustrativo, no debe reproducirse salvo que aplique al caso específico"".
-3. SIEMPRE usa los valores EXACTOS proporcionados en formData (filtros, columnas, campos).
-4. Si formData no especifica un valor, NO lo inventes. Indica ""no especificado por el usuario"".
-
-INSTRUCCIÓN CRÍTICA PARA DESCRIPCIÓN: La sección de DESCRIPCIÓN debe contener OBLIGATORIAMENTE 1-2 párrafos completos y detallados (mínimo 150 palabras). Debe explicar:
-- Primer párrafo: Qué hace el caso de uso, su propósito principal, qué procesos abarca, qué área de negocio atiende.
-- Segundo párrafo: Beneficios clave, valor para el negocio, mejoras que aporta, problemas que resuelve.
-NO generar descripciones de una sola línea. Expandir SIEMPRE la descripción proporcionada con contexto relevante del negocio bancario/empresarial.
+IMPORTANTE: La descripción ya viene procesada y expandida cuando es necesario.
+- Si es larga (2 párrafos), úsala completa tal cual
+- Si es corta, úsala tal cual (el sistema ya la procesó)
+- NUNCA la modifiques o reescribas
 
 FORMATO ESTRUCTURADO REQUERIDO:
 1. Organiza la información en secciones claras con títulos y subtítulos
-2. Para flujos, usa numeración jerárquica profesional:
-   1. Flujo Básico (Ejemplo ilustrativo, no debe reproducirse salvo que aplique)
+2. Para flujos, usa numeración jerárquica profesional con indentación:
+   1. Flujo Básico
      a. Menú principal
        i. Ingreso de filtros
        ii. Ejecución de búsqueda
@@ -146,1024 +216,265 @@ FORMATO ESTRUCTURADO REQUERIDO:
 
 3. Incluye una historia de revisiones con: Versión (1.0), Fecha actual, Autor (Sistema), Descripción (Creación inicial del documento)
 
-INSTRUCCIONES PARA ACTORES:
-- Si no hay actor explícito en los datos, usar: ""Actor no identificado""
-- NUNCA inventes actores como ""Empleado Bancario"" si no están especificados
+INSTRUCCIONES CRÍTICAS PARA PREVENIR ERRORES:
+- NUNCA uses valores por defecto o genéricos como "Apellido", "DNI", "Segmento" - estos son SOLO ejemplos ilustrativos
+- SIEMPRE usa EXACTAMENTE los datos provistos en el formulario
+- Para filtros de búsqueda: usa SOLO los valores exactos provistos en formData.searchFilters
+- Para columnas de resultado: usa SOLO los valores exactos en formData.resultColumns  
+- Para campos de entidad: usa SOLO los campos exactos en formData.entityFields con sus propiedades (tipo, requerido, longitud)
+- Si no hay datos provistos, indica "No especificado" pero NO inventes valores
+- TODO ejemplo en el documento debe ser marcado como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
+- Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
+- Para procesos automáticos: incluir configurables (path archivos, usuario/clave/URL web services)
 
-{rules}
+⚠️ REGLA CRÍTICA DE NOMBRES DE ARCHIVO ⚠️
+- NUNCA agregues extensiones de archivo (.json, .docx, .xml, .txt, etc.) al campo fileName
+- El fileName debe usarse EXACTAMENTE como viene sin modificaciones ni extensiones
+- El archivo ya tiene su formato definido (será DOCX automáticamente)
+- Ejemplo CORRECTO: "BP005GestionarClientes" 
+- Ejemplo INCORRECTO: "BP005GestionarClientes.docx"
 
-DATOS DEL FORMULARIO COMPLETOS (usar EXACTAMENTE estos valores):
-- Tipo de caso de uso: {formData.UseCaseType}
-- Cliente: {formData.ClientName}
-- Proyecto: {formData.ProjectName}
-- Código: {formData.UseCaseCode}
-- Nombre: {formData.UseCaseName}
-- Archivo: {formData.FileName}
-- Descripción: {formData.Description}
-- Filtros de búsqueda: {(formData.SearchFilters?.Any() == true ? string.Join("", "", formData.SearchFilters) : ""Ninguno especificado"")}
-- Columnas de resultado: {(formData.ResultColumns?.Any() == true ? string.Join("", "", formData.ResultColumns) : ""Ninguna especificada"")}
-- Campos de entidad: {entityFieldsDescription}
-- Reglas de negocio: {formData.BusinessRules ?? ""Ninguna específica""}
-- Requerimientos especiales: {formData.SpecialRequirements ?? ""Ninguno""}
-- Generar wireframes: {(formData.GenerateWireframes ? ""Sí"" : ""No"")}
-{(formData.WireframeDescriptions?.Any(w => !string.IsNullOrWhiteSpace(w)) == true ? $""- Descripciones de wireframes: {string.Join(""; "", formData.WireframeDescriptions.Where(w => !string.IsNullOrWhiteSpace(w)))}"" : """")}
-
-INSTRUCCIONES FINALES:
-- Genera un documento completo y profesional
-- Mantén consistencia en la numeración y formato
-- Incluye TODAS las secciones requeridas
-- Asegúrate de que la descripción sea detallada y profesional
-- Incluye título en MAYÚSCULAS con color azul RGB(0,112,192) en la sección inicial
-- El documento debe estar listo para convertirse a DOCX con formato corporativo ING
-- CRÍTICO: Usa SOLO los datos exactos proporcionados en formData
-";
-```
-
-**Mensaje de Sistema C#**:
-```csharp
-var systemMessage = "Eres un experto en documentación de casos de uso. Genera documentos profesionales siguiendo exactamente las reglas proporcionadas.";
+Datos del formulario:
+- Tipo de caso de uso: ${formData.useCaseType}
+- Cliente: ${formData.clientName}
+- Proyecto: ${formData.projectName}
+- Código: ${formData.useCaseCode}
+- Nombre del caso de uso: ${formData.useCaseName}
+- Nombre del archivo: ${formData.fileName}
+- Descripción: ${formData.description}
+- Filtros de búsqueda: ${formData.searchFilters?.join(', ') || 'Ninguno'}
+- Columnas de resultado: ${formData.resultColumns?.join(', ') || 'Ninguna'}
 ```
 
 ---
 
-## 2. Edición de Casos de Uso
+## 3. Expansión de Descripciones
 
-### 2.1. TypeScript/React
+### Prompt de Expansión
+```
+Como experto en documentación bancaria/empresarial, expande la siguiente descripción de caso de uso a exactamente 2 párrafos profesionales:
 
-**Ubicación**: `server/services/ai-service.ts` - método `editUseCase()`
+Descripción original: "${formData.description}"
+Caso de uso: ${formData.useCaseName}
+Cliente: ${formData.clientName}
+Proyecto: ${formData.projectName}
 
-```typescript
-// Prompt de edición en TypeScript
-const editPrompt = `
-Eres un experto en documentación de casos de uso. Tu tarea es modificar el documento existente aplicando los cambios solicitados mientras mantienes la estructura y formato profesional.
+INSTRUCCIONES OBLIGATORIAS:
+1. Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos abarca, qué área del negocio atiende, cómo se integra en el sistema.
+2. Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado, mejoras operativas, problemas que resuelve, impacto en eficiencia.
 
-Modifica el siguiente documento de caso de uso aplicando estos cambios: "${instructions}"
+IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato adicional. Usa contexto profesional relevante del sector ${formData.clientName?.includes('Banco') ? 'bancario' : 'empresarial'}.
+```
 
-Documento actual:
-${content}
+---
+
+## 4. Casos de Prueba Inteligentes
+
+### Prompt de Casos de Prueba
+```
+Genera casos de prueba profesionales para el caso de uso "${formData.useCaseName}".
+
+Tipo de caso: ${formData.useCaseType}
+Descripción: ${formData.description}
 
 INSTRUCCIONES:
-- Mantén la estructura y formato existente del documento
-- Aplica SOLO los cambios solicitados
-- Preserva toda la información no afectada por los cambios
-- Asegúrate de que el documento siga siendo coherente y profesional
-- Mantén el estilo y formato corporativo ING
-`;
+1. Define un objetivo claro y específico
+2. Lista precondiciones necesarias
+3. Genera pasos de prueba detallados con:
+   - Número secuencial
+   - Acción específica
+   - Datos de entrada
+   - Resultado esperado
+   - Observaciones
 
-// Token configuration para edición
-const editTokens = 16000; // Para documentos completos
-const temperature = 0.3;
-```
+Para tipo ENTITY, incluye pruebas de:
+- Búsqueda con filtros: ${formData.searchFilters}
+- Alta con campos: ${formData.entityFields}
+- Modificación
+- Eliminación
 
-### 2.2. C#/Blazor
+Para tipo API, incluye pruebas de:
+- Request válido al endpoint: ${formData.apiEndpoint}
+- Respuestas exitosas
+- Manejo de errores 400, 401, 500
 
-**Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs` - método `EditUseCaseAsync()`
+Para tipo SERVICE, incluye pruebas de:
+- Ejecución en horario: ${formData.executionTime}
+- Procesamiento de archivos
+- Conexión con servicios externos
 
-```csharp
-// Prompt de edición en C#
-var editPrompt = $@"
-Eres un experto en documentación de casos de uso. Tu tarea es modificar el documento existente aplicando los cambios solicitados mientras mantienes la estructura y formato profesional.
-
-Modifica el siguiente documento de caso de uso aplicando estos cambios: ""{instructions}""
-
-Documento actual:
-{content}
-
-INSTRUCCIONES:
-- Mantén la estructura y formato existente del documento
-- Aplica SOLO los cambios solicitados
-- Preserva toda la información no afectada por los cambios
-- Asegúrate de que el documento siga siendo coherente y profesional
-- Mantén el estilo y formato corporativo ING
-";
-
-// Token configuration para edición
-int editTokens = 16000; // Para documentos completos
-float temperature = 0.3f;
+Genera SOLO contenido JSON estructurado sin explicaciones adicionales.
 ```
 
 ---
 
-## 3. Asistencia AI para Campos Individuales
+## 5. AI Assist por Campo
 
-### 3.1. TypeScript/React
-
-**Ubicación**: `server/services/ai-service.ts` - método `improveField()`
-
-```typescript
-// Contextos disponibles en TypeScript
-const getContext = (isFinancialProject: boolean): string => {
-  if (isFinancialProject) {
-    return `Contexto: Estás trabajando en un proyecto bancario/financiero.
-- El lenguaje debe ser formal y profesional
-- Usa terminología bancaria apropiada
-- Considera regulaciones y compliance
-- Incluye aspectos de seguridad cuando sea relevante`;
-  } else {
-    return `Contexto: Estás trabajando en un proyecto empresarial/corporativo.
-- Mantén un tono profesional pero accesible
-- Usa terminología de negocio estándar
-- Enfócate en eficiencia y productividad
-- Considera múltiples departamentos y stakeholders`;
-  }
-};
-
-// Prompts específicos por campo en TypeScript
-const fieldPrompts = {
-  useCaseName: `Mejora el nombre del caso de uso siguiendo estas reglas:
-- DEBE comenzar con un verbo en infinitivo (ej: Gestionar, Consultar, Registrar, Actualizar)
-- Debe ser claro y específico sobre la acción principal
-- Máximo 5-6 palabras
-- Evita términos técnicos o de implementación
-- Ejemplo correcto: "Gestionar Información del Cliente"
-- Ejemplo incorrecto: "CRUD de Clientes" o "Pantalla de Clientes"`,
-
-  description: `Expande y mejora esta descripción de caso de uso:
-- Genera 1-2 párrafos completos (mínimo 150 palabras)
-- Primer párrafo: explica QUÉ hace el caso de uso y su propósito
-- Segundo párrafo: describe los BENEFICIOS y valor de negocio
-- Incluye explicación de alcance/objetivo como en minuta ING
-- Si aplica, menciona flujos principales con lista indentada (1-a-i):
-  1. Flujo principal (ej. Buscar [entidad])
-    a. Detallar filtros y columnas
-    i. Criterios de búsqueda
-- Usa un tono profesional pero claro
-- Incluye contexto relevante del negocio`,
-
-  businessRules: `Mejora las reglas de negocio considerando:
-- Cada regla debe ser clara, específica y verificable
-- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:
-  1. Regla principal
-    a. Sub-regla o detalle
-    i. Especificación adicional
-- Incluye validaciones, restricciones y políticas
-- Considera aspectos regulatorios si aplica
-- Para modificar/eliminar: incluir verificaciones
-- Ejemplo: "1. El monto máximo por transferencia es de $50,000"`,
-
-  specialRequirements: `Mejora los requerimientos especiales enfocándote en:
-- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)
-- Especifica métricas cuando sea posible
-- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos
-- Considera integraciones con otros sistemas
-- Ejemplo: "El sistema debe procesar 1000 transacciones por minuto"`
-};
-
-// Token configuration para campos
-const fieldTokens = 4000; // Para campos individuales
-const temperature = 0.3;
+### Cliente
+```
+Basándote en el contexto del proyecto, sugiere un nombre de cliente apropiado.
+Si el contexto sugiere banca, usa nombres como "Banco Santander", "Banco Macro", "Cohen Aliados Financieros".
+Si es empresarial, usa nombres corporativos reales y profesionales.
+Devuelve SOLO el nombre sin explicaciones.
 ```
 
-### 3.2. C#/Blazor
+### Proyecto
+```
+Genera un nombre de proyecto tecnológico relacionado con ${clientName}.
+Usa formato: "Sistema de [funcionalidad]" o "Plataforma de [proceso]".
+Debe ser específico y profesional.
+Devuelve SOLO el nombre del proyecto.
+```
 
-**Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs` - método `ImproveFieldAsync()`
+### Código de Caso de Uso
+```
+Genera un código de caso de uso siguiendo el formato XX###.
+- XX: 2 letras relacionadas con el módulo
+- ###: 3 números secuenciales
+Ejemplos: BP001, ST003, API005
+Devuelve SOLO el código.
+```
 
-```csharp
-// Contextos disponibles en C#
-private string GetContext(bool isFinancialProject)
+### Nombre de Caso de Uso
+```
+Genera un nombre de caso de uso que:
+1. DEBE comenzar con verbo en infinitivo
+2. Debe ser específico al tipo ${useCaseType}
+3. Debe ser profesional y claro
+
+Para entity: "Gestionar [Entidad]", "Administrar [Entidad]"
+Para api: "Consultar [Recurso]", "Procesar [Operación]"
+Para service: "Ejecutar [Proceso]", "Sincronizar [Datos]"
+
+Devuelve SOLO el nombre.
+```
+
+### Filtros de Búsqueda
+```
+Para el caso de uso "${useCaseName}", genera filtros de búsqueda apropiados.
+Los filtros deben ser campos lógicos de la entidad.
+NO incluyas tipos de dato, solo nombres de campos.
+Genera entre 3-5 filtros relevantes.
+Devuelve un array JSON de strings.
+```
+
+### Columnas de Resultado
+```
+Para la entidad "${useCaseName}", genera columnas apropiadas para mostrar en resultados.
+Las columnas deben representar la información clave de la entidad.
+Genera entre 5-8 columnas relevantes.
+Devuelve un array JSON de strings.
+```
+
+### Campos de Entidad
+```
+Para la entidad "${useCaseName}", genera campos completos con estructura:
 {
-    if (isFinancialProject)
-    {
-        return @"Contexto: Estás trabajando en un proyecto bancario/financiero.
-- El lenguaje debe ser formal y profesional
-- Usa terminología bancaria apropiada
-- Considera regulaciones y compliance
-- Incluye aspectos de seguridad cuando sea relevante";
-    }
-    else
-    {
-        return @"Contexto: Estás trabajando en un proyecto empresarial/corporativo.
-- Mantén un tono profesional pero accesible
-- Usa terminología de negocio estándar
-- Enfócate en eficiencia y productividad
-- Considera múltiples departamentos y stakeholders";
-    }
+  "name": "nombre del campo",
+  "type": "string|number|date|boolean|select",
+  "mandatory": true/false,
+  "length": número (solo para strings),
+  "description": "descripción clara del campo",
+  "validationRules": "reglas específicas de validación"
 }
 
-// Prompts específicos por campo en C#
-private Dictionary<string, string> FieldPrompts = new()
-{
-    ["useCaseName"] = @"Mejora el nombre del caso de uso siguiendo estas reglas:
-- DEBE comenzar con un verbo en infinitivo (ej: Gestionar, Consultar, Registrar, Actualizar)
-- Debe ser claro y específico sobre la acción principal
-- Máximo 5-6 palabras
-- Evita términos técnicos o de implementación
-- Ejemplo correcto: ""Gestionar Información del Cliente""
-- Ejemplo incorrecto: ""CRUD de Clientes"" o ""Pantalla de Clientes""",
-
-    ["description"] = @"Expande y mejora esta descripción de caso de uso:
-- Genera 1-2 párrafos completos (mínimo 150 palabras)
-- Primer párrafo: explica QUÉ hace el caso de uso y su propósito
-- Segundo párrafo: describe los BENEFICIOS y valor de negocio
-- Incluye explicación de alcance/objetivo como en minuta ING
-- Si aplica, menciona flujos principales con lista indentada (1-a-i):
-  1. Flujo principal (ej. Buscar [entidad])
-    a. Detallar filtros y columnas
-    i. Criterios de búsqueda
-- Usa un tono profesional pero claro
-- Incluye contexto relevante del negocio",
-
-    ["businessRules"] = @"Mejora las reglas de negocio considerando:
-- Cada regla debe ser clara, específica y verificable
-- Usa formato de lista numerada multi-nivel (1-a-i) si hay sub-reglas:
-  1. Regla principal
-    a. Sub-regla o detalle
-    i. Especificación adicional
-- Incluye validaciones, restricciones y políticas
-- Considera aspectos regulatorios si aplica
-- Para modificar/eliminar: incluir verificaciones
-- Ejemplo: ""1. El monto máximo por transferencia es de $50,000""",
-
-    ["specialRequirements"] = @"Mejora los requerimientos especiales enfocándote en:
-- Requerimientos no funcionales (rendimiento, seguridad, usabilidad)
-- Especifica métricas cuando sea posible
-- Formatea como lista multi-nivel (1-a-i) si hay sub-requerimientos
-- Considera integraciones con otros sistemas
-- Ejemplo: ""El sistema debe procesar 1000 transacciones por minuto"""
-};
-
-// Token configuration para campos
-int fieldTokens = 4000; // Para campos individuales
-float temperature = 0.3f;
+Genera 5-10 campos relevantes y realistas.
+Incluye tipos variados y validaciones apropiadas.
+Devuelve un array JSON de objetos.
 ```
 
 ---
 
-## 4. Análisis de Minutas
+## 🔧 Reglas de Limpieza de Respuestas AI
 
-### 4.1. TypeScript/React
+### Limpieza de Contenido
+```javascript
+// Eliminar marcadores de código
+content = content.replace(/```json\s*/gi, '').replace(/```\s*$/gi, '');
 
-**Ubicación**: `server/services/minute-analysis-service.ts`
+// Eliminar texto explicativo
+content = content.replace(/^(aquí está|here is|este es|a continuación).*:\s*/i, '');
 
-```typescript
-// Prompt principal de análisis en TypeScript
-const analyzeMinutePrompt = `
-Analiza el siguiente contenido de minuta y extrae la información relevante para un caso de uso de tipo ${useCaseType}.
+// Eliminar extensiones de archivo
+content = content.replace(/\.(json|docx|xml|txt|pdf|doc|html|md)"/gi, '"');
 
-INSTRUCCIONES CRÍTICAS:
-1. Extrae SOLO información explícitamente mencionada en la minuta
-2. NO inventes ni supongas información que no esté presente
-3. Si un campo no tiene información en la minuta, déjalo vacío o con valor por defecto
-4. Mantén la fidelidad al documento original
-
-CONTENIDO DE LA MINUTA:
-${minuteContent}
-
-FORMATO DE RESPUESTA REQUERIDO:
-Debes responder ÚNICAMENTE con un objeto JSON válido (sin markdown, sin explicaciones) con esta estructura exacta:
-
-{
-  "clientName": "nombre del cliente mencionado en la minuta",
-  "projectName": "nombre del proyecto mencionado",
-  "useCaseCode": "código si se menciona, sino usar el fileName",
-  "useCaseName": "nombre del caso de uso (debe empezar con verbo en infinitivo)",
-  "fileName": "${fileName}",
-  "description": "descripción detallada extraída de la minuta (1-2 párrafos)",
-  "businessRules": "reglas de negocio mencionadas",
-  "specialRequirements": "requerimientos especiales o no funcionales",
-  "actorName": "actor principal del caso de uso",
-  "searchFilters": ["filtro1", "filtro2"],
-  "resultColumns": ["columna1", "columna2"],
-  "entityFields": [
-    {
-      "name": "nombreCampo",
-      "type": "text|number|date|boolean|decimal|datetime",
-      "mandatory": true/false,
-      "length": 50,
-      "description": "descripción del campo",
-      "validationRules": "reglas de validación"
-    }
-  ],
-  "wireframeDescriptions": ["descripción de pantalla 1", "descripción de pantalla 2"],
-  "extractedInfo": {
-    "additionalNotes": "cualquier información adicional relevante",
-    "assumptions": "suposiciones o supuestos mencionados",
-    "constraints": "restricciones identificadas"
-  }
-}
-
-REGLAS PARA CAMPOS DE ENTIDAD:
-- Para montos monetarios usar tipo "decimal"
-- Para IDs usar tipo "number"
-- Incluir SIEMPRE description y validationRules para cada campo
-- El length es obligatorio para campos de texto
-- Auto-incluir campos de auditoría:
-  • fechaAlta (date, mandatory)
-  • usuarioAlta (text, mandatory)
-  • fechaModificacion (date, optional)
-  • usuarioModificacion (text, optional)
-`;
-
-// Configuración para análisis de minutas
-const minuteAnalysisTokens = 10000; // Token limit específico para minutas
-const temperature = 0.3;
+// Limpiar saltos de línea excesivos
+content = content.replace(/\n{3,}/g, '\n\n');
 ```
 
-### 4.2. C#/Blazor
+### Validación de Verbos Infinitivos
+```javascript
+const infinitivePattern = /^[a-záéíóúñ]+(ar|er|ir)$/;
+const irregularVerbs = ['ver', 'ser', 'ir'];
 
-**Ubicación**: `UseCaseGenerator.Server/Services/MinuteAnalysisService.cs`
-
-```csharp
-// Prompt principal de análisis en C#
-var analyzeMinutePrompt = $@"
-Analiza el siguiente contenido de minuta y extrae la información relevante para un caso de uso de tipo {useCaseType}.
-
-INSTRUCCIONES CRÍTICAS:
-1. Extrae SOLO información explícitamente mencionada en la minuta
-2. NO inventes ni supongas información que no esté presente
-3. Si un campo no tiene información en la minuta, déjalo vacío o con valor por defecto
-4. Mantén la fidelidad al documento original
-
-CONTENIDO DE LA MINUTA:
-{minuteContent}
-
-FORMATO DE RESPUESTA REQUERIDO:
-Debes responder ÚNICAMENTE con un objeto JSON válido (sin markdown, sin explicaciones) con esta estructura exacta:
-
-{{
-  ""clientName"": ""nombre del cliente mencionado en la minuta"",
-  ""projectName"": ""nombre del proyecto mencionado"",
-  ""useCaseCode"": ""código si se menciona, sino usar el fileName"",
-  ""useCaseName"": ""nombre del caso de uso (debe empezar con verbo en infinitivo)"",
-  ""fileName"": ""{fileName}"",
-  ""description"": ""descripción detallada extraída de la minuta (1-2 párrafos)"",
-  ""businessRules"": ""reglas de negocio mencionadas"",
-  ""specialRequirements"": ""requerimientos especiales o no funcionales"",
-  ""actorName"": ""actor principal del caso de uso"",
-  ""searchFilters"": [""filtro1"", ""filtro2""],
-  ""resultColumns"": [""columna1"", ""columna2""],
-  ""entityFields"": [
-    {{
-      ""name"": ""nombreCampo"",
-      ""type"": ""text|number|date|boolean|decimal|datetime"",
-      ""mandatory"": true/false,
-      ""length"": 50,
-      ""description"": ""descripción del campo"",
-      ""validationRules"": ""reglas de validación""
-    }}
-  ],
-  ""wireframeDescriptions"": [""descripción de pantalla 1"", ""descripción de pantalla 2""],
-  ""extractedInfo"": {{
-    ""additionalNotes"": ""cualquier información adicional relevante"",
-    ""assumptions"": ""suposiciones o supuestos mencionados"",
-    ""constraints"": ""restricciones identificadas""
-  }}
-}}
-
-REGLAS PARA CAMPOS DE ENTIDAD:
-- Para montos monetarios usar tipo ""decimal""
-- Para IDs usar tipo ""number""
-- Incluir SIEMPRE description y validationRules para cada campo
-- El length es obligatorio para campos de texto
-- Auto-incluir campos de auditoría:
-  • fechaAlta (date, mandatory)
-  • usuarioAlta (text, mandatory)
-  • fechaModificacion (date, optional)
-  • usuarioModificacion (text, optional)
-";
-
-// Configuración para análisis de minutas
-int minuteAnalysisTokens = 10000; // Token limit específico para minutas
-float temperature = 0.3f;
-```
-
----
-
-## 5. Generación Inteligente de Casos de Prueba
-
-### 5.1. TypeScript/React
-
-**Ubicación**: `server/services/intelligent-test-case-service.ts`
-
-```typescript
-// Prompt principal para casos de prueba en TypeScript (ACTUALIZADO - Enero 2025)
-const testCasePrompt = `
-Como experto en QA y testing de software, genera casos de prueba profesionales para el siguiente caso de uso.
-
-⚠️ INSTRUCCIONES CRÍTICAS SOBRE DATOS:
-1. NUNCA uses datos genéricos como "Apellido", "DNI", "Segmento" en los casos de prueba
-2. USA EXACTAMENTE los datos especificados en el contexto del caso de uso
-3. Si el contexto no especifica datos, indica "datos a definir por el usuario"
-4. Cualquier ejemplo genérico está marcado como: "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
-
-CONTEXTO DEL CASO DE USO:
-${JSON.stringify(context)}
-
-INSTRUCCIONES CRÍTICAS:
-1. Genera entre 5 y 10 pasos de prueba detallados y específicos
-2. Cada paso debe ser ejecutable y verificable
-3. Incluye tanto flujos principales como alternativos
-4. Considera casos límite y validaciones
-5. Genera precondiciones realistas y específicas
-6. USA SOLO los filtros, columnas y campos especificados en el contexto
-
-FORMATO DE RESPUESTA OBLIGATORIO:
-{
-  "objective": "Objetivo detallado de las pruebas (1-2 párrafos)",
-  "preconditions": "• Usuario con permisos...\n• Sistema configurado...\n• Datos de prueba...",
-  "testSteps": [
-    {
-      "number": 1,
-      "action": "Acción específica y clara usando datos del contexto",
-      "inputData": "Datos de entrada detallados del contexto específico",
-      "expectedResult": "Resultado esperado verificable con datos del contexto",
-      "observations": "Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba"
-    }
-  ],
-  "analysisNotes": "Notas sobre cobertura, riesgos o consideraciones especiales"
-}
-
-REQUISITOS:
-- El objetivo debe explicar QUÉ se prueba y POR QUÉ es importante
-- Las precondiciones deben estar categorizadas (Usuario, Sistema, Datos, Infraestructura)
-- Cada paso debe ser independiente y atómico
-- Los datos de entrada deben ser específicos del contexto (NO genéricos)
-- Los resultados esperados deben ser medibles
-- CRÍTICO: Usar SOLO datos del contexto proporcionado
-`;
-
-// Configuración para casos de prueba
-const testCaseTokens = 12000; // Token limit para casos de prueba
-const temperature = 0.2; // Reducida para mayor precisión
-```
-
-### 5.2. C#/Blazor
-
-**Ubicación**: `UseCaseGenerator.Server/Services/IntelligentTestCaseService.cs`
-
-```csharp
-// Prompt principal para casos de prueba en C# (ACTUALIZADO - Enero 2025)
-var testCasePrompt = $@"
-Como experto en QA y testing de software, genera casos de prueba profesionales para el siguiente caso de uso.
-
-⚠️ INSTRUCCIONES CRÍTICAS SOBRE DATOS:
-1. NUNCA uses datos genéricos como ""Apellido"", ""DNI"", ""Segmento"" en los casos de prueba
-2. USA EXACTAMENTE los datos especificados en el contexto del caso de uso
-3. Si el contexto no especifica datos, indica ""datos a definir por el usuario""
-4. Cualquier ejemplo genérico está marcado como: ""Ejemplo ilustrativo, no debe reproducirse salvo que aplique""
-
-CONTEXTO DEL CASO DE USO:
-{JsonSerializer.Serialize(context)}
-
-INSTRUCCIONES CRÍTICAS:
-1. Genera entre 5 y 10 pasos de prueba detallados y específicos
-2. Cada paso debe ser ejecutable y verificable
-3. Incluye tanto flujos principales como alternativos
-4. Considera casos límite y validaciones
-5. Genera precondiciones realistas y específicas
-6. USA SOLO los filtros, columnas y campos especificados en el contexto
-
-FORMATO DE RESPUESTA OBLIGATORIO:
-{{
-  ""objective"": ""Objetivo detallado de las pruebas (1-2 párrafos)"",
-  ""preconditions"": ""• Usuario con permisos...\n• Sistema configurado...\n• Datos de prueba..."",
-  ""testSteps"": [
-    {{
-      ""number"": 1,
-      ""action"": ""Acción específica y clara usando datos del contexto"",
-      ""inputData"": ""Datos de entrada detallados del contexto específico"",
-      ""expectedResult"": ""Resultado esperado verificable con datos del contexto"",
-      ""observations"": ""Observaciones técnicas importantes, consideraciones o puntos de atención específicos para esta prueba""
-    }}
-  ],
-  ""analysisNotes"": ""Notas sobre cobertura, riesgos o consideraciones especiales""
-}}
-
-REQUISITOS:
-- El objetivo debe explicar QUÉ se prueba y POR QUÉ es importante
-- Las precondiciones deben estar categorizadas (Usuario, Sistema, Datos, Infraestructura)
-- Cada paso debe ser independiente y atómico
-- Los datos de entrada deben ser específicos del contexto (NO genéricos)
-- Los resultados esperados deben ser medibles
-- CRÍTICO: Usar SOLO datos del contexto proporcionado
-";
-
-// Configuración para casos de prueba
-int testCaseTokens = 12000; // Token limit para casos de prueba
-float temperature = 0.2f; // Reducida para mayor precisión
-```
-
----
-
-## 6. Generación de Wireframes con IA
-
-### 6.1. TypeScript/React
-
-**Ubicación**: `client/src/components/steps/wireframes-step.tsx` - método `generateWireframePrompt()`
-
-#### Prompt para Wireframe de Búsqueda
-```typescript
-const searchWireframePrompt = `Generate a simplified graphical wireframe of an enterprise UI screen for searching and listing entities for "${formData.useCaseName || 'Entity Management'}".
-Follow these business rules and UI layout guidelines:
-
-🧭 Main UI Requirements
-– Add a search area at the top with various filters based on these fields: ${filtersText}
-– Below the filters, include three action buttons: Buscar (Search), Limpiar (Clear), and Agregar (Add new entry)
-– Below the search area, show a paginated table with results displaying these columns: ${columnsText}
-– Each row must include Edit and Delete buttons (icon buttons are acceptable)
-
-📑 Functionality Details
-– Clearly list and label each search filter using the provided fields
-– Clearly label columns in the results table, matching the most relevant fields
-– Indicate that pagination is required (show controls like "Previous, Next, Page X of Y")
-
-🎨 Styling & UI Rules
-– Follow Microsoft-style admin UI (flat design, minimal shadows, blue section headers, sans-serif fonts)
-– Prefer 2-column layout for filters if space allows
-– Align all elements cleanly with consistent spacing
-
-Generate a realistic wireframe image of the UI using Microsoft enterprise admin style.${additionalDescription}`;
-```
-
-#### Prompt para Wireframe de Formulario
-```typescript
-const formWireframePrompt = `Generate a simplified graphical wireframe of an enterprise UI screen for adding or editing an entity for "${formData.useCaseName || 'Entity Management'}".
-Use the provided list of fields to determine the inputs and follow these business layout rules:
-
-🧭 Main UI Requirements
-– At the top or bottom, include action buttons: Aceptar (Save) and Cancelar (Cancel)
-– Include two metadata fields at the bottom or side:
-    • Fecha de alta (creation date)
-    • Usuario de alta (creator user)
-    • Fecha de modificación (modification date)
-    • Usuario de modificación (modifier user)
-
-📑 Functionality Details
-– For each field from the provided data, indicate:
-    Fields to include: ${fieldsDetails}
-    • Field label
-    • Type of input (text, number, date, etc.)
-    • If it is required (show with asterisk *)
-    • Max length (if applicable)
-    • Special requirements or validations
-
-🎨 Styling & UI Rules
-– Use a clean, Microsoft-like admin form layout
-– Group related fields into sections where possible
-– Use blue titles or dividers for sections
-– Fields should be placed in a 2- or 3-column grid when space allows
-
-Generate a realistic Microsoft-style wireframe image of the form interface.${additionalDescription}`;
-```
-
-### 6.2. C#/Blazor
-
-**Ubicación**: `UseCaseGenerator.Client/Components/Steps/WireframesStep.razor` - método en código C#
-
-```csharp
-// Los mismos prompts se implementan en C# con sintaxis equivalente
-private string GenerateWireframePrompt(string type)
-{
-    // Implementación similar con los mismos prompts estructurados
-    // usando emojis organizacionales y especificaciones Microsoft-style
+function isInfinitive(word) {
+  const lower = word.toLowerCase();
+  return infinitivePattern.test(lower) || irregularVerbs.includes(lower);
 }
 ```
 
 ---
 
-## 7. Prompts Específicos por Tipo de Caso de Uso
+## 📊 Configuración de Modelos AI
 
-### Casos de Uso de Entidad
-**Ubicación**: `server/routes.ts` - función `getUseCaseSpecificRules()`
-
-```
-INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE GESTIÓN DE ENTIDADES:
-
-FLUJO PRINCIPAL OBLIGATORIO:
-1. Buscar datos de la entidad existente
-   - Incluir filtros de búsqueda disponibles
-   - Detallar columnas del resultado
-   - Especificar ordenamiento y paginación
-
-2. Agregar un nuevo registro
-   - Listar todos los campos con sus validaciones
-   - Incluir campos automáticos (fecha alta, usuario)
-   - Describir el proceso de guardado
-
-3. Modificar registro existente
-   - Mostrar datos actuales
-   - Validar cambios permitidos
-   - Registrar auditoría de cambios
-
-4. Eliminar registro (solo si aplica)
-   - Validar dependencias
-   - Confirmar acción
-   - Registrar baja lógica/física
-
-PRECONDICIONES Y POSTCONDICIONES para entidades:
-- Precondiciones: Usuario autenticado, permisos específicos, sistema disponible
-- Postcondiciones: Datos actualizados, logs generados, notificaciones enviadas
+### OpenAI
+```javascript
+model: "gpt-4o"  // Versión mayo 2024
+max_tokens: 4000
+temperature: 0.7
 ```
 
-### Casos de Uso API/Web Service
-```
-INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
-
-ESTRUCTURA OBLIGATORIA:
-1. FLUJO PRINCIPAL DE EVENTOS
-   1. Identificación del servicio
-      a. Endpoint: {definir URL completa}
-      b. Método HTTP: GET/POST/PUT/DELETE
-      c. Headers requeridos (Authorization, Content-Type, etc.)
-   
-   2. Request
-      a. Formato: JSON/XML con estructura detallada
-      b. Parámetros obligatorios con tipos y validaciones
-      c. Parámetros opcionales y valores por defecto
-      d. Incluir ejemplo detallado de request completo
-   
-   3. Response
-      a. Formato: JSON/XML con estructura de respuesta
-      b. Códigos de estado exitosos (200, 201, 204)
-      c. Estructura de datos de respuesta con tipos
-      d. Incluir ejemplo detallado de response completo
-
-2. FLUJOS ALTERNATIVOS
-   1. Errores de validación (400)
-   2. Errores de autorización (401/403)
-   3. Errores del servidor (500)
-   4. Timeouts y reintentos
-
-IMPORTANTE: Incluye detalle de request/response en flujos, con ejemplos JSON completos
+### Claude
+```javascript
+model: "claude-sonnet-4-20250514"
+max_tokens: 4000
+temperature: 0.7
 ```
 
-### Casos de Uso de Servicio/Proceso Automático
+### Gemini
+```javascript
+model: "gemini-2.5-flash"
+max_tokens: 4000
+temperature: 0.7
 ```
-INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE SERVICIO/PROCESO AUTOMÁTICO:
 
-ESTRUCTURA OBLIGATORIA:
-1. FLUJO PRINCIPAL DE EVENTOS
-   1. Programación de ejecución
-      a. Frecuencia: diaria/semanal/mensual/por evento
-      b. Hora específica con zona horaria
-      c. Condiciones de activación
-   
-   2. Proceso de ejecución
-      a. Inicialización y validación de prerequisites
-      b. Lógica principal paso a paso
-      c. Manejo de transacciones y rollback
-   
-   3. Finalización y logging
-      a. Registro de resultados y métricas
-      b. Notificaciones de completitud/errores
-      c. Limpieza de recursos
-
-2. FLUJOS ALTERNATIVOS
-   1. Errores de configuración
-   2. Fallos en dependencias externas
-   3. Recuperación ante fallos
-
-3. REQUERIMIENTOS ESPECIALES
-- Indicar configurables específicos del proceso:
-  a. Path para archivos de configuración y datos
-  b. Usuario/clave/URL para web services externos
-  c. Parámetros de ejecución modificables sin recompilación
-  d. Variables de entorno requeridas
+### Grok
+```javascript
+model: "grok-2-1212"
+max_tokens: 4000
+temperature: 0.7
 ```
 
 ---
 
-## Notas de Implementación
+## 🎯 Mejores Prácticas
 
-1. **Consistencia**: Todos los prompts siguen la misma estructura y tono profesional
-2. **Contexto**: Los prompts incluyen contexto específico del dominio bancario/empresarial
-3. **Formato**: Se evita pedir HTML, enfocándose en contenido estructurado
-4. **Validación**: Se incluyen reglas de validación específicas para cada tipo de dato
-5. **Sincronización**: Los prompts están sincronizados entre TypeScript y C#
-
-## 6. Prompts para Wireframes Dinámicos (NUEVOS - Enero 2025)
-
-### 6.1. Wireframes para Entidades - TypeScript
-**Ubicación**: `server/services/ai-service.ts` - método `generateEntitySearchWireframe()`
-
-```typescript
-function generateEntitySearchWireframe(userDescription, formData) {
-  const filters = formData.searchFilters || [];
-  const columns = formData.resultColumns || [];
-  
-  return `Wireframe textual ING para buscador de entidades ${formData.useCaseName || "entidad"}.
-
-IMPORTANTE: Este wireframe usa EXACTAMENTE los datos provistos en el formulario. NO sustituir con valores genéricos.
-
-Panel de búsqueda superior con los siguientes filtros${filters.length ? ":" : " (no especificados por el usuario):"}
-${filters.length ? filters.map(f => `- ${f}`).join("\n") : "- (El usuario no especificó filtros)"}
-
-Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
-
-Tabla de resultados con paginado ING activado, mostrando las siguientes columnas${columns.length ? ":" : " (no especificadas por el usuario):"}
-${columns.length ? columns.map(c => `- ${c}`).join("\n") : "- (El usuario no especificó columnas)"}
-
-Cada fila incluye botones Editar y Eliminar al final.
-
-Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).`;
-}
-```
-
-### 6.2. Wireframes para Entidades - C#
-**Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs` - método `GenerateEntitySearchWireframe()`
-
-```csharp
-private string GenerateEntitySearchWireframe(string userDescription, UseCaseFormData formData)
-{
-    var filters = formData.SearchFilters ?? new List<string>();
-    var columns = formData.ResultColumns ?? new List<string>();
-    
-    var wireframe = $@"Wireframe textual ING para buscador de entidades {formData.UseCaseName ?? "entidad"}.
-
-IMPORTANTE: Este wireframe usa EXACTAMENTE los datos provistos en el formulario. NO sustituir con valores genéricos.
-
-Panel de búsqueda superior con los siguientes filtros{(filters.Any() ? ":" : " (no especificados por el usuario):")}
-{(filters.Any() ? string.Join("\n", filters.Select(f => $"- {f}")) : "- (El usuario no especificó filtros)")}
-
-Botones: Buscar, Limpiar y Agregar (estilo ING estándar).
-
-Tabla de resultados con paginado ING activado, mostrando las siguientes columnas{(columns.Any() ? ":" : " (no especificadas por el usuario):")}
-{(columns.Any() ? string.Join("\n", columns.Select(c => $"- {c}")) : "- (El usuario no especificó columnas)")}
-
-Cada fila incluye botones Editar y Eliminar al final.
-
-Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).";
-
-    return FormatProfessionalText(wireframe);
-}
-```
+1. **Siempre validar respuestas**: Verificar estructura JSON antes de procesar
+2. **Limpiar contenido**: Eliminar markup y texto no deseado
+3. **Preservar datos originales**: No modificar información del usuario
+4. **Manejar nulls**: Validar valores null/undefined antes de usar
+5. **Fallback cascade**: Intentar múltiples modelos si uno falla
+6. **Logs detallados**: Registrar cada paso para debugging
+7. **Expansión condicional**: Solo expandir descripciones < 50 palabras
+8. **Prevenir extensiones**: Nunca agregar .json, .docx, etc. a nombres
 
 ---
 
-## 8. Configuración de Modelos AI
+## 📈 Métricas y Límites
 
-## Resumen de Cambios de Robustez Implementados
-
-Los siguientes cambios fueron implementados en **ambos sistemas** (TypeScript y C#) para prevenir el uso de datos genéricos:
-
-### ✅ Cambios Completados:
-1. **Instrucciones explícitas** para usar EXACTAMENTE los datos de formData
-2. **Marcación de ejemplos** como "Ejemplo ilustrativo, no debe reproducirse salvo que aplique"
-3. **Fallback para actores**: "Actor no identificado" cuando no se especifica
-4. **Wireframes dinámicos** que indican claramente cuando no hay datos especificados
-5. **Temperatura reducida** para casos de prueba (0.2) para mayor precisión
-6. **Validaciones explícitas** para evitar valores hardcoded como "Apellido", "DNI", "Segmento"
-
-### 🎯 Objetivo Logrado:
-Ambos sistemas ahora generan documentos usando **únicamente** los datos específicos proporcionados por el usuario, eliminando completamente la generación de valores genéricos o por defecto.
+- **Análisis de minuta**: 10,000 tokens máximo
+- **Generación de documento**: 16,000 tokens máximo
+- **Casos de prueba**: 12,000 tokens máximo
+- **Campos de entidad**: 4,000 tokens máximo
+- **AI Assist por campo**: 500 tokens máximo
 
 ---
 
-### 7.1. TypeScript/React
+## 🔄 Actualizaciones Recientes
 
-**Ubicación**: `server/services/ai-service.ts`
-
-```typescript
-// Configuración de tokens por servicio
-const tokenLimits = {
-  documentGeneration: 16000,  // Para generación de documentos completos
-  testCaseGeneration: 12000,  // Para casos de prueba
-  minuteAnalysis: 10000,      // Para análisis de minutas
-  fieldImprovement: 4000      // Para campos individuales
-};
-
-// Temperatura estándar
-const temperature = 0.3;
-
-// Orden de cascada (fallback)
-const fallbackOrder = [
-  'copilot',  // Si está configurado
-  'gemini',   // gemini-2.5-flash
-  'openai',   // gpt-4o
-  'claude',   // claude-sonnet-4-20250514
-  'grok'      // grok-2-1212
-];
-```
-
-### 7.2. C#/Blazor
-
-**Ubicación**: `UseCaseGenerator.Server/Services/AIService.cs`
-
-```csharp
-// Configuración de tokens por servicio
-private static class TokenLimits
-{
-    public const int DocumentGeneration = 16000;  // Para generación de documentos completos
-    public const int TestCaseGeneration = 12000;  // Para casos de prueba
-    public const int MinuteAnalysis = 10000;      // Para análisis de minutas
-    public const int FieldImprovement = 4000;     // Para campos individuales
-}
-
-// Temperatura estándar
-private const float Temperature = 0.3f;
-
-// Orden de cascada (fallback)
-private readonly List<string> FallbackOrder = new()
-{
-    "copilot",  // Si está configurado
-    "gemini",   // gemini-2.5-flash
-    "openai",   // gpt-4o
-    "claude",   // claude-sonnet-4-20250514
-    "grok"      // grok-2-1212
-};
-```
-
-### Modelos Específicos por Proveedor
-
-| Proveedor | Modelo | Notas |
-|-----------|--------|-------|
-| OpenAI | gpt-4o | Modelo más reciente |
-| Claude | claude-sonnet-4-20250514 | Versión más actualizada |
-| Gemini | gemini-2.5-flash | Optimizado para velocidad |
-| Grok | grok-2-1212 | API compatible con OpenAI |
-| Copilot | Varía | Según configuración corporativa |
-
----
-
-## 8. Prompts para Generación de Wireframes
-
-### 8.1 Wireframe Individual (TypeScript/React) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
-**Archivo:** `server/services/ai-service.ts`
-**Función:** `generateIntelligentWireframeDescription` (ahora con contexto)
-
-```typescript
-private generateIntelligentWireframeDescription(fieldValue: string, context?: any): string {
-  const formData = context?.fullFormData;
-  
-  // 🎯 NUEVA FUNCIONALIDAD: Wireframes dinámicos según datos del formulario
-  if (formData && formData.useCaseType === 'entidad') {
-    return this.generateEntitySearchWireframe(fieldValue, formData);
-  } else if (formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso')) {
-    return this.generateServiceWireframe(fieldValue, formData);
-  }
-  
-  // Fallback para casos sin contexto (mantiene funcionalidad anterior)
-  // - Usa filtros, columnas y campos REALES del formulario
-  // - NO inventa datos hardcodeados
-  // - Respeta exactamente los valores cargados por el usuario
-}
-
-// 🔧 FUNCIONES AUXILIARES DINÁMICAS:
-private generateEntitySearchWireframe(userDescription: string, formData: any): string {
-  const filters = formData.searchFilters || [];      // ✅ Datos reales del usuario
-  const columns = formData.resultColumns || [];      // ✅ Datos reales del usuario
-  
-  // Estructura del wireframe:
-  // - Panel de búsqueda con FILTROS ESPECÍFICOS del formulario
-  // - Tabla con COLUMNAS ESPECÍFICAS del formulario  
-  // - Botones y paginado obligatorios según minuta ING
-  // - Consideraciones adicionales del usuario
-}
-```
-
-### 8.2 Wireframes Múltiples (TypeScript/React) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
-**Archivo:** `server/services/ai-service.ts`
-**Función:** `generateIntelligentWireframesDescription` (ahora con contexto)
-
-```typescript
-private generateIntelligentWireframesDescription(fieldValue: string, context?: any): string {
-  const formData = context?.fullFormData;
-  
-  // 🎯 NUEVA FUNCIONALIDAD: Sistema completo con datos reales
-  if (formData && formData.useCaseType === 'entidad') {
-    return this.generateCompleteEntityWireframes(fieldValue, formData);
-  } else if (formData && (formData.useCaseType === 'api' || formData.useCaseType === 'proceso')) {
-    return this.generateCompleteServiceWireframes(fieldValue, formData);
-  }
-  
-  // Sistema completo dinámico que incluye:
-  // ✅ PANTALLA DE BÚSQUEDA: con filtros REALES del formulario
-  // ✅ TABLA DE RESULTADOS: con columnas REALES del formulario  
-  // ✅ FORMULARIO CRUD: con campos REALES de la entidad
-  // ✅ MENSAJES: confirmación/error según estándares ING
-}
-
-// 🔧 FUNCIÓN PRINCIPAL PARA ENTIDADES:
-private generateCompleteEntityWireframes(userDescription: string, formData: any): string {
-  const filters = formData.searchFilters || [];      // ✅ Filtros del usuario
-  const columns = formData.resultColumns || [];      // ✅ Columnas del usuario  
-  const fields = formData.entityFields || [];        // ✅ Campos del usuario
-  
-  // Genera 3 wireframes completos:
-  // 1. PANTALLA PRINCIPAL con filtros/columnas específicos
-  // 2. FORMULARIO MODAL con campos específicos + auditoría obligatoria
-  // 3. MENSAJES DE CONFIRMACIÓN según casos de uso
-}
-```
-
-### 8.3 Wireframe Individual (C#/Blazor) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
-**Archivo:** `UseCaseGenerator.Server/Services/AIService.cs`
-**Función:** `GenerateIntelligentWireframeDescription` (nueva implementación)
-
-```csharp
-public async Task<AIAssistResponse> ImproveFieldAsync(AIAssistRequest request)
-{
-    // 🎯 NUEVA DETECCIÓN: Wireframes con datos dinámicos
-    if (request.FieldName?.ToLowerInvariant().Contains("wireframe") == true)
-    {
-        return new AIAssistResponse
-        {
-            ImprovedValue = GenerateIntelligentWireframeDescription(request.CurrentValue, request.Context),
-            Success = true
-        };
-    }
-}
-
-private string GenerateIntelligentWireframeDescription(string fieldValue, object? context)
-{
-    var formData = ExtractFormDataFromContext(context);
-    
-    // 🔧 LÓGICA DINÁMICA: Usar datos reales del formulario
-    if (formData != null && formData.UseCaseType == "entidad")
-    {
-        return GenerateEntitySearchWireframe(fieldValue, formData);
-    }
-    
-    // ✅ Usa filtros/columnas REALES de formData.SearchFilters y formData.ResultColumns
-    // ❌ Ya NO usa datos hardcodeados como "Apellido", "DNI", "Segmento"
-    // ✅ Respeta exactamente los valores cargados por el usuario
-}
-```
-
-### 8.4 Wireframes Múltiples (C#/Blazor) - ✅ ACTUALIZADO CON DATOS DINÁMICOS
-**Archivo:** `UseCaseGenerator.Server/Services/AIService.cs`
-**Función:** `GenerateIntelligentWireframesDescription` (nueva implementación)
-
-```csharp
-private string GenerateIntelligentWireframesDescription(string fieldValue, object? context)
-{
-    var formData = ExtractFormDataFromContext(context);
-    
-    // 🎯 SISTEMA COMPLETO con datos reales del formulario
-    if (formData != null && formData.UseCaseType == "entidad")
-    {
-        return GenerateCompleteEntityWireframes(fieldValue, formData);
-    }
-}
-
-private string GenerateCompleteEntityWireframes(string userDescription, UseCaseFormData formData)
-{
-    var filters = formData.SearchFilters ?? new List<string>();    // ✅ Filtros reales
-    var columns = formData.ResultColumns ?? new List<string>();    // ✅ Columnas reales
-    var fields = formData.EntityFields ?? new List<EntityField>(); // ✅ Campos reales
-    
-    // 🔧 ESTRUCTURA GENERADA:
-    // PANTALLA PRINCIPAL: Lista los filtros específicos del usuario
-    // TABLA RESULTADOS: Lista las columnas específicas del usuario
-    // FORMULARIO MODAL: Lista los campos específicos de la entidad
-    // CAMPOS AUDITORÍA: Siempre incluye fechaAlta/usuarioAlta (obligatorio ING)
-    
-    // ✅ CUMPLE FEEDBACK: NO inventa datos, usa exactamente lo cargado
-}
-```
-
-### Elementos Comunes de Wireframes ING
-
-**Componentes Estándar:**
-- Panel de búsqueda con filtros estándar
-- Botones: Buscar/Limpiar/Agregar/Editar/Eliminar
-- Paginado ING en tablas de resultados  
-- Validaciones en tiempo real
-- Mensajes de confirmación/error
-- Layout según minuta ING vr19
-- UI textual describiendo componentes
-
-**Reglas de Mejora:**
-1. **Descripciones vacías**: Usar plantilla por defecto con elementos ING completos
-2. **Descripciones cortas**: Detectar tipo (búsqueda/formulario/tabla) y expandir con contexto ING
-3. **Descripciones largas**: Verificar y añadir elementos ING faltantes
-4. **Formato profesional**: Aplicar estándares de texto según minuta ING
-
-## 🎯 MEJORAS IMPLEMENTADAS SEGÚN FEEDBACK
-
-### ✅ Problema Resuelto: Datos Hardcodeados
-**Antes:** Los wireframes usaban datos genéricos como "Apellido", "DNI", "Segmento"
-**Ahora:** Los wireframes usan los datos EXACTOS que el usuario cargó en el formulario
-
-### 🔧 Estructura del Prompt Dinámico (Conceptual)
-```
-OBJETIVO: Generar wireframe textual personalizado usando datos del formulario
-
-DATOS DE ENTRADA OBLIGATORIOS:
-- searchFilters: [array con filtros del usuario]
-- resultColumns: [array con columnas del usuario]  
-- entityFields: [array con campos de la entidad del usuario]
-
-ELEMENTOS SIEMPRE PRESENTES (Minuta ING):
-- Botones: Buscar, Limpiar, Agregar, Editar, Eliminar
-- Paginado ING activado
-- Campos de auditoría: fechaAlta, usuarioAlta, fechaModificacion, usuarioModificacion
-- Formato: Segoe UI, layout ING vr19
-
-REGLA CRÍTICA: NO inventar datos. Solo usar los proporcionados por el usuario.
-```
-
-### 📋 Casos de Uso Dinámicos
-- **Entidad/CRUD**: Usa searchFilters + resultColumns + entityFields reales
-- **API/Proceso**: Usa apiEndpoint + serviceFrequency + configuración real
-- **Fallback**: Solo si faltan datos del contexto (mantiene compatibilidad)
-
-### 🚀 Funciones Nuevas Implementadas
-| Sistema | Función Individual | Función Múltiple |
-|---------|-------------------|------------------|
-| TypeScript | `generateEntitySearchWireframe()` | `generateCompleteEntityWireframes()` |
-| TypeScript | `generateServiceWireframe()` | `generateCompleteServiceWireframes()` |  
-| C# | `GenerateEntitySearchWireframe()` | `GenerateCompleteEntityWireframes()` |
-| C# | `GenerateServiceWireframe()` | `GenerateCompleteServiceWireframes()` |
-
-**Resultado:** Wireframes 100% personalizados, sin datos genéricos hardcodeados
+**Enero 2025**:
+- Actualización a modelos AI más recientes (GPT-4o, Claude 4, Gemini 2.5)
+- Implementación de regex para validación de verbos infinitivos
+- Prevención de extensiones en fileName
+- Mejora en extracción de campos service
+- Expansión automática de descripciones cortas

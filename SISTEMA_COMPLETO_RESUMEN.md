@@ -1,128 +1,212 @@
-# Generador Avanzado de Casos de Uso - Resumen Técnico Completo
+# Generador Avanzado de Casos de Uso - Manual Técnico Completo
+**Actualizado: 6 de Enero 2025**
 
 ## 🎯 Visión General del Sistema
 
-Este es un **generador avanzado de casos de uso impulsado por IA** que permite crear documentación técnica profesional siguiendo estrictamente las especificaciones de ING (Ingematica). El sistema mantiene **dos implementaciones paralelas idénticas**: React/TypeScript y Blazor WebAssembly, ambas con funcionalidad completa y sincronizadas.
+Sistema empresarial de **generación inteligente de documentación técnica** que automatiza la creación de casos de uso siguiendo estrictamente las especificaciones corporativas de ING (Ingematica). El proyecto mantiene **paridad funcional React/TypeScript** con objetivo de migración a Blazor WebAssembly.
 
-### Características Distintivas
+### Características Principales
 
-- **Sistema Dual Mantenido**: React y Blazor WebAssembly funcionando en paralelo
-- **Análisis de Minutas con IA**: Extracción inteligente de información desde documentos
-- **Generación de Wireframes Dinámicos**: Creación automática basada en datos del formulario
-- **Casos de Prueba Inteligentes**: Generación contextual con objetivos y precondiciones
-- **Soporte para 5 proveedores de IA**: OpenAI GPT-4o, Claude Sonnet 4, Google Gemini 2.5, Grok 2, y Copilot
-- **Modo Demo funcional**: Opera completamente sin APIs para evaluación y pruebas
-- **Exportación DOCX perfecta**: Documentos con formato Microsoft profesional
-- **UI Mejorada**: Componentes avanzados con animaciones profesionales
+- **Multi-Modelo AI con Cascading Fallback**: Copilot → Gemini → OpenAI → Claude → Grok
+- **Análisis Inteligente de Minutas**: Procesamiento de DOCX/XLSX/PPTX con extracción automática
+- **Generación Dinámica de Wireframes**: HTML → Screenshot → DOCX embedding
+- **Casos de Prueba con AI**: Tablas profesionales con precondiciones estructuradas
+- **Validación Inteligente de Verbos**: Regex pattern `/^[a-záéíóúñ]+(ar|er|ir)$/`
+- **Modo Demo Completo**: Funcionalidad total sin API keys
+- **Exportación DOCX Nativa**: Formato corporativo ING con secciones específicas por tipo
+- **UI Responsive Avanzada**: Shadcn/ui + Tailwind con animaciones profesionales
 
 ---
 
 ## 🏗️ Arquitectura del Sistema
 
-### Sistema Dual - Stack Tecnológico
+### Stack Tecnológico Actual (React/TypeScript)
 
-**Sistema React (Mantenido)**
-- **Frontend**: React 18 + TypeScript + Vite
-- **UI**: Radix UI + Tailwind CSS + Shadcn/ui
-- **Estado**: React Query (TanStack Query) + React Hook Form
+**Frontend**
+- **Framework**: React 18 + TypeScript + Vite
+- **UI Components**: Shadcn/ui + Radix UI + Tailwind CSS
+- **State Management**: TanStack Query v5 + React Hook Form
+- **Routing**: Wouter (lightweight)
 
-**Sistema Blazor (Principal)**
-- **Frontend**: Blazor WebAssembly con .NET 8
-- **UI**: MudBlazor + CSS personalizado con ING branding
-- **Estado**: State management integrado de Blazor
+**Backend**
+- **Runtime**: Node.js + Express + TypeScript
+- **AI Integration**: 
+  - OpenAI GPT-4o (última versión Mayo 2024)
+  - Claude Sonnet 4-20250514
+  - Gemini 2.5-flash
+  - Grok 2-1212
+  - Microsoft Copilot
+- **Document Processing**: 
+  - docx.js - Generación DOCX
+  - Puppeteer - Screenshots de wireframes
+  - Sharp - Compresión de imágenes
+  - Mammoth - Extracción de contenido DOCX
+- **Storage**: In-memory (MemStorage) con arquitectura lista para PostgreSQL
 
-**Compartido entre ambos sistemas**
-- **Backend**: Node.js + Express + TypeScript (API unificada)
-- **IA**: OpenAI, Anthropic, Google Gemini, X.AI, Copilot APIs
-- **Documentos**: docx.js para generación de Word
-- **Base de Datos**: Preparado para PostgreSQL con Drizzle ORM (actualmente in-memory)
+### Arquitectura de Servicios
 
-### Principios de Sincronización
-- **Paridad Funcional**: Toda característica debe implementarse en ambos sistemas
-- **UI Idéntica**: Misma experiencia de usuario en React y Blazor
-- **API Compartida**: Backend único sirve a ambos frontends
-- **Validación Duplicada**: Reglas de negocio idénticas en ambos
+```
+client/
+├── components/         # Componentes React reutilizables
+├── hooks/             # Custom hooks (useUseCaseForm, etc.)
+├── lib/               # Utilidades y configuración
+└── pages/             # Páginas de la aplicación
+
+server/
+├── services/          # Lógica de negocio
+│   ├── ai-service.ts          # Orquestación multi-modelo AI
+│   ├── minute-analysis-service.ts  # Análisis de minutas
+│   ├── document-service.ts    # Generación DOCX
+│   └── test-service.ts        # Casos de prueba inteligentes
+├── routes.ts          # Endpoints API REST
+└── storage.ts         # Capa de persistencia
+
+shared/
+└── schema.ts          # Tipos TypeScript y validaciones Zod
+```
 
 ---
 
 ## 📋 Funcionalidades del Sistema
 
-### 1. Análisis de Minutas con IA 🆕
+### 1. Análisis Inteligente de Minutas
 
-**Capacidades de Extracción**:
-- Soporte para archivos DOCX, XLSX, PPTX
-- Análisis inteligente de contenido con IA
-- Extracción automática de campos del formulario
-- Botón animado "Pensando..." con efecto violeta pulsante
-- Manejo robusto de valores null en campos extraídos
+**Extracción Automática por Tipo de Caso**:
+- **Entity**: Detecta filtros, columnas y campos de entidad
+- **API**: Extrae endpoints, métodos HTTP, formatos request/response
+- **Service**: Identifica frecuencia, horarios, rutas y credenciales
 
 **Formatos Soportados**:
 - Microsoft Word (.docx) - Extracción con mammoth
-- Microsoft Excel (.xlsx, .xls) - Todas las hojas
-- Microsoft PowerPoint (.pptx) - Diapositivas y notas
-- Tamaño máximo: 10MB por archivo
+- Microsoft Excel (.xlsx) - Procesamiento multi-hoja
+- Microsoft PowerPoint (.pptx) - Slides y notas del orador
+- Tamaño máximo: 10MB
 
-### 2. Sistema de Formulario Multi-Paso Inteligente
+**Características Técnicas**:
+- Prevención de extensiones en fileName (.json, .docx, .xml)
+- Validación "Actor no identificado" si no existe
+- Prompts específicos por tipo de caso de uso
 
-**Paso 1: Configuración de IA**
-- Selector de modelo de IA (OpenAI, Claude, Grok, Gemini, Copilot, Demo)
-- Sistema de fallback en cascada: Copilot → Gemini → OpenAI → Claude → Grok
-- Información transparente sobre cada proveedor
-- Modo Demo funcional sin necesidad de API keys
+### 2. Flujo de Formulario Multi-Paso
 
-**Paso 2: Análisis de Minuta (Opcional)** 🆕
-- Carga de documentos Office
-- Extracción automática de información
-- Pre-llenado inteligente del formulario
-- Validación de datos extraídos
+**Paso 1: Configuración AI**
+- 5 modelos disponibles + modo Demo
+- Cascading fallback automático
+- Información de cada proveedor
+
+**Paso 2: Análisis de Minuta (Opcional)**
+- Upload de documentos Office
+- Extracción inteligente con AI
+- Pre-llenado automático de campos
 
 **Paso 3: Tipo de Caso de Uso**
-- **Gestión de Entidades**: CRUD completo con wireframes dinámicos
-- **Servicios/Procesos**: Automatización y integración de sistemas
-- **APIs**: Endpoints y configuraciones técnicas
-- Previsualizaciones interactivas de cada tipo
-- Botón de autocompletado con ejemplo bancario complejo
+- **Entidad**: CRUD con búsqueda, alta, modificación, eliminación
+- **API**: Web services con request/response JSON
+- **Servicio/Proceso**: Automatización con schedulers
 
-**Paso 4: Información Básica** ⭐ *CON AI ASSIST Y SMART AUTOCOMPLETE*
-- Nombre del Cliente (con sugerencias contextuales inteligentes)
-- Nombre del Proyecto (autocomplete basado en contexto)
-- Código del Caso de Uso (formato XX000 validado)
+**Pasos 4-5: Información Básica**
+- Cliente y Proyecto con sugerencias contextuales
+- Código con formato XX###
+- Nombre con validación de verbo infinitivo (regex)
+- Descripción expandible automáticamente (< 50 palabras)
 
-**Paso 5: Detalles del Caso de Uso** ⭐ *CON AI ASSIST*
-- Nombre del Caso de Uso (debe comenzar con verbo infinitivo)
-- Nombre del Archivo (formato específico sin espacios)
-- Descripción detallada (50-200 palabras, técnica)
-- Opción de wireframes dinámicos para entidades
+**Pasos 6-10: Configuración Específica por Tipo**
 
-**Pasos 6-10: Configuración Avanzada** ⭐ *CON AI ASSIST Y UI MEJORADA*
-- Filtros de búsqueda con Smart Autocomplete
-- Columnas de resultado con sugerencias contextuales
-- Campos de entidad con validación y tooltips informativos
-- Reglas de negocio específicas
-- Requerimientos especiales técnicos
-- Generación de casos de prueba inteligentes
+*Para Entidad:*
+- Filtros de búsqueda (array)
+- Columnas de resultado (array)
+- Campos con tipo, obligatorio, longitud, validación
 
-### 3. Sistema Revolucionario "AI Assist" 🚀
+*Para API:*
+- Endpoint URL
+- Método HTTP
+- Formato request/response con ejemplos JSON
+- Códigos de error (400, 401/403, 500)
 
-**Concepto**: En lugar de solo generar documentos completos, cada campo tiene su propio botón de mejora IA.
+*Para Servicio:*
+- Frecuencia de ejecución
+- Horarios específicos
+- Rutas configurables
+- Credenciales de servicios externos
 
-**Campos con AI Assist Implementado**:
-- ✅ Nombre del Cliente
-- ✅ Nombre del Proyecto
-- ✅ Código del Caso de Uso
-- ✅ Nombre del Caso de Uso
-- ✅ Nombre del Archivo
-- ✅ Descripción
-- ✅ Filtros de Búsqueda
-- ✅ Columnas de Resultado
-- ✅ Campos de Entidad (con mejora de JSON completo)
+### 3. Generación de Documentos DOCX
 
-**Componentes UI Avanzados Implementados** 🆕:
-- **SmartAutocomplete**: Sugerencias contextuales inteligentes
-- **ContextualTooltip**: Tooltips con estilo ING corporativo
-- **MicroInteractions**: Animaciones sutiles profesionales
-- **AdaptiveLoading**: Estados de carga adaptativos (pulse, spin)
-- **ThinkingLoader**: Animación "Pensando..." con puntos cíclicos
+**Estructura por Tipo de Caso**:
+
+**Entity - Secciones**:
+```
+1. Buscar datos de la entidad
+   a. Filtros (numerales romanos)
+   b. Columnas (numerales romanos)
+2. Agregar nueva entidad
+   a. Campos con propiedades
+3. Modificar entidad
+4. Eliminar entidad
+```
+
+**API - Secciones**:
+```
+FLUJO PRINCIPAL DE EVENTOS
+1. Petición HTTP [METHOD] al endpoint
+2. Validación de datos
+3. Procesamiento
+4. Respuesta
+FLUJOS ALTERNATIVOS
+- Error 400: Bad Request
+- Error 401/403: Unauthorized
+- Error 500: Internal Server
+```
+
+**Service - Secciones**:
+```
+FLUJO PRINCIPAL
+1. Ejecución [frequency] a las [time]
+2. Inicialización automática
+3. Captura de archivos
+4. Conexión con servicios
+5. Procesamiento
+6. Generación de reportes
+```
+
+### 4. Casos de Prueba Inteligentes
+
+**Generación Automática con AI**:
+- Objetivo del caso de prueba
+- Precondiciones estructuradas
+- Tabla profesional de pasos:
+  - Nº secuencial
+  - Acción a realizar
+  - Datos de entrada
+  - Resultado esperado
+  - Observaciones
+  - Estado (checkbox)
+
+### 5. Wireframes Dinámicos
+
+**Pipeline de Generación**:
+1. Generación HTML con datos del formulario
+2. Screenshot con Puppeteer (headless Chrome)
+3. Compresión con Sharp
+4. Embedding en DOCX como imagen
+
+**Características**:
+- Diseño responsive Microsoft-style
+- Tablas con datos reales del formulario
+- Filtros y columnas dinámicas
+- Dimensiones correctas para DOCX
+
+### 6. Sistema de Validaciones
+
+**Validaciones Críticas**:
+- **Verbos Infinitivos**: Regex `/^[a-záéíóúñ]+(ar|er|ir)$/` + irregulares (ver, ser, ir)
+- **Formato Código**: XX### (2 letras + 3 números)
+- **Formato fileName**: Sin espacios ni extensiones
+- **Descripción**: Mínimo requerido con expansión automática
+
+**Validaciones por Tipo**:
+- Entity: Requiere filtros, columnas y campos
+- API: Requiere endpoint, request y response
+- Service: Requiere frecuencia y horarios
 
 **Reglas Específicas por Campo**:
 - **Cliente**: Nombres de empresas reales, formato profesional
