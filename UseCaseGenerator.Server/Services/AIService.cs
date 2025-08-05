@@ -1400,6 +1400,137 @@ Formato estilo Microsoft (fuente Segoe UI, layout según minuta ING vr19).";
         return string.Join(". ", formattedSentences.Where(s => !string.IsNullOrWhiteSpace(s)));
     }
 
+    public async Task<ImageGenerationResponse> GenerateImageAsync(ImageGenerationRequest request)
+    {
+        try
+        {
+            var geminiApiKey = _configuration["Gemini:ApiKey"];
+            if (string.IsNullOrEmpty(geminiApiKey))
+            {
+                return new ImageGenerationResponse
+                {
+                    Success = false,
+                    Error = "Gemini API key no está configurada"
+                };
+            }
+
+            var fileName = request.FileName ?? $"generated_image_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}.png";
+            var imagePath = Path.Combine("attached_assets", "generated_images", fileName);
+            
+            // Ensure directory exists
+            var imageDir = Path.GetDirectoryName(imagePath);
+            if (!string.IsNullOrEmpty(imageDir) && !Directory.Exists(imageDir))
+            {
+                Directory.CreateDirectory(imageDir);
+            }
+
+            // IMPORTANT: only this gemini model supports image generation
+            var client = GetHttpClient("Gemini");
+            var requestData = new
+            {
+                model = "gemini-2.0-flash-preview-image-generation",
+                contents = new[]
+                {
+                    new { role = "user", parts = new[] { new { text = request.Prompt } } }
+                },
+                config = new
+                {
+                    responseModalities = new[] { "TEXT", "IMAGE" }
+                }
+            };
+
+            var jsonContent = JsonSerializer.Serialize(requestData);
+            var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+            var url = $"https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-preview-image-generation:generateContent?key={geminiApiKey}";
+            var response = await client.PostAsync(url, content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError($"Gemini API error: {response.StatusCode} - {errorContent}");
+                return new ImageGenerationResponse
+                {
+                    Success = false,
+                    Error = $"Error en API de Gemini: {response.StatusCode}"
+                };
+            }
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(responseJson);
+
+            if (!doc.RootElement.TryGetProperty("candidates", out var candidates) || candidates.GetArrayLength() == 0)
+            {
+                return new ImageGenerationResponse
+                {
+                    Success = false,
+                    Error = "No se generó ninguna imagen"
+                };
+            }
+
+            var firstCandidate = candidates[0];
+            if (!firstCandidate.TryGetProperty("content", out var content_element) ||
+                !content_element.TryGetProperty("parts", out var parts))
+            {
+                return new ImageGenerationResponse
+                {
+                    Success = false,
+                    Error = "Respuesta inválida del modelo"
+                };
+            }
+
+            bool imageGenerated = false;
+            foreach (var part in parts.EnumerateArray())
+            {
+                if (part.TryGetProperty("text", out var textElement))
+                {
+                    _logger.LogInformation($"Gemini response: {textElement.GetString()}");
+                }
+                else if (part.TryGetProperty("inlineData", out var inlineDataElement) &&
+                         inlineDataElement.TryGetProperty("data", out var dataElement))
+                {
+                    var base64Data = dataElement.GetString();
+                    if (!string.IsNullOrEmpty(base64Data))
+                    {
+                        var imageData = Convert.FromBase64String(base64Data);
+                        await File.WriteAllBytesAsync(imagePath, imageData);
+                        _logger.LogInformation($"Image saved as {imagePath}");
+                        imageGenerated = true;
+                    }
+                }
+            }
+
+            if (imageGenerated)
+            {
+                // Return relative path for frontend access
+                var imageUrl = $"/attached_assets/generated_images/{fileName}";
+                return new ImageGenerationResponse
+                {
+                    Success = true,
+                    ImageUrl = imageUrl,
+                    ImagePath = imagePath
+                };
+            }
+            else
+            {
+                return new ImageGenerationResponse
+                {
+                    Success = false,
+                    Error = "No se pudo generar la imagen"
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating image");
+            return new ImageGenerationResponse
+            {
+                Success = false,
+                Error = $"Error al generar imagen: {ex.Message}"
+            };
+        }
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)

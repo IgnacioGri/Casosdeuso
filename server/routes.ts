@@ -829,6 +829,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image generation endpoint using Gemini
+  app.post("/api/generate-image", async (req, res) => {
+    try {
+      const { prompt, fileName } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ 
+          success: false,
+          error: "Prompt is required for image generation" 
+        });
+      }
+
+      const result = await AIService.generateImage({ prompt, fileName });
+      return res.json(result);
+      
+    } catch (error) {
+      console.error('Error in image generation endpoint:', error);
+      res.status(500).json({ 
+        success: false,
+        error: 'Failed to generate image'
+      });
+    }
+  });
+
   // Header image upload endpoint
   app.post("/api/upload-header", headerImageUpload.single('headerImage'), async (req, res) => {
     try {

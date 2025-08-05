@@ -1,0 +1,42 @@
+Cómo usarlo para imágenes
+El endpoint y el cliente (librería) son los mismos que para texto. Solo cambia el modelo y la configuración para incluir 'IMAGE' en las modalidades de respuesta. Si tu proyecto en Replit ya integra la API para texto (probablemente con la librería google-generativeai), puedes reutilizar el mismo setup. Si no la tienes instalada, en Replit ve a la consola y corre pip install google-generativeai (o agrégala al requirements.txt).
+Aquí un ejemplo simple en Python para generar una imagen a partir de texto (basado en la docs oficial). Pega tu API key en el código (mejor úsala como variable de entorno en Replit para seguridad, en "Secrets" > agrega "GEMINI_API_KEY" con tu valor).
+pythonimport google.generativeai as genai
+from PIL import Image
+from io import BytesIO
+import os
+
+# Configura la API key (usa os.getenv en Replit para secrets)
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))  # O reemplaza con tu key directamente: "tu_key_aqui"
+
+model = genai.GenerativeModel("gemini-2.0-flash-preview-image-generation")
+
+prompt = "Crea una imagen de un gato volador en una ciudad futurista"
+
+response = model.generate_content(
+    [prompt],
+    generation_config=genai.GenerationConfig(
+        response_mime_type="application/json",
+        response_schema={
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "description": {"type": "string"},
+                    "image": {"type": "string"}
+                }
+            }
+        }
+    )
+)
+
+# Procesa la respuesta (esto guarda y muestra la imagen)
+for candidate in response.candidates:
+    for part in candidate.content.parts:
+        if hasattr(part, 'inline_data'):
+            img_data = part.inline_data.data
+            img = Image.open(BytesIO(img_data))
+            img.save("generated_image.png")
+            img.show()  # En Replit, esto podría abrir en preview o descarga el archivo
+Si tu código actual es como el del quickstart (curl o simple generate_content), adáptalo cambiando el model a uno con soporte de imágenes y agregando response_modalities=['TEXT', 'IMAGE'] en la config. Prueba con prompts simples primero para no golpear los límites.
+Si en Replit estás usando algún template o AI integrado que te pide la key, dile que quieres usar Gemini para imágenes y pega la misma key; debería detectarlo. Si da error (e.g., "model not found" o región), cuéntame más detalles del error para ayudarte. ¡Éxitos con tu proyecto!
