@@ -167,7 +167,6 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
               onChange={(e) => onUpdateFormData({ wireframesDescription: e.target.value })}
               placeholder=""
               rows={3}
-              autoComplete="off"
             />
           </div>
 

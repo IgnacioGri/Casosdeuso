@@ -373,7 +373,6 @@ export default function FormSteps({
                 onChange={(e) => handleInputChange('fileName', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Ej: AB123GestionarUsuarios"
-                autoComplete="off"
               />
               <LiveValidation value={formData.fileName} type="fileName" />
             </div>
@@ -390,7 +389,6 @@ export default function FormSteps({
                 rows={4} 
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white" 
                 placeholder="Describa el alcance y objetivo del caso de uso..."
-                autoComplete="off"
               />
               <LiveValidation value={formData.description} type="required" label="Descripción" />
             </div>
@@ -450,7 +448,6 @@ export default function FormSteps({
                 placeholder="Ej: Los usuarios podrán filtrar por peso, altura y religión"
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-                autoComplete="off"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en filtros estructurados
@@ -556,7 +553,6 @@ export default function FormSteps({
                 placeholder="Ej: La tabla de resultados debe mostrar ID, nombre completo, email y estado"
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-                autoComplete="off"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en columnas estructuradas
@@ -710,7 +706,6 @@ export default function FormSteps({
                 placeholder="Ej: La entidad Cliente debe tener: nombre completo (texto, obligatorio, máximo 100 caracteres), email (email, obligatorio), teléfono (texto, opcional, 15 caracteres), fecha de nacimiento (fecha, opcional), estado (booleano, obligatorio, por defecto activo)..."
                 rows={6}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:border-ms-blue focus:ring-2 focus:ring-ms-blue/10 dark:bg-gray-800 dark:text-white resize-y"
-                autoComplete="off"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Usa el botón AI para convertir automáticamente tu descripción en campos estructurados con tipos y validaciones
@@ -777,7 +772,6 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { length: e.target.value ? parseInt(e.target.value) : undefined })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Long."
-                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
@@ -795,7 +789,6 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { description: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Descripción del campo"
-                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1">
@@ -805,7 +798,6 @@ export default function FormSteps({
                             onChange={(e) => onUpdateEntityField(index, { validationRules: e.target.value })}
                             className="w-full px-2 py-1 border-0 focus:outline-none focus:ring-1 focus:ring-ms-blue rounded" 
                             placeholder="Validaciones"
-                            autoComplete="off"
                           />
                         </td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
