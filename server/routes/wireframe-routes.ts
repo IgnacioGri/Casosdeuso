@@ -112,6 +112,14 @@ function generateSearchWireframeHTML(data: WireframeData): string {
       background: #107C10;
       color: white;
     }
+    .btn-white {
+      background: white;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    .btn-white:hover {
+      background: #f5f5f5;
+    }
     .results-panel {
       background: white;
       border-radius: 4px;
@@ -143,14 +151,20 @@ function generateSearchWireframeHTML(data: WireframeData): string {
       justify-content: center;
     }
     .action-btn {
-      padding: 5px 10px;
+      padding: 5px 8px;
       font-size: 12px;
       border: none;
       border-radius: 2px;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 3px;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+    }
+    .action-btn svg {
+      width: 16px;
+      height: 16px;
     }
     .action-btn.edit {
       background: #0078D4;
@@ -211,9 +225,9 @@ function generateSearchWireframeHTML(data: WireframeData): string {
         </div>
         
         <div class="buttons">
-          <button class="btn btn-primary">🔍 Buscar</button>
-          <button class="btn btn-secondary">🔄 Limpiar</button>
-          <button class="btn btn-success">➕ Agregar</button>
+          <button class="btn btn-white">🔍 Buscar</button>
+          <button class="btn btn-white">🕒 Limpiar</button>
+          <button class="btn btn-white">✚ Agregar</button>
         </div>
       </div>
     </div>
@@ -232,10 +246,26 @@ function generateSearchWireframeHTML(data: WireframeData): string {
             <tr>
               <td>
                 <div class="actions">
-                  <button class="action-btn view" title="Ver">👁️</button>
-                  <button class="action-btn edit" title="Editar">✏️</button>
-                  <button class="action-btn log" title="Bitácora">📋</button>
-                  <button class="action-btn delete" title="Eliminar">🗑️</button>
+                  <button class="action-btn view" title="Ver">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                      <path d="M12 5C7 5 2.73 8.11 1 12.5C2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn edit" title="Editar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn log" title="Bitácora">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                      <path d="M13 12h7v1.5h-7zm0-2.5h7V11h-7zm0 5h7V16h-7zM21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 15h-9V6h9v13z"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn delete" title="Eliminar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                    </svg>
+                  </button>
                 </div>
               </td>
               ${columns.map(() => `<td>Dato ejemplo ${i}</td>`).join('')}
