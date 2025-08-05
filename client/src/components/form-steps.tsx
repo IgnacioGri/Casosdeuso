@@ -225,23 +225,10 @@ export default function FormSteps({
                   className="ml-0.5"
                 />
               </div>
-              <SmartAutocomplete
+              <Input
                 value={formData.clientName}
-                onChange={(value) => handleInputChange('clientName', value)}
+                onChange={(e) => handleInputChange('clientName', e.target.value)}
                 placeholder="Ej: Banco Nacional de Argentina"
-                suggestions={[
-                  'Banco Santander Argentina S.A.',
-                  'Banco de la Nación Argentina',
-                  'Banco Provincia de Buenos Aires',
-                  'Banco Ciudad de Buenos Aires',
-                  'Banco Galicia',
-                  'Banco BBVA Argentina',
-                  'Banco Macro S.A.',
-                  'Banco HSBC Argentina',
-                  'Banco Patagonia S.A.',
-                  'Banco Credicoop'
-                ]}
-                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.clientName} type="required" label="Nombre del Cliente" />
             </div>
@@ -258,23 +245,10 @@ export default function FormSteps({
                   className="ml-0.5"
                 />
               </div>
-              <SmartAutocomplete
+              <Input
                 value={formData.projectName}
-                onChange={(value) => handleInputChange('projectName', value)}
+                onChange={(e) => handleInputChange('projectName', e.target.value)}
                 placeholder="Ej: Sistema de Gestión de Usuarios"
-                suggestions={[
-                  'Sistema de Gestión de Préstamos Personales',
-                  'Sistema de Home Banking',
-                  'Sistema de Gestión de Cuentas',
-                  'Sistema de Transferencias Interbancarias',
-                  'Sistema de Pagos Electrónicos',
-                  'Portal de Autogestión de Clientes',
-                  'Sistema de Gestión de Tarjetas',
-                  'Sistema de Gestión de Inversiones',
-                  'Sistema de Gestión de Riesgos',
-                  'Sistema de Prevención de Fraudes'
-                ]}
-                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.projectName} type="required" label="Nombre del Proyecto" />
             </div>
@@ -291,19 +265,10 @@ export default function FormSteps({
                   className="ml-0.5"
                 />
               </div>
-              <SmartAutocomplete
+              <Input
                 value={formData.useCaseCode}
-                onChange={(value) => handleInputChange('useCaseCode', value)}
+                onChange={(e) => handleInputChange('useCaseCode', e.target.value)}
                 placeholder="Ej: UC001"
-                suggestions={[
-                  'UC001', 'UC002', 'UC003', 'UC004', 'UC005',
-                  'PRE-001', 'PRE-002', 'PRE-003',
-                  'GES-001', 'GES-002', 'GES-003',
-                  'REP-001', 'REP-002', 'REP-003',
-                  'API-001', 'API-002', 'API-003',
-                  'PROC-001', 'PROC-002', 'PROC-003'
-                ]}
-                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.useCaseCode} type="required" label="Código del Caso de Uso" />
             </div>
@@ -339,26 +304,10 @@ export default function FormSteps({
                   className="ml-0.5"
                 />
               </div>
-              <SmartAutocomplete
+              <Input
                 value={formData.useCaseName}
-                onChange={(value) => handleInputChange('useCaseName', value)}
+                onChange={(e) => handleInputChange('useCaseName', e.target.value)}
                 placeholder="Ej: Gestionar Usuarios del Sistema"
-                suggestions={[
-                  'Gestionar Clientes',
-                  'Gestionar Usuarios',
-                  'Gestionar Cuentas Bancarias',
-                  'Gestionar Préstamos',
-                  'Gestionar Transferencias',
-                  'Gestionar Pagos',
-                  'Gestionar Inversiones',
-                  'Consultar Saldos',
-                  'Consultar Movimientos',
-                  'Generar Reportes',
-                  'Procesar Transacciones',
-                  'Validar Documentos',
-                  'Autorizar Operaciones'
-                ]}
-                useCaseType={formData.useCaseType}
               />
               <LiveValidation value={formData.useCaseName} type="useCaseName" />
             </div>
@@ -472,17 +421,10 @@ export default function FormSteps({
               {formData.searchFilters.map((filter, index) => (
                 <AnimatedField key={index} index={index} onRemove={() => onRemoveSearchFilter(index)}>
                   <div className="flex items-center space-x-2">
-                    <SmartAutocomplete
+                    <Input
                       value={filter}
-                      onChange={(value) => onUpdateSearchFilter(index, value)}
+                      onChange={(e) => onUpdateSearchFilter(index, e.target.value)}
                       placeholder="Nombre del filtro (ej: Nombre)"
-                      suggestions={[
-                        'Nombre', 'Apellido', 'DNI', 'CUIT', 'Estado',
-                        'Fecha Desde', 'Fecha Hasta', 'Tipo', 'Categoría',
-                        'Sucursal', 'Monto Mínimo', 'Monto Máximo',
-                        'Email', 'Teléfono', 'Ciudad', 'Provincia'
-                      ]}
-                      useCaseType={formData.useCaseType}
                       className="flex-1"
                     />
                   </div>
@@ -577,17 +519,10 @@ export default function FormSteps({
                 {formData.resultColumns.map((column, index) => (
                   <AnimatedField key={index} index={index} onRemove={() => onRemoveResultColumn(index)}>
                     <div className="flex items-center space-x-2">
-                      <SmartAutocomplete
+                      <Input
                         value={column}
-                        onChange={(value) => onUpdateResultColumn(index, value)}
+                        onChange={(e) => onUpdateResultColumn(index, e.target.value)}
                         placeholder="Nombre de la columna (ej: ID)"
-                        suggestions={[
-                          'ID', 'Código', 'Nombre', 'Apellido', 'Descripción',
-                          'Estado', 'Fecha Alta', 'Fecha Modificación', 
-                          'Usuario Alta', 'Tipo', 'Categoría', 'Monto',
-                          'Saldo', 'Email', 'Teléfono', 'Sucursal'
-                        ]}
-                        useCaseType={formData.useCaseType}
                         className="flex-1"
                       />
                     </div>
