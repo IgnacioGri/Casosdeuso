@@ -1,76 +1,67 @@
 import { useState, useEffect } from 'react';
-import { Upload, FileText, Loader2, Brain, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
+import { 
+  Brain, 
+  FileText, 
+  CheckCircle,
+  Upload,
+  AlertCircle
+} from 'lucide-react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { UseCaseFormData } from '@/types/use-case';
-import { ProgressIndicator } from '@/components/progress-indicator';
-import { AdaptiveLoading, AdaptiveProgressSteps } from '@/components/adaptive-loading';
+import { toast, useToast } from '@/hooks/use-toast';
+import type { UseCaseFormData } from '@shared/schema';
 
 interface MinuteAnalysisStepProps {
   formData: UseCaseFormData;
-  onFormChange: (updates: Partial<UseCaseFormData>) => void;
-  onNext: () => void;
-  onPrevious: () => void;
+  onDataExtracted: (extractedData: Partial<UseCaseFormData>) => void;
+  readOnly?: boolean;
 }
 
-export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious }: MinuteAnalysisStepProps) {
+export function MinuteAnalysisStep({ 
+  formData, 
+  onDataExtracted,
+  readOnly = false 
+}: MinuteAnalysisStepProps) {
   const [minuteText, setMinuteText] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressMessage, setProgressMessage] = useState('');
   const [dots, setDots] = useState('...');
   const { toast } = useToast();
 
   const analyzeMinuteMutation = useMutation({
     mutationFn: async (data: { text: string; useCaseType: string; aiModel: string }) => {
-      setProgress(10);
-      setProgressMessage('Preparando análisis de minuta...');
-      
-      const response = await apiRequest('POST', '/api/analyze-minute', {
-        minuteContent: data.text,
-        useCaseType: data.useCaseType,
-        aiModel: data.aiModel
+      const response = await apiRequest('/api/analyze-minute', {
+        method: 'POST',
+        body: JSON.stringify({
+          minuteContent: data.text,
+          useCaseType: data.useCaseType,
+          aiModel: data.aiModel || 'demo'
+        })
       });
-      
-      setProgress(50);
-      setProgressMessage('Procesando contenido con IA...');
-      
-      // Simular progreso gradual mientras esperamos
-      const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 5, 90));
-      }, 1000);
-      
-      const result = await response.json();
-      clearInterval(progressInterval);
-      
-      setProgress(100);
-      setProgressMessage('¡Análisis completado!');
-      
-      return result;
+      return response;
     },
-    onSuccess: (data) => {
-      // Apply the analyzed data to the form
-      onFormChange(data.formData);
-      
-      // Reset progress after a brief delay
-      setTimeout(() => {
-        setProgress(0);
-        setProgressMessage('');
-      }, 1500);
-      
-      toast({
-        title: "Análisis completado",
-        description: "La minuta ha sido analizada y el formulario se ha completado automáticamente"
-      });
+    onSuccess: (response) => {
+      if (response.success && response.formData) {
+        onDataExtracted(response.formData);
+        toast({
+          title: "✨ Análisis completado",
+          description: "El formulario ha sido actualizado con la información extraída",
+        });
+      } else {
+        toast({
+          title: "Error en el análisis",
+          description: "No se pudo extraer información de la minuta",
+          variant: "destructive"
+        });
+      }
     },
     onError: (error) => {
+      console.error('Error analyzing minute:', error);
       toast({
-        title: "Error en el análisis",
-        description: error instanceof Error ? error.message : "Error analizando la minuta",
+        title: "Error al analizar",
+        description: "Ocurrió un error al procesar la minuta. Por favor, intenta nuevamente.",
         variant: "destructive"
       });
     }
@@ -206,7 +197,142 @@ export function MinuteAnalysisStep({ formData, onFormChange, onNext, onPrevious 
   };
 
   const loadDemoMinute = () => {
-    const demoText = `MINUTA DE REUNIÓN - GESTIONAR TRANSFERENCIAS BANCARIAS
+    let demoText = '';
+    
+    // Cargar ejemplo diferente según el tipo de caso de uso
+    if (formData.useCaseType === 'service') {
+      demoText = `MINUTA DE REUNIÓN - PROCESO AUTOMÁTICO DE CONCILIACIÓN BANCARIA
+
+Cliente: Banco Santander Argentina
+Proyecto: Sistema de Procesamiento Automático de Archivos
+Código: SP001
+Fecha: 28 de enero de 2025
+Participantes: Equipo de desarrollo, Arquitecto de sistemas, DevOps
+
+OBJETIVO DEL PROCESO:
+Desarrollar un proceso automático que se ejecute diariamente para conciliar las transacciones bancarias, procesando archivos desde múltiples fuentes, validando la integridad de los datos y generando reportes de discrepancias.
+
+ALCANCE Y DESCRIPCIÓN:
+El proceso debe ejecutarse automáticamente todos los días a las 2:00 AM y 14:00 PM. Capturará archivos desde servidores SFTP de diferentes sucursales, procesará las transacciones, aplicará reglas de conciliación y generará reportes consolidados. En caso de discrepancias críticas, debe enviar alertas inmediatas al equipo de operaciones.
+
+FRECUENCIA Y HORARIOS DE EJECUCIÓN:
+- Frecuencia principal: Diariamente a las 02:00 AM (proceso completo)
+- Frecuencia secundaria: Cada 4 horas para procesamiento incremental (06:00, 10:00, 14:00, 18:00, 22:00)
+- Proceso mensual: Último día del mes a las 23:30 para cierre contable
+
+CONFIGURACIÓN DE RUTAS Y DIRECTORIOS:
+Las siguientes rutas deben ser configurables mediante archivo de propiedades:
+- Captura de archivos: /sftp/incoming/transactions/
+- Archivos procesados: /sftp/processed/{YYYY}/{MM}/{DD}/
+- Archivos con error: /sftp/errors/
+- Logs del proceso: /logs/conciliation/
+- Reportes generados: /reports/daily/
+
+INTEGRACIÓN CON SERVICIOS EXTERNOS:
+El proceso debe conectarse con los siguientes web services:
+- Servicio de validación BCRA: https://api.bcra.gov.ar/v2/validate
+  Usuario: srv_conciliacion_santander
+  Clave: Debe ser configurable y encriptada
+  Método de autenticación: OAuth 2.0
+- API interna de saldos: https://internal.santander.com/api/balances
+  Token: Renovación automática cada 24 horas
+
+REQUISITOS FUNCIONALES IDENTIFICADOS:
+1. Capturar archivos desde múltiples servidores SFTP según horario configurado
+2. Validar formato y estructura de archivos antes de procesar
+3. Aplicar reglas de conciliación bancaria automáticamente
+4. Detectar discrepancias y generar alertas cuando corresponda
+5. Generar reportes consolidados diarios, semanales y mensuales
+6. Mantener log detallado de todas las operaciones procesadas
+7. Archivar archivos procesados para auditoría
+8. Enviar notificaciones al equipo de operaciones
+
+REGLAS DE NEGOCIO ESTABLECIDAS:
+1. Los archivos deben procesarse en el orden de llegada
+2. Si un archivo falla, no debe detener el proceso de otros archivos
+3. Las discrepancias mayores a $10.000 requieren revisión manual
+4. Los reportes deben generarse aunque haya errores parciales
+5. Mantener historial de 90 días de archivos procesados
+6. Reintentar archivos fallidos hasta 3 veces antes de marcarlos como error
+
+REQUERIMIENTOS ESPECIALES Y TÉCNICOS:
+1. Capacidad de procesar archivos de hasta 500MB
+2. Soporte para múltiples formatos (CSV, XML, JSON)
+3. Encriptación de archivos sensibles durante transferencia
+4. Monitoreo en tiempo real del estado del proceso
+5. Capacidad de reprocesar archivos manualmente
+6. Dashboard de control con métricas de procesamiento`;
+    } else if (formData.useCaseType === 'api') {
+      demoText = `MINUTA DE REUNIÓN - API DE CONSULTA DE SALDOS
+
+Cliente: Banco Santander Argentina
+Proyecto: API Gateway Bancario
+Código: API003
+Fecha: 28 de enero de 2025
+Participantes: Equipo de APIs, Arquitecto de integración, Product Owner
+
+OBJETIVO DEL API:
+Desarrollar un endpoint REST para consultar saldos de cuentas bancarias en tiempo real, con autenticación OAuth 2.0, rate limiting y respuestas en formato JSON estandarizado.
+
+DESCRIPCIÓN TÉCNICA:
+Endpoint: GET /api/v2/accounts/{accountId}/balance
+Método: GET
+Autenticación: Bearer Token (OAuth 2.0)
+Content-Type: application/json
+Rate Limit: 100 requests por minuto por API key
+
+HEADERS REQUERIDOS:
+- Authorization: Bearer {token}
+- X-API-Key: {apiKey}
+- X-Request-ID: UUID único por request
+- X-Client-Version: Versión del cliente
+
+REQUEST PARAMETERS:
+- accountId (path): Identificador único de la cuenta (CBU o número de cuenta)
+- currency (query, opcional): Moneda para la consulta (ARS, USD, EUR)
+- includeHolds (query, opcional): Incluir retenciones (true/false)
+
+EJEMPLO DE REQUEST:
+GET /api/v2/accounts/0170099220000001234567/balance?currency=ARS&includeHolds=true
+Headers:
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  X-API-Key: sk_live_4242424242424242
+  X-Request-ID: 550e8400-e29b-41d4-a716-446655440000
+
+RESPONSE SUCCESS (200 OK):
+{
+  "status": "success",
+  "data": {
+    "accountId": "0170099220000001234567",
+    "availableBalance": 150000.50,
+    "currentBalance": 155000.00,
+    "currency": "ARS",
+    "holds": [
+      {
+        "amount": 4500.50,
+        "description": "Compra en cuotas",
+        "releaseDate": "2025-02-15"
+      }
+    ],
+    "lastUpdate": "2025-01-28T10:30:45Z"
+  },
+  "metadata": {
+    "requestId": "550e8400-e29b-41d4-a716-446655440000",
+    "timestamp": "2025-01-28T10:30:45Z"
+  }
+}
+
+CÓDIGOS DE ERROR:
+- 400 Bad Request: Parámetros inválidos o faltantes
+- 401 Unauthorized: Token inválido o expirado
+- 403 Forbidden: Sin permisos para la cuenta
+- 404 Not Found: Cuenta no encontrada
+- 429 Too Many Requests: Rate limit excedido
+- 500 Internal Server Error: Error del servidor
+- 503 Service Unavailable: Servicio temporalmente no disponible`;
+    } else {
+      // Default para entity
+      demoText = `MINUTA DE REUNIÓN - GESTIONAR TRANSFERENCIAS BANCARIAS
 
 Cliente: Banco Santander Argentina
 Proyecto: Sistema de Gestión de Transferencias Electrónicas
@@ -266,21 +392,6 @@ CAMPOS DE LA ENTIDAD TRANSFERENCIA:
 - fechaOperacion: fecha y hora, obligatorio
 - fechaProcesamiento: fecha y hora, opcional
 - motivoRechazo: texto, opcional, máximo 500 caracteres
-- ipCliente: texto, obligatorio, formato IP válido
-- dispositivoOrigen: texto, obligatorio, máximo 100 caracteres
-- fechaAlta: fecha y hora, obligatorio, automático
-- usuarioAlta: texto, obligatorio, máximo 50 caracteres
-- fechaModificacion: fecha y hora, opcional, automático
-- usuarioModificacion: texto, opcional, máximo 50 caracteres
-
-PANTALLAS Y WIREFRAMES IDENTIFICADOS:
-- Pantalla de búsqueda de cuenta origen con validación CBU/Alias
-- Formulario de datos de transferencia con calculadora de comisiones
-- Pantalla de confirmación con resumen de operación
-- Grilla de resultados de transferencias con filtros avanzados
-- Detalle de transferencia individual con timeline de estados
-- Pantalla de programación de transferencias futuras
-- Formulario de autorización con token de seguridad
 
 REGLAS DE NEGOCIO ESTABLECIDAS:
 1. Solo clientes con cuentas activas pueden realizar transferencias
@@ -316,6 +427,8 @@ CRITERIOS DE ACEPTACIÓN:
 - Cumplimiento de normativas PCI-DSS para seguridad de datos
 - Integración exitosa con 15 bancos principales del país
 - Capacidad de procesar 10.000 transferencias simultáneas`;
+    }
+    
     setMinuteText(demoText);
   };
 
@@ -328,41 +441,51 @@ CRITERIOS DE ACEPTACIÓN:
             <Brain className="mr-2 text-ms-blue" size={20} />
             Análisis Inteligente de Minutas
           </CardTitle>
+          <div className="text-sm text-gray-500">
+            Tipo de CU: <span className="font-medium">
+              {formData.useCaseType === 'entity' && 'Gestión de Entidad'}
+              {formData.useCaseType === 'api' && 'API'}
+              {formData.useCaseType === 'service' && 'Servicio/Proceso Automático'}
+            </span>
+          </div>
         </div>
-        <p className="text-sm text-gray-600">
-          Sube o pega el texto de la minuta de reunión para que la IA complete automáticamente el formulario
-        </p>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Área de carga de archivo */}
-        <div
-          className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-            dragActive 
-              ? 'border-ms-blue bg-blue-50 dark:bg-blue-900/20' 
-              : 'border-gray-300 dark:border-gray-600 hover:border-ms-blue'
+        {/* Zona de carga de archivos */}
+        <div 
+          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            dragActive ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
           <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              Arrastra y suelta un archivo aquí
-            </p>
-            <p className="text-xs text-gray-500">
-              o haz clic para seleccionar un archivo (.txt, .docx, .pptx, .xlsx)
-            </p>
-          </div>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Arrastra y suelta tu archivo aquí, o haz clic para seleccionar
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+            Soporta: .txt, .docx, .pptx, .xlsx
+          </p>
           <input
             type="file"
-            accept=".txt,.docx,.pptx,.xlsx,.xls,.ppt"
+            id="file-upload"
+            className="hidden"
             onChange={handleFileUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            accept=".txt,.docx,.pptx,.xlsx,.xls,.ppt"
+            disabled={readOnly}
           />
+          <label htmlFor="file-upload">
+            <Button variant="outline" size="sm" className="cursor-pointer" asChild>
+              <span>
+                <FileText className="mr-2 h-4 w-4" />
+                Seleccionar Archivo
+              </span>
+            </Button>
+          </label>
         </div>
 
-        {/* Área de texto */}
+        {/* Área de texto de minuta */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
