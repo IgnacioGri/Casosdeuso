@@ -1,0 +1,388 @@
+Feedback sobre las imágenes generadas desde HTML
+1. Wireframe del Buscador (Imagen 1)
+✔️ Lo positivo:
+Incluye botones Buscar, Limpiar y Agregar como se requería.
+
+Tiene estructura de tabla para los resultados.
+
+Incluye acciones Editar y Eliminar por fila.
+
+Incorpora paginación inferior.
+
+🔧 Para mejorar:
+Los filtros están muy genéricos y no hay separación visual clara entre secciones (filtros, resultados).
+
+Falta espacio o padding entre los controles del filtro (queda visualmente amontonado).
+
+Sería ideal agregar títulos como “Filtros de búsqueda” y “Resultados” para separar visualmente.
+
+Los íconos de editar/eliminar podrían estar representados con íconos estilo Microsoft (lápiz, tacho).
+
+Paginación podría estar mejor alineada o tener estilo más moderno (como botones pequeños tipo Bootstrap).
+
+ Wireframe del Formulario de Alta (Imagen 2)
+✔️ Lo positivo:
+Respeta la estructura de formulario de carga.
+
+Incluye campos de fecha y usuario de alta/modificación (requerido).
+
+Botones “Aceptar” y “Cancelar” bien ubicados.
+
+Uso correcto de etiquetas y campos con tamaños distintos.
+
+🔧 Para mejorar:
+Falta un título general (ej. “Alta de Entidad”).
+
+Podés agrupar campos en secciones lógicas (ej. Datos generales, Auditoría).
+
+Espaciado entre campos: muy justo; debería haber más separación vertical.
+
+Los campos obligatorios podrían tener un asterisco rojo o tooltip explicativo.
+
+La sección de Auditoría (fecha/usuario) podría ir con un fondo gris claro o en un contenedor más visual.
+
+Sugerencias generales para mejorar el sistema
+CSS corporativo unificado: Usar un pequeño CSS con tipografías, bordes, paddings y colores similares a Office/Microsoft para consistencia visual.
+
+Plantillas reusables: Crear un set de componentes en HTML para:
+
+Filtros de búsqueda (inputs + botones)
+
+Tabla de resultados con acciones
+
+Formularios con validaciones
+
+Sección de auditoría
+
+
+Me dieron sugerencias y un codigo html para que te inspires, no es necesariamente algo que tenes que copiar textual pero si esta bueno:
+Listo. Ya tenés una plantilla HTML para el formulario de alta o edición de entidad, siguiendo el estilo Microsoft/ING y con los elementos requeridos: campos con validaciones, estructura en grilla, datos de auditoría y botones Aceptar / Cancelar. :
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario Alta de Entidad - Wireframe</title>
+  <style>
+    body {
+      font-family: Segoe UI, sans-serif;
+      margin: 0;
+      background: #f2f4f8;
+    }
+    header {
+      background: #004b8d;
+      color: white;
+      padding: 10px 20px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+    main {
+      padding: 20px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 4px;
+    }
+    .campo {
+      margin-bottom: 15px;
+    }
+    .campo label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    .campo input, .campo select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .botones {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .botones button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 2px;
+      color: white;
+      cursor: pointer;
+    }
+    .cancelar { background: #666; }
+    .aceptar { background: #0078d4; }
+    .auditoria {
+      background: #eef2f7;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>Alta / Edición de Entidad</header>
+  <main>
+    <form>
+      <div class="form-grid">
+        <div class="campo">
+          <label for="nombre">Nombre *</label>
+          <input type="text" id="nombre" maxlength="100">
+        </div>
+        <div class="campo">
+          <label for="apellido">Apellido *</label>
+          <input type="text" id="apellido" maxlength="100">
+        </div>
+        <div class="campo">
+          <label for="tipoDocumento">Tipo de Documento *</label>
+          <select id="tipoDocumento">
+            <option>DNI</option>
+            <option>CUIT</option>
+            <option>Pasaporte</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="numeroDocumento">Número de Documento *</label>
+          <input type="text" id="numeroDocumento" maxlength="20">
+        </div>
+        <div class="campo">
+          <label for="email">Email</label>
+          <input type="email" id="email" maxlength="150">
+        </div>
+        <div class="campo">
+          <label for="estado">Estado *</label>
+          <select id="estado">
+            <option>Activo</option>
+            <option>Inactivo</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="fechaAlta">Fecha de Alta</label>
+          <input type="date" id="fechaAlta">
+        </div>
+        <div class="campo">
+          <label for="usuarioAlta">Usuario Alta</label>
+          <input type="text" id="usuarioAlta" maxlength="50">
+        </div>
+        <div class="campo">
+          <label for="fechaModificacion">Fecha de Modificación</label>
+          <input type="date" id="fechaModificacion">
+        </div>
+        <div class="campo">
+          <label for="usuarioModificacion">Usuario Modificación</label>
+          <input type="text" id="usuarioModificacion" maxlength="50">
+        </div>
+      </div>
+
+      <div class="auditoria">
+        <strong>Auditoría:</strong><br>
+        Fecha de alta: 15/01/2025 10:30<br>
+        Usuario de alta: admin.sistema<br>
+        Fecha de modificación: 15/01/2025 14:45<br>
+        Usuario de modificación: usuario.actual
+      </div>
+
+      <div class="botones">
+        <button type="button" class="cancelar">Cancelar</button>
+        <button type="submit" class="aceptar">Aceptar</button>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
+
+Listo, te generé una plantilla HTML para el buscador de entidades con filtros, tabla de resultados, íconos de acciones (ver, editar, bitácora, eliminar) y paginado:
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buscador de Entidades</title>
+  <style>
+    body {
+      font-family: Segoe UI, sans-serif;
+      margin: 0;
+      background: #f4f6f9;
+    }
+    header {
+      background: #004b8d;
+      color: white;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    main {
+      padding: 20px;
+    }
+    .filtros {
+      background: #1d4e89;
+      color: white;
+      padding: 15px;
+      border-radius: 4px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .filtros label {
+      font-size: 13px;
+    }
+    .filtros input, .filtros select {
+      width: 100%;
+      padding: 6px;
+      margin-top: 3px;
+      border: none;
+      border-radius: 2px;
+    }
+    .botones {
+      display: flex;
+      gap: 10px;
+      justify-content: start;
+      margin-top: 10px;
+    }
+    .botones button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 2px;
+      color: white;
+      cursor: pointer;
+    }
+    .buscar { background: #0078d4; }
+    .limpiar { background: #666; }
+    .agregar { background: #107c10; }
+
+    .tabla-container {
+      background: white;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .acciones {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+    }
+    .acciones button {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .acciones img {
+      width: 100%;
+    }
+    .paginado {
+      display: flex;
+      justify-content: center;
+      padding: 12px;
+      gap: 5px;
+    }
+    .paginado button {
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+    }
+    .paginado .activo {
+      background: #0078d4;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>Buscador de Entidades</header>
+  <main>
+    <section class="filtros">
+      <div>
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" placeholder="Ingrese nombre...">
+      </div>
+      <div>
+        <label for="documento">Documento</label>
+        <input type="text" id="documento" placeholder="Ingrese Nº documento...">
+      </div>
+      <div>
+        <label for="tipo">Tipo de Persona</label>
+        <select id="tipo">
+          <option>Todos</option>
+          <option>Física</option>
+          <option>Jurídica</option>
+        </select>
+      </div>
+      <div>
+        <label for="estado">Estado</label>
+        <select id="estado">
+          <option>Todos</option>
+          <option>Activo</option>
+          <option>Inactivo</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="botones">
+      <button class="buscar">Buscar</button>
+      <button class="limpiar">Limpiar</button>
+      <button class="agregar">Agregar</button>
+    </div>
+
+    <section class="tabla-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Acciones</th>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Documento</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="acciones">
+              <button title="Ver"><img src="icono-ver.png" alt="Ver"></button>
+              <button title="Editar"><img src="icono-editar.png" alt="Editar"></button>
+              <button title="Bitácora"><img src="icono-bitacora.png" alt="Bitácora"></button>
+              <button title="Eliminar"><img src="icono-eliminar.png" alt="Eliminar"></button>
+            </td>
+            <td>Juan Pérez</td>
+            <td>Física</td>
+            <td>30123456</td>
+            <td>Activo</td>
+          </tr>
+          <!-- más filas -->
+        </tbody>
+      </table>
+
+      <div class="paginado">
+        <button>&laquo;</button>
+        <button class="activo">1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>&raquo;</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

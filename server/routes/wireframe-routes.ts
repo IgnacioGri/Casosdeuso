@@ -33,60 +33,61 @@ function generateSearchWireframeHTML(data: WireframeData): string {
     }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #f4f6f9;
+      margin: 0;
     }
     .header {
-      background: #0078D4;
+      background: #004b8d;
       color: white;
-      padding: 16px 24px;
-      font-size: 20px;
-      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: bold;
     }
-    .search-panel {
-      padding: 24px;
-      border-bottom: 1px solid #e0e0e0;
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
-    .search-title {
+    .section {
+      margin-bottom: 25px;
+    }
+    .section-title {
+      color: #0078D4;
       font-size: 16px;
       font-weight: 600;
-      margin-bottom: 16px;
-      color: #0078D4;
+      margin-bottom: 10px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #0078D4;
+    }
+    .filters-panel {
+      background: #1d4e89;
+      color: white;
+      padding: 20px;
+      border-radius: 4px;
     }
     .filters-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
       margin-bottom: 20px;
     }
-    .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .filter-group label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+      font-weight: 500;
     }
-    .filter-label {
-      min-width: 120px;
-      font-size: 14px;
-      color: #666;
-    }
-    .filter-input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #d0d0d0;
+    .filter-group input {
+      width: 100%;
+      padding: 8px;
+      border: none;
       border-radius: 2px;
       font-size: 14px;
     }
     .buttons {
       display: flex;
       gap: 12px;
-      margin-top: 20px;
+      margin-top: 15px;
     }
     .btn {
       padding: 8px 20px;
@@ -95,135 +96,160 @@ function generateSearchWireframeHTML(data: WireframeData): string {
       font-size: 14px;
       cursor: pointer;
       font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .btn-primary {
       background: #0078D4;
       color: white;
     }
     .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
+      background: #666;
+      color: white;
     }
     .btn-success {
       background: #107C10;
       color: white;
     }
     .results-panel {
-      padding: 24px;
+      background: white;
+      border-radius: 4px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 14px;
+      font-size: 13px;
     }
     .table th {
-      background: #f8f8f8;
-      padding: 12px;
+      background: #f0f0f0;
+      padding: 10px 8px;
       text-align: left;
       font-weight: 600;
-      border-bottom: 2px solid #e0e0e0;
-      color: #333;
+      border: 1px solid #ddd;
     }
     .table td {
-      padding: 12px;
-      border-bottom: 1px solid #e0e0e0;
+      padding: 10px 8px;
+      border: 1px solid #ddd;
     }
     .table tr:hover {
-      background: #f5f5f5;
+      background: #f8f8f8;
     }
-    .action-buttons {
+    .actions {
       display: flex;
-      gap: 8px;
+      gap: 5px;
+      justify-content: center;
     }
-    .icon-btn {
-      padding: 6px 12px;
+    .action-btn {
+      padding: 5px 10px;
       font-size: 12px;
-      border: 1px solid #d0d0d0;
-      background: white;
-      cursor: pointer;
+      border: none;
       border-radius: 2px;
-      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
-    .icon-btn:hover {
-      background: #f0f0f0;
+    .action-btn.edit {
+      background: #0078D4;
+      color: white;
+    }
+    .action-btn.delete {
+      background: #D13438;
+      color: white;
+    }
+    .action-btn.view {
+      background: #008272;
+      color: white;
+    }
+    .action-btn.log {
+      background: #666;
+      color: white;
     }
     .pagination {
       display: flex;
       justify-content: center;
-      align-items: center;
-      gap: 8px;
+      gap: 5px;
       margin-top: 20px;
-      padding: 20px;
-      border-top: 1px solid #e0e0e0;
+      padding: 15px;
     }
     .page-btn {
       padding: 6px 12px;
-      border: 1px solid #d0d0d0;
+      border: 1px solid #ccc;
       background: white;
       cursor: pointer;
+      font-size: 13px;
       border-radius: 2px;
-      font-size: 14px;
+    }
+    .page-btn:hover {
+      background: #f5f5f5;
     }
     .page-btn.active {
       background: #0078D4;
       color: white;
       border-color: #0078D4;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
+  <div class="header">${data.title}</div>
+  
   <div class="container">
-    <div class="header">${data.title}</div>
-    
-    <div class="search-panel">
-      <div class="search-title">Filtros de Búsqueda</div>
-      <div class="filters-grid">
-        ${filters.map(filter => `
-          <div class="filter-group">
-            <label class="filter-label">${filter}:</label>
-            <input type="text" class="filter-input" placeholder="Ingrese ${filter.toLowerCase()}">
-          </div>
-        `).join('')}
-      </div>
-      <div class="buttons">
-        <button class="btn btn-primary">🔍 Buscar</button>
-        <button class="btn btn-secondary">🗑️ Limpiar</button>
-        <button class="btn btn-success">➕ Agregar</button>
+    <div class="section">
+      <h2 class="section-title">Filtros de búsqueda</h2>
+      <div class="filters-panel">
+        <div class="filters-grid">
+          ${filters.map(filter => `
+            <div class="filter-group">
+              <label>${filter}</label>
+              <input type="text" placeholder="Ingrese ${filter.toLowerCase()}...">
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="buttons">
+          <button class="btn btn-primary">🔍 Buscar</button>
+          <button class="btn btn-secondary">🔄 Limpiar</button>
+          <button class="btn btn-success">➕ Agregar</button>
+        </div>
       </div>
     </div>
     
-    <div class="results-panel">
+    <div class="section results-panel">
+      <h2 class="section-title">Resultados</h2>
       <table class="table">
         <thead>
           <tr>
+            <th style="width: 150px; text-align: center;">Acciones</th>
             ${columns.map(col => `<th>${col}</th>`).join('')}
-            <th style="width: 120px;">Acciones</th>
           </tr>
         </thead>
         <tbody>
           ${[1, 2, 3, 4, 5].map(i => `
             <tr>
-              ${columns.map(() => `<td>Dato ejemplo ${i}</td>`).join('')}
               <td>
-                <div class="action-buttons">
-                  <button class="icon-btn">✏️ Editar</button>
-                  <button class="icon-btn">🗑️ Eliminar</button>
+                <div class="actions">
+                  <button class="action-btn view" title="Ver">👁️</button>
+                  <button class="action-btn edit" title="Editar">✏️</button>
+                  <button class="action-btn log" title="Bitácora">📋</button>
+                  <button class="action-btn delete" title="Eliminar">🗑️</button>
                 </div>
               </td>
+              ${columns.map(() => `<td>Dato ejemplo ${i}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>
       </table>
       
       <div class="pagination">
-        <button class="page-btn">⬅️</button>
+        <button class="page-btn">«</button>
         <button class="page-btn active">1</button>
         <button class="page-btn">2</button>
         <button class="page-btn">3</button>
-        <button class="page-btn">4</button>
-        <button class="page-btn">5</button>
-        <button class="page-btn">➡️</button>
-        <span style="margin-left: 20px; color: #666; font-size: 14px;">Página 1 de 5</span>
+        <button class="page-btn">»</button>
       </div>
     </div>
   </div>
@@ -247,39 +273,48 @@ function generateFormWireframeHTML(data: WireframeData): string {
     }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #f2f4f8;
+      margin: 0;
     }
     .header {
-      background: #0078D4;
+      background: #004b8d;
       color: white;
-      padding: 16px 24px;
-      font-size: 20px;
-      font-weight: 600;
+      padding: 12px 20px;
+      font-size: 18px;
+      font-weight: bold;
     }
-    .form-content {
-      padding: 24px;
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .form-panel {
+      background: white;
+      border-radius: 4px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section-title {
+      color: #0078D4;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding-bottom: 5px;
+      border-bottom: 2px solid #0078D4;
     }
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
-      margin-bottom: 30px;
     }
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-    }
-    .form-group.full-width {
-      grid-column: span 2;
+      gap: 8px;
+      margin-bottom: 15px;
     }
     .form-label {
       font-size: 14px;
@@ -288,19 +323,18 @@ function generateFormWireframeHTML(data: WireframeData): string {
     }
     .required {
       color: #D13438;
+      font-weight: bold;
     }
-    .form-input {
+    .form-input, .form-select {
+      width: 100%;
       padding: 8px 12px;
-      border: 1px solid #d0d0d0;
+      border: 1px solid #ccc;
       border-radius: 2px;
       font-size: 14px;
     }
-    .form-select {
-      padding: 8px 12px;
-      border: 1px solid #d0d0d0;
-      border-radius: 2px;
-      font-size: 14px;
-      background: white;
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #0078D4;
     }
     .form-checkbox {
       display: flex;
@@ -309,21 +343,21 @@ function generateFormWireframeHTML(data: WireframeData): string {
       margin-top: 6px;
     }
     .metadata-section {
-      background: #f8f8f8;
-      padding: 16px;
-      margin: 24px 0;
-      border-radius: 2px;
+      background: #eef2f7;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 30px;
     }
     .metadata-title {
       font-size: 14px;
       font-weight: 600;
       color: #0078D4;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .metadata-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      gap: 15px;
       font-size: 13px;
     }
     .metadata-item {
@@ -338,8 +372,7 @@ function generateFormWireframeHTML(data: WireframeData): string {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 20px 24px;
-      border-top: 1px solid #e0e0e0;
+      margin-top: 30px;
     }
     .btn {
       padding: 8px 24px;
@@ -354,51 +387,92 @@ function generateFormWireframeHTML(data: WireframeData): string {
       color: white;
     }
     .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
+      background: #666;
+      color: white;
     }
   </style>
 </head>
 <body>
+  <div class="header">Alta / Edición de Entidad</div>
+  
   <div class="container">
-    <div class="header">${data.title}</div>
-    
-    <div class="form-content">
-      <div class="form-grid">
-        ${fields.map(field => {
-          const inputType = field.type === 'NUMBER' ? 'number' : 
-                          field.type === 'DATE' ? 'date' : 
-                          field.type === 'BOOLEAN' ? 'checkbox' : 'text';
-          
-          if (field.type === 'BOOLEAN') {
+    <div class="form-panel">
+      <div class="section">
+        <h2 class="section-title">Datos Generales</h2>
+        <div class="form-grid">
+          ${fields.slice(0, Math.ceil(fields.length * 0.7)).map(field => {
+            const inputType = field.type === 'NUMBER' ? 'number' : 
+                            field.type === 'DATE' ? 'date' : 
+                            field.type === 'BOOLEAN' ? 'checkbox' : 'text';
+            
+            if (field.type === 'BOOLEAN') {
+              return `
+                <div class="form-group">
+                  <div class="form-checkbox">
+                    <input type="checkbox" id="${field.name}">
+                    <label for="${field.name}" class="form-label">${field.name}</label>
+                  </div>
+                </div>
+              `;
+            }
+            
             return `
               <div class="form-group">
-                <div class="form-checkbox">
-                  <input type="checkbox" id="${field.name}">
-                  <label for="${field.name}" class="form-label">${field.name}</label>
-                </div>
+                <label class="form-label">
+                  ${field.name} ${field.mandatory ? '<span class="required">*</span>' : ''}
+                </label>
+                <input 
+                  type="${inputType}" 
+                  class="form-input" 
+                  ${field.length ? `maxlength="${field.length}"` : ''}
+                  ${field.mandatory ? 'required' : ''}
+                >
               </div>
             `;
-          }
-          
-          return `
-            <div class="form-group">
-              <label class="form-label">
-                ${field.name}
-                ${field.mandatory ? '<span class="required">*</span>' : ''}
-              </label>
-              <input 
-                type="${inputType}" 
-                class="form-input" 
-                placeholder="${field.length ? `Máximo ${field.length} caracteres` : ''}"
-              >
-            </div>
-          `;
-        }).join('')}
+          }).join('')}
+        </div>
       </div>
+
+      ${fields.length > 4 ? `
+      <div class="section">
+        <h2 class="section-title">Información Adicional</h2>
+        <div class="form-grid">
+          ${fields.slice(Math.ceil(fields.length * 0.7)).map(field => {
+            const inputType = field.type === 'NUMBER' ? 'number' : 
+                            field.type === 'DATE' ? 'date' : 
+                            field.type === 'BOOLEAN' ? 'checkbox' : 'text';
+            
+            if (field.type === 'BOOLEAN') {
+              return `
+                <div class="form-group">
+                  <div class="form-checkbox">
+                    <input type="checkbox" id="${field.name}">
+                    <label for="${field.name}" class="form-label">${field.name}</label>
+                  </div>
+                </div>
+              `;
+            }
+            
+            return `
+              <div class="form-group">
+                <label class="form-label">
+                  ${field.name} ${field.mandatory ? '<span class="required">*</span>' : ''}
+                </label>
+                <input 
+                  type="${inputType}" 
+                  class="form-input" 
+                  ${field.length ? `maxlength="${field.length}"` : ''}
+                  ${field.mandatory ? 'required' : ''}
+                >
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+      ` : ''}
       
       <div class="metadata-section">
-        <div class="metadata-title">Información de Auditoría</div>
+        <div class="metadata-title">Auditoría</div>
         <div class="metadata-grid">
           <div class="metadata-item">
             <span class="metadata-label">Fecha de alta:</span>
@@ -418,11 +492,11 @@ function generateFormWireframeHTML(data: WireframeData): string {
           </div>
         </div>
       </div>
-    </div>
-    
-    <div class="buttons">
-      <button class="btn btn-secondary">❌ Cancelar</button>
-      <button class="btn btn-primary">✅ Aceptar</button>
+
+      <div class="buttons">
+        <button class="btn btn-secondary">Cancelar</button>
+        <button class="btn btn-primary">Aceptar</button>
+      </div>
     </div>
   </div>
 </body>
