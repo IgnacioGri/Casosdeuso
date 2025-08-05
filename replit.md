@@ -49,6 +49,11 @@ Preferred communication style: Simple, everyday language.
   - **Complete Coverage**: ALL auto-completion sources (AI assist, minute analysis, test case generation) now generate bullet-formatted content
   - Enhanced with warning emojis (⚠️) and explicit format requirements to ensure AI compliance across all generation methods
   - Perfect synchronization: Both systems generate identical bullet-point content matching BulletTextarea component behavior
+- **[ENHANCEMENT COMPLETED]** Updated wireframe generation prompts with professional Microsoft-style templates:
+  - Enhanced search wireframe prompt with structured UI requirements, functionality details, and Microsoft admin styling
+  - Enhanced form wireframe prompt with detailed field specifications and enterprise layout guidelines
+  - Prompts now include emojis for clear section organization (🧭 Main UI, 📑 Functionality, 🎨 Styling)
+  - Integrated actual form data (filters, columns, fields) for data-driven wireframe generation
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

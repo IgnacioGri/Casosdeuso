@@ -9,6 +9,7 @@ Este documento contiene todos los prompts utilizados en el sistema, diferenciado
 - **CRÍTICO**: Instrucciones explícitas para usar EXACTAMENTE los datos de formData y nunca valores genéricos como "Apellido", "DNI", "Segmento"
 - **Fallback para actores**: "Si no hay actor explícito, usar 'Actor no identificado'"
 - **Wireframes dinámicos**: Los wireframes ahora usan datos específicos del formulario en lugar de valores hardcoded
+- **Generación de Imágenes con IA**: Prompts profesionales para wireframes usando estilo Microsoft enterprise con emojis organizacionales (🧭 🎨 📑)
 
 ## Índice
 1. [Generación Principal de Casos de Uso](#1-generación-principal-de-casos-de-uso)
@@ -26,8 +27,11 @@ Este documento contiene todos los prompts utilizados en el sistema, diferenciado
 5. [Generación Inteligente de Casos de Prueba](#5-generación-inteligente-de-casos-de-prueba)
    - [TypeScript/React](#51-typescriptreact-4)
    - [C#/Blazor](#52-csharp-blazor-4)
-6. [Prompts Específicos por Tipo de Caso de Uso](#6-prompts-específicos-por-tipo-de-caso-de-uso)
-7. [Configuración de Modelos AI](#7-configuración-de-modelos-ai)
+6. [Generación de Wireframes con IA](#6-generación-de-wireframes-con-ia)
+   - [TypeScript/React](#61-typescriptreact-5)
+   - [C#/Blazor](#62-csharp-blazor-5)
+7. [Prompts Específicos por Tipo de Caso de Uso](#7-prompts-específicos-por-tipo-de-caso-de-uso)
+8. [Configuración de Modelos AI](#8-configuración-de-modelos-ai)
 
 ---
 
@@ -641,7 +645,83 @@ float temperature = 0.2f; // Reducida para mayor precisión
 
 ---
 
-## 6. Prompts Específicos por Tipo de Caso de Uso
+## 6. Generación de Wireframes con IA
+
+### 6.1. TypeScript/React
+
+**Ubicación**: `client/src/components/steps/wireframes-step.tsx` - método `generateWireframePrompt()`
+
+#### Prompt para Wireframe de Búsqueda
+```typescript
+const searchWireframePrompt = `Generate a simplified graphical wireframe of an enterprise UI screen for searching and listing entities for "${formData.useCaseName || 'Entity Management'}".
+Follow these business rules and UI layout guidelines:
+
+🧭 Main UI Requirements
+– Add a search area at the top with various filters based on these fields: ${filtersText}
+– Below the filters, include three action buttons: Buscar (Search), Limpiar (Clear), and Agregar (Add new entry)
+– Below the search area, show a paginated table with results displaying these columns: ${columnsText}
+– Each row must include Edit and Delete buttons (icon buttons are acceptable)
+
+📑 Functionality Details
+– Clearly list and label each search filter using the provided fields
+– Clearly label columns in the results table, matching the most relevant fields
+– Indicate that pagination is required (show controls like "Previous, Next, Page X of Y")
+
+🎨 Styling & UI Rules
+– Follow Microsoft-style admin UI (flat design, minimal shadows, blue section headers, sans-serif fonts)
+– Prefer 2-column layout for filters if space allows
+– Align all elements cleanly with consistent spacing
+
+Generate a realistic wireframe image of the UI using Microsoft enterprise admin style.${additionalDescription}`;
+```
+
+#### Prompt para Wireframe de Formulario
+```typescript
+const formWireframePrompt = `Generate a simplified graphical wireframe of an enterprise UI screen for adding or editing an entity for "${formData.useCaseName || 'Entity Management'}".
+Use the provided list of fields to determine the inputs and follow these business layout rules:
+
+🧭 Main UI Requirements
+– At the top or bottom, include action buttons: Aceptar (Save) and Cancelar (Cancel)
+– Include two metadata fields at the bottom or side:
+    • Fecha de alta (creation date)
+    • Usuario de alta (creator user)
+    • Fecha de modificación (modification date)
+    • Usuario de modificación (modifier user)
+
+📑 Functionality Details
+– For each field from the provided data, indicate:
+    Fields to include: ${fieldsDetails}
+    • Field label
+    • Type of input (text, number, date, etc.)
+    • If it is required (show with asterisk *)
+    • Max length (if applicable)
+    • Special requirements or validations
+
+🎨 Styling & UI Rules
+– Use a clean, Microsoft-like admin form layout
+– Group related fields into sections where possible
+– Use blue titles or dividers for sections
+– Fields should be placed in a 2- or 3-column grid when space allows
+
+Generate a realistic Microsoft-style wireframe image of the form interface.${additionalDescription}`;
+```
+
+### 6.2. C#/Blazor
+
+**Ubicación**: `UseCaseGenerator.Client/Components/Steps/WireframesStep.razor` - método en código C#
+
+```csharp
+// Los mismos prompts se implementan en C# con sintaxis equivalente
+private string GenerateWireframePrompt(string type)
+{
+    // Implementación similar con los mismos prompts estructurados
+    // usando emojis organizacionales y especificaciones Microsoft-style
+}
+```
+
+---
+
+## 7. Prompts Específicos por Tipo de Caso de Uso
 
 ### Casos de Uso de Entidad
 **Ubicación**: `server/routes.ts` - función `getUseCaseSpecificRules()`
@@ -810,7 +890,7 @@ Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).";
 
 ---
 
-## 7. Configuración de Modelos AI
+## 8. Configuración de Modelos AI
 
 ## Resumen de Cambios de Robustez Implementados
 
