@@ -189,6 +189,8 @@ FORMATO HTML CRÍTICO:
     return `
 INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
 
+⚠️ CRÍTICO: DEBES INCLUIR OBLIGATORIAMENTE ESTAS SECCIONES ESPECÍFICAS ⚠️
+
 DATOS DEL FORMULARIO:
 - Cliente: ${formData.clientName}
 - Proyecto: ${formData.projectName}
@@ -202,36 +204,88 @@ DATOS DEL FORMULARIO:
 - Reglas de negocio: ${formData.businessRules || 'No especificado'}
 - Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
 
-ESTRUCTURA OBLIGATORIA:
+⚠️ ESTRUCTURA OBLIGATORIA - NO OMITIR ESTAS SECCIONES ⚠️
 
-1. FLUJO PRINCIPAL DE EVENTOS
-   1. Identificación del servicio
-      a. Endpoint: ${formData.apiEndpoint || 'Definir endpoint apropiado'}
-      b. Método HTTP: GET/POST/PUT/DELETE
-      c. Headers requeridos (Authorization, Content-Type, etc.)
-   2. Request
-      a. Formato: ${formData.requestFormat || 'Definir formato JSON apropiado'}
-      b. Parámetros obligatorios con tipos y validaciones
-      c. Parámetros opcionales y valores por defecto
-      d. Incluir ejemplo detallado de request completo
-   3. Response
-      a. Formato: ${formData.responseFormat || 'Definir formato JSON apropiado'}
-      b. Códigos de estado exitosos (200, 201, 204)
-      c. Estructura de datos de respuesta con tipos
-      d. Incluir ejemplo detallado de response completo
+DESPUÉS DE REQUERIMIENTOS ESPECIALES, INCLUIR OBLIGATORIAMENTE:
 
-2. FLUJOS ALTERNATIVOS
-   1. Errores de validación (400)
-      a. Request malformado
-      b. Parámetros faltantes
-      c. Tipos de datos incorrectos
-   2. Errores de autorización (401/403)
-      a. Token inválido
-      b. Permisos insuficientes
-   3. Errores del servidor (500)
-      a. Error interno del sistema
-      b. Timeout de conexión
-      c. Servicio no disponible`;
+4. FLUJO PRINCIPAL DE EVENTOS
+   Este título debe aparecer como Heading 2 con color azul RGB(0,112,192)
+   
+   4.1. Identificación del servicio
+        a. Endpoint: ${formData.apiEndpoint || 'Definir endpoint específico según el caso de uso'}
+        b. Método HTTP: POST/GET/PUT/DELETE (según corresponda)
+        c. Headers requeridos:
+           - Authorization: Bearer [token]
+           - Content-Type: application/json
+           - Accept: application/json
+   
+   4.2. Request (Petición)
+        a. Formato de entrada: ${formData.requestFormat || 'JSON estructurado'}
+        b. Parámetros obligatorios con tipos y validaciones específicas
+        c. Parámetros opcionales y valores por defecto
+        d. Ejemplo detallado de request completo en formato JSON:
+           {
+             "campo1": "valor_ejemplo",
+             "campo2": 123,
+             "campo3": true
+           }
+   
+   4.3. Response (Respuesta)
+        a. Formato de salida: ${formData.responseFormat || 'JSON estructurado'}
+        b. Códigos de estado exitosos (200, 201, 204) con descripción
+        c. Estructura de datos de respuesta con tipos y descripción de cada campo
+        d. Ejemplo detallado de response exitoso en formato JSON:
+           {
+             "status": "success",
+             "data": {
+               "id": 12345,
+               "message": "Operación exitosa"
+             }
+           }
+
+5. FLUJOS ALTERNATIVOS
+   Este título debe aparecer como Heading 2 con color azul RGB(0,112,192)
+   
+   5.1. Errores de validación (Código 400 - Bad Request)
+        a. Request malformado - campos faltantes o tipos incorrectos
+        b. Validaciones de negocio fallidas
+        c. Formato de respuesta de error:
+           {
+             "status": "error",
+             "error_code": 400,
+             "message": "Descripción del error",
+             "details": ["Lista de errores específicos"]
+           }
+   
+   5.2. Errores de autorización (Códigos 401/403)
+        a. Token inválido o expirado (401)
+        b. Permisos insuficientes (403)
+        c. Formato de respuesta:
+           {
+             "status": "error",
+             "error_code": 401,
+             "message": "Token inválido o expirado"
+           }
+   
+   5.3. Errores del servidor (Código 500)
+        a. Error interno del sistema
+        b. Timeout de conexión
+        c. Servicio no disponible
+        d. Formato de respuesta:
+           {
+             "status": "error",
+             "error_code": 500,
+             "message": "Error interno del servidor"
+           }
+
+⚠️ INSTRUCCIONES CRÍTICAS PARA REQUEST Y RESPONSE ⚠️
+- SIEMPRE incluir ejemplos de JSON completos y realistas
+- Los ejemplos deben estar relacionados con el caso de uso específico
+- Incluir todos los campos obligatorios y opcionales
+- Especificar tipos de datos (string, number, boolean, array, object)
+- Documentar cada campo con su propósito y validaciones
+- Para códigos de error, incluir mensajes descriptivos en español
+- Todos los ejemplos JSON deben estar bien formateados con identación`;
   }
   
   if (useCaseType === 'service') {

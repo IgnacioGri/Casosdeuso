@@ -1,91 +1,10 @@
 # Use Case Generator Application
 
 ## Overview
-This full-stack web application generates standardized use case documents using AI. It features a multi-step form for requirements collection and formats outputs into consistent, professional documents adhering to Microsoft-style formatting. The application supports robust error handling and includes a demo mode for testing without API keys. The project aims to provide a streamlined, AI-powered solution for producing high-quality, standardized documentation, enhancing efficiency and consistency in project development.
+This full-stack web application generates standardized use case documents using AI. It features a multi-step form for requirements collection and formats outputs into consistent, professional documents adhering to Microsoft-style formatting. The application supports robust error handling and includes a demo mode for testing without API keys. The project aims to provide a streamlined, AI-powered solution for producing high-quality, standardized documentation, enhancing efficiency and consistency in project development, with a vision to streamline project development processes and ensure consistency in documentation.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
-
-## Recent Changes (August 2025)
-- **[CRITICAL FIX]** Enhanced wireframe generation with dynamic data: Replaced hardcoded generic wireframes with data-driven generation using actual user form data (filters, columns, fields).
-- **New Functions Added**: Implemented `generateEntitySearchWireframe()`, `generateCompleteEntityWireframes()`, `generateServiceWireframe()`, and `generateCompleteServiceWireframes()` in both TypeScript and C# systems.
-- **User Feedback Integration**: Wireframes now use specific form data instead of generic placeholders like "Apellido", "DNI", "Segmento".
-- **Enhanced AI Assistance**: Improved field enhancement capabilities with context-aware wireframe generation for all use case types (entity, API, process).
-- **UI Enhancements**: Added smart autocomplete with contextual suggestions, informative tooltips with Ingematica styling, and professional micro-interactions for better user experience.
-- **Animation Fixes**: Changed inappropriate animations - minute analysis from 'float' to 'pulse' and test generation from 'bounce' to 'spin' for more professional appearance.
-- **UI Enhancement Components Created**: Built 4 new Blazor components to match TypeScript UI features: `SmartAutocomplete.razor`, `ContextualTooltip.razor`, `MicroInteractions.razor`, and `AdaptiveLoading.razor`.
-- **Component Integration Progress**: Successfully integrated UI enhancements across key components:
-  - BasicInfoStep: Added SmartAutocomplete for project name with intelligent suggestions and ContextualTooltip for field guidance
-  - FiltersColumnsStep: Integrated SmartAutocomplete for both filters and columns with context-aware suggestions
-  - MinuteAnalysis: Replaced MudProgressCircular with AdaptiveLoading using professional pulse animation
-  - TestCasesStep: Updated to use AdaptiveLoading with spin animation for test generation
-  - EntityFieldsStep: Implemented AdaptiveLoading with pulse animation for field generation
-- **Minute Analysis Animation Update**: Modified both React and Blazor versions to replace progress step list with "Pensando..." button animation featuring violet pulse effect (#6b5b95) and animated dots that cycle through "..." → "...." → "....." → "......" every 400ms
-- **[CRITICAL FIX]** Fixed null reference errors in SmartAutocomplete components: Both React and Blazor versions now properly handle null values in input fields, preventing crashes when minute analysis returns null values for fields like clientName or projectName
-- **[CRITICAL FIX]** Enhanced description expansion prompts: After client feedback showing descriptions weren't expanding to required 2 paragraphs (150+ words), reinforced AI instructions with warning emojis (⚠️), explicit word count requirements per paragraph (75+ words each), and specific examples of the problem (e.g., "Mostrar proveedores"). Updated both React and Blazor systems with identical enhanced prompts.
-- **[CRITICAL FIX]** Implemented automatic description expansion: Added a pre-processing step that detects short descriptions (<50 words) and expands them using a dedicated AI prompt before generating the full document. This ensures descriptions always meet the 2-paragraph requirement regardless of the AI model's response to the main prompt. Implemented in both React and Blazor systems.
-- **[CRITICAL FIX COMPLETED]** Fixed description expansion flow: The server was successfully expanding descriptions but the client wasn't updating the form or DOCX with the expanded text. Fixed by:
-  - React: Updated mutation to capture expandedDescription from response and update both form state and DOCX export data
-  - Blazor: Added ExpandedDescription property to response DTO and updated Generator.razor to handle it
-  - Both systems now properly display expanded descriptions in UI and generate DOCX with full 2-paragraph content
-- **[CRITICAL FIX]** Fixed test case table formatting issue: Tables were getting cut off when containing extensive text. Fixed by:
-  - React: Changed table width to 100% and all column widths from fixed DXA units to percentages (5%, 25%, 20%, 25%, 18%, 7%)
-  - Blazor: Updated table to use percentage-based widths matching React system
-  - Tables now properly expand rows vertically when text is long instead of cutting off content
-- **[CRITICAL FIX]** Completely eliminated browser autocomplete from ALL input fields in both systems:
-  - React: Added aggressive anti-autocomplete attributes to Input and Textarea components (autocomplete="nope", autocorrect="off", autocapitalize="off", spellcheck="false", data-lpignore="true", data-form-type="other")
-  - Blazor: Added UserAttributes dictionary with same anti-autocomplete settings to ALL MudTextField and SmartAutocomplete components
-  - Applied to every single text input field across the entire application to prevent browser suggestions
-- **[ENHANCEMENT]** Converted test case tables to bullet/sub-bullet format for improved readability:
-  - React: Replaced table structure with bullet points using document library's bullet property
-  - Blazor: Replaced AddTestCasesTable with AddTestCasesList using NumberingProperties for bullets
-  - Format: Each test step becomes a main bullet with "Paso X" followed by sub-bullets for Acción, Datos de entrada, Resultado esperado, Observaciones, and Estado
-  - Both systems maintain identical formatting and structure for consistency
-- **[CRITICAL SYNC COMPLETED]** Comprehensive bullet format synchronization across all auto-completion sources:
-  - **React System Updates**:
-    - AI assist prompts: getFieldRules(), generateIntelligentBusinessRules(), generateIntelligentSpecialRequirements() now output bullet format (•)
-    - Minute analysis: Updated analysis rules for businessRules and specialRequirements to specify bullet format requirements
-    - Test case generation: Updated getDefaultPreconditions() to use bullets, updated demo content in generateTestCases()
-  - **Blazor System Updates**:
-    - AI assist prompts: GetFieldRules() already had bullet formatting for all relevant fields
-    - Minute analysis: Updated BuildAnalysisPrompt() rules for businessRules and specialRequirements with bullet format requirements
-    - Test case generation: Updated BuildIntelligentTestPrompt() with bullet format rules, updated demo content in BuildDemoHTML()
-  - **Complete Coverage**: ALL auto-completion sources (AI assist, minute analysis, test case generation) now generate bullet-formatted content
-  - Enhanced with warning emojis (⚠️) and explicit format requirements to ensure AI compliance across all generation methods
-  - Perfect synchronization: Both systems generate identical bullet-point content matching BulletTextarea component behavior
-- **[ENHANCEMENT COMPLETED]** Updated wireframe generation prompts with professional Microsoft-style templates:
-  - Enhanced search wireframe prompt with structured UI requirements, functionality details, and Microsoft admin styling
-  - Enhanced form wireframe prompt with detailed field specifications and enterprise layout guidelines
-  - Prompts now include emojis for clear section organization (🧭 Main UI, 📑 Functionality, 🎨 Styling)
-  - Integrated actual form data (filters, columns, fields) for data-driven wireframe generation
-- **[CRITICAL FIX COMPLETED]** Replaced AI image generation with HTML-based wireframe system:
-  - Implemented HTML templates with Microsoft enterprise styling using Segoe UI and #0078D4 blue
-  - Created Puppeteer screenshot service for instant wireframe generation
-  - Fixed Replit environment Chromium dependencies and configuration
-  - Added Sharp image compression to reduce payload size and prevent 413 errors
-  - Increased server payload limits to 50MB for handling large DOCX files with embedded images
-  - System now generates professional wireframes instantly and free vs expensive AI image generation
-- **[CODE CLEANUP COMPLETED]** Comprehensive removal of orphaned wireframe-related code:
-  - Removed AI model selector dropdown from wireframes step (now uses global header selection)
-  - Cleaned up wireframe description field to be empty by default (user fills optionally)
-  - Removed orphaned AIModelForWireframes type and all references
-  - Deleted legacy AI image generation code and interfaces (GenerateImageRequest/Response)
-  - Removed unused imports and demo wireframe image references
-  - Simplified wireframe generation logic to only use HTML templates
-  - Code is now clean, efficient, and focused on HTML-based wireframe generation
-- **[CRITICAL FIX]** Fixed wireframe embedding in DOCX documents:
-  - Wireframes were generating correctly as base64 data URLs but not appearing in exported DOCX
-  - Modified DocumentService to handle both base64 data URLs and file paths for wireframe images
-  - Added proper base64 decoding logic to extract image data from data URLs
-  - Fixed aspect ratio distortion: Search wireframes use 450x338px (4:3 ratio), Form wireframes use 450x450px (1:1 ratio)
-  - Each wireframe type now maintains its natural proportions without vertical compression
-  - Wireframes properly embed in DOCX exports with correct dimensions and no distortion
-- **[CRITICAL FIX]** Eliminated AI adding inappropriate file extensions to DOCX filenames:
-  - AI was incorrectly adding .json extensions to fileName fields during document generation
-  - Added explicit warning rules in AI prompts to prevent adding any file extensions (.json, .docx, .xml, .txt)
-  - Implemented content cleaning regex patterns to remove unwanted extensions from generated content
-  - Enhanced data validation in routes to handle null/undefined values and prevent "Expected string, received object" errors
-  - Fixed comprehensive data transformation for all fields to prevent validation failures
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
@@ -94,28 +13,26 @@ The application utilizes a modern full-stack .NET architecture, ensuring a clear
 - **Framework**: Blazor WebAssembly with .NET 8.
 - **UI Library**: MudBlazor for Material Design.
 - **State Management**: Built-in Blazor state management and local storage.
-- **Styling**: Custom ING corporate colors, Segoe UI typography, and responsive design.
+- **Styling**: Custom ING corporate colors, Segoe UI typography, and responsive design. UI enhancements include smart autocomplete, contextual tooltips, micro-interactions, and adaptive loading animations.
 
 ### Backend Architecture (ASP.NET Core)
 - **Framework**: ASP.NET Core 8 Web API.
 - **Language**: C#.
 - **API Style**: RESTful API with JSON.
 - **Database**: Entity Framework Core (in-memory default, PostgreSQL ready).
-- **Security**: HttpClient Factory, input sanitization, robust validation, custom rate limiting (100 requests/minute), and 30-second HttpClient timeouts.
-- **Code Quality**: 0 errors and 0 warnings on server components.
+- **Security**: HttpClient Factory, input sanitization, robust validation, custom rate limiting, and HttpClient timeouts.
 
 ### Core Features
 - **Multi-step Form System**: Progressive forms (9 steps for entity, 6 for others) with dynamic fields and client-side validation.
-- **AI Integration Layer**: Abstracted `AIService` supports OpenAI, Claude, Grok, and Gemini, including a demo mode.
-- **Document Generation**: AI-powered content generation with direct DOCX export using predefined Microsoft-style templates. Includes full wireframe embedding in "BOCETOS GRÁFICOS DE INTERFAZ DE USUARIO" section.
-- **Test Case Integration**: AI-driven test case generation integrated into DOCX export with professional table formatting. Includes fallback generation for incomplete AI responses.
+- **AI Integration Layer**: Abstracted `AIService` supports multiple AI providers, including a demo mode, with a cascading fallback mechanism (Copilot → Gemini → OpenAI → Claude → Grok).
+- **Document Generation**: AI-powered content generation with direct DOCX export using predefined Microsoft-style templates. Includes full wireframe embedding and AI-driven test case generation with professional table formatting. Ensures consistent corporate branding and specific document formatting.
 - **Data Management**: In-memory storage for development, with architecture defined for PostgreSQL integration.
-- **Prompt Synchronization & Optimization**: AI prompts are optimized for structured content generation, ensuring detailed descriptions, hierarchical formatting, and consistent field properties. Both systems (C# and previous React) use identical enhanced prompts.
-- **Performance Optimizations**: Utilizes `gemini-2.5-flash` for faster generation, increased token limits (16000 for docs, 12000 for test cases, 10000 for minute analysis, 4000 for fields), enhanced progress indicators, and standardized temperature (0.3).
-- **DOCX Formatting Consistency**: Ensures consistent corporate branding with specific header images (600x79 pixels), "página X de Y" footers, professional table formats (ING corporate blue header #DEEAF6), and corporate heading styles with blue borders.
-- **AI Provider Fallback**: Implements an automatic cascading fallback mechanism: Copilot → Gemini → OpenAI → Claude → Grok.
-- **Dynamic Wireframe Generation**: Enhanced wireframe generation using actual form data (filters, columns, fields) instead of hardcoded generic values. Implements data-driven wireframes for entity, API, and process use cases with complete CRUD functionality.
-- **System Synchronization**: Both frontend and backend systems maintain functional and UI parity, including the removal of HTML preview functionality for direct DOCX download, and removal of help buttons.
+- **Prompt Synchronization & Optimization**: AI prompts are optimized for structured content generation, ensuring detailed descriptions, hierarchical formatting, and consistent field properties across both frontend and backend. Prompts include explicit format requirements and content cleaning.
+- **Performance Optimizations**: Utilizes `gemini-2.5-flash` for faster generation, increased token limits for various processes, enhanced progress indicators, and standardized temperature.
+- **Dynamic Wireframe Generation**: Generates professional, data-driven HTML-based wireframes instantly, using actual form data (filters, columns, fields), with Microsoft enterprise styling. Wireframes are embedded as images in DOCX documents with correct dimensions.
+- **System Synchronization**: Both frontend and backend systems maintain functional and UI parity.
+- **Description Expansion**: Automatically expands short descriptions using a dedicated AI prompt to meet minimum length requirements.
+- **API Use Case Structure**: Enforces mandatory sections and detailed JSON examples for API use cases to match minute requirements.
 
 ## External Dependencies
 
@@ -126,5 +43,9 @@ The application utilizes a modern full-stack .NET architecture, ensuring a clear
 - **Google Gemini**: Google's AI service.
 
 ### Document Processing
+- **Puppeteer**: Used for screenshotting HTML wireframes.
+- **Sharp**: For image compression.
 - **docx**: Library for Microsoft Word document generation.
+
+### Utilities
 - **date-fns**: Utilities for date formatting.
