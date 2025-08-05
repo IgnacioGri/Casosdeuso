@@ -97,6 +97,14 @@ Estructura JSON requerida:
       ""validationRules"": ""string""
     }
   ],
+  ""serviceFrequency"": ""string (para servicios: Diariamente, Semanalmente, Mensualmente, etc.)"",
+  ""executionTime"": ""string (para servicios: 02:00 AM, 14:30, etc.)"",
+  ""configurationPaths"": ""string (para servicios: rutas de archivos configurables)"",
+  ""webServiceCredentials"": ""string (para servicios: credenciales de APIs externas)"",
+  ""apiEndpoint"": ""string (para APIs: URL del endpoint)"",
+  ""httpMethod"": ""string (para APIs: GET, POST, PUT, DELETE)"",
+  ""requestFormat"": ""string (para APIs: formato de request)"",
+  ""responseFormat"": ""string (para APIs: formato de response)"",
   ""businessRules"": ""⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas. Ejemplo: • Regla de validación • Regla de acceso"",
   ""specialRequirements"": ""⚠️ FORMATO OBLIGATORIO: Usar BULLETS (•) exclusivamente, NO listas numeradas. Ejemplo: • Tiempo de respuesta < 3s • Validación HTTPS"",
   ""isAIGenerated"": true
@@ -224,6 +232,18 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
                     .Where(r => !string.IsNullOrEmpty(r));
                 formData.SpecialRequirements = string.Join("\n", requirements);
             }
+
+            // Parse service-specific fields (for service/process use cases)
+            formData.ServiceFrequency = GetStringProperty(root, "serviceFrequency", "");
+            formData.ExecutionTime = GetStringProperty(root, "executionTime", "");
+            formData.ConfigurationPaths = GetStringProperty(root, "configurationPaths", "");
+            formData.WebServiceCredentials = GetStringProperty(root, "webServiceCredentials", "");
+            
+            // Parse API-specific fields (for API use cases)
+            formData.ApiEndpoint = GetStringProperty(root, "apiEndpoint", "");
+            formData.HttpMethod = GetStringProperty(root, "httpMethod", "");
+            formData.RequestFormat = GetStringProperty(root, "requestFormat", "");
+            formData.ResponseFormat = GetStringProperty(root, "responseFormat", "");
 
             return formData;
         }

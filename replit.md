@@ -24,10 +24,10 @@ The application utilizes a modern full-stack .NET architecture, ensuring a clear
 
 ### Core Features
 - **Multi-step Form System**: Progressive forms (9 steps for entity, 6 for others) with dynamic fields and client-side validation.
-- **AI Integration Layer**: Abstracted `AIService` supports multiple AI providers with cascading fallback (Copilot → Gemini → OpenAI → Claude → Grok). Models updated to latest versions: GPT-4o, Claude Sonnet 4-20250514, Gemini 2.5-flash, Grok 2-1212.
+- **AI Integration Layer**: Abstracted `AIService` supports multiple AI providers with cascading fallback (Copilot → Gemini → OpenAI → Claude → Grok). **UPDATED 2025-01-06**: All models now use latest versions consistently in both React and Blazor: GPT-4o, Claude Sonnet 4-20250514, Gemini 2.5-flash, Grok 2-1212.
 - **Document Generation**: AI-powered content generation with direct DOCX export. Sections generated directly from formData without HTML parsing. Entity cases include search/CRUD flows, API cases include error codes (400/401/500), Service cases include frequency/execution time fields.
-- **Intelligent Validation**: Verb infinitive validation using regex `/^[a-záéíóúñ]+(ar|er|ir)$/` plus irregular verbs (ver, ser, ir). System recognizes any Spanish infinitive verb automatically.
-- **Minute Analysis**: Extracts fields specific to each use case type. Entity: filters/columns/fields. API: endpoint/request/response. Service: frequency/execution time/paths/credentials (4 specific fields).
+- **Intelligent Validation**: **UPDATED 2025-01-06**: Verb infinitive validation now uses regex pattern `/^[a-záéíóúñ]+(ar|er|ir)$/` plus irregular verbs (ver, ser, ir). System recognizes any Spanish infinitive verb automatically. Removed unused hardcoded verb list.
+- **Minute Analysis**: **UPDATED 2025-01-06**: Now extracts all fields specific to each use case type. Entity: filters/columns/fields. API: endpoint/method/request/response. Service: frequency/execution time/configuration paths/credentials.
 - **Description Expansion**: Automatically expands descriptions < 50 words to 2 professional paragraphs using dedicated AI prompt.
 - **Wireframe Generation**: HTML generation → Puppeteer screenshot → Sharp compression → DOCX embedding pipeline. Professional Microsoft-style tables with actual form data.
 - **Test Case Generation**: AI creates intelligent test cases with objectives, preconditions, and professional step tables (Nº, Action, Input, Expected Result, Observations, Status).

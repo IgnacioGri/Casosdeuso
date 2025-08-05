@@ -16,25 +16,6 @@ public class ValidationResult
 
 public class UseCaseFormValidator
 {
-    private readonly string[] _infinitiveVerbs = {
-        "gestionar", "crear", "actualizar", "eliminar", "consultar", "registrar", 
-        "modificar", "validar", "procesar", "generar", "obtener", "establecer", 
-        "configurar", "sincronizar", "enviar", "recibir", "ver", "mostrar", 
-        "listar", "buscar", "filtrar", "exportar", "importar", "calcular", 
-        "analizar", "reportar", "administrar", "mantener", "controlar", "supervisar",
-        "revisar", "aprobar", "rechazar", "autorizar", "denegar", "bloquear",
-        "desbloquear", "activar", "desactivar", "habilitar", "deshabilitar",
-        "configurar", "parametrizar", "personalizar", "monitorear", "auditar",
-        "verificar", "comprobar", "testear", "evaluar", "medir", "documentar",
-        "clasificar", "categorizar", "organizar", "ordenar", "priorizar",
-        "ejecutar", "implementar", "desarrollar", "construir", "diseñar",
-        "planificar", "programar", "automatizar", "optimizar", "mejorar",
-        "corregir", "solucionar", "reparar", "restaurar", "recuperar",
-        "respaldar", "archivar", "almacenar", "conservar", "preservar",
-        "migrar", "transferir", "convertir", "transformar", "adaptar",
-        "integrar", "conectar", "sincronizar", "comunicar", "notificar",
-        "alertar", "informar", "publicar", "compartir", "distribuir"
-    };
 
     public static ValidationResult ValidateUseCaseFormData(UseCaseFormData formData)
     {

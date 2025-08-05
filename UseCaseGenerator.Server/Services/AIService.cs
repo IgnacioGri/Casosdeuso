@@ -434,9 +434,21 @@ INSTRUCCIONES:
         if (_openAIClient == null)
             throw new InvalidOperationException("OpenAI client not configured");
 
-        // TODO: Implement modern OpenAI API integration
-        await Task.Delay(100); // Simulate API call
-        return "OpenAI integration pending - use Demo mode for now";
+        var chatCompletionOptions = new ChatCompletionOptions
+        {
+            Temperature = 0.3f,
+            MaxTokens = 16000,  // For document generation
+            TopP = 0.95f,
+            DeploymentName = "gpt-4o"  // Use latest GPT-4o model
+        };
+
+        var messages = new List<ChatMessage>
+        {
+            new UserChatMessage(prompt)
+        };
+
+        var response = await _openAIClient.CompleteChatAsync(messages, chatCompletionOptions);
+        return response.Value.Content[0].Text;
     }
 
     private async Task<string> ProcessWithOpenAI(string systemPrompt, string fieldValue)
@@ -453,7 +465,8 @@ INSTRUCCIONES:
         {
             Temperature = 0.3f,
             MaxTokens = maxTokens,
-            TopP = 0.95f
+            TopP = 0.95f,
+            DeploymentName = "gpt-4o"  // Use latest GPT-4o model
         };
 
         var messages = new List<ChatMessage>
@@ -543,7 +556,7 @@ INSTRUCCIONES:
         
         var requestBody = new
         {
-            model = "claude-3-sonnet-20240229",
+            model = "claude-sonnet-4-20250514",
             messages = new[]
             {
                 new { role = "user", content = prompt }
