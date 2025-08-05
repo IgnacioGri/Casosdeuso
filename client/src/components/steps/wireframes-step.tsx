@@ -36,9 +36,9 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
   const [isGeneratingForm, setIsGeneratingForm] = useState(false);
   const { toast } = useToast();
 
-  const generateWireframeMutation = useMutation({
-    mutationFn: async (request: WireframeGenerationRequest) => {
-      const response = await apiRequest('POST', '/api/wireframe/generate', request);
+  const generateImageMutation = useMutation({
+    mutationFn: async (request: { prompt: string; fileName?: string }) => {
+      const response = await apiRequest('POST', '/api/generate-image', request);
       return response.json();
     },
     onError: (error: any) => {
@@ -75,37 +75,113 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
       return;
     }
 
-    const isSearch = type === 'search';
-    isSearch ? setIsGeneratingSearch(true) : setIsGeneratingForm(true);
+    // Generate AI-powered wireframe image
+    if (type === 'search') {
+      setIsGeneratingSearch(true);
+    } else {
+      setIsGeneratingForm(true);
+    }
 
     try {
-      const result = await generateWireframeMutation.mutateAsync({
-        searchFilters: formData.searchFilters,
-        resultColumns: formData.resultColumns,
-        entityFields: formData.entityFields,
-        useCaseName: formData.useCaseName,
-        description: formData.description,
-        additionalDescription: formData.wireframesDescription,
-        aiModel: formData.aiModelForWireframes!,
-        wireframeType: type,
+      const prompt = generateWireframePrompt(type);
+      const fileName = `wireframe_${type}_${formData.useCaseName?.replace(/\s+/g, '_') || 'entity'}_${Date.now()}.png`;
+      
+      const result = await generateImageMutation.mutateAsync({
+        prompt,
+        fileName
       });
 
-      if (result.imageUrl) {
-        onUpdateFormData({
-          generatedWireframes: {
-            ...formData.generatedWireframes,
-            [isSearch ? 'searchWireframe' : 'formWireframe']: result.imageUrl
-          }
-        });
+      if (result.success && result.imageUrl) {
+        if (type === 'search') {
+          onUpdateFormData({
+            generatedWireframes: {
+              ...formData.generatedWireframes,
+              searchWireframe: result.imageUrl
+            }
+          });
+        } else {
+          onUpdateFormData({
+            generatedWireframes: {
+              ...formData.generatedWireframes,
+              formWireframe: result.imageUrl
+            }
+          });
+        }
+        
         toast({
-          title: "Éxito",
-          description: `Wireframe de ${isSearch ? 'búsqueda' : 'formulario'} generado correctamente`,
+          title: "Wireframe generado",
+          description: `Se generó exitosamente el wireframe de ${type === 'search' ? 'búsqueda' : 'formulario'} usando IA`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "No se pudo generar el wireframe",
+          variant: "destructive",
         });
       }
-    } catch (error) {
-      console.error('Error generating wireframe:', error);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Error al generar el wireframe",
+        variant: "destructive",
+      });
     } finally {
-      isSearch ? setIsGeneratingSearch(false) : setIsGeneratingForm(false);
+      if (type === 'search') {
+        setIsGeneratingSearch(false);
+      } else {
+        setIsGeneratingForm(false);
+      }
+    }
+  };
+
+  const generateWireframePrompt = (type: 'search' | 'form'): string => {
+    const baseStyle = "Clean, professional wireframe mockup in the style of banking software interface. ";
+    const colorScheme = "Corporate blue and white color scheme (#6b5b95 accent colors). ";
+    const layout = "Modern UI layout with clear typography and well-organized elements. ";
+    
+    const filters = formData.searchFilters?.filter(f => f.trim()) || [];
+    const columns = formData.resultColumns?.filter(c => c.trim()) || [];
+    const fields = formData.entityFields?.filter(f => f.name?.trim()) || [];
+    
+    const additionalDescription = formData.wireframesDescription ? 
+      ` Additional style requirements: ${formData.wireframesDescription}` : '';
+
+    if (type === 'search') {
+      const filtersText = filters.length > 0 ? 
+        filters.map(f => f.trim()).join(', ') : 
+        'standard search filters';
+      
+      const columnsText = columns.length > 0 ? 
+        columns.map(c => c.trim()).join(', ') : 
+        'result columns';
+
+      return `${baseStyle}${colorScheme}${layout}Search interface wireframe for "${formData.useCaseName || 'Entity Management'}" showing:
+      
+      Top section: Search panel with filter fields for: ${filtersText}
+      Three buttons aligned horizontally: "Buscar" (Search), "Limpiar" (Clear), "Agregar" (Add)
+      
+      Main section: Data table displaying columns: ${columnsText}
+      Each row has "Editar" (Edit) and "Eliminar" (Delete) action buttons at the end
+      
+      Bottom section: Pagination controls with page numbers and navigation arrows
+      
+      Professional banking software aesthetic with clean borders, proper spacing, and ING corporate styling.${additionalDescription}`;
+    } else {
+      const fieldsText = fields.length > 0 ? 
+        fields.map(f => `${f.name} (${f.type}${f.mandatory ? ' - required' : ''})`).join(', ') : 
+        'form input fields';
+
+      return `${baseStyle}${colorScheme}${layout}Form interface wireframe for "${formData.useCaseName || 'Entity Management'}" showing:
+      
+      Modal or page layout with form fields arranged in a professional grid:
+      Form fields: ${fieldsText}
+      
+      Each field clearly labeled with proper input types (text boxes, dropdowns, checkboxes as appropriate)
+      Required fields marked with asterisk (*)
+      
+      Bottom section: Two buttons - "Aceptar" (Accept/Save) in primary blue color and "Cancelar" (Cancel) in secondary gray
+      
+      Professional banking software form design with proper field spacing, clear labels, and ING corporate styling.${additionalDescription}`;
     }
   };
 
@@ -128,7 +204,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
       <div className="space-y-2">
         <Label htmlFor="aiModelForWireframes">Modelo de IA para Wireframes</Label>
         <Select
-          value={formData.aiModelForWireframes || 'demo'}
+          value={formData.aiModelForWireframes || 'gemini'}
           onValueChange={(value: AIModelForWireframes) => 
             onUpdateFormData({ aiModelForWireframes: value })
           }

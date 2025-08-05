@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { UseCaseFormData, EntityField, UseCaseType, TestStep } from '@/types/use-case';
+import { UseCaseFormData, EntityField, UseCaseType, TestStep, AIModelForWireframes } from '@/types/use-case';
 
 export function useUseCaseForm() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -30,6 +30,8 @@ export function useUseCaseForm() {
     specialRequirements: '',
     generateWireframes: false,
     wireframeDescriptions: [''],
+    aiModelForWireframes: 'gemini' as AIModelForWireframes,
+    wireframesDescription: '',
     // Campos específicos para tipos de casos de uso
     apiEndpoint: '',
     requestFormat: '',
