@@ -662,6 +662,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         aiModel
       );
       
+      // Debug logging for service-specific fields
+      if (useCaseType === 'service') {
+        console.log('🎯 Service Analysis Result:', {
+          hasServiceFrequency: !!analysisResult.serviceFrequency,
+          hasExecutionTime: !!analysisResult.executionTime,
+          hasConfigPaths: !!analysisResult.configurationPaths,
+          hasWebCredentials: !!analysisResult.webServiceCredentials,
+          serviceFrequency: analysisResult.serviceFrequency,
+          executionTime: analysisResult.executionTime
+        });
+      }
+      
       res.json({
         success: true,
         formData: analysisResult

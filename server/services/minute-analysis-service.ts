@@ -202,20 +202,49 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
 - Ejemplo correcto: "SRV001ProcesarPagos" (NO "SRV001ProcesarPagos.json")
 - Si encuentras extensiones, elimínalas completamente
 
+📋 INSTRUCCIONES ESPECÍFICAS PARA SERVICIOS/PROCESOS AUTOMÁTICOS:
+- Busca información sobre frecuencia de ejecución (diario, semanal, mensual, cada hora, etc.)
+- Identifica horarios específicos de ejecución (02:00 AM, 18:30, etc.)
+- Detecta rutas de archivos o directorios que deben ser configurables
+- Identifica credenciales de web services, APIs o integraciones externas
+- Extrae flujos alternativos relacionados con fallos del proceso
+
 {
   "clientName": "Nombre del cliente/organización",
   "projectName": "Nombre del proyecto o sistema",
   "useCaseCode": "Código del caso de uso (ej: SRV001, PROC002)",
   "useCaseName": "Nombre del proceso empezando con verbo infinitivo",
   "fileName": "Nombre de archivo siguiendo patrón: 2letras+3números+descripción",
-  "description": "Descripción del proceso automático",
-  "serviceConfig": "Configuración del servicio (horarios, frecuencia, etc.)",
-  "cronExpression": "Expresión cron si es proceso programado",
-  "alternativeFlows": ["Fallo en el proceso", "Reintentos", "Notificaciones"],
-  "businessRules": "• Regla de ejecución del proceso • Regla de monitoreo según la minuta",
-  "specialRequirements": "• Logging detallado de ejecución • Alertas por fallo • Mecanismo de recuperación automático",
+  "description": "Descripción completa del proceso automático y sus etapas",
+  "serviceFrequency": "Frecuencia de ejecución: Diariamente, Cada hora, Semanalmente, Mensualmente, etc. Si hay múltiples frecuencias, sepáralas con comas",
+  "executionTime": "Hora(s) de ejecución: 02:00 AM, 14:30, 23:59, etc. Si hay múltiples horarios, sepáralos con comas",
+  "configurationPaths": "Si el proceso captura o genera archivos, lista las rutas que deben ser configurables. Ejemplo: /sftp/incoming/, /sftp/processed/, /logs/. Si no hay rutas, devuelve cadena vacía",
+  "webServiceCredentials": "Si llama a web services o APIs externas, indica qué credenciales deben ser configurables. Ejemplo: Usuario: srv_proceso, URL: https://api.ejemplo.com, Método: OAuth 2.0. Si no hay servicios externos, devuelve cadena vacía",
+  "alternativeFlows": [
+    "No se encuentran archivos en la ruta configurada",
+    "Falla conexión con servicio externo",
+    "Error en procesamiento de datos",
+    "Timeout en operación",
+    "Proceso anterior no finalizó"
+  ],
+  "businessRules": "• Reglas de validación de datos • Límites de procesamiento • Horarios permitidos • Validaciones específicas del negocio",
+  "specialRequirements": "• Integración con sistemas externos • Monitoreo en tiempo real • Notificaciones por email • Backup automático • Encriptación de datos",
+  "generateTestCase": true,
+  "testCaseObjective": "Verificar que el proceso automático ejecute correctamente todas sus etapas",
+  "testCasePreconditions": "Archivos de prueba disponibles. Servicios externos accesibles. Base de datos en estado consistente",
   "isAIGenerated": true
 }
+
+EJEMPLOS DE EXTRACCIÓN:
+- Si el documento menciona "El proceso se ejecuta todos los días a las 2 AM", extrae:
+  serviceFrequency: "Diariamente"
+  executionTime: "02:00 AM"
+  
+- Si dice "captura archivos desde servidor SFTP", extrae:
+  configurationPaths: "/sftp/incoming/, /sftp/processed/"
+  
+- Si menciona "integración con API del BCRA", extrae:
+  webServiceCredentials: "Usuario y URL del servicio BCRA deben ser configurables"
 `;
   }
 
@@ -294,6 +323,21 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           correctedData.projectName = 'Sistema de Gestión';
         }
         console.log('✓ Inferred projectName:', correctedData.projectName);
+      }
+      
+      // Ensure service-specific fields are mapped correctly
+      if (useCaseType === 'service') {
+        console.log('📋 Processing service-specific fields:');
+        console.log('  serviceFrequency:', correctedData.serviceFrequency);
+        console.log('  executionTime:', correctedData.executionTime);
+        console.log('  configurationPaths:', correctedData.configurationPaths);
+        console.log('  webServiceCredentials:', correctedData.webServiceCredentials);
+        
+        // Ensure these fields are present even if empty
+        correctedData.serviceFrequency = correctedData.serviceFrequency || '';
+        correctedData.executionTime = correctedData.executionTime || '';
+        correctedData.configurationPaths = correctedData.configurationPaths || '';
+        correctedData.webServiceCredentials = correctedData.webServiceCredentials || '';
       }
       
       // Ensure the result includes the use case type and AI generated flag
@@ -375,11 +419,12 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
           ...baseData,
           useCaseName: "Procesar cierre diario",
           fileName: "BP001ProcesarCierreDiario",
-          serviceFrequency: "Ejecución diaria a las 23:00 hrs",
-          executionTime: "23:00 hrs",
-          configurationPaths: "0 0 23 * * *",
-          businessRules: "1. Ejecutar solo en días hábiles\n2. Generar backup antes del proceso",
-          specialRequirements: "1. Logging detallado\n2. Alertas por email\n3. Mecanismo de rollback"
+          serviceFrequency: "Diariamente, Fin de mes",
+          executionTime: "23:00, 00:30",
+          configurationPaths: "/batch/input/, /batch/output/, /batch/logs/",
+          webServiceCredentials: "Usuario: srv_batch, URL: https://api.banco.com/v1/cierre, Método: OAuth 2.0",
+          businessRules: "1. Ejecutar solo en días hábiles\n2. Generar backup antes del proceso\n3. Validar integridad de datos antes de procesar",
+          specialRequirements: "1. Logging detallado\n2. Alertas por email\n3. Mecanismo de rollback\n4. Integración con sistema de monitoreo"
         };
 
       default:
