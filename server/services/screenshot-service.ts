@@ -60,9 +60,7 @@ export class ScreenshotService {
       const screenshot = await page.screenshot({
         type: 'png',
         fullPage: true,
-        encoding: 'binary',
-        quality: 80,
-        optimizeForSpeed: true
+        encoding: 'binary'
       });
 
       // Cleanup temp file
