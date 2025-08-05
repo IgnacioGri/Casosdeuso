@@ -321,18 +321,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         businessRules: Array.isArray(req.body.businessRules) 
           ? req.body.businessRules.join('\n') 
-          : req.body.businessRules,
+          : req.body.businessRules || '',
         specialRequirements: Array.isArray(req.body.specialRequirements) 
           ? req.body.specialRequirements.join('\n') 
-          : req.body.specialRequirements,
+          : req.body.specialRequirements || '',
+        // Convert null/undefined string fields to empty strings to prevent validation errors
+        clientName: req.body.clientName || '',
+        projectName: req.body.projectName || '',
+        useCaseCode: req.body.useCaseCode || '',
+        useCaseName: req.body.useCaseName || '',
+        fileName: req.body.fileName || '',
+        description: req.body.description || '',
+        filtersDescription: req.body.filtersDescription || '',
+        columnsDescription: req.body.columnsDescription || '',
+        fieldsDescription: req.body.fieldsDescription || '',
+        wireframesDescription: req.body.wireframesDescription || '',
+        apiEndpoint: req.body.apiEndpoint || '',
+        requestFormat: req.body.requestFormat || '',
+        responseFormat: req.body.responseFormat || '',
+        serviceFrequency: req.body.serviceFrequency || '',
+        executionTime: req.body.executionTime || '',
+        configurationPaths: req.body.configurationPaths || '',
+        webServiceCredentials: req.body.webServiceCredentials || '',
+        testCaseObjective: req.body.testCaseObjective || '',
+        testCasePreconditions: req.body.testCasePreconditions || '',
         // Clean up entity fields - convert null values to empty strings
         entityFields: req.body.entityFields?.map((field: any) => ({
           ...field,
+          name: field.name || '',
+          type: field.type || '',
           description: field.description || '',
           validationRules: field.validationRules || '',
           message: field.message || '',
-          length: field.length || null
-        })) || []
+          length: field.length || null,
+          mandatory: Boolean(field.mandatory)
+        })) || [],
+        // Clean up arrays
+        searchFilters: Array.isArray(req.body.searchFilters) ? req.body.searchFilters : [],
+        resultColumns: Array.isArray(req.body.resultColumns) ? req.body.resultColumns : [],
+        wireframeDescriptions: Array.isArray(req.body.wireframeDescriptions) ? req.body.wireframeDescriptions : [],
+        testSteps: Array.isArray(req.body.testSteps) ? req.body.testSteps.map((step: any) => ({
+          number: step.number || 0,
+          action: step.action || '',
+          inputData: step.inputData || '',
+          expectedResult: step.expectedResult || '',
+          observations: step.observations || '',
+          status: step.status || ''
+        })) : []
       };
       
       const validatedData = useCaseFormSchema.parse(requestData);

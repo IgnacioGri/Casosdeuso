@@ -80,6 +80,12 @@ Preferred communication style: Simple, everyday language.
   - Fixed aspect ratio distortion: Search wireframes use 450x338px (4:3 ratio), Form wireframes use 450x450px (1:1 ratio)
   - Each wireframe type now maintains its natural proportions without vertical compression
   - Wireframes properly embed in DOCX exports with correct dimensions and no distortion
+- **[CRITICAL FIX]** Eliminated AI adding inappropriate file extensions to DOCX filenames:
+  - AI was incorrectly adding .json extensions to fileName fields during document generation
+  - Added explicit warning rules in AI prompts to prevent adding any file extensions (.json, .docx, .xml, .txt)
+  - Implemented content cleaning regex patterns to remove unwanted extensions from generated content
+  - Enhanced data validation in routes to handle null/undefined values and prevent "Expected string, received object" errors
+  - Fixed comprehensive data transformation for all fields to prevent validation failures
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.

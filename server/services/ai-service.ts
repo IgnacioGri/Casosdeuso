@@ -270,6 +270,13 @@ INSTRUCCIONES CRÍTICAS PARA PREVENIR ERRORES:
 - Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
 - Para procesos automáticos: incluir configurables (path archivos, usuario/clave/URL web services)
 
+⚠️ REGLA CRÍTICA DE NOMBRES DE ARCHIVO ⚠️
+- NUNCA agregues extensiones de archivo (.json, .docx, .xml, .txt, etc.) al campo fileName
+- El fileName debe usarse EXACTAMENTE como viene sin modificaciones ni extensiones
+- El archivo ya tiene su formato definido (será DOCX automáticamente)
+- Ejemplo CORRECTO: "BP005GestionarClientes" 
+- Ejemplo INCORRECTO: "BP005GestionarClientes.json" o "BP005GestionarClientes.docx"
+
 DATOS DEL FORMULARIO COMPLETOS:
 - Tipo de caso de uso: ${formData.useCaseType}
 - Cliente: ${formData.clientName}
@@ -299,6 +306,12 @@ INSTRUCCIONES FINALES:
   static cleanAIResponse(content: string): string {
     // Remove any explanatory text before HTML
     let cleaned = content;
+    
+    // ⚠️ CRITICAL FIX: Remove .json extensions from filenames in generated content
+    cleaned = cleaned.replace(/([A-Z]{2}\d{3}[^.\s]*)(\.json)/gi, '$1');
+    cleaned = cleaned.replace(/([A-Z]{2}\d{3}[^.\s]*)(\.docx)/gi, '$1');
+    cleaned = cleaned.replace(/([A-Z]{2}\d{3}[^.\s]*)(\.xml)/gi, '$1');
+    cleaned = cleaned.replace(/([A-Z]{2}\d{3}[^.\s]*)(\.txt)/gi, '$1');
     
     // Remove common AI explanatory phrases and unwanted patterns
     const unwantedPhrases = [
