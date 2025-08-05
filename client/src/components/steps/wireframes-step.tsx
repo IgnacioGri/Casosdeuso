@@ -135,10 +135,6 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
   };
 
   const generateWireframePrompt = (type: 'search' | 'form'): string => {
-    const baseStyle = "Clean, professional wireframe mockup in the style of banking software interface. ";
-    const colorScheme = "Corporate blue and white color scheme (#6b5b95 accent colors). ";
-    const layout = "Modern UI layout with clear typography and well-organized elements. ";
-    
     const filters = formData.searchFilters?.filter(f => f.trim()) || [];
     const columns = formData.resultColumns?.filter(c => c.trim()) || [];
     const fields = formData.entityFields?.filter(f => f.name?.trim()) || [];
@@ -155,33 +151,58 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
         columns.map(c => c.trim()).join(', ') : 
         'result columns';
 
-      return `${baseStyle}${colorScheme}${layout}Search interface wireframe for "${formData.useCaseName || 'Entity Management'}" showing:
-      
-      Top section: Search panel with filter fields for: ${filtersText}
-      Three buttons aligned horizontally: "Buscar" (Search), "Limpiar" (Clear), "Agregar" (Add)
-      
-      Main section: Data table displaying columns: ${columnsText}
-      Each row has "Editar" (Edit) and "Eliminar" (Delete) action buttons at the end
-      
-      Bottom section: Pagination controls with page numbers and navigation arrows
-      
-      Professional banking software aesthetic with clean borders, proper spacing, and ING corporate styling.${additionalDescription}`;
-    } else {
-      const fieldsText = fields.length > 0 ? 
-        fields.map(f => `${f.name} (${f.type}${f.mandatory ? ' - required' : ''})`).join(', ') : 
-        'form input fields';
+      return `Generate a simplified graphical wireframe of an enterprise UI screen for searching and listing entities for "${formData.useCaseName || 'Entity Management'}".
+Follow these business rules and UI layout guidelines:
 
-      return `${baseStyle}${colorScheme}${layout}Form interface wireframe for "${formData.useCaseName || 'Entity Management'}" showing:
-      
-      Modal or page layout with form fields arranged in a professional grid:
-      Form fields: ${fieldsText}
-      
-      Each field clearly labeled with proper input types (text boxes, dropdowns, checkboxes as appropriate)
-      Required fields marked with asterisk (*)
-      
-      Bottom section: Two buttons - "Aceptar" (Accept/Save) in primary blue color and "Cancelar" (Cancel) in secondary gray
-      
-      Professional banking software form design with proper field spacing, clear labels, and ING corporate styling.${additionalDescription}`;
+🧭 Main UI Requirements
+– Add a search area at the top with various filters based on these fields: ${filtersText}
+– Below the filters, include three action buttons: Buscar (Search), Limpiar (Clear), and Agregar (Add new entry)
+– Below the search area, show a paginated table with results displaying these columns: ${columnsText}
+– Each row must include Edit and Delete buttons (icon buttons are acceptable)
+
+📑 Functionality Details
+– Clearly list and label each search filter using the provided fields
+– Clearly label columns in the results table, matching the most relevant fields
+– Indicate that pagination is required (show controls like "Previous, Next, Page X of Y")
+
+🎨 Styling & UI Rules
+– Follow Microsoft-style admin UI (flat design, minimal shadows, blue section headers, sans-serif fonts)
+– Prefer 2-column layout for filters if space allows
+– Align all elements cleanly with consistent spacing
+
+Generate a realistic wireframe image of the UI using Microsoft enterprise admin style.${additionalDescription}`;
+    } else {
+      const fieldsDetails = fields.map(f => 
+        `${f.name} (${f.type}${f.mandatory ? ' - required' : ''}${f.length ? ` - max ${f.length}` : ''})`
+      ).join(', ') || 'form input fields';
+
+      return `Generate a simplified graphical wireframe of an enterprise UI screen for adding or editing an entity for "${formData.useCaseName || 'Entity Management'}".
+Use the provided list of fields to determine the inputs and follow these business layout rules:
+
+🧭 Main UI Requirements
+– At the top or bottom, include action buttons: Aceptar (Save) and Cancelar (Cancel)
+– Include two metadata fields at the bottom or side:
+    • Fecha de alta (creation date)
+    • Usuario de alta (creator user)
+    • Fecha de modificación (modification date)
+    • Usuario de modificación (modifier user)
+
+📑 Functionality Details
+– For each field from the provided data, indicate:
+    Fields to include: ${fieldsDetails}
+    • Field label
+    • Type of input (text, number, date, etc.)
+    • If it is required (show with asterisk *)
+    • Max length (if applicable)
+    • Special requirements or validations
+
+🎨 Styling & UI Rules
+– Use a clean, Microsoft-like admin form layout
+– Group related fields into sections where possible
+– Use blue titles or dividers for sections
+– Fields should be placed in a 2- or 3-column grid when space allows
+
+Generate a realistic Microsoft-style wireframe image of the form interface.${additionalDescription}`;
     }
   };
 

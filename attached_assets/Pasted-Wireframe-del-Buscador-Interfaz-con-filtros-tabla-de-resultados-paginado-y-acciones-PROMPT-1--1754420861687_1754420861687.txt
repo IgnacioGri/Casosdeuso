@@ -1,0 +1,45 @@
+Wireframe del Buscador
+Interfaz con filtros, tabla de resultados, paginado y acciones:
+✅ PROMPT 1 — Generar interfaz de BÚSQUEDA y LISTADO de entidades (adaptado a normas)
+Generate a simplified graphical wireframe of an enterprise UI screen for searching and listing entities (the specific entity type is not fixed).
+Follow these business rules and UI layout guidelines:
+🧭 Main UI Requirements
+– Add a search area at the top with various filters based on the provided formData
+– Below the filters, include three action buttons: Buscar (Search), Limpiar (Clear), and Agregar (Add new entry)
+– Below the search area, show a paginated table with results
+– Each row must include Edit and Delete buttons (icon buttons are acceptable)
+📑 Functionality Details
+– Clearly list and label each search filter using formData fields (type, validation, length, required)
+– Clearly label columns in the results table, matching the most relevant fields
+– Indicate that pagination is required (show controls like “Previous, Next, Page X of Y”)
+🎨 Styling & UI Rules
+– Follow Microsoft-style admin UI (flat design, minimal shadows, blue section headers, sans-serif fonts)
+– Prefer 2-column layout for filters if space allows
+– Align all elements cleanly with consistent spacing
+generate a realistic wireframe image of the UI using Microsoft enterprise admin style.
+________________________________________
+Wireframe del Formulario
+Interfaz para agregar/editar entidad con todos los campos:
+✅ PROMPT 2 — Generar interfaz de ALTA/CARGA de entidad (adaptado a normas)
+Generate a simplified graphical wireframe of an enterprise UI screen for adding or editing an entity.
+Use the provided list of fields (formData) to determine the inputs and follow these business layout rules:
+🧭 Main UI Requirements
+– At the top or bottom, include action buttons: Aceptar (Save) and Cancelar
+– Include two metadata fields at the bottom or side:
+    • Fecha de alta (creation date)
+    • Usuario de alta (creator user)
+    • Fecha de modificación
+    • Usuario de modificación
+📑 Functionality Details
+– For each field from formData, indicate:
+    • Field label
+    • Type of input (text, number, date, etc.)
+    • If it is required
+    • Max length (if applicable)
+    • Special requirements or validations (e.g., must be numeric, valid email format, must exist in system)
+🎨 Styling & UI Rules
+– Use a clean, Microsoft-like admin form layout
+– Group related fields into sections where possible
+– Use blue titles or dividers for sections
+– Fields should be placed in a 2- or 3-column grid when space allows
+generate a realistic Microsoft-style wireframe image of the form interface.
