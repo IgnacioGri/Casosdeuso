@@ -71,10 +71,18 @@ const baseUseCaseFormSchema = z.object({
   useCaseCode: z.string().min(1, "El código del caso de uso es requerido"),
   useCaseName: z.string().min(1, "El nombre del caso de uso es requerido").refine(
     (val) => {
-      const infinitiveVerbs = ['gestionar', 'crear', 'actualizar', 'eliminar', 'consultar', 'registrar', 'modificar', 'validar', 'procesar', 'generar', 'obtener', 'establecer', 'configurar', 'sincronizar', 'enviar', 'recibir', 'ver', 'mostrar', 'listar', 'buscar', 'filtrar', 'exportar', 'importar', 'calcular', 'analizar', 'reportar', 'conciliar', 'ejecutar', 'monitorear', 'supervisar', 'automatizar'];
-      return infinitiveVerbs.some(verb => val.toLowerCase().startsWith(verb));
+      // Detectar verbos en infinitivo en español (terminan en -ar, -er, -ir)
+      // También incluir irregulares comunes: ver, ser, ir
+      const words = val.toLowerCase().split(' ');
+      const firstWord = words[0];
+      
+      // Patrones de verbos en infinitivo
+      const infinitivePattern = /^[a-záéíóúñ]+(ar|er|ir)$/;
+      const irregularVerbs = ['ver', 'ser', 'ir'];
+      
+      return infinitivePattern.test(firstWord) || irregularVerbs.includes(firstWord);
     },
-    "Debe comenzar con un verbo en infinitivo (Gestionar, Crear, Ver, Mostrar, etc.)"
+    "Debe comenzar con un verbo en infinitivo (terminar en -ar, -er, -ir)"
   ),
   fileName: z.string().min(1, "El nombre del archivo es requerido").refine(
     (val) => {
