@@ -339,27 +339,46 @@ export default function FormSteps({
                   className="ml-0.5"
                 />
               </div>
-              <SmartAutocomplete
-                value={formData.useCaseName}
-                onChange={(value) => handleInputChange('useCaseName', value)}
-                placeholder="Ej: Gestionar Usuarios del Sistema"
-                suggestions={[
-                  'Gestionar Clientes',
-                  'Gestionar Usuarios',
-                  'Gestionar Cuentas Bancarias',
-                  'Gestionar Préstamos',
-                  'Gestionar Transferencias',
-                  'Gestionar Pagos',
-                  'Gestionar Inversiones',
-                  'Consultar Saldos',
-                  'Consultar Movimientos',
-                  'Generar Reportes',
-                  'Procesar Transacciones',
-                  'Validar Documentos',
-                  'Autorizar Operaciones'
-                ]}
-                useCaseType={formData.useCaseType}
-              />
+              <div className="relative">
+                <SmartAutocomplete
+                  value={formData.useCaseName}
+                  onChange={(value) => handleInputChange('useCaseName', value)}
+                  placeholder="Ej: Gestionar Usuarios del Sistema"
+                  suggestions={[
+                    'Gestionar Clientes',
+                    'Gestionar Usuarios',
+                    'Gestionar Cuentas Bancarias',
+                    'Gestionar Préstamos',
+                    'Gestionar Transferencias',
+                    'Gestionar Pagos',
+                    'Gestionar Inversiones',
+                    'Consultar Saldos',
+                    'Consultar Movimientos',
+                    'Generar Reportes',
+                    'Procesar Transacciones',
+                    'Validar Documentos',
+                    'Autorizar Operaciones'
+                  ]}
+                  useCaseType={formData.useCaseType}
+                />
+                <div className="absolute top-2 right-2">
+                  <AIAssistButton
+                    fieldName="useCaseName"
+                    fieldValue={formData.useCaseName}
+                    fieldType="useCaseName"
+                    context={{ 
+                      step: 4, 
+                      useCaseType: formData.useCaseType,
+                      clientName: formData.clientName,
+                      projectName: formData.projectName,
+                      description: formData.description
+                    }}
+                    onImprovement={(value) => handleInputChange('useCaseName', value)}
+                    aiModel={formData.aiModel}
+                    size="sm"
+                  />
+                </div>
+              </div>
               <LiveValidation value={formData.useCaseName} type="useCaseName" />
             </div>
             
