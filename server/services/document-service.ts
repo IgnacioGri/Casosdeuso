@@ -512,29 +512,43 @@ export class DocumentService {
         }));
         
         try {
-          // Convert the URL path to file path
-          let searchWireframePath = formData.generatedWireframes.searchWireframe;
-          if (searchWireframePath.startsWith('/')) {
-            searchWireframePath = searchWireframePath.substring(1);
-          }
-          const searchImagePath = path.join(process.cwd(), searchWireframePath);
+          // Handle both base64 data URLs and file paths
+          let imageData: Buffer;
+          const searchWireframePath = formData.generatedWireframes.searchWireframe;
           
-          if (fs.existsSync(searchImagePath)) {
-            sections.push(new Paragraph({
-              spacing: { after: 120 },
-              alignment: AlignmentType.CENTER,
-              children: [
-                new ImageRun({
-                  type: "png",
-                  data: fs.readFileSync(searchImagePath),
-                  transformation: {
-                    width: 450,  // 6.25 inches
-                    height: 338  // Maintain aspect ratio (4:3)
-                  }
-                })
-              ]
-            }));
+          if (searchWireframePath.startsWith('data:image/')) {
+            // Extract base64 data from data URL
+            const base64Data = searchWireframePath.split(',')[1];
+            imageData = Buffer.from(base64Data, 'base64');
+          } else {
+            // Handle file path
+            let filePath = searchWireframePath;
+            if (filePath.startsWith('/')) {
+              filePath = filePath.substring(1);
+            }
+            const fullPath = path.join(process.cwd(), filePath);
+            
+            if (fs.existsSync(fullPath)) {
+              imageData = fs.readFileSync(fullPath);
+            } else {
+              throw new Error(`File not found: ${fullPath}`);
+            }
           }
+          
+          sections.push(new Paragraph({
+            spacing: { after: 120 },
+            alignment: AlignmentType.CENTER,
+            children: [
+              new ImageRun({
+                type: "png",
+                data: imageData,
+                transformation: {
+                  width: 450,  // 6.25 inches
+                  height: 338  // Maintain aspect ratio (4:3)
+                }
+              })
+            ]
+          }));
         } catch (error) {
           console.error('Error loading search wireframe:', error);
         }
@@ -554,29 +568,43 @@ export class DocumentService {
         }));
         
         try {
-          // Convert the URL path to file path
-          let formWireframePath = formData.generatedWireframes.formWireframe;
-          if (formWireframePath.startsWith('/')) {
-            formWireframePath = formWireframePath.substring(1);
-          }
-          const formImagePath = path.join(process.cwd(), formWireframePath);
+          // Handle both base64 data URLs and file paths
+          let imageData: Buffer;
+          const formWireframePath = formData.generatedWireframes.formWireframe;
           
-          if (fs.existsSync(formImagePath)) {
-            sections.push(new Paragraph({
-              spacing: { after: 120 },
-              alignment: AlignmentType.CENTER,
-              children: [
-                new ImageRun({
-                  type: "png",
-                  data: fs.readFileSync(formImagePath),
-                  transformation: {
-                    width: 450,  // 6.25 inches
-                    height: 338  // Maintain aspect ratio (4:3)
-                  }
-                })
-              ]
-            }));
+          if (formWireframePath.startsWith('data:image/')) {
+            // Extract base64 data from data URL
+            const base64Data = formWireframePath.split(',')[1];
+            imageData = Buffer.from(base64Data, 'base64');
+          } else {
+            // Handle file path
+            let filePath = formWireframePath;
+            if (filePath.startsWith('/')) {
+              filePath = filePath.substring(1);
+            }
+            const fullPath = path.join(process.cwd(), filePath);
+            
+            if (fs.existsSync(fullPath)) {
+              imageData = fs.readFileSync(fullPath);
+            } else {
+              throw new Error(`File not found: ${fullPath}`);
+            }
           }
+          
+          sections.push(new Paragraph({
+            spacing: { after: 120 },
+            alignment: AlignmentType.CENTER,
+            children: [
+              new ImageRun({
+                type: "png",
+                data: imageData,
+                transformation: {
+                  width: 450,  // 6.25 inches
+                  height: 338  // Maintain aspect ratio (4:3)
+                }
+              })
+            ]
+          }));
         } catch (error) {
           console.error('Error loading form wireframe:', error);
         }

@@ -69,6 +69,12 @@ Preferred communication style: Simple, everyday language.
   - Removed unused imports and demo wireframe image references
   - Simplified wireframe generation logic to only use HTML templates
   - Code is now clean, efficient, and focused on HTML-based wireframe generation
+- **[CRITICAL FIX]** Fixed wireframe embedding in DOCX documents:
+  - Wireframes were generating correctly as base64 data URLs but not appearing in exported DOCX
+  - Modified DocumentService to handle both base64 data URLs and file paths for wireframe images
+  - Added proper base64 decoding logic to extract image data from data URLs
+  - Wireframes now properly embed in DOCX exports with correct dimensions (450x338px)
+  - Fixed both search and form wireframe embedding with identical logic
 
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
