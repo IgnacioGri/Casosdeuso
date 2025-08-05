@@ -189,7 +189,9 @@ FORMATO HTML CRÍTICO:
     return `
 INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
 
-⚠️ CRÍTICO: DEBES INCLUIR OBLIGATORIAMENTE ESTAS SECCIONES ESPECÍFICAS ⚠️
+🚨🚨🚨 CRÍTICO: DEBES INCLUIR OBLIGATORIAMENTE ESTAS SECCIONES ESPECÍFICAS 🚨🚨🚨
+⛔ SIN ESTAS SECCIONES EL DOCUMENTO SERÁ RECHAZADO ⛔
+💥 OBLIGATORIO: NO ES OPCIONAL, ES MANDATORIO 💥
 
 DATOS DEL FORMULARIO:
 - Cliente: ${formData.clientName}
@@ -204,12 +206,16 @@ DATOS DEL FORMULARIO:
 - Reglas de negocio: ${formData.businessRules || 'No especificado'}
 - Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
 
-⚠️ ESTRUCTURA OBLIGATORIA - NO OMITIR ESTAS SECCIONES ⚠️
+🚨🚨🚨 ESTRUCTURA OBLIGATORIA - NO OMITIR ESTAS SECCIONES 🚨🚨🚨
+⛔ ESTAS SECCIONES SON MANDATORIAS PARA CASOS DE USO API ⛔
+💥 EL DOCUMENTO DEBE INCLUIR EXACTAMENTE ESTAS SECCIONES DESPUÉS DE REQUERIMIENTOS ESPECIALES 💥
 
-DESPUÉS DE REQUERIMIENTOS ESPECIALES, INCLUIR OBLIGATORIAMENTE:
+⚠️⚠️⚠️ DESPUÉS DE LA SECCIÓN "REQUERIMIENTOS ESPECIALES", INCLUIR OBLIGATORIAMENTE ⚠️⚠️⚠️
 
-4. FLUJO PRINCIPAL DE EVENTOS
-   Este título debe aparecer como Heading 2 con color azul RGB(0,112,192)
+🚨 SECCIÓN OBLIGATORIA 1 🚨
+FLUJO PRINCIPAL DE EVENTOS
+   ⚠️ Este título debe aparecer como Heading 2 con color azul RGB(0,112,192) ⚠️
+   ⚠️ Esta sección DEBE estar inmediatamente después de REQUERIMIENTOS ESPECIALES ⚠️
    
    4.1. Identificación del servicio
         a. Endpoint: ${formData.apiEndpoint || 'Definir endpoint específico según el caso de uso'}
@@ -243,8 +249,10 @@ DESPUÉS DE REQUERIMIENTOS ESPECIALES, INCLUIR OBLIGATORIAMENTE:
              }
            }
 
-5. FLUJOS ALTERNATIVOS
-   Este título debe aparecer como Heading 2 con color azul RGB(0,112,192)
+🚨 SECCIÓN OBLIGATORIA 2 🚨
+FLUJOS ALTERNATIVOS
+   ⚠️ Este título debe aparecer como Heading 2 con color azul RGB(0,112,192) ⚠️
+   ⚠️ Esta sección DEBE estar inmediatamente después de FLUJO PRINCIPAL DE EVENTOS ⚠️
    
    5.1. Errores de validación (Código 400 - Bad Request)
         a. Request malformado - campos faltantes o tipos incorrectos
@@ -285,7 +293,22 @@ DESPUÉS DE REQUERIMIENTOS ESPECIALES, INCLUIR OBLIGATORIAMENTE:
 - Especificar tipos de datos (string, number, boolean, array, object)
 - Documentar cada campo con su propósito y validaciones
 - Para códigos de error, incluir mensajes descriptivos en español
-- Todos los ejemplos JSON deben estar bien formateados con identación`;
+- Todos los ejemplos JSON deben estar bien formateados con identación
+
+🚨🚨🚨 RESUMEN DE SECCIONES OBLIGATORIAS PARA API 🚨🚨🚨
+
+EL DOCUMENTO DEBE INCLUIR EN ESTE ORDEN EXACTO:
+1. INFORMACIÓN DEL PROYECTO (cliente, proyecto, código, archivo)
+2. DESCRIPCIÓN DEL CASO DE USO
+3. REGLAS DE NEGOCIO
+4. REQUERIMIENTOS ESPECIALES
+5. ⚠️ FLUJO PRINCIPAL DE EVENTOS ⚠️ (con 4.1 Identificación, 4.2 Request, 4.3 Response)
+6. ⚠️ FLUJOS ALTERNATIVOS ⚠️ (con 5.1 Error 400, 5.2 Error 401/403, 5.3 Error 500)
+7. PRECONDICIONES
+8. POSTCONDICIONES
+
+💥 SIN LAS SECCIONES 5 Y 6 EL DOCUMENTO SERÁ RECHAZADO 💥
+💥 ESTAS SECCIONES DEBEN INCLUIR EJEMPLOS JSON DETALLADOS 💥`;
   }
   
   if (useCaseType === 'service') {
