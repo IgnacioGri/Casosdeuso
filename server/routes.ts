@@ -12,6 +12,11 @@ import * as XLSX from "xlsx";
 import wireframeRoutes from './routes/wireframe-routes';
 
 const USE_CASE_RULES = `
+🚨 PARA CASOS DE USO DE TIPO "api": OBLIGATORIO INCLUIR ESTAS SECCIONES DESPUÉS DE "REQUERIMIENTOS ESPECIALES":
+- FLUJO PRINCIPAL DE EVENTOS
+- FLUJOS ALTERNATIVOS
+🚨
+
 REGLAS PARA CASOS DE USO CON IA - SEGUIR ESTRICTAMENTE:
 
 ESTRUCTURA COMÚN PARA TODOS LOS TIPOS:
@@ -53,10 +58,15 @@ AGREGAR SECCIONES DE WIREFRAMES (solo para entidades):
 - Boceto gráfico para agregar entidad: botones Aceptar/Cancelar, fechas de alta/modificación
 - Detallar funcionalidades de cada interfaz con listas específicas
 
-CASOS DE USO DE API/WEB SERVICE:
-Flujo Principal: incluir identificación, request y response
-Flujos Alternativos: incluir respuestas de error
-Incluir detalle completo del request y response
+CASOS DE USO DE API/WEB SERVICE - ESTRUCTURA OBLIGATORIA:
+5. FLUJO PRINCIPAL DE EVENTOS (Heading 2, azul RGB(0,112,192))
+   5.1 Identificación del servicio (endpoint, método HTTP, headers)
+   5.2 Request (formato JSON con ejemplo completo)
+   5.3 Response (formato JSON con ejemplo completo)
+6. FLUJOS ALTERNATIVOS (Heading 2, azul RGB(0,112,192))
+   6.1 Errores de validación (Código 400)
+   6.2 Errores de autenticación (Código 401/403)
+   6.3 Errores internos (Código 500)
 
 CASOS DE USO DE SERVICIO/PROCESO AUTOMÁTICO:
 Flujo Principal: incluir frecuencia y/o hora de ejecución
@@ -187,11 +197,16 @@ FORMATO HTML CRÍTICO:
   
   if (useCaseType === 'api') {
     return `
-INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
+⚠️⚠️⚠️ REGLAS OBLIGATORIAS PARA API - LEER PRIMERO ⚠️⚠️⚠️
 
-🚨🚨🚨 CRÍTICO: DEBES INCLUIR OBLIGATORIAMENTE ESTAS SECCIONES ESPECÍFICAS 🚨🚨🚨
-⛔ SIN ESTAS SECCIONES EL DOCUMENTO SERÁ RECHAZADO ⛔
-💥 OBLIGATORIO: NO ES OPCIONAL, ES MANDATORIO 💥
+🚨 MANDATORIO: DESPUÉS DE "REQUERIMIENTOS ESPECIALES" INCLUIR EXACTAMENTE ESTAS DOS SECCIONES:
+
+1. FLUJO PRINCIPAL DE EVENTOS (este título exacto como Heading 2, color azul RGB(0,112,192))
+2. FLUJOS ALTERNATIVOS (este título exacto como Heading 2, color azul RGB(0,112,192))
+
+💥 SI NO INCLUYES ESTAS DOS SECCIONES EL DOCUMENTO ESTÁ INCOMPLETO 💥
+
+INSTRUCCIONES ESPECÍFICAS PARA CASOS DE USO DE API/WEB SERVICE:
 
 DATOS DEL FORMULARIO:
 - Cliente: ${formData.clientName}
@@ -206,16 +221,15 @@ DATOS DEL FORMULARIO:
 - Reglas de negocio: ${formData.businessRules || 'No especificado'}
 - Requerimientos especiales: ${formData.specialRequirements || 'No especificado'}
 
-🚨🚨🚨 ESTRUCTURA OBLIGATORIA - NO OMITIR ESTAS SECCIONES 🚨🚨🚨
-⛔ ESTAS SECCIONES SON MANDATORIAS PARA CASOS DE USO API ⛔
-💥 EL DOCUMENTO DEBE INCLUIR EXACTAMENTE ESTAS SECCIONES DESPUÉS DE REQUERIMIENTOS ESPECIALES 💥
+🚨 ORDEN EXACTO DE SECCIONES DESPUÉS DE "REQUERIMIENTOS ESPECIALES": 🚨
 
-⚠️⚠️⚠️ DESPUÉS DE LA SECCIÓN "REQUERIMIENTOS ESPECIALES", INCLUIR OBLIGATORIAMENTE ⚠️⚠️⚠️
+5. FLUJO PRINCIPAL DE EVENTOS (Heading 2, color azul RGB(0,112,192))
+6. FLUJOS ALTERNATIVOS (Heading 2, color azul RGB(0,112,192))
+7. PRECONDICIONES
+8. POSTCONDICIONES
 
-🚨 SECCIÓN OBLIGATORIA 1 🚨
+DETALLE DE SECCIÓN OBLIGATORIA:
 FLUJO PRINCIPAL DE EVENTOS
-   ⚠️ Este título debe aparecer como Heading 2 con color azul RGB(0,112,192) ⚠️
-   ⚠️ Esta sección DEBE estar inmediatamente después de REQUERIMIENTOS ESPECIALES ⚠️
    
    4.1. Identificación del servicio
         a. Endpoint: ${formData.apiEndpoint || 'Definir endpoint específico según el caso de uso'}
@@ -249,10 +263,7 @@ FLUJO PRINCIPAL DE EVENTOS
              }
            }
 
-🚨 SECCIÓN OBLIGATORIA 2 🚨
 FLUJOS ALTERNATIVOS
-   ⚠️ Este título debe aparecer como Heading 2 con color azul RGB(0,112,192) ⚠️
-   ⚠️ Esta sección DEBE estar inmediatamente después de FLUJO PRINCIPAL DE EVENTOS ⚠️
    
    5.1. Errores de validación (Código 400 - Bad Request)
         a. Request malformado - campos faltantes o tipos incorrectos
@@ -295,20 +306,15 @@ FLUJOS ALTERNATIVOS
 - Para códigos de error, incluir mensajes descriptivos en español
 - Todos los ejemplos JSON deben estar bien formateados con identación
 
-🚨🚨🚨 RESUMEN DE SECCIONES OBLIGATORIAS PARA API 🚨🚨🚨
-
-EL DOCUMENTO DEBE INCLUIR EN ESTE ORDEN EXACTO:
-1. INFORMACIÓN DEL PROYECTO (cliente, proyecto, código, archivo)
-2. DESCRIPCIÓN DEL CASO DE USO
-3. REGLAS DE NEGOCIO
-4. REQUERIMIENTOS ESPECIALES
-5. ⚠️ FLUJO PRINCIPAL DE EVENTOS ⚠️ (con 4.1 Identificación, 4.2 Request, 4.3 Response)
-6. ⚠️ FLUJOS ALTERNATIVOS ⚠️ (con 5.1 Error 400, 5.2 Error 401/403, 5.3 Error 500)
-7. PRECONDICIONES
-8. POSTCONDICIONES
-
-💥 SIN LAS SECCIONES 5 Y 6 EL DOCUMENTO SERÁ RECHAZADO 💥
-💥 ESTAS SECCIONES DEBEN INCLUIR EJEMPLOS JSON DETALLADOS 💥`;
+ESTRUCTURA FINAL OBLIGATORIA:
+- INFORMACIÓN DEL PROYECTO
+- DESCRIPCIÓN DEL CASO DE USO
+- REGLAS DE NEGOCIO
+- REQUERIMIENTOS ESPECIALES
+- FLUJO PRINCIPAL DE EVENTOS (con ejemplos JSON)
+- FLUJOS ALTERNATIVOS (con códigos de error)
+- PRECONDICIONES
+- POSTCONDICIONES`;
   }
   
   if (useCaseType === 'service') {
