@@ -193,9 +193,7 @@ export default function FormSteps({
     return (
       <MinuteAnalysisStep
         formData={formData}
-        onFormChange={onUpdateFormData}
-        onNext={onNextStep || (() => {})}
-        onPrevious={onPreviousStep || (() => {})}
+        onDataExtracted={onUpdateFormData}
       />
     );
   }
