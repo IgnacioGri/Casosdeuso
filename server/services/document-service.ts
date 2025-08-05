@@ -231,113 +231,176 @@ export class DocumentService {
   private static addFormDataSections(formData: any, aiGeneratedContent?: string): (Paragraph | Table)[] {
     const sections: (Paragraph | Table)[] = [];
     
-    // For API/Service use cases, use the AI-generated content which includes mandatory sections
-    if ((formData.useCaseType === 'api' || formData.useCaseType === 'service') && aiGeneratedContent) {
-      console.log('📄 Using AI-generated content for API/Service sections');
-      console.log('🔍 AI Content length:', aiGeneratedContent.length);
-      console.log('🔍 AI Content preview:', aiGeneratedContent.substring(0, 500));
+    // For API/Service use cases, generate sections directly like we do for entities
+    if (formData.useCaseType === 'api' || formData.useCaseType === 'service') {
+      console.log('📄 Generating API/Service sections directly from formData');
       
-      // Parse the AI content to extract the mandatory sections
-      // The content already includes FLUJO PRINCIPAL DE EVENTOS and FLUJOS ALTERNATIVOS
-      const flujoPrincipalMatch = aiGeneratedContent.match(/<h2[^>]*>FLUJO PRINCIPAL DE EVENTOS<\/h2>([\s\S]*?)(?=<h2|$)/i);
-      const flujoAlternativoMatch = aiGeneratedContent.match(/<h2[^>]*>FLUJOS ALTERNATIVOS<\/h2>([\s\S]*?)(?=<h2|$)/i);
+      // FLUJO PRINCIPAL DE EVENTOS - Generate directly like entity type
+      sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
       
-      console.log('✅ Found FLUJO PRINCIPAL:', !!flujoPrincipalMatch);
-      console.log('✅ Found FLUJOS ALTERNATIVOS:', !!flujoAlternativoMatch);
+      // 1. Request initiation
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: `1. El cliente realiza una petición HTTP ${formData.httpMethod || 'POST'} al endpoint ${formData.apiEndpoint || formData.endpoint || '/api/endpoint'}`,
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
       
-      // Add FLUJO PRINCIPAL DE EVENTOS
-      if (flujoPrincipalMatch) {
-        sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
-        // Parse and add the content after the heading
-        const contentHtml = flujoPrincipalMatch[1];
-        sections.push(...this.parseHtmlContent(contentHtml));
-      } else {
-        // Fallback: Add a basic structure if not found
-        console.log('⚠️ FLUJO PRINCIPAL not found in AI content, adding basic structure');
-        sections.push(this.createStyledHeading("FLUJO PRINCIPAL DE EVENTOS"));
+      // Add request format details if available
+      if (formData.requestFormat || formData.requestExample) {
         sections.push(new Paragraph({
-          spacing: { after: 80 },
+          spacing: { after: 60 },
+          indent: { left: 288 },
           children: [new TextRun({
-            text: `1. El cliente realiza una petición HTTP ${formData.httpMethod || 'POST'} al endpoint ${formData.endpoint || '/api/endpoint'}`,
+            text: "a. Formato de solicitud:",
             font: "Segoe UI Semilight"
           })]
         }));
         sections.push(new Paragraph({
           spacing: { after: 80 },
+          indent: { left: 576 },
           children: [new TextRun({
-            text: `2. El sistema valida los datos de entrada según el formato especificado`,
+            text: formData.requestFormat || formData.requestExample || "JSON con los parámetros requeridos",
             font: "Segoe UI Semilight"
           })]
         }));
+      }
+      
+      // 2. Validation
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "2. El sistema valida los datos de entrada",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. Validación de estructura del mensaje",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Validación de datos obligatorios",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 3. Processing
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "3. El sistema procesa la solicitud",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 60 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "a. Ejecuta la lógica de negocio correspondiente",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        indent: { left: 288 },
+        children: [new TextRun({
+          text: "b. Registra la operación en el log de auditoría",
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // 4. Response
+      sections.push(new Paragraph({
+        spacing: { after: 80 },
+        children: [new TextRun({
+          text: "4. El sistema retorna la respuesta",
+          bold: true,
+          font: "Segoe UI Semilight"
+        })]
+      }));
+      
+      // Add response format details if available
+      if (formData.responseFormat || formData.responseExample) {
         sections.push(new Paragraph({
-          spacing: { after: 80 },
+          spacing: { after: 60 },
+          indent: { left: 288 },
           children: [new TextRun({
-            text: `3. El sistema procesa la solicitud y genera la respuesta`,
+            text: "a. Formato de respuesta:",
             font: "Segoe UI Semilight"
           })]
         }));
         sections.push(new Paragraph({
           spacing: { after: 120 },
+          indent: { left: 576 },
           children: [new TextRun({
-            text: `4. El sistema retorna la respuesta en formato JSON`,
+            text: formData.responseFormat || formData.responseExample || "JSON con el resultado de la operación",
             font: "Segoe UI Semilight"
           })]
         }));
       }
       
-      // Add FLUJOS ALTERNATIVOS
-      if (flujoAlternativoMatch) {
-        sections.push(this.createStyledHeading("FLUJOS ALTERNATIVOS"));
-        // Parse and add the content after the heading
-        const contentHtml = flujoAlternativoMatch[1];
-        sections.push(...this.parseHtmlContent(contentHtml));
-      } else {
-        // Fallback: Add a basic structure if not found
-        console.log('⚠️ FLUJOS ALTERNATIVOS not found in AI content, adding basic structure');
-        sections.push(this.createStyledHeading("FLUJOS ALTERNATIVOS"));
+      // FLUJOS ALTERNATIVOS - Generate directly like entity type
+      sections.push(this.createStyledHeading("FLUJOS ALTERNATIVOS"));
+      
+      // Generate error handling flows
+      const errorCodes = formData.errorCodes || ['400', '401', '403', '404', '500'];
+      
+      errorCodes.forEach((code: string, index: number) => {
+        const errorDescription = 
+          code === '400' ? 'Solicitud incorrecta - datos de entrada inválidos' :
+          code === '401' ? 'No autorizado - credenciales inválidas o expiradas' :
+          code === '403' ? 'Prohibido - sin permisos suficientes para la operación' :
+          code === '404' ? 'No encontrado - el recurso solicitado no existe' :
+          code === '500' ? 'Error interno del servidor - problema en el procesamiento' :
+          `Error ${code} - error en la aplicación`;
         
-        // Add error codes if available
-        if (formData.errorCodes && formData.errorCodes.length > 0) {
-          formData.errorCodes.forEach((code: string, index: number) => {
-            sections.push(new Paragraph({
-              spacing: { after: 80 },
-              children: [new TextRun({
-                text: `${index + 1}. Error ${code}: ${
-                  code === '400' ? 'Solicitud incorrecta - datos de entrada inválidos' :
-                  code === '401' ? 'No autorizado - credenciales inválidas' :
-                  code === '403' ? 'Prohibido - sin permisos suficientes' :
-                  code === '404' ? 'No encontrado - recurso no existe' :
-                  code === '500' ? 'Error interno del servidor' :
-                  `Error de aplicación`
-                }`,
-                font: "Segoe UI Semilight"
-              })]
-            }));
-          });
-        } else {
-          sections.push(new Paragraph({
-            spacing: { after: 80 },
-            children: [new TextRun({
-              text: "1. Error 400: Solicitud incorrecta - datos de entrada inválidos",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-          sections.push(new Paragraph({
-            spacing: { after: 80 },
-            children: [new TextRun({
-              text: "2. Error 401/403: No autorizado o sin permisos",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-          sections.push(new Paragraph({
-            spacing: { after: 120 },
-            children: [new TextRun({
-              text: "3. Error 500: Error interno del servidor",
-              font: "Segoe UI Semilight"
-            })]
-          }));
-        }
-      }
+        sections.push(new Paragraph({
+          spacing: { after: 80 },
+          children: [new TextRun({
+            text: `${index + 1}. Error ${code}: ${errorDescription}`,
+            bold: true,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: `a. El sistema detecta un error de tipo ${code}`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        sections.push(new Paragraph({
+          spacing: { after: 60 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: "b. Se registra el error en el log del sistema",
+            font: "Segoe UI Semilight"
+          })]
+        }));
+        
+        sections.push(new Paragraph({
+          spacing: { after: index === errorCodes.length - 1 ? 120 : 80 },
+          indent: { left: 288 },
+          children: [new TextRun({
+            text: `c. Se retorna el código de error ${code} con el mensaje correspondiente`,
+            font: "Segoe UI Semilight"
+          })]
+        }));
+      });
       
       // Add Business Rules for API/Service
       if (formData.businessRules) {

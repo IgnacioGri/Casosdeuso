@@ -1,0 +1,35 @@
+GESTIONAR TRANSFERENCIAS BANCARIAS
+INFORMACIÓN DEL PROYECTO
+• Cliente: Banco Santander Argentina
+• Proyecto: Sistema de Gestión de Transferencias Electrónicas
+• Código: ST003
+• Archivo: ST003GestionarTransferenciasBancarias
+DESCRIPCIÓN DEL CASO DE USO
+• Nombre: Gestionar Transferencias Bancarias
+• Tipo: api
+• Descripción: Desarrollar un caso de uso para gestionar transferencias bancarias electrónicas entre cuentas propias y de terceros, incluyendo validaciones de seguridad, límites operativos y trazabilidad completa de todas las operaciones. El sistema debe permitir a los clientes realizar transferencias de dinero de forma segura y eficiente, con validaciones automáticas de fondos, límites diarios, y cumplimiento de normativas del Banco Central. Debe incluir funcionalidades para programar transferencias futuras y generar comprobantes.
+REGLAS DE NEGOCIO
+1. • Solo clientes con cuentas activas pueden realizar transferencias
+2. • Validar saldo suficiente incluyendo comisiones antes de procesar
+3. • Aplicar límites diarios según perfil del cliente (Estándar: $500.000, Premium: $2.000.000)
+4. • Transferencias superiores a $100.000 requieren doble autenticación
+5. • Comisión del 0.5% para bancos externos, gratis para cuentas propias
+6. • Todas las operaciones deben registrarse para cumplimiento BCRA
+7. • Transferencias programadas se procesan a las 9:00 AM del día seleccionado
+8. • Timeout de sesión de 10 minutos por seguridad durante el proceso
+REQUERIMIENTOS ESPECIALES
+1. • Integración con API del Banco Central para validación de CBU
+2. • Encriptación de datos sensibles con algoritmo AES-256
+3. • Registro completo de auditoría para cumplimiento normativo
+4. • Notificaciones SMS/email para transferencias superiores a $50.000
+5. • Backup automático de operaciones cada 5 minutos
+6. • Monitoreo en tiempo real de operaciones sospechosas
+7. • Interfaz accesible compatible con lectores de pantalla
+PRECONDICIONES
+El usuario debe estar autenticado en el sistema y tener los permisos necesarios para acceder a este caso de uso.
+POSTCONDICIONES
+Los datos de la entidad quedan actualizados en el sistema y se registra la auditoría correspondiente.
+HISTORIA DE REVISIONES Y APROBACIONES
+Fecha	Acción	Responsable	Comentario
+5/8/2025	Creación	Sistema	Versión original
+
