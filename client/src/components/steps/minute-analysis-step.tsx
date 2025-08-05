@@ -32,15 +32,12 @@ export function MinuteAnalysisStep({
 
   const analyzeMinuteMutation = useMutation({
     mutationFn: async (data: { text: string; useCaseType: string; aiModel: string }) => {
-      const response = await apiRequest('/api/analyze-minute', {
-        method: 'POST',
-        body: JSON.stringify({
-          minuteContent: data.text,
-          useCaseType: data.useCaseType,
-          aiModel: data.aiModel || 'demo'
-        })
+      const response = await apiRequest('POST', '/api/analyze-minute', {
+        minuteContent: data.text,
+        useCaseType: data.useCaseType,
+        aiModel: data.aiModel || 'demo'
       });
-      return response;
+      return response.json();
     },
     onSuccess: (response) => {
       if (response.success && response.formData) {
