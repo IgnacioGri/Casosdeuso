@@ -102,6 +102,12 @@ NUNCA MEZCLAR:
 - NO poner el nombre del caso de uso en clientName
 - NO dejar projectName vacío si se puede inferir
 
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "ST003GestionarTransferencias" (NO "ST003GestionarTransferencias.json")
+- Si encuentras extensiones, elimínalas completamente
+
 {
   "clientName": "Nombre de la empresa/banco cliente",
   "projectName": "Nombre del proyecto o sistema",
@@ -160,6 +166,12 @@ INSTRUCCIONES CRÍTICAS:
 - Si algún dato no está en la minuta, devuelve null o array vacío según corresponda
 - Para el actor principal: Si no hay actor explícito, usar "Actor no identificado"
 
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "API001ConsultarSaldo" (NO "API001ConsultarSaldo.json")
+- Si encuentras extensiones, elimínalas completamente
+
 {
   "clientName": "Nombre del cliente/organización",
   "projectName": "Nombre del proyecto o sistema",
@@ -183,6 +195,12 @@ INSTRUCCIONES CRÍTICAS:
   private getServiceAnalysisRules(): string {
     return `
 Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente información:
+
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "SRV001ProcesarPagos" (NO "SRV001ProcesarPagos.json")
+- Si encuentras extensiones, elimínalas completamente
 
 {
   "clientName": "Nombre del cliente/organización",
@@ -222,10 +240,24 @@ Para casos de uso tipo SERVICIO/PROCESO, extrae y estructura la siguiente inform
 
       console.log('Cleaned result for JSON parsing:', cleanedResult.substring(0, 200) + '...');
 
-      const parsed = JSON.parse(cleanedResult);
+      // Apply additional cleaning for fileName extensions that AI might add incorrectly
+      const finalCleanedResult = cleanedResult
+        .replace(/"fileName":\s*"([^"]+)\.json"/g, '"fileName": "$1"')
+        .replace(/"fileName":\s*"([^"]+)\.docx"/g, '"fileName": "$1"')
+        .replace(/"fileName":\s*"([^"]+)\.xml"/g, '"fileName": "$1"')
+        .replace(/"fileName":\s*"([^"]+)\.txt"/g, '"fileName": "$1"');
+
+      const parsed = JSON.parse(finalCleanedResult);
       
       // Validation and correction of common AI parsing errors
       let correctedData = { ...parsed };
+      
+      // Additional validation for fileName to ensure no extensions
+      if (correctedData.fileName && typeof correctedData.fileName === 'string') {
+        correctedData.fileName = correctedData.fileName
+          .replace(/\.(json|docx|xml|txt|pdf)$/i, '')
+          .trim();
+      }
       
       // Check if clientName contains a verb (likely mixed with useCaseName)
       const infinitiveVerbs = ['gestionar', 'crear', 'mostrar', 'consultar', 'ver', 'actualizar', 'eliminar', 'procesar'];

@@ -33,6 +33,7 @@ The application utilizes a modern full-stack .NET architecture, ensuring a clear
 - **System Synchronization**: Both frontend and backend systems maintain functional and UI parity.
 - **Description Expansion**: Automatically expands short descriptions using a dedicated AI prompt to meet minimum length requirements.
 - **API Use Case Structure**: Enforces mandatory sections and detailed JSON examples for API use cases to match minute requirements.
+- **File Naming Protection**: Comprehensive prevention system for AI-generated inappropriate file extensions. Both document generation and minute analysis include explicit prompt rules, regex cleaning patterns, and post-processing validation to eliminate .json, .docx, .xml, and other extensions from fileName fields.
 
 ## External Dependencies
 
