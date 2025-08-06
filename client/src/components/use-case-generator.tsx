@@ -323,7 +323,7 @@ export default function UseCaseGenerator() {
                 variant="ghost" 
                 size="default"
                 onClick={handleReset}
-                className="text-ms-blue hover:text-ms-blue/80 h-[44px] w-[44px] p-0 pt-[0px] pb-[0px]"
+                className="text-ms-blue hover:text-ms-blue/80 h-12 w-12 p-0"
               >
                 <RefreshCw size={20} />
               </Button>
