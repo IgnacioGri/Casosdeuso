@@ -83,7 +83,7 @@ export class DocumentService {
                 alignment: AlignmentType.LEFT,
                 style: {
                   paragraph: {
-                    indent: { left: convertInchesToTwip(0), hanging: convertInchesToTwip(0.25) },
+                    indent: { left: convertInchesToTwip(0.25), hanging: convertInchesToTwip(0.25) },
                   },
                 },
               },
@@ -94,7 +94,7 @@ export class DocumentService {
                 alignment: AlignmentType.LEFT,
                 style: {
                   paragraph: {
-                    indent: { left: convertInchesToTwip(0.2), hanging: convertInchesToTwip(0.25) },
+                    indent: { left: convertInchesToTwip(0.5), hanging: convertInchesToTwip(0.25) },
                   },
                 },
               },
@@ -105,7 +105,7 @@ export class DocumentService {
                 alignment: AlignmentType.LEFT,
                 style: {
                   paragraph: {
-                    indent: { left: convertInchesToTwip(0.4), hanging: convertInchesToTwip(0.25) },
+                    indent: { left: convertInchesToTwip(0.75), hanging: convertInchesToTwip(0.25) },
                   },
                 },
               },
@@ -122,7 +122,7 @@ export class DocumentService {
                 alignment: AlignmentType.LEFT,
                 style: {
                   paragraph: {
-                    indent: { left: convertInchesToTwip(0), hanging: convertInchesToTwip(0.25) },
+                    indent: { left: convertInchesToTwip(0.25), hanging: convertInchesToTwip(0.25) },
                   },
                 },
               },
@@ -139,7 +139,7 @@ export class DocumentService {
                 alignment: AlignmentType.LEFT,
                 style: {
                   paragraph: {
-                    indent: { left: convertInchesToTwip(0), hanging: convertInchesToTwip(0.25) },
+                    indent: { left: convertInchesToTwip(0.25), hanging: convertInchesToTwip(0.25) },
                   },
                 },
               },
