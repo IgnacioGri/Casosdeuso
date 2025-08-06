@@ -198,7 +198,7 @@ export function generateSearchWireframeHTML(data: WireframeData): string {
         <tbody>
           ${[1, 2, 3, 4, 5].map(i => `
             <tr>
-              ${columns.map(() => `<td>Dato ejemplo ${i}</td>`).join('')}
+              ${columns.map(() => `<td>Dato ${i}</td>`).join('')}
               <td>
                 <div class="action-buttons">
                   <button class="icon-btn">✏️ Editar</button>

@@ -272,7 +272,7 @@ function generateSearchWireframeHTML(data: WireframeData): string {
                   </button>
                 </div>
               </td>
-              ${columns.map(() => `<td>Dato ejemplo ${i}</td>`).join('')}
+              ${columns.map(() => `<td>Dato ${i}</td>`).join('')}
             </tr>
           `).join('')}
         </tbody>
