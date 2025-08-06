@@ -1,5 +1,6 @@
 @using UseCaseGenerator.Shared
 @using Microsoft.AspNetCore.Components
+@using MudBlazor
 
 <div class="mb-6">
     <div class="d-flex align-items-center mb-2">
@@ -61,7 +62,7 @@
                                     var index = i; // Capture for closure
                                     <MudGrid Class="mb-2">
                                         <MudItem xs="11">
-                                            <MudTextField @bind-Value="category.Items[index]"
+                                            <MudTextField @bind-value="category.Items[index]"
                                                         Placeholder="@category.Placeholder"
                                                         Variant="Variant.Outlined"
                                                         Lines="2"

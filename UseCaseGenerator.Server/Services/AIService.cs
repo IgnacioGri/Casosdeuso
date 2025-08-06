@@ -580,7 +580,7 @@ INSTRUCCIONES:
         
         var requestBody = new
         {
-            model = "grok-beta",
+            model = "grok-2-1212",
             messages = new[]
             {
                 new { role = "user", content = prompt }

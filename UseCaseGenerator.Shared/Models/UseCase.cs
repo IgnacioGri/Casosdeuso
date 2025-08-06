@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using UseCaseGenerator.Shared.DTOs;
 
 namespace UseCaseGenerator.Shared.Models;
 

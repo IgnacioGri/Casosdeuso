@@ -45,4 +45,10 @@ public class DocumentService : IDocumentService
     }
 
     // HTML download removed - DOCX generated and downloaded directly
+    
+    public void DownloadHtml(string html, string fileName)
+    {
+        // This method is deprecated - always use DOCX export instead
+        throw new NotImplementedException("HTML export is deprecated. Use DOCX export instead.");
+    }
 }

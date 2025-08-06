@@ -1,7 +1,9 @@
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using MudBlazor
 @inject IJSRuntime JSRuntime
 
-<MudTextField @bind-Value="@CurrentValue"
+<MudTextField T="string" @bind-value="@CurrentValue"
               @onkeydown="OnKeyDown"
               @onblur="OnBlur"
               @onfocus="OnFocus"
