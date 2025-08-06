@@ -8,6 +8,7 @@ export type LoadingContext =
   | 'document-generation'
   | 'minute-analysis'
   | 'test-generation'
+  | 'test-regeneration'
   | 'wireframe-generation'
   | 'form-validation'
   | 'data-processing'
@@ -54,6 +55,14 @@ const loadingConfigs: Record<LoadingContext, LoadingConfig> = {
     animationStyle: 'spin',
     duration: 'medium',
     color: 'text-green-600'
+  },
+  'test-regeneration': {
+    icon: <Brain className="h-5 w-5" />,
+    message: 'Regenerando casos de prueba...',
+    submessage: 'Aplicando sus sugerencias',
+    animationStyle: 'pulse',
+    duration: 'medium',
+    color: 'text-violet-600'
   },
   'wireframe-generation': {
     icon: <ImageIcon className="h-5 w-5" />,
