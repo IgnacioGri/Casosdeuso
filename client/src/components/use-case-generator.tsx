@@ -243,7 +243,7 @@ export default function UseCaseGenerator() {
           <Button 
             onClick={handleGenerateUseCase}
             disabled={generateAndDownloadUseCaseMutation.isPending}
-            className="bg-ms-blue hover:bg-ms-blue/90 text-white flex items-center"
+            className="bg-violet-600 hover:bg-violet-700 text-white flex items-center border-violet-600"
           >
             <Cog className="mr-2" size={16} />
 {generateAndDownloadUseCaseMutation.isPending ? (generationProgress || 'Generando documento...') : 'Generar y Descargar'}

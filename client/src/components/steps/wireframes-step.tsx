@@ -191,7 +191,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     variant="outline"
                     size="sm"
                     disabled={isGeneratingSearch}
-                    className="w-full"
+                    className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
                   >
                     {isGeneratingSearch ? (
                       <AdaptiveLoading
@@ -202,7 +202,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                       />
                     ) : (
                       <>
-                        <RefreshCw className="h-4 w-4 mr-2" />
+                        <RefreshCw className="h-4 w-4 mr-2 text-violet-600" />
                         Regenerar
                       </>
                     )}
@@ -212,7 +212,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                 <Button
                   onClick={() => handleGenerateWireframe('search')}
                   disabled={isGeneratingSearch}
-                  className="w-full"
+                  className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
                 >
                   {isGeneratingSearch ? (
                     <AdaptiveLoading
@@ -223,7 +223,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     />
                   ) : (
                     <>
-                      <ImageIcon className="h-4 w-4 mr-2" />
+                      <ImageIcon className="h-4 w-4 mr-2 text-violet-600" />
                       Generar Wireframe Buscador
                     </>
                   )}
@@ -250,7 +250,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     variant="outline"
                     size="sm"
                     disabled={isGeneratingForm}
-                    className="w-full"
+                    className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
                   >
                     {isGeneratingForm ? (
                       <AdaptiveLoading
@@ -261,7 +261,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                       />
                     ) : (
                       <>
-                        <RefreshCw className="h-4 w-4 mr-2" />
+                        <RefreshCw className="h-4 w-4 mr-2 text-violet-600" />
                         Regenerar
                       </>
                     )}
@@ -271,7 +271,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                 <Button
                   onClick={() => handleGenerateWireframe('form')}
                   disabled={isGeneratingForm}
-                  className="w-full"
+                  className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
                 >
                   {isGeneratingForm ? (
                     <AdaptiveLoading
@@ -282,7 +282,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     />
                   ) : (
                     <>
-                      <ImageIcon className="h-4 w-4 mr-2" />
+                      <ImageIcon className="h-4 w-4 mr-2 text-violet-600" />
                       Generar Wireframe Formulario
                     </>
                   )}

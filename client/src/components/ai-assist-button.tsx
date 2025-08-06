@@ -81,7 +81,7 @@ export function AIAssistButton({
       disabled={disabled || improveMutation.isPending}
       variant="outline"
       size="sm"
-      className="whitespace-nowrap border-violet-300 bg-violet-50 hover:bg-violet-100 hover:border-violet-400 text-violet-700 transition-colors"
+      className="whitespace-nowrap border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600 transition-colors"
       title={`Mejorar "${fieldName}" con IA según reglas ING`}
     >
       {improveMutation.isPending ? (
