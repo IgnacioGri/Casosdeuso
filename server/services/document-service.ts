@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun, TabStopType, TabStopPosition } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, BorderStyle, AlignmentType, Header, Footer, PageNumber, NumberFormat, VerticalAlign, ShadingType, ImageRun, TabStopType, TabStopPosition, LevelFormat, AlignmentType as NumberingAlignment, convertInchesToTwip } from 'docx';
 import * as fs from 'fs';
 import * as path from 'path';
 // Removed image-size due to compatibility issues
@@ -46,6 +46,11 @@ export class DocumentService {
 
   // Generate DOCX directly from form data - no HTML conversion needed
   static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string, aiGeneratedContent?: string): Promise<Buffer> {
+    // Create numbering configurations for native lists
+    const multiLevelNumberingReference = "multilevel";
+    const bulletNumberingReference = "bullet";
+    const simpleNumberingReference = "simple";
+    
     // Logo path for the header table - use the new Ingematica logo
     const logoPath = path.join(process.cwd(), 'attached_assets', 'image_1754501839527.png');
     
@@ -65,6 +70,83 @@ export class DocumentService {
     }
     
     const doc = new Document({
+      numbering: {
+        config: [
+          // Multilevel numbering (1, a, i)
+          {
+            reference: multiLevelNumberingReference,
+            levels: [
+              {
+                level: 0,
+                format: LevelFormat.DECIMAL,
+                text: "%1.",
+                alignment: AlignmentType.LEFT,
+                style: {
+                  paragraph: {
+                    indent: { left: convertInchesToTwip(0), hanging: convertInchesToTwip(0.25) },
+                  },
+                },
+              },
+              {
+                level: 1,
+                format: LevelFormat.LOWER_LETTER,
+                text: "%2.",
+                alignment: AlignmentType.LEFT,
+                style: {
+                  paragraph: {
+                    indent: { left: convertInchesToTwip(0.2), hanging: convertInchesToTwip(0.25) },
+                  },
+                },
+              },
+              {
+                level: 2,
+                format: LevelFormat.LOWER_ROMAN,
+                text: "%3.",
+                alignment: AlignmentType.LEFT,
+                style: {
+                  paragraph: {
+                    indent: { left: convertInchesToTwip(0.4), hanging: convertInchesToTwip(0.25) },
+                  },
+                },
+              },
+            ],
+          },
+          // Bullet list
+          {
+            reference: bulletNumberingReference,
+            levels: [
+              {
+                level: 0,
+                format: LevelFormat.BULLET,
+                text: "•",
+                alignment: AlignmentType.LEFT,
+                style: {
+                  paragraph: {
+                    indent: { left: convertInchesToTwip(0), hanging: convertInchesToTwip(0.25) },
+                  },
+                },
+              },
+            ],
+          },
+          // Simple numbered list
+          {
+            reference: simpleNumberingReference,
+            levels: [
+              {
+                level: 0,
+                format: LevelFormat.DECIMAL,
+                text: "%1.",
+                alignment: AlignmentType.LEFT,
+                style: {
+                  paragraph: {
+                    indent: { left: convertInchesToTwip(0), hanging: convertInchesToTwip(0.25) },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
       sections: [{
         children: [
           // Title - Code + Use case name in uppercase
@@ -84,30 +166,46 @@ export class DocumentService {
           // Project Information Section
           this.createStyledHeading("Información del Proyecto"),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Cliente: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Cliente: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: formData.clientName || '', font: "Segoe UI Semilight" })
             ]
           }),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Proyecto: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Proyecto: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: formData.projectName || '', font: "Segoe UI Semilight" })
             ]
           }),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Código: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Código: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: formData.useCaseCode || '', font: "Segoe UI Semilight" })
             ]
           }),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Archivo: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Archivo: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: formData.fileName || '', font: "Segoe UI Semilight" })
             ]
           }),
@@ -115,23 +213,35 @@ export class DocumentService {
           // Use Case Description Section
           this.createStyledHeading("Descripción del Caso de Uso"),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Nombre: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Nombre: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: SpellChecker.correctAccents(formData.useCaseName || ''), font: "Segoe UI Semilight" })
             ]
           }),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Tipo: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Tipo: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: formData.useCaseType === 'entity' ? 'Gestión de Entidades' : formData.useCaseType || '', font: "Segoe UI Semilight" })
             ]
           }),
           new Paragraph({
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
             spacing: { after: 120 },
             children: [
-              new TextRun({ text: "• Descripción: ", bold: true, font: "Segoe UI Semilight" }),
+              new TextRun({ text: "Descripción: ", bold: true, font: "Segoe UI Semilight" }),
               new TextRun({ text: SpellChecker.correctAccents(formData.description || ''), font: "Segoe UI Semilight" })
             ]
           }),
@@ -321,9 +431,13 @@ export class DocumentService {
       
       // 1. Request initiation
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: `1. El cliente realiza una petición HTTP ${formData.httpMethod || 'POST'} al endpoint ${formData.apiEndpoint || formData.endpoint || '/api/endpoint'}`,
+          text: `El cliente realiza una petición HTTP ${formData.httpMethod || 'POST'} al endpoint ${formData.apiEndpoint || formData.endpoint || '/api/endpoint'}`,
           bold: true,
           font: "Segoe UI Semilight"
         })]
@@ -332,10 +446,13 @@ export class DocumentService {
       // Add request format details if available
       if (formData.requestFormat || formData.requestExample) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "a. Formato de solicitud:",
+            text: "Formato de solicitud:",
             font: "Segoe UI Semilight"
           })]
         }));
@@ -351,61 +468,85 @@ export class DocumentService {
       
       // 2. Validation
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "2. El sistema valida los datos de entrada",
+          text: "El sistema valida los datos de entrada",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Validación de estructura del mensaje",
+          text: "Validación de estructura del mensaje",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Validación de datos obligatorios",
+          text: "Validación de datos obligatorios",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 3. Processing
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "3. El sistema procesa la solicitud",
+          text: "El sistema procesa la solicitud",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Ejecuta la lógica de negocio correspondiente",
+          text: "Ejecuta la lógica de negocio correspondiente",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Registra la operación en el log de auditoría",
+          text: "Registra la operación en el log de auditoría",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 4. Response
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "4. El sistema retorna la respuesta",
+          text: "El sistema retorna la respuesta",
           bold: true,
           font: "Segoe UI Semilight"
         })]
@@ -414,10 +555,13 @@ export class DocumentService {
       // Add response format details if available
       if (formData.responseFormat || formData.responseExample) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "a. Formato de respuesta:",
+            text: "Formato de respuesta:",
             font: "Segoe UI Semilight"
           })]
         }));
@@ -447,37 +591,50 @@ export class DocumentService {
           `Error ${code} - error en la aplicación`;
         
         sections.push(new Paragraph({
+          numbering: {
+            reference: simpleNumberingReference,
+            level: 0
+          },
           spacing: { after: 80 },
           children: [new TextRun({
-            text: `${index + 1}. Error ${code}: ${errorDescription}`,
+            text: `Error ${code}: ${errorDescription}`,
             bold: true,
             font: "Segoe UI Semilight"
           })]
         }));
         
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: `a. El sistema detecta un error de tipo ${code}`,
+            text: `El sistema detecta un error de tipo ${code}`,
             font: "Segoe UI Semilight"
           })]
         }));
         
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "b. Se registra el error en el log del sistema",
+            text: "Se registra el error en el log del sistema",
             font: "Segoe UI Semilight"
           })]
         }));
         
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: index === errorCodes.length - 1 ? 120 : 80 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: `c. Se retorna el código de error ${code} con el mensaje correspondiente`,
+            text: `Se retorna el código de error ${code} con el mensaje correspondiente`,
             font: "Segoe UI Semilight"
           })]
         }));
@@ -495,10 +652,13 @@ export class DocumentService {
         
         rules.forEach((rule: string, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: simpleNumberingReference,
+              level: 0
+            },
             spacing: { after: 80 },
-            indent: { left: 288 },
             children: [new TextRun({
-              text: `${index + 1}. ${rule.toString().trim()}`,
+              text: rule.toString().trim(),
               font: "Segoe UI Semilight"
             })]
           }));
@@ -519,10 +679,13 @@ export class DocumentService {
         
         requirements.forEach((req: string, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: simpleNumberingReference,
+              level: 0
+            },
             spacing: { after: 80 },
-            indent: { left: 288 },
             children: [new TextRun({
-              text: `${index + 1}. ${req.toString().trim()}`,
+              text: req.toString().trim(),
               font: "Segoe UI Semilight"
             })]
           }));
@@ -562,9 +725,13 @@ export class DocumentService {
       
       // 1. Service execution schedule
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: `1. El servicio se ejecuta ${formData.serviceFrequency || 'Diariamente'} a las ${formData.executionTime || '02:00 AM'}`,
+          text: `El servicio se ejecuta ${formData.serviceFrequency || 'Diariamente'} a las ${formData.executionTime || '02:00 AM'}`,
           bold: true,
           font: "Segoe UI Semilight"
         })]
@@ -572,28 +739,38 @@ export class DocumentService {
       
       // Add details about the execution frequency
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: `a. Frecuencia de ejecución: ${formData.serviceFrequency || 'Cada 24 horas'}`,
+          text: `Frecuencia de ejecución: ${formData.serviceFrequency || 'Cada 24 horas'}`,
           font: "Segoe UI Semilight"
         })]
       }));
       
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: `b. Hora programada: ${formData.executionTime || '02:00 AM (configuración estándar)'}`,
+          text: `Hora programada: ${formData.executionTime || '02:00 AM (configuración estándar)'}`,
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 2. Process initialization
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "2. El proceso inicia automáticamente según la programación establecida",
+          text: "El proceso inicia automáticamente según la programación establecida",
           bold: true,
           font: "Segoe UI Semilight"
         })]
@@ -602,10 +779,13 @@ export class DocumentService {
       // Check if it processes files
       if (formData.configurationPaths) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "a. Captura archivos desde rutas configurables:",
+            text: "Captura archivos desde rutas configurables:",
             font: "Segoe UI Semilight"
           })]
         }));
@@ -622,10 +802,13 @@ export class DocumentService {
       // Check if it calls web services
       if (formData.webServiceCredentials) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "b. Conecta con web services externos:",
+            text: "Conecta con web services externos:",
             font: "Segoe UI Semilight"
           })]
         }));
@@ -641,60 +824,83 @@ export class DocumentService {
       
       // 3. Data processing
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "3. El sistema procesa los datos según las reglas de negocio",
+          text: "El sistema procesa los datos según las reglas de negocio",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Valida la integridad de los datos",
+          text: "Valida la integridad de los datos",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Aplica las transformaciones necesarias",
+          text: "Aplica las transformaciones necesarias",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "c. Registra el progreso en el log de auditoría",
+          text: "Registra el progreso en el log de auditoría",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 4. Results generation
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "4. El proceso genera los resultados y notificaciones",
+          text: "El proceso genera los resultados y notificaciones",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Genera archivos de salida o actualiza base de datos",
+          text: "Genera archivos de salida o actualiza base de datos",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 120 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Envía notificaciones de finalización",
+          text: "Envía notificaciones de finalización",
           font: "Segoe UI Semilight"
         })]
       }));
@@ -704,78 +910,108 @@ export class DocumentService {
       
       // 1. File not found error
       sections.push(new Paragraph({
+        numbering: {
+          reference: simpleNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "1. Error en captura de archivos",
+          text: "Error en captura de archivos",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. El sistema no encuentra archivos en la ruta configurada",
+          text: "El sistema no encuentra archivos en la ruta configurada",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Se registra el error y se notifica al administrador",
+          text: "Se registra el error y se notifica al administrador",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 2. Web service connection error
       sections.push(new Paragraph({
+        numbering: {
+          reference: simpleNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "2. Error de conexión con web service",
+          text: "Error de conexión con web service",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Falla la conexión con el servicio externo",
+          text: "Falla la conexión con el servicio externo",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Se intenta reconectar según política de reintentos",
+          text: "Se intenta reconectar según política de reintentos",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 3. Processing error
       sections.push(new Paragraph({
+        numbering: {
+          reference: simpleNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "3. Error en procesamiento de datos",
+          text: "Error en procesamiento de datos",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Se detecta inconsistencia en los datos",
+          text: "Se detecta inconsistencia en los datos",
           font: "Segoe UI Semilight"
         })]
       }));
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 120 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Se genera reporte de errores y se detiene el proceso",
+          text: "Se genera reporte de errores y se detiene el proceso",
           font: "Segoe UI Semilight"
         })]
       }));
@@ -792,10 +1028,13 @@ export class DocumentService {
         
         rules.forEach((rule: string, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: simpleNumberingReference,
+              level: 0
+            },
             spacing: { after: 80 },
-            indent: { left: 288 },
             children: [new TextRun({
-              text: `${index + 1}. ${rule.toString().trim()}`,
+              text: rule.toString().trim(),
               font: "Segoe UI Semilight"
             })]
           }));
@@ -871,9 +1110,13 @@ export class DocumentService {
       
       // 1. Add search functionality
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "1. Buscar datos de la entidad",
+          text: "Buscar datos de la entidad",
           bold: true,
           font: "Segoe UI Semilight"
         })]
@@ -882,20 +1125,26 @@ export class DocumentService {
       // a. Search filters with roman numerals
       if (formData.searchFilters && formData.searchFilters.length > 0) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 }, // 0.2 inch = 288 twips
           children: [new TextRun({
-            text: "a. Filtros de búsqueda disponibles:",
+            text: "Filtros de búsqueda disponibles:",
             font: "Segoe UI Semilight"
           })]
         }));
         
         formData.searchFilters.forEach((filter: string, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: multiLevelNumberingReference,
+              level: 2
+            },
             spacing: { after: 40 },
-            indent: { left: 576 }, // 0.4 inch = 576 twips (additional 0.2)
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${SpellChecker.correctAccents(filter)}`,
+              text: SpellChecker.correctAccents(filter),
               font: "Segoe UI Semilight"
             })]
           }));
@@ -905,20 +1154,26 @@ export class DocumentService {
       // b. Result columns with roman numerals
       if (formData.resultColumns && formData.resultColumns.length > 0) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60, before: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "b. Columnas del resultado de búsqueda:",
+            text: "Columnas del resultado de búsqueda:",
             font: "Segoe UI Semilight"
           })]
         }));
         
         formData.resultColumns.forEach((column: string, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: multiLevelNumberingReference,
+              level: 2
+            },
             spacing: { after: 40 },
-            indent: { left: 576 },
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${SpellChecker.correctAccents(column)}`,
+              text: SpellChecker.correctAccents(column),
               font: "Segoe UI Semilight"
             })]
           }));
@@ -927,9 +1182,13 @@ export class DocumentService {
       
       // 2. Add create functionality
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 0
+        },
         spacing: { after: 80, before: 80 },
         children: [new TextRun({
-          text: "2. Agregar una nueva entidad",
+          text: "Agregar una nueva entidad",
           bold: true,
           font: "Segoe UI Semilight"
         })]
@@ -938,20 +1197,26 @@ export class DocumentService {
       // a. Entity fields with roman numerals
       if (formData.entityFields && formData.entityFields.length > 0) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "a. Datos de la entidad:",
+            text: "Datos de la entidad:",
             font: "Segoe UI Semilight"
           })]
         }));
         
         formData.entityFields.forEach((field: any, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: multiLevelNumberingReference,
+              level: 2
+            },
             spacing: { after: 40 },
-            indent: { left: 576 },
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${SpellChecker.correctAccents(field.name)} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})${field.description ? ` - ${SpellChecker.correctAccents(field.description)}` : ''}`,
+              text: `${SpellChecker.correctAccents(field.name)} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})${field.description ? ` - ${SpellChecker.correctAccents(field.description)}` : ''}`,
               font: "Segoe UI Semilight"
             })]
           }));
@@ -960,10 +1225,13 @@ export class DocumentService {
       
       // b. Auto-registration
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 120, before: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Al agregar se registra automáticamente la fecha y usuario de alta",
+          text: "Al agregar se registra automáticamente la fecha y usuario de alta",
           font: "Segoe UI Semilight"
         })]
       }));
@@ -976,9 +1244,13 @@ export class DocumentService {
       
       // 1. Modify or update entity
       sections.push(new Paragraph({
+        numbering: {
+          reference: simpleNumberingReference,
+          level: 0
+        },
         spacing: { after: 80 },
         children: [new TextRun({
-          text: "1. Modificar o actualizar una entidad",
+          text: "Modificar o actualizar una entidad",
           bold: true,
           font: "Segoe UI Semilight"
         })]
