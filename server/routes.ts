@@ -924,7 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Intelligent Test Case Generation endpoint
   app.post("/api/generate-intelligent-tests", async (req, res) => {
     try {
-      const { formData, aiModel = 'demo' } = req.body;
+      const { formData, aiModel = 'demo', suggestions, isRegeneration = false } = req.body;
       
       if (!formData) {
         return res.status(400).json({ 
@@ -933,12 +933,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      console.log('🧠 Test case generation request:', {
+        isRegeneration,
+        hasSuggestions: !!suggestions,
+        suggestionsLength: suggestions?.length || 0,
+        aiModel
+      });
+
       const aiServiceInstance = new AIService();
       const intelligentTestService = new IntelligentTestCaseService(aiServiceInstance);
       
       const testResult = await intelligentTestService.generateIntelligentTestCases(
         formData,
-        aiModel
+        aiModel,
+        suggestions,
+        isRegeneration
       );
       
       res.json({

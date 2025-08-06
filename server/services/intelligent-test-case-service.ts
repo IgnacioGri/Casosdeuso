@@ -20,13 +20,25 @@ export interface IntelligentTestCaseResult {
 export class IntelligentTestCaseService {
   constructor(private aiService: AIService) {}
 
-  async generateIntelligentTestCases(formData: UseCaseFormData, aiModel: string): Promise<IntelligentTestCaseResult> {
+  async generateIntelligentTestCases(
+    formData: UseCaseFormData, 
+    aiModel: string, 
+    suggestions?: string, 
+    isRegeneration?: boolean
+  ): Promise<IntelligentTestCaseResult> {
     try {
       // Build comprehensive context from the entire use case
       const context = this.buildUseCaseContext(formData);
       
       // Generate intelligent test cases using AI
-      const prompt = this.buildIntelligentTestPrompt(context, formData.useCaseType);
+      const prompt = this.buildIntelligentTestPrompt(context, formData.useCaseType, suggestions, isRegeneration);
+      
+      console.log('🎯 Using prompt for test generation:', {
+        hasBasicPrompt: !!prompt,
+        hasSuggestions: !!suggestions,
+        isRegeneration,
+        promptLength: prompt.length
+      });
       
       // Use processFieldWithAI method for test case generation
       const testCaseResult = await AIService.processFieldWithAI(
@@ -188,7 +200,7 @@ export class IntelligentTestCaseService {
     return sections.join('\n');
   }
 
-  private buildIntelligentTestPrompt(context: any, useCaseType: string): string {
+  private buildIntelligentTestPrompt(context: any, useCaseType: string, suggestions?: string, isRegeneration?: boolean): string {
     const basePrompt = `
 Eres un analista de QA experto especializado en generar casos de prueba completos y profesionales siguiendo estándares bancarios ING.
 
@@ -235,6 +247,28 @@ NO uses bullets (•) ni guiones (-). Usa numeración jerárquica.
 TIPOS DE PRUEBAS A INCLUIR:
 `;
 
+    // Add suggestions section if this is a regeneration
+    let suggestionsSection = '';
+    if (isRegeneration && suggestions) {
+      console.log('🎯 Adding suggestions to prompt:', suggestions.substring(0, 200) + '...');
+      suggestionsSection = `
+
+🔥 IMPORTANTE: REGENERACIÓN CON SUGERENCIAS DEL USUARIO 🔥
+
+EL USUARIO HA PROPORCIONADO LAS SIGUIENTES SUGERENCIAS ESPECÍFICAS QUE DEBES IMPLEMENTAR OBLIGATORIAMENTE:
+
+${suggestions}
+
+INSTRUCCIONES CRÍTICAS PARA LA REGENERACIÓN:
+1. DEBES incorporar TODAS las sugerencias específicas del usuario en los casos de prueba
+2. DEBES agregar los elementos exactos que el usuario solicita
+3. DEBES mantener la estructura JSON pero MODIFICAR el contenido según las sugerencias
+4. Si el usuario menciona nombres específicos, datos específicos, o casos específicos, DEBES incluirlos EXACTAMENTE
+5. Esta es una REGENERACIÓN, no una primera generación, así que el usuario espera ver los cambios sugeridos aplicados
+
+`;
+    }
+
     switch (useCaseType) {
       case 'entity':
         return basePrompt + `
@@ -254,7 +288,7 @@ CONTEXTO BANCARIO ING:
 - Cumplimiento de normativas bancarias
 - Auditoría completa de operaciones
 - Seguridad de datos sensibles
-`;
+${suggestionsSection}`;
 
       case 'api':
         return basePrompt + `
@@ -274,7 +308,7 @@ CONTEXTO BANCARIO ING:
 - Logs de auditoría de transacciones
 - Validación de permisos por cliente
 - Cumplimiento PCI DSS
-`;
+${suggestionsSection}`;
 
       case 'service':
         return basePrompt + `
@@ -294,7 +328,7 @@ CONTEXTO BANCARIO ING:
 - Conciliación de cuentas
 - Generación de reportes regulatorios
 - Backup de datos críticos
-`;
+${suggestionsSection}`;
 
       default:
         return basePrompt;
