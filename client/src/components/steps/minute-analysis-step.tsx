@@ -263,12 +263,13 @@ export function MinuteAnalysisStep({
             <Button
               onClick={handleAnalyze}
               disabled={analyzeMinuteMutation.isPending || !minuteText.trim()}
-              className={`ai-button ${analyzeMinuteMutation.isPending ? 'thinking-button' : ''} px-4`}
+              variant="outline"
+              className={`ai-button variant-outline ${analyzeMinuteMutation.isPending ? 'thinking-button' : ''} px-4`}
               size="sm"
               style={{ 
-                backgroundColor: '#7c3aed', 
+                backgroundColor: analyzeMinuteMutation.isPending ? '#7c3aed' : '#ede9fe', 
                 borderColor: '#7c3aed', 
-                color: 'white' 
+                color: analyzeMinuteMutation.isPending ? 'white' : '#7c3aed' 
               }}
             >
               {analyzeMinuteMutation.isPending ? (

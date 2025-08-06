@@ -243,11 +243,12 @@ export default function UseCaseGenerator() {
           <Button 
             onClick={handleGenerateUseCase}
             disabled={generateAndDownloadUseCaseMutation.isPending}
-            className="ai-button flex items-center"
+            variant="outline"
+            className="ai-button variant-outline flex items-center"
             style={{ 
-              backgroundColor: '#7c3aed', 
+              backgroundColor: '#ede9fe', 
               borderColor: '#7c3aed', 
-              color: 'white' 
+              color: '#7c3aed' 
             }}
           >
             <Cog className="mr-2" size={16} />
