@@ -1080,10 +1080,13 @@ export class DocumentService {
       
       serviceRequirements.forEach((req: string, index: number) => {
         sections.push(new Paragraph({
+          numbering: {
+            reference: simpleNumberingReference,
+            level: 0
+          },
           spacing: { after: 80 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: `${index + 1}. ${req}`,
+            text: req,
             font: "Segoe UI Semilight"
           })]
         }));
@@ -1268,20 +1271,26 @@ export class DocumentService {
       // a. Entity data
       if (formData.entityFields && formData.entityFields.length > 0) {
         sections.push(new Paragraph({
+          numbering: {
+            reference: multiLevelNumberingReference,
+            level: 1
+          },
           spacing: { after: 60 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: "a. Datos de la entidad a modificar:",
+            text: "Datos de la entidad a modificar:",
             font: "Segoe UI Semilight"
           })]
         }));
         
         formData.entityFields.forEach((field: any, index: number) => {
           sections.push(new Paragraph({
+            numbering: {
+              reference: multiLevelNumberingReference,
+              level: 2
+            },
             spacing: { after: 40 },
-            indent: { left: 576 },
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${field.name} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})`,
+              text: `${field.name} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})`,
               font: "Segoe UI Semilight"
             })]
           }));
@@ -1290,49 +1299,65 @@ export class DocumentService {
       
       // b. Show identifier
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60, before: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "b. Mostrar el identificador único de la entidad",
+          text: "Mostrar el identificador único de la entidad",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // c. Show creation data
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 60 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "c. Mostrar la fecha y el usuario de alta originales",
+          text: "Mostrar la fecha y el usuario de alta originales",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // d. Register modification
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 80 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "d. Al modificar se registra automáticamente la fecha y usuario de modificación",
+          text: "Al modificar se registra automáticamente la fecha y usuario de modificación",
           font: "Segoe UI Semilight"
         })]
       }));
       
       // 2. Delete entity
       sections.push(new Paragraph({
+        numbering: {
+          reference: simpleNumberingReference,
+          level: 0
+        },
         spacing: { after: 80, before: 80 },
         children: [new TextRun({
-          text: "2. Eliminar una entidad",
+          text: "Eliminar una entidad",
           bold: true,
           font: "Segoe UI Semilight"
         })]
       }));
       
       sections.push(new Paragraph({
+        numbering: {
+          reference: multiLevelNumberingReference,
+          level: 1
+        },
         spacing: { after: 120 },
-        indent: { left: 288 },
         children: [new TextRun({
-          text: "a. Verificar que la entidad no tenga relaciones con otras entidades antes de eliminar",
+          text: "Verificar que la entidad no tenga relaciones con otras entidades antes de eliminar",
           font: "Segoe UI Semilight"
         })]
       }));
@@ -1352,10 +1377,13 @@ export class DocumentService {
       
       rules.forEach((rule: string, index: number) => {
         sections.push(new Paragraph({
+          numbering: {
+            reference: simpleNumberingReference,
+            level: 0
+          },
           spacing: { after: 80 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: `${index + 1}. ${rule.toString().trim()}`,
+            text: rule.toString().trim(),
             font: "Segoe UI Semilight"
           })]
         }));
@@ -1379,10 +1407,13 @@ export class DocumentService {
       
       requirements.forEach((req: string, index: number) => {
         sections.push(new Paragraph({
+          numbering: {
+            reference: simpleNumberingReference,
+            level: 0
+          },
           spacing: { after: 80 },
-          indent: { left: 288 },
           children: [new TextRun({
-            text: `${index + 1}. ${req.toString().trim()}`,
+            text: req.toString().trim(),
             font: "Segoe UI Semilight"
           })]
         }));
@@ -1583,34 +1614,20 @@ export class DocumentService {
         
         lines.forEach((line: string) => {
           if (line.trim()) {
-            // Determine the level based on the pattern (1., a., i., etc.)
             const trimmedLine = line.trim();
-            let indentLevel = 0;
-            let formattedText = trimmedLine;
             
-            // Check for numbered items (1., 2., etc.)
-            if (/^\d+\./.test(trimmedLine)) {
-              indentLevel = 0;
-            }
-            // Check for lettered items (a., b., etc.)
-            else if (/^[a-z]\./.test(trimmedLine)) {
-              indentLevel = 432; // 0.3 inch
-            }
-            // Check for roman numerals (i., ii., etc.)
-            else if (/^[ivx]+\./.test(trimmedLine)) {
-              indentLevel = 864; // 0.6 inch
-            }
-            // Check for leading spaces to determine indentation
-            else {
-              const leadingSpaces = line.length - line.trimStart().length;
-              indentLevel = Math.floor(leadingSpaces / 3) * 288; // 288 twips = 0.2 inch per 3 spaces
-            }
+            // Remove existing numbering if present
+            const cleanedLine = trimmedLine.replace(/^(\d+\.|[a-z]\.|[ivx]+\.|•|-)\s*/, '');
             
+            // Always use bullet list for preconditions
             sections.push(new Paragraph({
+              numbering: {
+                reference: bulletNumberingReference,
+                level: 0
+              },
               spacing: { after: 40 },
-              indent: { left: indentLevel },
               children: [new TextRun({
-                text: SpellChecker.correctAccents(formattedText),
+                text: SpellChecker.correctAccents(cleanedLine),
                 font: "Segoe UI Semilight"
               })]
             }));
@@ -1636,11 +1653,14 @@ export class DocumentService {
         })]
       }));
       
-      // Test Cases Steps as bulleted list
+      // Test Cases Steps as numbered list
       formData.testSteps.forEach((testStep: any, index: number) => {
-        // Main bullet with step number
+        // Main number with step number
         sections.push(new Paragraph({
-          bullet: { level: 0 },
+          numbering: {
+            reference: simpleNumberingReference,
+            level: 0
+          },
           spacing: { before: 120, after: 60 },
           children: [new TextRun({
             text: `Paso ${testStep.number || index + 1}`,
@@ -1653,7 +1673,11 @@ export class DocumentService {
         // Sub-bullets for each detail
         if (testStep.action) {
           sections.push(new Paragraph({
-            bullet: { level: 1 },
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
+            indent: { left: convertInchesToTwip(0.5) },
             spacing: { after: 30 },
             children: [
               new TextRun({
@@ -1671,7 +1695,11 @@ export class DocumentService {
         
         if (testStep.inputData) {
           sections.push(new Paragraph({
-            bullet: { level: 1 },
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
+            indent: { left: convertInchesToTwip(0.5) },
             spacing: { after: 30 },
             children: [
               new TextRun({
@@ -1689,7 +1717,11 @@ export class DocumentService {
         
         if (testStep.expectedResult) {
           sections.push(new Paragraph({
-            bullet: { level: 1 },
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
+            indent: { left: convertInchesToTwip(0.5) },
             spacing: { after: 30 },
             children: [
               new TextRun({
@@ -1707,7 +1739,11 @@ export class DocumentService {
         
         if (testStep.observations) {
           sections.push(new Paragraph({
-            bullet: { level: 1 },
+            numbering: {
+              reference: bulletNumberingReference,
+              level: 0
+            },
+            indent: { left: convertInchesToTwip(0.5) },
             spacing: { after: 30 },
             children: [
               new TextRun({
@@ -1725,7 +1761,11 @@ export class DocumentService {
         
         // Estado - always show
         sections.push(new Paragraph({
-          bullet: { level: 1 },
+          numbering: {
+            reference: bulletNumberingReference,
+            level: 0
+          },
+          indent: { left: convertInchesToTwip(0.5) },
           spacing: { after: 60 },
           children: [
             new TextRun({
