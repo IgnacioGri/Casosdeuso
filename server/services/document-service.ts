@@ -202,10 +202,6 @@ export class DocumentService {
                       new TableCell({
                         width: { size: 75, type: WidthType.PERCENTAGE },
                         verticalAlign: VerticalAlign.CENTER,
-                        shading: {
-                          fill: "F0F0F0",
-                          type: ShadingType.CLEAR
-                        },
                         children: [
                           new Paragraph({
                             alignment: AlignmentType.CENTER,
