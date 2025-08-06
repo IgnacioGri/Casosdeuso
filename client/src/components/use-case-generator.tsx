@@ -176,6 +176,44 @@ export default function UseCaseGenerator() {
   });
 
   const handleNextStep = () => {
+    // Check if we're on the test case step
+    const isTestCaseStep = () => {
+      if (!formData.generateTestCase) return false;
+      
+      const testCaseStepNumber = formData.useCaseType === 'entity' ? 10 : 7;
+      return currentStep === testCaseStepNumber;
+    };
+
+    // Check if test cases are incomplete
+    const areTestCasesIncomplete = () => {
+      if (!formData.generateTestCase) return false;
+      
+      const hasEmptyFields = !formData.testCaseObjective || !formData.testCasePreconditions;
+      const hasNoTestSteps = !formData.testSteps || formData.testSteps.length === 0;
+      const hasIncompleteSteps = formData.testSteps?.some(step => 
+        !step.action || !step.inputData || !step.expectedResult
+      );
+      
+      return hasEmptyFields || hasNoTestSteps || hasIncompleteSteps;
+    };
+
+    // Special validation for test case step
+    if (isTestCaseStep() && areTestCasesIncomplete()) {
+      const confirmed = window.confirm(
+        "⚠️ Casos de Prueba Incompletos\n\n" +
+        "Los casos de prueba no están completamente definidos o no se generaron con IA.\n\n" +
+        "Se recomienda:\n" +
+        "• Completar todos los campos (Objetivo, Precondiciones, Pasos)\n" +
+        "• Usar el botón 'Generar con IA' para crear casos de prueba automáticamente\n\n" +
+        "¿Desea continuar de todas formas?"
+      );
+      
+      if (!confirmed) {
+        return; // User cancelled, stay on current step
+      }
+    }
+
+    // Standard validation for other steps
     if (validateStep(currentStep)) {
       setCurrentStep(Math.min(currentStep + 1, getTotalSteps()));
     } else {
