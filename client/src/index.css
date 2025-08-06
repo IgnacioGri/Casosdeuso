@@ -428,6 +428,12 @@ button[role="combobox"][data-state="closed"] {
   overflow: hidden;
 }
 
+/* Force thinking button to use violet background */
+.thinking-button {
+  background-color: #7c3aed !important; /* Violet-600 consistent with other AI buttons */
+  border-color: #7c3aed !important;
+}
+
 .ai-button:hover {
   background-color: #6d28d9 !important; /* Violet-700 */
   border-color: #6d28d9 !important;
@@ -477,6 +483,47 @@ button[data-variant="outline"][class*="violet"] {
   background-color: #f9fafb !important;
   border-color: #7c3aed !important;
   color: #7c3aed !important;
+}
+
+/* Force specific AI buttons with extremely high specificity */
+button[class*="ai-button"] {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: white !important;
+}
+
+/* Override any possible bg-blue classes */
+button[class*="bg-blue"].ai-button,
+button[class*="ms-blue"].ai-button {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+}
+
+/* More specific overrides for AI buttons */
+.ai-button,
+button.ai-button {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: white !important;
+}
+
+.ai-button:hover,
+button.ai-button:hover {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+.ai-button.variant-outline,
+button.ai-button.variant-outline {
+  background-color: #ede9fe !important;
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+}
+
+.ai-button.variant-outline:hover,
+button.ai-button.variant-outline:hover {
+  background-color: #ddd6fe !important;
+  border-color: #6d28d9 !important;
 }
 
 .thinking-button-content {

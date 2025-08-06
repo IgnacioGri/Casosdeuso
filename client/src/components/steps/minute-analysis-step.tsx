@@ -263,8 +263,13 @@ export function MinuteAnalysisStep({
             <Button
               onClick={handleAnalyze}
               disabled={analyzeMinuteMutation.isPending || !minuteText.trim()}
-              className={`${analyzeMinuteMutation.isPending ? 'thinking-button' : 'ai-button'} px-4`}
+              className={`ai-button ${analyzeMinuteMutation.isPending ? 'thinking-button' : ''} px-4`}
               size="sm"
+              style={{ 
+                backgroundColor: '#7c3aed', 
+                borderColor: '#7c3aed', 
+                color: 'white' 
+              }}
             >
               {analyzeMinuteMutation.isPending ? (
                 <div className="thinking-button-content">

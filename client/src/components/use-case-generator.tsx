@@ -244,6 +244,11 @@ export default function UseCaseGenerator() {
             onClick={handleGenerateUseCase}
             disabled={generateAndDownloadUseCaseMutation.isPending}
             className="ai-button flex items-center"
+            style={{ 
+              backgroundColor: '#7c3aed', 
+              borderColor: '#7c3aed', 
+              color: 'white' 
+            }}
           >
             <Cog className="mr-2" size={16} />
 {generateAndDownloadUseCaseMutation.isPending ? (generationProgress || 'Generando documento...') : 'Generar y Descargar'}
