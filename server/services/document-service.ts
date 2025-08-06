@@ -46,22 +46,21 @@ export class DocumentService {
 
   // Generate DOCX directly from form data - no HTML conversion needed
   static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string, aiGeneratedContent?: string): Promise<Buffer> {
-    // Use custom header image if provided, otherwise use official Ingematica header
-    let headerImagePath = path.join(process.cwd(), 'attached_assets', 'Header oficial Ingematica  _1754166268982.png');
+    // Logo path for the header table
+    const logoPath = path.join(process.cwd(), 'attached_assets', 'Logo.png');
     
-    // Fallback to older headers if official header doesn't exist
-    if (!fs.existsSync(headerImagePath)) {
-      headerImagePath = path.join(process.cwd(), 'attached_assets', 'official-ingematica-header.png');
-      if (!fs.existsSync(headerImagePath)) {
-        headerImagePath = path.join(process.cwd(), 'attached_assets', 'Encabezado_1753600608270.png');
-      }
-    }
-    
-    if (customHeaderImage) {
-      // If customHeaderImage is a URL path like /attached_assets/header-xxx.png, convert to file path
-      if (customHeaderImage.startsWith('/attached_assets/')) {
-        const filename = customHeaderImage.replace('/attached_assets/', '');
-        headerImagePath = path.join(process.cwd(), 'attached_assets', filename);
+    // Fallback logos if main doesn't exist
+    let logoImageData: Buffer | null = null;
+    if (fs.existsSync(logoPath)) {
+      logoImageData = fs.readFileSync(logoPath);
+    } else {
+      const fallbackLogos = ['company-logo.png', 'ingematica-logo-full.png'];
+      for (const fallback of fallbackLogos) {
+        const fallbackPath = path.join(process.cwd(), 'attached_assets', fallback);
+        if (fs.existsSync(fallbackPath)) {
+          logoImageData = fs.readFileSync(fallbackPath);
+          break;
+        }
       }
     }
     
@@ -146,28 +145,113 @@ export class DocumentService {
         headers: {
           default: new Header({
             children: [
-              fs.existsSync(headerImagePath) ? new Paragraph({
-                children: [
-                  new ImageRun({
-                    type: "png",
-                    data: fs.readFileSync(headerImagePath),
-                    transformation: { 
-                      width: 600,  // 900 / 1.5 scaling factor = 600
-                      height: 80   // 120 / 1.5 scaling factor = 80
-                    }
+              // Create header table instead of image
+              new Table({
+                width: {
+                  size: 100,
+                  type: WidthType.PERCENTAGE
+                },
+                borders: {
+                  top: { style: BorderStyle.SINGLE, size: 6, color: "006BB6" },
+                  bottom: { style: BorderStyle.SINGLE, size: 6, color: "006BB6" },
+                  left: { style: BorderStyle.SINGLE, size: 6, color: "006BB6" },
+                  right: { style: BorderStyle.SINGLE, size: 6, color: "006BB6" },
+                  insideHorizontal: { style: BorderStyle.SINGLE, size: 6, color: "006BB6" },
+                  insideVertical: { style: BorderStyle.SINGLE, size: 6, color: "006BB6" }
+                },
+                rows: [
+                  new TableRow({
+                    height: { value: 500, rule: "exact" },
+                    children: [
+                      // Logo cell (spans 2 rows)
+                      new TableCell({
+                        rowSpan: 2,
+                        width: { size: 25, type: WidthType.PERCENTAGE },
+                        verticalAlign: VerticalAlign.CENTER,
+                        margins: {
+                          top: 60,
+                          bottom: 60,
+                          left: 120,
+                          right: 120
+                        },
+                        children: [
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: logoImageData ? [
+                              new ImageRun({
+                                type: "png",
+                                data: logoImageData,
+                                transformation: {
+                                  width: 120,
+                                  height: 60
+                                }
+                              })
+                            ] : [
+                              new TextRun({
+                                text: "INGEMATICA",
+                                bold: true,
+                                size: 24,
+                                color: "006BB6",
+                                font: "Segoe UI"
+                              })
+                            ]
+                          })
+                        ]
+                      }),
+                      // "Documento de Casos de Uso" cell
+                      new TableCell({
+                        width: { size: 75, type: WidthType.PERCENTAGE },
+                        verticalAlign: VerticalAlign.CENTER,
+                        shading: {
+                          fill: "F0F0F0",
+                          type: ShadingType.CLEAR
+                        },
+                        children: [
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                              new TextRun({
+                                text: "Documento de Casos de Uso",
+                                bold: true,
+                                size: 26,
+                                color: "006BB6",
+                                font: "Segoe UI"
+                              })
+                            ]
+                          })
+                        ]
+                      })
+                    ]
+                  }),
+                  new TableRow({
+                    height: { value: 700, rule: "exact" },
+                    children: [
+                      // Project name cell
+                      new TableCell({
+                        width: { size: 75, type: WidthType.PERCENTAGE },
+                        verticalAlign: VerticalAlign.CENTER,
+                        children: [
+                          new Paragraph({
+                            alignment: AlignmentType.CENTER,
+                            children: [
+                              new TextRun({
+                                text: formData.projectName || "Proyecto",
+                                bold: true,
+                                size: 32,
+                                color: "333333",
+                                font: "Segoe UI Semilight"
+                              })
+                            ]
+                          })
+                        ]
+                      })
+                    ]
                   })
                 ]
-              }) : new Paragraph({
-                children: [new TextRun({
-                  text: "INGEMATICA - Documentación de casos de uso",
-                  bold: true,
-                  size: 28,
-                  color: "0070C0"
-                })]
               }),
-              // Add spacing after header
+              // Add spacing after header table
               new Paragraph({
-                spacing: { after: 240 }, // Add space after header
+                spacing: { after: 240 },
                 children: []
               })
             ]
