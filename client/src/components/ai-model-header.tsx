@@ -50,22 +50,8 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
   };
 
   const getModelBadgeVariant = (model: AIModel) => {
-    switch (model) {
-      case 'openai':
-        return 'default';
-      case 'claude':
-        return 'secondary';
-      case 'grok':
-        return 'outline';
-      case 'gemini':
-        return 'default';
-      case 'copilot':
-        return 'default';
-      case 'demo':
-        return 'secondary';
-      default:
-        return 'default';
-    }
+    // Todos los modelos ahora usan el fondo azul (default) por preferencia del usuario
+    return 'default';
   };
 
   return (
