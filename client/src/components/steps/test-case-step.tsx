@@ -230,6 +230,55 @@ export function TestCaseStep({
         )}
       </div>
 
+      {/* Suggestions Field - Show after AI generation at the top */}
+      {testCasesGeneratedWithAI && onUpdateSuggestions && (
+        <Card className="border-violet-200 bg-violet-50/50 mb-6">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Brain className="h-5 w-5 text-violet-600" />
+              Sugerencias para Mejorar los Casos de Prueba
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Si desea mejorar los casos de prueba generados, escriba sus sugerencias a continuación:
+              </p>
+              <BulletTextarea
+                value={testCaseSuggestions}
+                onChange={onUpdateSuggestions}
+                placeholder="Escriba sus sugerencias con bullet points. Ej:
+• Agregar validación de campos vacíos
+• Incluir caso de prueba para usuarios con permisos limitados
+• Probar el comportamiento con conexión lenta
+• Verificar mensajes de error específicos..."
+                rows={5}
+                className="bg-white"
+              />
+              {testCaseSuggestions && (
+                <Button
+                  onClick={handleRegenerateWithSuggestions}
+                  disabled={isRegenerating}
+                  className="w-full ai-button variant-outline"
+                >
+                  {isRegenerating ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin text-violet-600" />
+                      Regenerando con sus sugerencias...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 text-violet-600" />
+                      Regenerar Casos de Prueba con Sugerencias
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 gap-4">
         <div>
           <div className="flex items-center justify-between mb-2">
@@ -414,55 +463,6 @@ export function TestCaseStep({
           )}
         </div>
       </div>
-      
-      {/* Suggestions Field - Only show after AI generation */}
-      {testCasesGeneratedWithAI && onUpdateSuggestions && (
-        <Card className="border-violet-200 bg-violet-50/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Brain className="h-5 w-5 text-violet-600" />
-              Sugerencias para Mejorar los Casos de Prueba
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Si desea mejorar los casos de prueba generados, escriba sus sugerencias a continuación:
-              </p>
-              <BulletTextarea
-                value={testCaseSuggestions}
-                onChange={onUpdateSuggestions}
-                placeholder="Escriba sus sugerencias con bullet points. Ej:
-• Agregar validación de campos vacíos
-• Incluir caso de prueba para usuarios con permisos limitados
-• Probar el comportamiento con conexión lenta
-• Verificar mensajes de error específicos..."
-                rows={5}
-                className="bg-white"
-              />
-              {testCaseSuggestions && (
-                <Button
-                  onClick={handleRegenerateWithSuggestions}
-                  disabled={isRegenerating}
-                  className="w-full ai-button variant-outline"
-                >
-                  {isRegenerating ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin text-violet-600" />
-                      Regenerando con sus sugerencias...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="h-4 w-4 mr-2 text-violet-600" />
-                      Regenerar Casos de Prueba con Sugerencias
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
     
     {/* Progress Indicator */}
