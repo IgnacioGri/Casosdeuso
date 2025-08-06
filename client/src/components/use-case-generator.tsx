@@ -277,8 +277,9 @@ export default function UseCaseGenerator() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-ms-border">
         <div className="max-w-none xl:max-w-7xl 2xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center py-4">
+            {/* Columna izquierda - Logo */}
+            <div className="flex items-center space-x-3 flex-1">
               {/* Logo responsive: logo completo en pantallas grandes, logo pequeño en móvil */}
               <img 
                 src="/ingematica-logo-full.png" 
@@ -300,11 +301,17 @@ export default function UseCaseGenerator() {
                 }}
                 title="Volver al inicio"
               />
+            </div>
+            
+            {/* Columna centro - Título */}
+            <div className="flex justify-center flex-1">
               <h1 className="text-xl font-semibold text-gray-900 hidden sm:block">
                 Generador de Casos de Uso
               </h1>
             </div>
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            
+            {/* Columna derecha - Controles */}
+            <div className="flex items-center justify-end space-x-2 sm:space-x-4 flex-1">
               <div className="scale-90 sm:scale-100">
                 <AIModelHeader 
                   currentModel={formData.aiModel}
