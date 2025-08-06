@@ -57,7 +57,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
   return (
     <div className="flex items-center gap-4">
       <Select value={currentModel} onValueChange={(value: AIModel) => onModelChange(value)}>
-        <SelectTrigger className="w-[250px]">
+        <SelectTrigger className="w-[250px] pt-[12px] pb-[12px]">
           <SelectValue>
             <div className="flex items-center gap-2">
               {getModelIcon(currentModel)}
