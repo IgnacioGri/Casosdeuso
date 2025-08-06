@@ -22,23 +22,12 @@ public class DocumentService : IDocumentService
             throw new ArgumentException("formData is required for DOCX export. The HTML conversion method is deprecated.");
         }
         
-        // Get custom header image from localStorage
-        string customHeaderImage = null;
-        try
-        {
-            customHeaderImage = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "customHeaderImage");
-        }
-        catch
-        {
-            // Ignore localStorage errors
-        }
-        
+
         var response = await _httpClient.PostAsJsonAsync("api/Document/docx", new 
         { 
             Content = content, 
             FileName = fileName,
-            FormData = formData,
-            CustomHeaderImage = customHeaderImage
+            FormData = formData
         });
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsByteArrayAsync();

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { FileText, RefreshCw, ArrowLeft, ArrowRight, Cog, Upload, X, Image } from "lucide-react";
+import { FileText, RefreshCw, ArrowLeft, ArrowRight, Cog, Upload, X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -18,10 +18,7 @@ export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState(0);
-  const [customHeaderImage, setCustomHeaderImage] = useState<string | null>(
-    localStorage.getItem('customHeaderImage')
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const { toast } = useToast();
 
   const {
@@ -119,8 +116,7 @@ export default function UseCaseGenerator() {
           content: generatedData.content,
           fileName: generatedData.useCase.fileName,
           useCaseName: generatedData.useCase.useCaseName,
-          formData: exportData,
-          customHeaderImage: customHeaderImage
+          formData: exportData
         }),
         credentials: 'include'
       });
@@ -225,72 +221,7 @@ export default function UseCaseGenerator() {
     });
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Formato inválido",
-        description: "Por favor seleccione un archivo de imagen",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        title: "Archivo muy grande",
-        description: "La imagen debe ser menor a 2MB",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      // Upload to server
-      const formData = new FormData();
-      formData.append('headerImage', file);
-      
-      const response = await apiRequest('POST', '/api/upload-header', formData);
-      
-      if (response.ok) {
-        const data = await response.json();
-        const imageUrl = data.imageUrl;
-        
-        // Save to localStorage and state
-        localStorage.setItem('customHeaderImage', imageUrl);
-        setCustomHeaderImage(imageUrl);
-        
-        toast({
-          title: "Imagen cargada",
-          description: "La imagen del header se ha actualizado correctamente"
-        });
-      } else {
-        throw new Error('Error al subir la imagen');
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "No se pudo cargar la imagen",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleClearCustomHeader = () => {
-    localStorage.removeItem('customHeaderImage');
-    setCustomHeaderImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    toast({
-      title: "Imagen eliminada",
-      description: "Se ha restaurado el header por defecto"
-    });
-  };
 
   const isReviewStep = () => {
     // Final review step happens after test cases (if enabled) or after decision step
@@ -348,46 +279,27 @@ export default function UseCaseGenerator() {
         <div className="max-w-none xl:max-w-7xl 2xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
-              {customHeaderImage ? (
-                <div className="relative group">
-                  <img 
-                    src={customHeaderImage} 
-                    alt="Custom Header" 
-                    className="h-12 max-w-xs object-contain"
-                  />
-                  <button
-                    onClick={handleClearCustomHeader}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Eliminar imagen personalizada"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {/* Logo responsive: logo completo en pantallas grandes, logo pequeño en móvil */}
-                  <img 
-                    src="/ingematica-logo-full.png" 
-                    alt="Ingematica Logo" 
-                    className="hidden sm:block h-10 object-contain cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => {
-                      setCurrentStep(1);
-                      handleReset();
-                    }}
-                    title="Volver al inicio"
-                  />
-                  <img 
-                    src="/attached_assets/company-logo.png" 
-                    alt="Ingematica Logo" 
-                    className="sm:hidden h-8 w-8 object-contain cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => {
-                      setCurrentStep(1);
-                      handleReset();
-                    }}
-                    title="Volver al inicio"
-                  />
-                </>
-              )}
+              {/* Logo responsive: logo completo en pantallas grandes, logo pequeño en móvil */}
+              <img 
+                src="/ingematica-logo-full.png" 
+                alt="Ingematica Logo" 
+                className="hidden sm:block h-10 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => {
+                  setCurrentStep(1);
+                  handleReset();
+                }}
+                title="Volver al inicio"
+              />
+              <img 
+                src="/attached_assets/company-logo.png" 
+                alt="Ingematica Logo" 
+                className="sm:hidden h-8 w-8 object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={() => {
+                  setCurrentStep(1);
+                  handleReset();
+                }}
+                title="Volver al inicio"
+              />
               <h1 className="text-xl font-semibold text-gray-900 hidden sm:block">
                 Generador de Casos de Uso
               </h1>
@@ -399,15 +311,7 @@ export default function UseCaseGenerator() {
                   onModelChange={(model: AIModel) => updateFormData({ aiModel: model })}
                 />
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="hidden sm:flex text-gray-600 hover:text-ms-blue px-2 py-1 text-xs"
-                title="Cargar imagen personalizada"
-              >
-                <Image size={14} />
-              </Button>
+
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -420,15 +324,7 @@ export default function UseCaseGenerator() {
           </div>
         </div>
       </header>
-      
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="hidden"
-      />
+
 
       <div className="max-w-none xl:max-w-7xl 2xl:max-w-none mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-8">
         {/* Form Section - Always full width */}
@@ -460,6 +356,9 @@ export default function UseCaseGenerator() {
             onAddWireframeDescription={addWireframeDescription}
             onRemoveWireframeDescription={removeWireframeDescription}
             onUpdateWireframeDescription={updateWireframeDescription}
+            onAddAlternativeFlow={() => {}} // Placeholder - not implemented yet
+            onRemoveAlternativeFlow={() => {}} // Placeholder - not implemented yet
+            onUpdateAlternativeFlow={() => {}} // Placeholder - not implemented yet
             onAddTestStep={addTestStep}
             onRemoveTestStep={removeTestStep}
             onUpdateTestStep={updateTestStep}

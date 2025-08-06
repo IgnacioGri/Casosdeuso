@@ -954,55 +954,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Configure multer for header image upload
-  const headerImageStorage = multer.diskStorage({
-    destination: 'attached_assets/',
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const ext = file.originalname.split('.').pop();
-      cb(null, `header-${uniqueSuffix}.${ext}`);
-    }
-  });
 
-  const headerImageUpload = multer({
-    storage: headerImageStorage,
-    limits: {
-      fileSize: 2 * 1024 * 1024 // 2MB limit
-    },
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Only image files are allowed'));
-      }
-    }
-  });
-
-
-
-  // Header image upload endpoint
-  app.post("/api/upload-header", headerImageUpload.single('headerImage'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: 'No image file provided' });
-      }
-
-      // Return the relative URL for the uploaded image
-      const imageUrl = `/attached_assets/${req.file.filename}`;
-      
-      res.json({ 
-        success: true,
-        imageUrl: imageUrl,
-        filename: req.file.filename
-      });
-    } catch (error) {
-      console.error('Error uploading header image:', error);
-      res.status(500).json({ 
-        error: 'Failed to upload header image',
-        success: false
-      });
-    }
-  });
 
   // Add wireframe routes
   app.use(wireframeRoutes);
