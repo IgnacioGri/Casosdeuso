@@ -1101,11 +1101,11 @@ REGLAS: {rules}";
         var formData = ExtractFormDataFromContext(context);
         
         // Generate dynamic wireframe based on actual form data
-        if (formData != null && formData.UseCaseType == "entidad")
+        if (formData != null && formData.UseCaseType == UseCaseType.Entity)
         {
             return GenerateEntitySearchWireframe(fieldValue, formData);
         }
-        else if (formData != null && (formData.UseCaseType == "api" || formData.UseCaseType == "proceso"))
+        else if (formData != null && (formData.UseCaseType == UseCaseType.API || formData.UseCaseType == UseCaseType.Service))
         {
             return GenerateServiceWireframe(fieldValue, formData);
         }
@@ -1338,7 +1338,7 @@ Formato estilo Microsoft (fuente Segoe UI, layout según minuta ING vr19).";
     {
         var baseDescription = !string.IsNullOrWhiteSpace(userDescription) ? CleanInputText(userDescription) : "";
         
-        var wireframes = $@"Sistema completo de wireframes ING para {(formData.UseCaseType == "api" ? "API/Web Service" : "Proceso Automático")} {formData.UseCaseName ?? "servicio"}.
+        var wireframes = $@"Sistema completo de wireframes ING para {(formData.UseCaseType == UseCaseType.API ? "API/Web Service" : "Proceso Automático")} {formData.UseCaseName ?? "servicio"}.
 
 PANTALLA DE CONFIGURACIÓN:
 Panel de parámetros{(!string.IsNullOrWhiteSpace(formData.ApiEndpoint) ? $" (Endpoint: {formData.ApiEndpoint})" : "")}:
@@ -1367,7 +1367,7 @@ Log de actividades:
 - Tiempos de respuesta
 
 PANTALLA DE RESULTADOS:
-{(formData.UseCaseType == "api" ? "Request/Response detallado:" : "Salida del proceso:")}
+{(formData.UseCaseType == UseCaseType.API ? "Request/Response detallado:" : "Salida del proceso:")}
 - Datos de entrada formateados
 - Respuesta/resultado obtenido  
 - Códigos de estado

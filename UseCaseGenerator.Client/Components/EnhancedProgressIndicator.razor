@@ -102,7 +102,7 @@
         stepInfo.Name = stepNumber <= stepNames.Length ? stepNames[stepNumber - 1] : $"Paso {stepNumber}";
         
         // Adjust short names based on use case type
-        if (UseCaseType == UseCaseType.Api || UseCaseType == UseCaseType.Service)
+        if (UseCaseType == UseCaseType.API || UseCaseType == UseCaseType.Service)
         {
             if (stepNumber == 5) stepInfo.ShortName = "Config";
             else if (stepNumber == 6) stepInfo.ShortName = "Reglas";

@@ -25,6 +25,7 @@ public class UseCaseFormData
     // Business logic
     public string? BusinessRules { get; set; }
     public string? SpecialRequirements { get; set; }
+    public string? AlternativeFlows { get; set; }
     
     // Wireframes
     public bool GenerateWireframes { get; set; }

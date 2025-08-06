@@ -180,15 +180,10 @@
                 </MudExpansionPanel>
             }
             
-            @if (FormData.AlternativeFlows.Any())
+            @if (!string.IsNullOrWhiteSpace(FormData.AlternativeFlows))
             {
-                <MudExpansionPanel Text="@($"Flujos Alternativos ({FormData.AlternativeFlows.Count})")">
-                    <MudList T="string" Dense="true">
-                        @foreach (var flow in FormData.AlternativeFlows)
-                        {
-                            <MudListItem T="string" Icon="@Icons.Material.Filled.AccountTree" Text="@flow" />
-                        }
-                    </MudList>
+                <MudExpansionPanel Text="Flujos Alternativos">
+                    <MudText Style="white-space: pre-line">@FormData.AlternativeFlows</MudText>
                 </MudExpansionPanel>
             }
             

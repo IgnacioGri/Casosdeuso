@@ -9,6 +9,10 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
 
+### Recent Changes (2025-01-06)
+- **Blazor Migration Progress**: Reduced compilation errors from 41 to 12. Fixed CSS keyframes (@@prefix), TestCases page structure, and MainLayout FilesChanged EventCallback
+- **Critical Discovery**: AlternativeFlows in UseCaseFormData is a string property, not List<string>. WireframesFlowsStep component needs refactoring to handle this correctly
+
 ### Frontend Architecture (Blazor WebAssembly)
 - **Framework**: Blazor WebAssembly with .NET 8.
 - **UI Library**: MudBlazor for Material Design.

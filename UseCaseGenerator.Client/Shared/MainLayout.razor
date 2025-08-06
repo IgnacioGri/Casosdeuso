@@ -28,7 +28,7 @@
         <MudSpacer />
         
         <!-- Custom Header Upload Button -->
-        <MudFileUpload T="IBrowserFile" Accept="image/*" FilesChanged="OnFileSelected" MaximumFileCount="1">
+        <MudFileUpload T="IBrowserFile" Accept="image/*" FilesChanged="@OnFileSelected" MaximumFileCount="1">
             <ButtonTemplate>
                 <MudIconButton Icon="@Icons.Material.Filled.Image" 
                               Color="Color.Inherit" 
@@ -77,11 +77,9 @@
         drawerOpen = !drawerOpen;
     }
 
-    private async Task OnFileSelected(IReadOnlyList<IBrowserFile> files)
+    private async Task OnFileSelected(IBrowserFile file)
     {
-        if (files.Count == 0) return;
-
-        var file = files[0];
+        if (file == null) return;
 
         // Validate file size
         if (file.Size > MaxFileSize)

@@ -117,32 +117,27 @@
                         
                         @if (testCaseResult.Success)
                         {
-                            @foreach (var testCase in testCaseResult.TestCases)
-                            {
-                                <MudGrid Class="mb-4">
-                                    <MudItem xs="12">
-                                        <MudText Typo="Typo.h6" Class="mb-3">@testCase.Name</MudText>
-                                    </MudItem>
-                                    <MudItem xs="12" md="6">
-                                        <MudTextField Value="@testCase.Objective"
-                                                      Label="Objetivo"
-                                                      Variant="Variant.Outlined"
-                                                      Lines="3"
-                                                      ReadOnly="true"
-                                                      Class="mb-3" T="string" />
-                                    </MudItem>
-                                    <MudItem xs="12" md="6">
-                                        <MudTextField Value="@testCase.Preconditions"
-                                                      Label="Precondiciones"
-                                                      Variant="Variant.Outlined"
-                                                      Lines="3"
-                                                      ReadOnly="true"
-                                                      Class="mb-3" T="string" />
-                                    </MudItem>
-                                    
-                                    <MudItem xs="12">
-                                        <MudText Typo="Typo.h6" Class="mb-3">Pasos de Prueba</MudText>
-                                        <MudDataGrid Items="@testCase.Steps" 
+                            <MudGrid Class="mb-4">
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Value="@testCaseResult.Objective"
+                                                  Label="Objetivo"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="3"
+                                                  ReadOnly="true"
+                                                  Class="mb-3" T="string" />
+                                </MudItem>
+                                <MudItem xs="12" md="6">
+                                    <MudTextField Value="@testCaseResult.Preconditions"
+                                                  Label="Precondiciones"
+                                                  Variant="Variant.Outlined"
+                                                  Lines="3"
+                                                  ReadOnly="true"
+                                                  Class="mb-3" T="string" />
+                                </MudItem>
+                                
+                                <MudItem xs="12">
+                                    <MudText Typo="Typo.h6" Class="mb-3">Pasos de Prueba</MudText>
+                                    <MudDataGrid Items="@testCaseResult.TestSteps" 
                                                      Filterable="false" 
                                                      SortMode="SortMode.None"
                                                      Groupable="false" T="TestStep">
@@ -156,7 +151,6 @@
                                         </MudDataGrid>
                                     </MudItem>
                                 </MudGrid>
-                            }
                                 
                             <!-- Export Options -->
                             <MudGrid Class="mt-4">
@@ -275,12 +269,9 @@
         {
             // Update form data with generated test cases
             formData.GenerateTestCase = true;
-            if (testCaseResult.TestCases.Any())
-            {
-                var firstTestCase = testCaseResult.TestCases.First();
-                formData.TestCaseObjective = firstTestCase.Objective;
-                formData.TestCasePreconditions = firstTestCase.Preconditions;
-                formData.TestSteps = firstTestCase.Steps.Select(s => new TestStep
+            formData.TestCaseObjective = testCaseResult.Objective;
+            formData.TestCasePreconditions = testCaseResult.Preconditions;
+            formData.TestSteps = testCaseResult.TestSteps.Select(s => new TestStep
                 {
                     Number = s.Number,
                     Action = s.Action,
@@ -288,7 +279,6 @@
                     ExpectedResult = s.ExpectedResult,
                     Observations = s.Observations
                 }).ToList();
-            }
 
             await FormStateService.SaveFormStateAsync(formData);
             Snackbar.Add("Casos de prueba agregados al formulario principal", Severity.Success);

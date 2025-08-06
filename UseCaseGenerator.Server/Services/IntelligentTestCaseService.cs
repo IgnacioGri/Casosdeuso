@@ -1,6 +1,7 @@
 using UseCaseGenerator.Shared.DTOs;
 using UseCaseGenerator.Shared.Models;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace UseCaseGenerator.Server.Services;
 
@@ -140,8 +141,8 @@ REGLAS:
 - Considerar flujos alternativos y manejo de errores
 - Usar terminología bancaria profesional
 - Incluir datos de prueba específicos y realistas
-- ⚠️ FORMATO OBLIGATORIO para preconditions: Usar BULLETS (•) exclusivamente, NO listas numeradas
-- Ejemplo preconditions: "• Usuario con permisos logueado • Base de datos con datos de prueba • Sistema en ambiente UAT"
+- FORMATO OBLIGATORIO para preconditions: Usar BULLETS (*) exclusivamente, NO listas numeradas
+- Ejemplo preconditions: ""* Usuario con permisos logueado * Base de datos con datos de prueba * Sistema en ambiente UAT""
 
 Responde ÚNICAMENTE con el JSON válido.
 ";
@@ -189,7 +190,7 @@ Responde ÚNICAMENTE con el JSON válido.
             if (testSteps.Count == 0)
             {
                 _logger.LogWarning("AI response missing testSteps array or empty, generating fallback test steps");
-                testSteps = GenerateFallbackTestSteps(formData.UseCaseName);
+                testSteps = GenerateFallbackTestSteps("Caso de Uso");
             }
 
             var response = new IntelligentTestCaseResponse

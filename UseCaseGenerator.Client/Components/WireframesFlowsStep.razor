@@ -81,51 +81,19 @@
     <MudItem xs="12" md="6">
         <MudText Typo="Typo.h6" Class="mb-3">Flujos Alternativos</MudText>
         
-        <div class="d-flex align-center mb-2">
-            <MudTextField @bind-Value="newAlternativeFlow"
-                          Label="Flujo alternativo"
-                          Variant="Variant.Outlined"
-                          Class="flex-grow-1 mr-2"
-                          Placeholder="Ej: Error en validación de DNI duplicado"
-                          @onkeypress="@(async (KeyboardEventArgs e) => { if (e.Key == "Enter") await AddAlternativeFlow(); })" />
-            <MudButton Variant="Variant.Filled" 
-                       Color="Color.Primary"
-                       OnClick="AddAlternativeFlow"
-                       Disabled="string.IsNullOrWhiteSpace(newAlternativeFlow)">
-                Agregar
-            </MudButton>
-        </div>
+        <MudTextField @bind-Value="FormData.AlternativeFlows"
+                      Label="Flujos alternativos"
+                      Variant="Variant.Outlined"
+                      Lines="6"
+                      Placeholder="Describa los flujos alternativos, casos de error y excepciones. Por ejemplo:&#10;- Error en validación de DNI duplicado&#10;- Cliente con productos activos: impedir eliminación&#10;- Timeout de sesión: mostrar modal de re-autenticación"
+                      Class="mb-3" />
         
-        @if (FormData.AlternativeFlows.Any())
-        {
-            <MudList T="string" Dense="true">
-                @foreach (var flow in FormData.AlternativeFlows.ToList())
-                {
-                    <MudListItem T="string">
-                        <div class="d-flex justify-space-between align-center">
-                            <MudText>@flow</MudText>
-                            <MudIconButton Icon="@Icons.Material.Filled.Delete" 
-                                           Color="Color.Error" 
-                                           Size="Size.Small"
-                                           OnClick="() => RemoveAlternativeFlow(flow)" />
-                        </div>
-                    </MudListItem>
-                }
-            </MudList>
-        }
-        else
+        @if (string.IsNullOrWhiteSpace(FormData.AlternativeFlows))
         {
             <MudAlert Severity="Severity.Info" Dense="true">
                 No hay flujos alternativos definidos
             </MudAlert>
         }
-        
-        <MudTextField @bind-Value="FormData.AlternativeFlowsDescription"
-                      Label="Descripción de flujos alternativos"
-                      Variant="Variant.Outlined"
-                      Lines="4"
-                      Placeholder="Describe los escenarios de error y casos especiales..."
-                      Class="mt-3" />
     </MudItem>
     
     <!-- Quick Examples -->
@@ -177,7 +145,6 @@
     [Parameter] public EventCallback<UseCaseFormData> FormDataChanged { get; set; }
     
     private string newWireframe = "";
-    private string newAlternativeFlow = "";
 
     private async Task AddWireframe()
     {
@@ -192,22 +159,6 @@
     private async Task RemoveWireframe(string wireframe)
     {
         FormData.WireframeDescriptions.Remove(wireframe);
-        await FormDataChanged.InvokeAsync(FormData);
-    }
-
-    private async Task AddAlternativeFlow()
-    {
-        if (!string.IsNullOrWhiteSpace(newAlternativeFlow) && !FormData.AlternativeFlows.Contains(newAlternativeFlow))
-        {
-            FormData.AlternativeFlows.Add(newAlternativeFlow.Trim());
-            newAlternativeFlow = "";
-            await FormDataChanged.InvokeAsync(FormData);
-        }
-    }
-
-    private async Task RemoveAlternativeFlow(string flow)
-    {
-        FormData.AlternativeFlows.Remove(flow);
         await FormDataChanged.InvokeAsync(FormData);
     }
 
@@ -237,19 +188,15 @@
     {
         var errorFlows = new[]
         {
-            "Error de validación: mostrar mensajes específicos por campo",
-            "Error de conexión: mostrar mensaje y botón de reintentar",
-            "Error de permisos: redirigir a pantalla de acceso denegado",
-            "Timeout de sesión: mostrar modal de re-autenticación"
+            "- Error de validación: mostrar mensajes específicos por campo",
+            "- Error de conexión: mostrar mensaje y botón de reintentar",
+            "- Error de permisos: redirigir a pantalla de acceso denegado",
+            "- Timeout de sesión: mostrar modal de re-autenticación"
         };
 
-        foreach (var flow in errorFlows)
-        {
-            if (!FormData.AlternativeFlows.Contains(flow))
-            {
-                FormData.AlternativeFlows.Add(flow);
-            }
-        }
+        FormData.AlternativeFlows = string.IsNullOrWhiteSpace(FormData.AlternativeFlows) 
+            ? string.Join("\n", errorFlows)
+            : FormData.AlternativeFlows + "\n" + string.Join("\n", errorFlows);
 
         await FormDataChanged.InvokeAsync(FormData);
     }
@@ -258,19 +205,15 @@
     {
         var bankingFlows = new[]
         {
-            "DNI duplicado: mostrar mensaje y opciones de resolución",
-            "Cliente con productos activos: impedir eliminación con detalle",
-            "Scoring crediticio negativo: solicitar autorización supervisor",
-            "Límite de transacciones diarias excedido: bloquear hasta próximo día"
+            "- DNI duplicado: mostrar mensaje y opciones de resolución",
+            "- Cliente con productos activos: impedir eliminación con detalle",
+            "- Scoring crediticio negativo: solicitar autorización supervisor",
+            "- Límite de transacciones diarias excedido: bloquear hasta próximo día"
         };
 
-        foreach (var flow in bankingFlows)
-        {
-            if (!FormData.AlternativeFlows.Contains(flow))
-            {
-                FormData.AlternativeFlows.Add(flow);
-            }
-        }
+        FormData.AlternativeFlows = string.IsNullOrWhiteSpace(FormData.AlternativeFlows) 
+            ? string.Join("\n", bankingFlows)
+            : FormData.AlternativeFlows + "\n" + string.Join("\n", bankingFlows);
 
         await FormDataChanged.InvokeAsync(FormData);
     }
@@ -279,19 +222,15 @@
     {
         var securityFlows = new[]
         {
-            "Intento de acceso no autorizado: registrar en log y bloquear",
-            "Cambio de datos sensibles: requerir re-autenticación",
-            "Múltiples intentos fallidos: bloquear usuario temporalmente",
-            "Acceso desde ubicación inusual: enviar notificación de seguridad"
+            "- Intento de acceso no autorizado: registrar en log y bloquear",
+            "- Cambio de datos sensibles: requerir re-autenticación",
+            "- Múltiples intentos fallidos: bloquear usuario temporalmente",
+            "- Acceso desde ubicación inusual: enviar notificación de seguridad"
         };
 
-        foreach (var flow in securityFlows)
-        {
-            if (!FormData.AlternativeFlows.Contains(flow))
-            {
-                FormData.AlternativeFlows.Add(flow);
-            }
-        }
+        FormData.AlternativeFlows = string.IsNullOrWhiteSpace(FormData.AlternativeFlows) 
+            ? string.Join("\n", securityFlows)
+            : FormData.AlternativeFlows + "\n" + string.Join("\n", securityFlows);
 
         await FormDataChanged.InvokeAsync(FormData);
     }
