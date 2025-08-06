@@ -305,7 +305,7 @@ export default function UseCaseGenerator() {
             
             {/* Columna centro - Título */}
             <div className="flex justify-center flex-1">
-              <h1 className="text-gray-900 hidden sm:block font-bold text-[25px]">
+              <h1 className="text-gray-900 hidden sm:block font-bold text-[30px]">
                 Generador de Casos de Uso
               </h1>
             </div>
@@ -323,9 +323,9 @@ export default function UseCaseGenerator() {
                 variant="ghost" 
                 size="default"
                 onClick={handleReset}
-                className="text-ms-blue hover:text-ms-blue/80 h-12 w-12 p-0"
+                className="text-ms-blue hover:text-ms-blue/80 h-[44px] w-[44px] p-0"
               >
-                <RefreshCw size={18} />
+                <RefreshCw size={20} />
               </Button>
             </div>
           </div>
