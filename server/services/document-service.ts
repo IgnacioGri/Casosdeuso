@@ -46,15 +46,15 @@ export class DocumentService {
 
   // Generate DOCX directly from form data - no HTML conversion needed
   static async generateDirectFromFormData(formData: any, testCases?: TestCase[], customHeaderImage?: string, aiGeneratedContent?: string): Promise<Buffer> {
-    // Logo path for the header table
-    const logoPath = path.join(process.cwd(), 'attached_assets', 'Logo.png');
+    // Logo path for the header table - use the new Ingematica logo
+    const logoPath = path.join(process.cwd(), 'attached_assets', 'image_1754501839527.png');
     
     // Fallback logos if main doesn't exist
     let logoImageData: Buffer | null = null;
     if (fs.existsSync(logoPath)) {
       logoImageData = fs.readFileSync(logoPath);
     } else {
-      const fallbackLogos = ['company-logo.png', 'ingematica-logo-full.png'];
+      const fallbackLogos = ['Logo.png', 'company-logo.png', 'ingematica-logo-full.png'];
       for (const fallback of fallbackLogos) {
         const fallbackPath = path.join(process.cwd(), 'attached_assets', fallback);
         if (fs.existsSync(fallbackPath)) {
@@ -182,8 +182,8 @@ export class DocumentService {
                                 type: "png",
                                 data: logoImageData,
                                 transformation: {
-                                  width: 120,
-                                  height: 60
+                                  width: 160,  // Increased width to better show the logo text
+                                  height: 50   // Proportional height to preserve aspect ratio
                                 }
                               })
                             ] : [
