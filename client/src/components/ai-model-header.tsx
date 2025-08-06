@@ -11,7 +11,7 @@ interface AIModelHeaderProps {
 
 export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProps) {
   const getModelIcon = (model: AIModel) => {
-    const iconClass = "h-4 w-4 text-ing-blue";
+    const iconClass = "h-4 w-4 text-violet-600";
     switch (model) {
       case 'openai':
         return <Bot className={iconClass} />;
@@ -50,18 +50,18 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
   };
 
   const getModelBadgeVariant = (model: AIModel) => {
-    // Todos los modelos ahora usan el fondo azul (default) por preferencia del usuario
-    return 'default';
+    // Todos los modelos ahora usan el fondo violeta (default) por preferencia del usuario
+    return 'default' as const;
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 ai-model-header">
       <Select value={currentModel} onValueChange={(value: AIModel) => onModelChange(value)}>
-        <SelectTrigger className="w-[250px] h-12">
+        <SelectTrigger className="w-[250px] h-12 border-violet-300 focus:border-violet-500 focus:ring-violet-500">
           <SelectValue>
             <div className="flex items-center gap-2">
               {getModelIcon(currentModel)}
-              <Badge variant={getModelBadgeVariant(currentModel)} className="text-xs">
+              <Badge variant={getModelBadgeVariant(currentModel)} className="text-xs bg-violet-100 text-violet-700 border-violet-300">
                 {currentModel.toUpperCase()}
               </Badge>
             </div>
@@ -70,7 +70,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
         <SelectContent>
           <SelectItem value="demo">
             <div className="flex items-center gap-3 w-full">
-              <PlayCircle className="h-4 w-4 text-ing-blue" />
+              <PlayCircle className="h-4 w-4 text-violet-600" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Demo</span>
                 <span className="text-xs text-gray-500">Modo Demo - Sin API</span>
@@ -79,7 +79,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="openai">
             <div className="flex items-center gap-3 w-full">
-              <Bot className="h-4 w-4 text-ing-blue" />
+              <Bot className="h-4 w-4 text-violet-600" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">GPT-4o</span>
                 <span className="text-xs text-gray-500">Balanceado y versátil</span>
@@ -88,7 +88,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="claude">
             <div className="flex items-center gap-3 w-full">
-              <Brain className="h-4 w-4 text-ing-blue" />
+              <Brain className="h-4 w-4 text-violet-600" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Claude 4.0</span>
                 <span className="text-xs text-gray-500">Análisis profundo</span>
@@ -97,7 +97,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="grok">
             <div className="flex items-center gap-3 w-full">
-              <Zap className="h-4 w-4 text-ing-blue" />
+              <Zap className="h-4 w-4 text-violet-600" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Grok</span>
                 <span className="text-xs text-gray-500">Rápido y directo</span>
@@ -106,7 +106,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="gemini">
             <div className="flex items-center gap-3 w-full">
-              <Gem className="h-4 w-4 text-ing-blue" />
+              <Gem className="h-4 w-4 text-violet-600" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Gemini 2.5</span>
                 <span className="text-xs text-gray-500">Google AI</span>
@@ -115,7 +115,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           </SelectItem>
           <SelectItem value="copilot">
             <div className="flex items-center gap-3 w-full">
-              <Monitor className="h-4 w-4 text-ing-blue" />
+              <Monitor className="h-4 w-4 text-violet-600" />
               <div className="flex flex-col items-start">
                 <span className="font-medium">Microsoft Copilot</span>
                 <span className="text-xs text-gray-500">Microsoft Copilot - Empresarial</span>

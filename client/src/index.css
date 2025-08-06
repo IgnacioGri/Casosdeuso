@@ -526,6 +526,16 @@ button.ai-button.variant-outline:hover {
   border-color: #6d28d9 !important;
 }
 
+/* Force AI Model Header dropdown to use violet colors */
+.ai-model-header [data-radix-select-trigger] {
+  border-color: #c4b5fd !important; /* violet-300 */
+}
+
+.ai-model-header [data-radix-select-trigger]:focus {
+  border-color: #7c3aed !important; /* violet-600 */
+  ring-color: #7c3aed !important;
+}
+
 .thinking-button-content {
   display: flex;
   align-items: center;
