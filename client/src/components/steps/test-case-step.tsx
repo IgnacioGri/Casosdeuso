@@ -128,16 +128,16 @@ export function TestCaseStep({
             disabled={isGenerating}
             size="sm"
             variant="outline"
-            className="border-purple-500 text-purple-600 hover:bg-purple-50"
+            className="border-violet-300 bg-violet-50 hover:bg-violet-100 hover:border-violet-400 text-violet-700"
           >
             {isGenerating ? (
               <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin text-violet-600" />
                 Generando...
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4 mr-2" />
+                <Sparkles className="h-4 w-4 mr-2 text-violet-600" />
                 Generar con IA
               </>
             )}
