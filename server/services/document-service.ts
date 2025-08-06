@@ -213,8 +213,8 @@ export class DocumentService {
                               new TextRun({
                                 text: "Documento de Casos de Uso",
                                 bold: true,
-                                size: 26,
-                                color: "006BB6",
+                                size: 28,  // 14pt in Word
+                                color: "000000",  // Black text instead of blue
                                 font: "Segoe UI"
                               })
                             ]
@@ -237,8 +237,8 @@ export class DocumentService {
                               new TextRun({
                                 text: formData.projectName || "Proyecto",
                                 bold: true,
-                                size: 32,
-                                color: "333333",
+                                size: 26,  // 13pt in Word
+                                color: "000000",  // Pure black for consistency
                                 font: "Segoe UI Semilight"
                               })
                             ]
