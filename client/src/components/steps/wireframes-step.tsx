@@ -191,7 +191,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     variant="outline"
                     size="sm"
                     disabled={isGeneratingSearch}
-                    className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
+                    className="w-full ai-button variant-outline"
                   >
                     {isGeneratingSearch ? (
                       <AdaptiveLoading
@@ -212,7 +212,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                 <Button
                   onClick={() => handleGenerateWireframe('search')}
                   disabled={isGeneratingSearch}
-                  className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
+                  className="w-full ai-button variant-outline"
                 >
                   {isGeneratingSearch ? (
                     <AdaptiveLoading
@@ -250,7 +250,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                     variant="outline"
                     size="sm"
                     disabled={isGeneratingForm}
-                    className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
+                    className="w-full ai-button variant-outline"
                   >
                     {isGeneratingForm ? (
                       <AdaptiveLoading
@@ -271,7 +271,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                 <Button
                   onClick={() => handleGenerateWireframe('form')}
                   disabled={isGeneratingForm}
-                  className="w-full border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600"
+                  className="w-full ai-button variant-outline"
                 >
                   {isGeneratingForm ? (
                     <AdaptiveLoading

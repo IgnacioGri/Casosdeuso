@@ -128,7 +128,7 @@ export function TestCaseStep({
             disabled={isGenerating}
             size="sm"
             variant="outline"
-            className="border-violet-300 bg-violet-50 hover:bg-violet-100 hover:border-violet-400 text-violet-700"
+            className="ai-button variant-outline"
           >
             {isGenerating ? (
               <>

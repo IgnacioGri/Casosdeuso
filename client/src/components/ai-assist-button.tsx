@@ -81,7 +81,7 @@ export function AIAssistButton({
       disabled={disabled || improveMutation.isPending}
       variant="outline"
       size="sm"
-      className="whitespace-nowrap border-violet-500 bg-violet-50 hover:bg-violet-100 hover:border-violet-600 text-violet-600 transition-colors"
+      className="whitespace-nowrap ai-button variant-outline transition-colors"
       title={`Mejorar "${fieldName}" con IA según reglas ING`}
     >
       {improveMutation.isPending ? (
@@ -93,7 +93,7 @@ export function AIAssistButton({
         />
       ) : (
         <>
-          <Sparkles className="h-4 w-4 text-violet-600" />
+          <Sparkles className="h-4 w-4 !text-violet-600" />
           <span className="ml-1 hidden sm:inline">AI Assist</span>
         </>
       )}

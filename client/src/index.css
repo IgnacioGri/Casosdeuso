@@ -419,11 +419,64 @@ button[role="combobox"][data-state="closed"] {
   min-height: 3.5rem !important;
 }
 
-/* Thinking Button Animation */
-.thinking-button {
-  background-color: #7c3aed !important; /* Violet-600 consistent with other AI buttons */
+/* AI Button Styling - Force violet colors */
+.ai-button, .thinking-button {
+  background-color: #7c3aed !important; /* Violet-600 */
+  border-color: #7c3aed !important;
+  color: white !important;
   position: relative;
   overflow: hidden;
+}
+
+.ai-button:hover {
+  background-color: #6d28d9 !important; /* Violet-700 */
+  border-color: #6d28d9 !important;
+}
+
+.ai-button.variant-outline {
+  background-color: #f3f4f6 !important; /* Light background */
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+}
+
+.ai-button.variant-outline:hover {
+  background-color: #ede9fe !important; /* Violet-50 */
+  border-color: #6d28d9 !important;
+}
+
+/* Global violet button overrides for all AI-related buttons */
+button[class*="border-violet"], 
+button[class*="bg-violet"],
+button[class*="text-violet"],
+button[class*="violet-"] {
+  background-color: #ede9fe !important; /* Violet-50 */
+  border-color: #7c3aed !important; /* Violet-600 */
+  color: #7c3aed !important;
+}
+
+button[class*="border-violet"]:hover, 
+button[class*="bg-violet"]:hover,
+button[class*="text-violet"]:hover,
+button[class*="violet-"]:hover {
+  background-color: #ddd6fe !important; /* Violet-100 */
+  border-color: #6d28d9 !important; /* Violet-700 */
+  color: #6d28d9 !important;
+}
+
+/* Force violet for all icons inside these buttons */
+button[class*="violet-"] svg,
+button[class*="border-violet"] svg,
+button[class*="bg-violet"] svg,
+button[class*="text-violet"] svg {
+  color: #7c3aed !important;
+}
+
+/* Override shadcn button variants specifically */
+.btn-outline[class*="violet"],
+button[data-variant="outline"][class*="violet"] {
+  background-color: #f9fafb !important;
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
 }
 
 .thinking-button-content {
