@@ -182,8 +182,8 @@ export class DocumentService {
                                 type: "png",
                                 data: logoImageData,
                                 transformation: {
-                                  width: 160,  // Increased width to better show the logo text
-                                  height: 50   // Proportional height to preserve aspect ratio
+                                  width: 160,  // Width adjusted to fit in cell
+                                  height: 64   // Height calculated to preserve 199:80 aspect ratio (160 * 80/199 = 64)
                                 }
                               })
                             ] : [
