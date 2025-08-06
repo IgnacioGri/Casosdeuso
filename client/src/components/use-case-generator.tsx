@@ -305,7 +305,7 @@ export default function UseCaseGenerator() {
             
             {/* Columna centro - Título */}
             <div className="flex justify-center flex-1">
-              <h1 className="text-xl font-semibold text-gray-900 hidden sm:block">
+              <h1 className="text-gray-900 hidden sm:block font-bold text-[25px]">
                 Generador de Casos de Uso
               </h1>
             </div>
@@ -384,37 +384,36 @@ export default function UseCaseGenerator() {
 
       </div>
     </div>
-    
-    {/* Adaptive Loading for Document Generation */}
-    {generateAndDownloadUseCaseMutation.isPending && (
-      <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-96 border border-gray-200 dark:border-gray-700 z-50">
-        <AdaptiveProgressSteps
-          stages={[
-            { stage: "Preparando datos", message: "Organizando información del formulario" },
-            { stage: "Generando contenido", message: "Creando caso de uso con IA" },
-            { stage: "Aplicando formato", message: "Estructurando documento según estándar ING" },
-            { stage: "Creando documento", message: "Generando archivo DOCX profesional" },
-            { stage: "Descargando", message: "Preparando descarga del documento" }
-          ]}
-          currentStage={
-            progressPercentage < 20 ? 0 :
-            progressPercentage < 40 ? 1 :
-            progressPercentage < 60 ? 2 :
-            progressPercentage < 80 ? 3 : 4
-          }
-        />
-        <div className="mt-4">
-          <AdaptiveLoading
-            context="document-generation"
-            isLoading={true}
-            progress={progressPercentage}
-            message={generationProgress}
-            submessage="Esto puede tomar de 20 a 60 segundos"
-            variant="inline"
+      {/* Adaptive Loading for Document Generation */}
+      {generateAndDownloadUseCaseMutation.isPending && (
+        <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-96 border border-gray-200 dark:border-gray-700 z-50">
+          <AdaptiveProgressSteps
+            stages={[
+              { stage: "Preparando datos", message: "Organizando información del formulario" },
+              { stage: "Generando contenido", message: "Creando caso de uso con IA" },
+              { stage: "Aplicando formato", message: "Estructurando documento según estándar ING" },
+              { stage: "Creando documento", message: "Generando archivo DOCX profesional" },
+              { stage: "Descargando", message: "Preparando descarga del documento" }
+            ]}
+            currentStage={
+              progressPercentage < 20 ? 0 :
+              progressPercentage < 40 ? 1 :
+              progressPercentage < 60 ? 2 :
+              progressPercentage < 80 ? 3 : 4
+            }
           />
+          <div className="mt-4">
+            <AdaptiveLoading
+              context="document-generation"
+              isLoading={true}
+              progress={progressPercentage}
+              message={generationProgress}
+              submessage="Esto puede tomar de 20 a 60 segundos"
+              variant="inline"
+            />
+          </div>
         </div>
-      </div>
-    )}
+      )}
     </>
   );
 }
