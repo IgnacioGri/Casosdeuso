@@ -201,242 +201,6 @@ export function MinuteAnalysisStep({
     });
   };
 
-  const loadDemoMinute = () => {
-    let demoText = '';
-    
-    // Cargar ejemplo diferente según el tipo de caso de uso
-    if (formData.useCaseType === 'service') {
-      demoText = `MINUTA DE REUNIÓN - PROCESO AUTOMÁTICO DE CONCILIACIÓN BANCARIA
-
-Cliente: Banco Santander Argentina
-Proyecto: Sistema de Procesamiento Automático de Archivos
-Código: SP001
-Fecha: 28 de enero de 2025
-Participantes: Equipo de desarrollo, Arquitecto de sistemas, DevOps
-
-OBJETIVO DEL PROCESO:
-Desarrollar un proceso automático que se ejecute diariamente para conciliar las transacciones bancarias, procesando archivos desde múltiples fuentes, validando la integridad de los datos y generando reportes de discrepancias.
-
-ALCANCE Y DESCRIPCIÓN:
-El proceso debe ejecutarse automáticamente todos los días a las 2:00 AM y 14:00 PM. Capturará archivos desde servidores SFTP de diferentes sucursales, procesará las transacciones, aplicará reglas de conciliación y generará reportes consolidados. En caso de discrepancias críticas, debe enviar alertas inmediatas al equipo de operaciones.
-
-FRECUENCIA Y HORARIOS DE EJECUCIÓN:
-- Frecuencia principal: Diariamente a las 02:00 AM (proceso completo)
-- Frecuencia secundaria: Cada 4 horas para procesamiento incremental (06:00, 10:00, 14:00, 18:00, 22:00)
-- Proceso mensual: Último día del mes a las 23:30 para cierre contable
-
-CONFIGURACIÓN DE RUTAS Y DIRECTORIOS:
-Las siguientes rutas deben ser configurables mediante archivo de propiedades:
-- Captura de archivos: /sftp/incoming/transactions/
-- Archivos procesados: /sftp/processed/{YYYY}/{MM}/{DD}/
-- Archivos con error: /sftp/errors/
-- Logs del proceso: /logs/conciliation/
-- Reportes generados: /reports/daily/
-
-INTEGRACIÓN CON SERVICIOS EXTERNOS:
-El proceso debe conectarse con los siguientes web services:
-- Servicio de validación BCRA: https://api.bcra.gov.ar/v2/validate
-  Usuario: srv_conciliacion_santander
-  Clave: Debe ser configurable y encriptada
-  Método de autenticación: OAuth 2.0
-- API interna de saldos: https://internal.santander.com/api/balances
-  Token: Renovación automática cada 24 horas
-
-REQUISITOS FUNCIONALES IDENTIFICADOS:
-1. Capturar archivos desde múltiples servidores SFTP según horario configurado
-2. Validar formato y estructura de archivos antes de procesar
-3. Aplicar reglas de conciliación bancaria automáticamente
-4. Detectar discrepancias y generar alertas cuando corresponda
-5. Generar reportes consolidados diarios, semanales y mensuales
-6. Mantener log detallado de todas las operaciones procesadas
-7. Archivar archivos procesados para auditoría
-8. Enviar notificaciones al equipo de operaciones
-
-REGLAS DE NEGOCIO ESTABLECIDAS:
-1. Los archivos deben procesarse en el orden de llegada
-2. Si un archivo falla, no debe detener el proceso de otros archivos
-3. Las discrepancias mayores a $10.000 requieren revisión manual
-4. Los reportes deben generarse aunque haya errores parciales
-5. Mantener historial de 90 días de archivos procesados
-6. Reintentar archivos fallidos hasta 3 veces antes de marcarlos como error
-
-REQUERIMIENTOS ESPECIALES Y TÉCNICOS:
-1. Capacidad de procesar archivos de hasta 500MB
-2. Soporte para múltiples formatos (CSV, XML, JSON)
-3. Encriptación de archivos sensibles durante transferencia
-4. Monitoreo en tiempo real del estado del proceso
-5. Capacidad de reprocesar archivos manualmente
-6. Dashboard de control con métricas de procesamiento`;
-    } else if (formData.useCaseType === 'api') {
-      demoText = `MINUTA DE REUNIÓN - API DE CONSULTA DE SALDOS
-
-Cliente: Banco Santander Argentina
-Proyecto: API Gateway Bancario
-Código: API003
-Fecha: 28 de enero de 2025
-Participantes: Equipo de APIs, Arquitecto de integración, Product Owner
-
-OBJETIVO DEL API:
-Desarrollar un endpoint REST para consultar saldos de cuentas bancarias en tiempo real, con autenticación OAuth 2.0, rate limiting y respuestas en formato JSON estandarizado.
-
-DESCRIPCIÓN TÉCNICA:
-Endpoint: GET /api/v2/accounts/{accountId}/balance
-Método: GET
-Autenticación: Bearer Token (OAuth 2.0)
-Content-Type: application/json
-Rate Limit: 100 requests por minuto por API key
-
-HEADERS REQUERIDOS:
-- Authorization: Bearer {token}
-- X-API-Key: {apiKey}
-- X-Request-ID: UUID único por request
-- X-Client-Version: Versión del cliente
-
-REQUEST PARAMETERS:
-- accountId (path): Identificador único de la cuenta (CBU o número de cuenta)
-- currency (query, opcional): Moneda para la consulta (ARS, USD, EUR)
-- includeHolds (query, opcional): Incluir retenciones (true/false)
-
-EJEMPLO DE REQUEST:
-GET /api/v2/accounts/0170099220000001234567/balance?currency=ARS&includeHolds=true
-Headers:
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-  X-API-Key: sk_live_4242424242424242
-  X-Request-ID: 550e8400-e29b-41d4-a716-446655440000
-
-RESPONSE SUCCESS (200 OK):
-{
-  "status": "success",
-  "data": {
-    "accountId": "0170099220000001234567",
-    "availableBalance": 150000.50,
-    "currentBalance": 155000.00,
-    "currency": "ARS",
-    "holds": [
-      {
-        "amount": 4500.50,
-        "description": "Compra en cuotas",
-        "releaseDate": "2025-02-15"
-      }
-    ],
-    "lastUpdate": "2025-01-28T10:30:45Z"
-  },
-  "metadata": {
-    "requestId": "550e8400-e29b-41d4-a716-446655440000",
-    "timestamp": "2025-01-28T10:30:45Z"
-  }
-}
-
-CÓDIGOS DE ERROR:
-- 400 Bad Request: Parámetros inválidos o faltantes
-- 401 Unauthorized: Token inválido o expirado
-- 403 Forbidden: Sin permisos para la cuenta
-- 404 Not Found: Cuenta no encontrada
-- 429 Too Many Requests: Rate limit excedido
-- 500 Internal Server Error: Error del servidor
-- 503 Service Unavailable: Servicio temporalmente no disponible`;
-    } else {
-      // Default para entity
-      demoText = `MINUTA DE REUNIÓN - GESTIONAR TRANSFERENCIAS BANCARIAS
-
-Cliente: Banco Santander Argentina
-Proyecto: Sistema de Gestión de Transferencias Electrónicas
-Código: ST003
-Fecha: 28 de enero de 2025
-Participantes: Equipo de desarrollo, Analistas funcionales, Product Owner
-
-OBJETIVO DEL CASO DE USO:
-Desarrollar un caso de uso para gestionar transferencias bancarias electrónicas entre cuentas propias y de terceros, incluyendo validaciones de seguridad, límites operativos y trazabilidad completa de todas las operaciones.
-
-ALCANCE Y DESCRIPCIÓN:
-El sistema debe permitir a los clientes realizar transferencias de dinero de forma segura y eficiente, con validaciones automáticas de fondos, límites diarios, y cumplimiento de normativas del Banco Central. Debe incluir funcionalidades para programar transferencias futuras y generar comprobantes.
-
-REQUISITOS FUNCIONALES IDENTIFICADOS:
-1. Buscar cuenta origen por CBU, alias o número de cuenta
-2. Validar saldo disponible y límites operativos del cliente
-3. Ingresar datos de cuenta destino (CBU, alias, titular)
-4. Validar cuenta destino contra base de datos bancaria
-5. Aplicar comisiones según tipo de transferencia y banco destino
-6. Generar token de seguridad para autorización
-7. Procesar transferencia y actualizar saldos
-8. Generar comprobante con número de operación único
-9. Registrar operación en auditoría para cumplimiento normativo
-
-FILTROS DE BÚSQUEDA NECESARIOS:
-- CBU de cuenta origen (22 dígitos)
-- Alias de cuenta (máximo 20 caracteres alfanuméricos)
-- Número de cuenta tradicional
-- DNI/CUIT del titular
-- Fecha de operación (rango)
-- Estado de transferencia (Pendiente/Procesada/Rechazada/Cancelada)
-- Monto (rango mínimo y máximo)
-- Banco destino
-
-COLUMNAS PARA MOSTRAR EN RESULTADOS:
-- Número de Operación
-- Fecha y Hora
-- Cuenta Origen (últimos 4 dígitos)
-- Cuenta Destino (últimos 4 dígitos)
-- Titular Destino
-- Monto Transferido
-- Comisión Aplicada
-- Estado Actual
-- Banco Destino
-
-CAMPOS DE LA ENTIDAD TRANSFERENCIA:
-- numeroOperacion: numérico, obligatorio, único, 15 dígitos
-- cbuOrigen: texto, obligatorio, 22 caracteres, formato CBU válido
-- cbuDestino: texto, obligatorio, 22 caracteres, formato CBU válido
-- titularDestino: texto, obligatorio, máximo 100 caracteres
-- montoTransferencia: decimal, obligatorio, 2 decimales, mayor a 0
-- comisionAplicada: decimal, obligatorio, 2 decimales
-- conceptoTransferencia: texto, opcional, máximo 200 caracteres
-- estadoOperacion: texto, obligatorio, valores: PENDIENTE/PROCESADA/RECHAZADA/CANCELADA
-- codigoAutorizacion: texto, obligatorio, 8 caracteres alfanuméricos
-- bancoDestino: texto, obligatorio, máximo 50 caracteres
-- fechaOperacion: fecha y hora, obligatorio
-- fechaProcesamiento: fecha y hora, opcional
-- motivoRechazo: texto, opcional, máximo 500 caracteres
-
-REGLAS DE NEGOCIO ESTABLECIDAS:
-1. Solo clientes con cuentas activas pueden realizar transferencias
-2. Validar saldo suficiente incluyendo comisiones antes de procesar
-3. Aplicar límites diarios según perfil del cliente (Estándar: $500.000, Premium: $2.000.000)
-4. Transferencias superiores a $100.000 requieren doble autenticación
-5. Comisión del 0.5% para bancos externos, gratis para cuentas propias
-6. Todas las operaciones deben registrarse para cumplimiento BCRA
-7. Transferencias programadas se procesan a las 9:00 AM del día seleccionado
-8. Timeout de sesión de 10 minutos por seguridad durante el proceso
-
-FLUJOS ALTERNATIVOS Y MANEJO DE ERRORES:
-- Saldo insuficiente: mostrar saldo disponible y sugerir monto máximo
-- CBU destino inválido: validar formato y existencia en sistema bancario
-- Límite diario excedido: mostrar límite actual y monto disponible
-- Error de conectividad: guardar borrador y permitir reintento
-- Rechazo del banco receptor: notificar motivo y reversar operación
-- Token de seguridad expirado: generar nuevo token automáticamente
-- Cuenta origen bloqueada: derivar a atención al cliente
-
-REQUERIMIENTOS ESPECIALES Y TÉCNICOS:
-1. Integración con API del Banco Central para validación de CBU
-2. Encriptación de datos sensibles con algoritmo AES-256
-3. Registro completo de auditoría para cumplimiento normativo
-4. Notificaciones SMS/email para transferencias superiores a $50.000
-5. Backup automático de operaciones cada 5 minutos
-6. Monitoreo en tiempo real de operaciones sospechosas
-7. Interfaz accesible compatible con lectores de pantalla
-
-CRITERIOS DE ACEPTACIÓN:
-- Tiempo de respuesta menor a 3 segundos para validaciones
-- Disponibilidad del sistema 99.9% durante horario bancario
-- Cumplimiento de normativas PCI-DSS para seguridad de datos
-- Integración exitosa con 15 bancos principales del país
-- Capacidad de procesar 10.000 transferencias simultáneas`;
-    }
-    
-    setMinuteText(demoText);
-  };
-
   return (
     <>
       <Card className="shadow-sm border border-ms-border">
@@ -497,14 +261,22 @@ CRITERIOS DE ACEPTACIÓN:
               Texto de la Minuta
             </label>
             <Button
-              type="button"
-              variant="outline"
+              onClick={handleAnalyze}
+              disabled={analyzeMinuteMutation.isPending || !minuteText.trim()}
+              className={`${analyzeMinuteMutation.isPending ? 'thinking-button' : 'bg-ms-blue hover:bg-ms-blue/90'} text-white px-4`}
               size="sm"
-              onClick={loadDemoMinute}
-              className="text-xs"
             >
-              <FileText className="mr-1 h-3 w-3" />
-              Cargar Ejemplo
+              {analyzeMinuteMutation.isPending ? (
+                <div className="thinking-button-content">
+                  <div className="thinking-pulse"></div>
+                  <span className="thinking-text">Pensando<span className="thinking-dots">{dots}</span></span>
+                </div>
+              ) : (
+                <>
+                  <Brain className="mr-2 h-4 w-4" />
+                  Analizar y Completar Formulario
+                </>
+              )}
             </Button>
           </div>
           <Textarea
@@ -513,27 +285,6 @@ CRITERIOS DE ACEPTACIÓN:
             placeholder="Pega aquí el contenido de la minuta de reunión, documento de requisitos, o descripción del caso de uso..."
             className="min-h-[200px] resize-y"
           />
-        </div>
-
-        {/* Botón de análisis */}
-        <div className="flex justify-center">
-          <Button
-            onClick={handleAnalyze}
-            disabled={analyzeMinuteMutation.isPending || !minuteText.trim()}
-            className={`${analyzeMinuteMutation.isPending ? 'thinking-button' : 'bg-ms-blue hover:bg-ms-blue/90'} text-white px-6`}
-          >
-            {analyzeMinuteMutation.isPending ? (
-              <div className="thinking-button-content">
-                <div className="thinking-pulse"></div>
-                <span className="thinking-text">Pensando<span className="thinking-dots">{dots}</span></span>
-              </div>
-            ) : (
-              <>
-                <Brain className="mr-2 h-4 w-4" />
-                Analizar y Completar Formulario
-              </>
-            )}
-          </Button>
         </div>
 
         {/* Indicador de éxito */}

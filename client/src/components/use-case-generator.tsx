@@ -42,8 +42,6 @@ export default function UseCaseGenerator() {
     removeTestStep,
     updateTestStep,
     validateStep,
-    loadDemoData,
-    loadComplexExample,
     resetForm
   } = useUseCaseForm();
 
@@ -213,13 +211,7 @@ export default function UseCaseGenerator() {
     }
   };
 
-  const handleLoadDemo = () => {
-    loadDemoData();
-    toast({
-      title: "Datos cargados",
-      description: "Datos de demostración cargados correctamente"
-    });
-  };
+
 
 
 
@@ -369,8 +361,7 @@ export default function UseCaseGenerator() {
             onAddTestStep={addTestStep}
             onRemoveTestStep={removeTestStep}
             onUpdateTestStep={updateTestStep}
-            onLoadDemoData={handleLoadDemo}
-            onLoadComplexExample={loadComplexExample}
+
             onNextStep={handleNextStep}
             onPreviousStep={handlePreviousStep}
           />

@@ -18,11 +18,6 @@ const templates = {
       { name: "Tabla de resultados", icon: Table },
       { name: "Formulario de entidad", icon: FileText },
       { name: "Validaciones de campo", icon: Cog }
-    ],
-    examples: [
-      "Gestionar Usuarios del Sistema",
-      "Administrar Productos del Catálogo", 
-      "Mantener Clientes Corporativos"
     ]
   },
   api: {
@@ -35,11 +30,6 @@ const templates = {
       { name: "Formato de petición", icon: FileText },
       { name: "Procesamiento respuesta", icon: Cog },
       { name: "Manejo de errores", icon: Zap }
-    ],
-    examples: [
-      "Consultar Datos Bancarios Externos",
-      "Validar Identidad con RENIEC",
-      "Sincronizar con Sistema ERP"
     ]
   },
   automated: {
@@ -52,11 +42,6 @@ const templates = {
       { name: "Parámetros ejecución", icon: FileText },
       { name: "Logs y monitoreo", icon: Table },
       { name: "Notificaciones", icon: Zap }
-    ],
-    examples: [
-      "Generar Reportes Diarios Automáticos",
-      "Procesar Transacciones Nocturnas",
-      "Enviar Notificaciones Programadas"
     ]
   }
 };
@@ -110,19 +95,7 @@ export default function UseCaseTemplatePreview({ selectedType, onTypeSelect }: U
                   </div>
                 </div>
                 
-                <div>
-                  <h4 className="text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Ejemplos típicos:
-                  </h4>
-                  <ul className="space-y-1">
-                    {template.examples.slice(0, 2).map((example, index) => (
-                      <li key={index} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                        <div className="w-1 h-1 bg-gray-400 rounded-full" />
-                        {example}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+
               </div>
             </CardContent>
           </Card>

@@ -39,8 +39,7 @@ interface FormStepsProps {
   onAddTestStep?: () => void;
   onRemoveTestStep?: (index: number) => void;
   onUpdateTestStep?: (index: number, field: any, value: string | number) => void;
-  onLoadDemoData: () => void;
-  onLoadComplexExample?: (type: UseCaseType) => void;
+
   onNextStep?: () => void;
   onPreviousStep?: () => void;
 
@@ -65,8 +64,6 @@ export default function FormSteps({
   onAddTestStep,
   onRemoveTestStep,
   onUpdateTestStep,
-  onLoadDemoData,
-  onLoadComplexExample,
   onNextStep,
   onPreviousStep
 }: FormStepsProps) {
