@@ -81,7 +81,7 @@ export function AIAssistButton({
       disabled={disabled || improveMutation.isPending}
       variant="outline"
       size="sm"
-      className="ml-2 whitespace-nowrap"
+      className="whitespace-nowrap"
       title={`Mejorar "${fieldName}" con IA según reglas ING`}
     >
       {improveMutation.isPending ? (

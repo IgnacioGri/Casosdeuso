@@ -147,7 +147,7 @@ export function TestCaseStep({
 
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center justify-between mb-2">
             <Label htmlFor="testCaseObjective">Objetivo del Caso de Prueba</Label>
             <AIAssistButton
               fieldName="testCaseObjective"
@@ -175,7 +175,7 @@ export function TestCaseStep({
         </div>
 
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center justify-between mb-2">
             <Label htmlFor="testCasePreconditions">Precondiciones de Prueba</Label>
             <AIAssistButton
               fieldName="testCasePreconditions"
