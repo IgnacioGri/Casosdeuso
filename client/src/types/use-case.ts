@@ -55,6 +55,8 @@ export interface UseCaseFormData {
   testCaseObjective?: string;
   testCasePreconditions?: string;
   testSteps?: TestStep[];
+  testCaseSuggestions?: string;
+  testCasesGeneratedWithAI?: boolean;
   aiModel: AIModel;
   // Campos específicos para tipos de casos de uso
   apiEndpoint?: string;

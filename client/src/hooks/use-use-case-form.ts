@@ -274,6 +274,8 @@ export function useUseCaseForm() {
       testCaseObjective: '',
       testCasePreconditions: '',
       testSteps: [],
+      testCaseSuggestions: '',
+      testCasesGeneratedWithAI: false,
       aiModel: 'gemini'
     });
     setCurrentStep(1);

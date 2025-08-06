@@ -968,8 +968,11 @@ export default function FormSteps({
             testCaseObjective={formData.testCaseObjective || ''}
             testCasePreconditions={formData.testCasePreconditions || ''}
             testSteps={formData.testSteps || []}
+            testCaseSuggestions={formData.testCaseSuggestions || ''}
+            testCasesGeneratedWithAI={formData.testCasesGeneratedWithAI || false}
             onUpdateObjective={(value) => handleInputChange('testCaseObjective', value)}
             onUpdatePreconditions={(value) => handleInputChange('testCasePreconditions', value)}
+            onUpdateSuggestions={(value) => handleInputChange('testCaseSuggestions', value)}
             onAddTestStep={onAddTestStep}
             onRemoveTestStep={onRemoveTestStep}
             onUpdateTestStep={onUpdateTestStep}
@@ -985,6 +988,7 @@ export default function FormSteps({
                 testSteps: data.testSteps
               });
             }}
+            onSetAIGenerated={(value) => handleInputChange('testCasesGeneratedWithAI', value)}
           />
         </CardContent>
       </Card>

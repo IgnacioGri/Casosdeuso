@@ -18,8 +18,11 @@ interface TestCaseStepProps {
   testCaseObjective: string;
   testCasePreconditions: string;
   testSteps: TestStep[];
+  testCaseSuggestions?: string;
+  testCasesGeneratedWithAI?: boolean;
   onUpdateObjective: (value: string) => void;
   onUpdatePreconditions: (value: string) => void;
+  onUpdateSuggestions?: (value: string) => void;
   onAddTestStep: () => void;
   onRemoveTestStep: (index: number) => void;
   onUpdateTestStep: (index: number, field: keyof TestStep, value: string | number) => void;
@@ -30,14 +33,18 @@ interface TestCaseStepProps {
   // Add the complete form data for intelligent test generation
   formData?: any;
   onReplaceAllTestData?: (data: { objective: string; preconditions: string; testSteps: TestStep[] }) => void;
+  onSetAIGenerated?: (value: boolean) => void;
 }
 
 export function TestCaseStep({
   testCaseObjective,
   testCasePreconditions,
   testSteps,
+  testCaseSuggestions = '',
+  testCasesGeneratedWithAI = false,
   onUpdateObjective,
   onUpdatePreconditions,
+  onUpdateSuggestions,
   onAddTestStep,
   onRemoveTestStep,
   onUpdateTestStep,
@@ -46,11 +53,15 @@ export function TestCaseStep({
   useCaseName,
   aiModel,
   formData,
-  onReplaceAllTestData
+  onReplaceAllTestData,
+  onSetAIGenerated
 }: TestCaseStepProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressMessage, setProgressMessage] = useState('');
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [regenerateProgress, setRegenerateProgress] = useState(0);
+  const [regenerateMessage, setRegenerateMessage] = useState('');
 
   const handleIntelligentGeneration = async () => {
     if (!formData || !onReplaceAllTestData) return;
@@ -92,6 +103,11 @@ export function TestCaseStep({
           testSteps: result.testSteps || []
         });
         
+        // Mark test cases as AI-generated
+        if (onSetAIGenerated) {
+          onSetAIGenerated(true);
+        }
+        
         // Reset progress after a delay
         setTimeout(() => {
           setProgress(0);
@@ -110,6 +126,75 @@ export function TestCaseStep({
       if (progress < 100) {
         setProgress(0);
         setProgressMessage('');
+      }
+    }
+  };
+
+  const handleRegenerateWithSuggestions = async () => {
+    if (!formData || !onReplaceAllTestData || !testCaseSuggestions) return;
+    
+    setIsRegenerating(true);
+    setRegenerateProgress(10);
+    setRegenerateMessage('Procesando sugerencias...');
+    
+    try {
+      // Simular progreso gradual
+      const progressInterval = setInterval(() => {
+        setRegenerateProgress(prev => Math.min(prev + 10, 80));
+      }, 2000);
+      
+      const response = await fetch('/api/generate-intelligent-tests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          formData,
+          aiModel,
+          suggestions: testCaseSuggestions,
+          isRegeneration: true
+        }),
+      });
+
+      clearInterval(progressInterval);
+      setRegenerateProgress(90);
+      setRegenerateMessage('Aplicando mejoras...');
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Regenerated test case result:', result);
+        setRegenerateProgress(100);
+        setRegenerateMessage('¡Casos de prueba regenerados con sus sugerencias!');
+        
+        onReplaceAllTestData({
+          objective: result.objective || '',
+          preconditions: result.preconditions || '',
+          testSteps: result.testSteps || []
+        });
+        
+        // Clear suggestions after successful regeneration
+        if (onUpdateSuggestions) {
+          onUpdateSuggestions('');
+        }
+        
+        // Reset progress after a delay
+        setTimeout(() => {
+          setRegenerateProgress(0);
+          setRegenerateMessage('');
+        }, 1500);
+      } else {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        alert(`Error al regenerar casos de prueba: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Error regenerating tests:', error);
+      alert('Error al regenerar casos de prueba. Por favor, intente nuevamente.');
+    } finally {
+      setIsRegenerating(false);
+      if (regenerateProgress < 100) {
+        setRegenerateProgress(0);
+        setRegenerateMessage('');
       }
     }
   };
@@ -329,6 +414,55 @@ export function TestCaseStep({
           )}
         </div>
       </div>
+      
+      {/* Suggestions Field - Only show after AI generation */}
+      {testCasesGeneratedWithAI && onUpdateSuggestions && (
+        <Card className="border-violet-200 bg-violet-50/50">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Brain className="h-5 w-5 text-violet-600" />
+              Sugerencias para Mejorar los Casos de Prueba
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Si desea mejorar los casos de prueba generados, escriba sus sugerencias a continuación:
+              </p>
+              <BulletTextarea
+                value={testCaseSuggestions}
+                onChange={onUpdateSuggestions}
+                placeholder="Escriba sus sugerencias con bullet points. Ej:
+• Agregar validación de campos vacíos
+• Incluir caso de prueba para usuarios con permisos limitados
+• Probar el comportamiento con conexión lenta
+• Verificar mensajes de error específicos..."
+                rows={5}
+                className="bg-white"
+              />
+              {testCaseSuggestions && (
+                <Button
+                  onClick={handleRegenerateWithSuggestions}
+                  disabled={isRegenerating}
+                  className="w-full ai-button variant-outline"
+                >
+                  {isRegenerating ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin text-violet-600" />
+                      Regenerando con sus sugerencias...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 text-violet-600" />
+                      Regenerar Casos de Prueba con Sugerencias
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
     
     {/* Progress Indicator */}
@@ -355,6 +489,39 @@ export function TestCaseStep({
             progress={progress}
             message={progressMessage}
             submessage="Creando casos de prueba inteligentes"
+            variant="inline"
+          />
+        </div>
+      </div>
+    )}
+    
+    {/* Progress Indicator for Regeneration with Suggestions */}
+    {isRegenerating && (
+      <div className="fixed bottom-4 right-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 w-96 border border-violet-300 dark:border-violet-700 z-50">
+        <div className="flex items-center gap-2 mb-3">
+          <Brain className="h-5 w-5 text-violet-600 animate-pulse" />
+          <span className="font-medium text-violet-700">Aplicando sus sugerencias</span>
+        </div>
+        <AdaptiveProgressSteps
+          stages={[
+            { stage: "Procesando sugerencias", message: "Analizando mejoras solicitadas" },
+            { stage: "Refinando casos", message: "Aplicando sus comentarios" },
+            { stage: "Regenerando pruebas", message: "Creando versión mejorada" },
+            { stage: "Finalizando", message: "Completando actualización" }
+          ]}
+          currentStage={
+            regenerateProgress < 25 ? 0 :
+            regenerateProgress < 50 ? 1 :
+            regenerateProgress < 75 ? 2 : 3
+          }
+        />
+        <div className="mt-4">
+          <AdaptiveLoading
+            context="test-regeneration"
+            isLoading={true}
+            progress={regenerateProgress}
+            message={regenerateMessage}
+            submessage="Mejorando casos con sus sugerencias"
             variant="inline"
           />
         </div>

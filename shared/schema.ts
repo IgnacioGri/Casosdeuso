@@ -117,6 +117,8 @@ const baseUseCaseFormSchema = z.object({
   testCaseObjective: z.string().optional(),
   testCasePreconditions: z.string().optional(),
   testSteps: z.array(testStepSchema).default([]),
+  testCaseSuggestions: z.string().optional(), // Suggestions for test case regeneration
+  testCasesGeneratedWithAI: z.boolean().default(false), // Track if test cases were AI-generated
   
   // AI-generated content tracking
   isAIGenerated: z.boolean().default(false),
