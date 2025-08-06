@@ -131,8 +131,8 @@ export default function EnhancedProgressIndicator({ currentStep, totalSteps, use
         />
       </div>
       <div className="text-center">
-        <div className="text-gray-600 dark:text-gray-400 font-bold text-[15px]">
-          <span className="font-extrabold">Paso {currentStep} de {totalSteps}</span>
+        <div className="text-gray-600 dark:text-gray-400 text-[15px]">
+          <span className="font-black">Paso {currentStep} de {totalSteps}</span>
         </div>
       </div>
     </div>
