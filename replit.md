@@ -7,31 +7,30 @@ This full-stack web application generates standardized use case documents using 
 Preferred communication style: Simple, everyday language.
 
 ## System Architecture
-The application utilizes a modern full-stack .NET architecture, ensuring a clear separation of concerns.
+The application utilizes a modern full-stack JavaScript/TypeScript architecture with React frontend and Express backend.
 
 ### Recent Changes (2025-01-06)
-- **Blazor Migration Complete**: Successfully compiled Blazor WebAssembly application with 0 errors. All compilation issues resolved
-- **Critical Fixes Applied**:
-  - Fixed AlternativeFlows type mismatch (string vs List<string>) in WireframesFlowsStep and ReviewGenerateStep
-  - Resolved all enum comparison errors (UseCaseType vs string literals)
-  - Fixed OpenAI SDK integration with updated method calls
-  - Added missing API key fields for all AI providers
-  - Removed System.Drawing dependency for cross-platform compatibility
-  - Fixed mainPart scope issues in DocumentService
-  - Removed non-existent properties from AppDbContext configuration
+- **Architecture Migration**: Migrated from Blazor/.NET to Node.js/React/Express stack
+- **Deployment Configuration**: Fixed deployment issues for Replit Autoscale
+  - Server configured to use dynamic PORT environment variable allocation (respects platform-assigned ports)
+  - Host binding set to "0.0.0.0" for all interfaces accessibility
+  - Production build tested and verified working
+  - Build outputs to `dist/` directory with static assets in `dist/public/`
+  - Deployment scripts configured in package.json (`build` and `start` commands)
 
-### Frontend Architecture (Blazor WebAssembly)
-- **Framework**: Blazor WebAssembly with .NET 8.
-- **UI Library**: MudBlazor for Material Design.
-- **State Management**: Built-in Blazor state management and local storage.
-- **Styling**: Custom ING corporate colors, Segoe UI typography, and responsive design. UI enhancements include smart autocomplete, contextual tooltips, micro-interactions, and adaptive loading animations.
+### Frontend Architecture (React/Vite)
+- **Framework**: React 18 with TypeScript and Vite build system
+- **UI Library**: Shadcn/UI components with Tailwind CSS
+- **State Management**: TanStack Query for server state, React hooks for local state
+- **Routing**: Wouter for client-side routing
+- **Styling**: Tailwind CSS with custom design tokens and responsive design
 
-### Backend Architecture (ASP.NET Core)
-- **Framework**: ASP.NET Core 8 Web API.
-- **Language**: C#.
-- **API Style**: RESTful API with JSON.
-- **Database**: Entity Framework Core (in-memory default, PostgreSQL ready).
-- **Security**: HttpClient Factory, input sanitization, robust validation, custom rate limiting, and HttpClient timeouts.
+### Backend Architecture (Express/Node.js)
+- **Framework**: Express.js with TypeScript
+- **Database**: Drizzle ORM with PostgreSQL support, in-memory storage for development
+- **API Style**: RESTful API with JSON responses
+- **Security**: CORS configuration, input validation with Zod schemas
+- **Deployment**: Configured for Replit Autoscale with dynamic port allocation
 
 ### Core Features
 - **Multi-step Form System**: Progressive forms (9 steps for entity, 6 for others) with dynamic fields and client-side validation.
