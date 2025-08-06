@@ -56,7 +56,7 @@ public class DocumentController : ControllerBase
                 UseCaseCode = InputValidator.SanitizeText(request.FormData.UseCaseCode, 50),
                 FileName = sanitizedFileName,
                 Description = InputValidator.SanitizeText(request.FormData.Description, 1000),
-                UseCaseType = request.FormData.UseCaseType ?? UseCaseType.Entity,
+                UseCaseType = request.FormData.UseCaseType,
                 BusinessRules = InputValidator.SanitizeText(request.FormData.BusinessRules, 2000),
                 SearchFilters = request.FormData?.SearchFilters ?? new List<string>(),
                 ResultColumns = request.FormData?.ResultColumns ?? new List<string>(),

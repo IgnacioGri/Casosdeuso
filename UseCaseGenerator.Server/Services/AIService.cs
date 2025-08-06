@@ -12,6 +12,9 @@ public class AIService : IAIService, IDisposable
     private readonly IConfiguration _configuration;
     private readonly IHttpClientFactory _httpClientFactory;
     private OpenAIClient? _openAIClient;
+    private readonly string? _geminiApiKey;
+    private readonly string? _claudeApiKey;
+    private readonly string? _grokApiKey;
     private bool _disposed;
 
     public AIService(ILogger<AIService> logger, IConfiguration configuration, IHttpClientFactory httpClientFactory)
@@ -19,6 +22,9 @@ public class AIService : IAIService, IDisposable
         _logger = logger;
         _configuration = configuration;
         _httpClientFactory = httpClientFactory;
+        _geminiApiKey = _configuration["Gemini:ApiKey"];
+        _claudeApiKey = _configuration["Anthropic:ApiKey"];
+        _grokApiKey = _configuration["Grok:ApiKey"];
         InitializeOpenAIClient();
     }
 
@@ -156,11 +162,11 @@ public class AIService : IAIService, IDisposable
                             else if (trimmedLine.StartsWith("•") || trimmedLine.StartsWith("-"))
                             {
                                 // It's a bullet point
-                                var content = Regex.Replace(trimmedLine, @"^[•\-]\s*", "").Trim();
-                                if (!string.IsNullOrEmpty(content))
+                                var bulletContent = Regex.Replace(trimmedLine, @"^[•\-]\s*", "").Trim();
+                                if (!string.IsNullOrEmpty(bulletContent))
                                 {
                                     testCaseSection += $@"
-                  <p style=""margin: 4px 0 4px 20px; font-family: 'Segoe UI Semilight', sans-serif;"">• {content}</p>
+                  <p style=""margin: 4px 0 4px 20px; font-family: 'Segoe UI Semilight', sans-serif;"">• {bulletContent}</p>
                 ";
                                 }
                             }
@@ -434,21 +440,32 @@ INSTRUCCIONES:
         if (_openAIClient == null)
             throw new InvalidOperationException("OpenAI client not configured");
 
-        var chatCompletionOptions = new ChatCompletionOptions
+        var httpClient = _httpClientFactory.CreateClient();
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_configuration["OpenAI:ApiKey"]}");
+
+        var requestBody = new
         {
-            Temperature = 0.3f,
-            MaxTokens = 16000,  // For document generation
-            TopP = 0.95f,
-            DeploymentName = "gpt-4o"  // Use latest GPT-4o model
+            model = "gpt-4o",
+            messages = new[]
+            {
+                new { role = "user", content = prompt }
+            },
+            temperature = 0.3,
+            max_tokens = 16000,
+            top_p = 0.95
         };
 
-        var messages = new List<ChatMessage>
-        {
-            new UserChatMessage(prompt)
-        };
+        var response = await httpClient.PostAsJsonAsync("https://api.openai.com/v1/chat/completions", requestBody);
+        var responseContent = await response.Content.ReadAsStringAsync();
 
-        var response = await _openAIClient.CompleteChatAsync(messages, chatCompletionOptions);
-        return response.Value.Content[0].Text;
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException($"OpenAI API error: {responseContent}");
+        }
+
+        var jsonDoc = JsonDocument.Parse(responseContent);
+        var content = jsonDoc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
+        return content ?? "";
     }
 
     private async Task<string> ProcessWithOpenAI(string systemPrompt, string fieldValue)
@@ -461,22 +478,33 @@ INSTRUCCIONES:
         bool isMinuteAnalysis = systemPrompt.Contains("minuta") || systemPrompt.Contains("análisis de documento");
         int maxTokens = isTestCaseGeneration ? 12000 : (isMinuteAnalysis ? 10000 : 4000);
 
-        var chatCompletionOptions = new ChatCompletionOptions
+        var httpClient = _httpClientFactory.CreateClient();
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_configuration["OpenAI:ApiKey"]}");
+
+        var requestBody = new
         {
-            Temperature = 0.3f,
-            MaxTokens = maxTokens,
-            TopP = 0.95f,
-            DeploymentName = "gpt-4o"  // Use latest GPT-4o model
+            model = "gpt-4o",
+            messages = new[]
+            {
+                new { role = "system", content = systemPrompt },
+                new { role = "user", content = fieldValue }
+            },
+            temperature = 0.3,
+            max_tokens = maxTokens,
+            top_p = 0.95
         };
 
-        var messages = new List<ChatMessage>
-        {
-            new SystemChatMessage(systemPrompt),
-            new UserChatMessage(fieldValue)
-        };
+        var response = await httpClient.PostAsJsonAsync("https://api.openai.com/v1/chat/completions", requestBody);
+        var responseContent = await response.Content.ReadAsStringAsync();
 
-        var response = await _openAIClient.CompleteChatAsync(messages, chatCompletionOptions);
-        return response.Value.Content[0].Text;
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException($"OpenAI API error: {responseContent}");
+        }
+
+        var jsonDoc = JsonDocument.Parse(responseContent);
+        var content = jsonDoc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
+        return content ?? "";
     }
 
     private GenerateUseCaseResponse GenerateDemoContent(UseCaseFormData formData)
@@ -1155,11 +1183,11 @@ REGLAS: {rules}";
         var formData = ExtractFormDataFromContext(context);
         
         // Generate complete wireframe system based on actual form data
-        if (formData != null && formData.UseCaseType == "entidad")
+        if (formData != null && formData.UseCaseType == UseCaseType.Entity)
         {
             return GenerateCompleteEntityWireframes(fieldValue, formData);
         }
-        else if (formData != null && (formData.UseCaseType == "api" || formData.UseCaseType == "proceso"))
+        else if (formData != null && (formData.UseCaseType == UseCaseType.API || formData.UseCaseType == UseCaseType.Service))
         {
             return GenerateCompleteServiceWireframes(fieldValue, formData);
         }
@@ -1267,7 +1295,7 @@ Formato estilo Microsoft (fuente Segoe UI, layout ING vr19).";
     {
         var baseDescription = !string.IsNullOrWhiteSpace(userDescription) ? CleanInputText(userDescription) : "";
         
-        var wireframe = $@"Wireframe textual ING para {(formData.UseCaseType == "api" ? "interfaz de API" : "proceso automático")} {formData.UseCaseName ?? "servicio"}.
+        var wireframe = $@"Wireframe textual ING para {(formData.UseCaseType == UseCaseType.API ? "interfaz de API" : "proceso automático")} {formData.UseCaseName ?? "servicio"}.
 
 Panel de configuración con:
 - Parámetros de ejecución {(!string.IsNullOrWhiteSpace(formData.ApiEndpoint) ? $"(Endpoint: {formData.ApiEndpoint})" : "")}

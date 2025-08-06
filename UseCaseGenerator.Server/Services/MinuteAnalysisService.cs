@@ -241,7 +241,7 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional.
             
             // Parse API-specific fields (for API use cases)
             formData.ApiEndpoint = GetStringProperty(root, "apiEndpoint", "");
-            formData.HttpMethod = GetStringProperty(root, "httpMethod", "");
+            // HttpMethod is not a property of UseCaseFormData - skip it
             formData.RequestFormat = GetStringProperty(root, "requestFormat", "");
             formData.ResponseFormat = GetStringProperty(root, "responseFormat", "");
 

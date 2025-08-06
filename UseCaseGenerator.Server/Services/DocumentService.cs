@@ -35,7 +35,7 @@ public class DocumentService : IDocumentService
                 mainPart.Document = new Document();
                 
                 // Add header with ING logo or custom image
-                AddHeaderWithImage(mainPart, customHeaderImage);
+                AddHeaderWithImage(mainPart, null);
                 
                 // Add footer with page numbering
                 AddFooterWithPageNumbers(mainPart, useCase);
@@ -62,7 +62,7 @@ public class DocumentService : IDocumentService
                 AddBulletPoint(body, "Descripción", useCase.Description);
 
                 // Add remaining sections based on form data
-                AddFormDataSections(body, useCase);
+                AddFormDataSections(body, useCase, mainPart);
 
                 // Add revision history table
                 AddRevisionHistoryTable(body, useCase);
@@ -149,12 +149,12 @@ public class DocumentService : IDocumentService
         return number > 0 && number <= 20 ? romanNumerals[number - 1] : number.ToString();
     }
 
-    private void AddFormDataSections(Body body, UseCase useCase)
+    private void AddFormDataSections(Body body, UseCase useCase, MainDocumentPart mainPart)
     {
         // Use properties directly from UseCase model
 
         // Main Flow (Flujo Principal) - for entity use cases
-        if (useCase.UseCaseType == "entity")
+        if (useCase.UseCaseType == UseCaseType.Entity)
         {
             // Use styled heading for consistency
             AddStyledHeading(body, "FLUJO PRINCIPAL DE EVENTOS");
@@ -285,7 +285,7 @@ public class DocumentService : IDocumentService
         }
 
         // Preconditions (for entity use cases)
-        if (useCase.UseCaseType == "entity")
+        if (useCase.UseCaseType == UseCaseType.Entity)
         {
             AddStyledHeading(body, "PRECONDICIONES");
             var preconditionsText = useCase.Preconditions ?? "El usuario debe estar autenticado en el sistema y tener los permisos necesarios para acceder a este caso de uso.";
@@ -293,7 +293,7 @@ public class DocumentService : IDocumentService
         }
 
         // Postconditions (for entity use cases)
-        if (useCase.UseCaseType == "entity")
+        if (useCase.UseCaseType == UseCaseType.Entity)
         {
             AddStyledHeading(body, "POSTCONDICIONES");
             var postconditionsText = useCase.Postconditions ?? "Los datos de la entidad quedan actualizados en el sistema y se registra la auditoría correspondiente.";
@@ -1238,25 +1238,12 @@ public class DocumentService : IDocumentService
                 long width = 6000000L;
                 long height = 1000000L;
                 
-                if (!string.IsNullOrEmpty(imagePath))
-                {
-                    try
-                    {
-                        using (var image = System.Drawing.Image.FromFile(imagePath))
-                        {
-                            // Compensate for 1.5x scaling factor in DOCX library
-                            // Target: 900x120, divided by 1.5 = 600x80
-                            // 1 pixel = 9525 EMUs
-                            width = 600L * 9525L;  // 5715000 EMUs
-                            height = 80L * 9525L;  // 762000 EMUs
-                        }
-                    }
-                    catch
-                    {
-                        // Fall back to default if image reading fails
-                        _logger.LogWarning("Could not read image dimensions, using defaults");
-                    }
-                }
+                // Use fixed dimensions for header images
+                // Compensate for 1.5x scaling factor in DOCX library
+                // Target: 900x120, divided by 1.5 = 600x80
+                // 1 pixel = 9525 EMUs
+                width = 600L * 9525L;  // 5715000 EMUs
+                height = 80L * 9525L;  // 762000 EMUs
                 
                 if (imageData != null)
                 {

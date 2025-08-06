@@ -40,10 +40,7 @@ public class AppDbContext : DbContext
                 v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
                 v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default) ?? new List<string>());
 
-        useCaseEntity.Property(u => u.AlternativeFlows)
-            .HasConversion(
-                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
-                v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default) ?? new List<string>());
+        // AlternativeFlows is not a property of UseCase model - removed
 
         useCaseEntity.Property(u => u.TestSteps)
             .HasConversion(
