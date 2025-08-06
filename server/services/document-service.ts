@@ -67,15 +67,15 @@ export class DocumentService {
     const doc = new Document({
       sections: [{
         children: [
-          // Title - Use case name in uppercase
+          // Title - Code + Use case name in uppercase
           new Paragraph({
             heading: HeadingLevel.TITLE,
             spacing: { after: 400 },
             alignment: AlignmentType.LEFT,
             children: [new TextRun({
-              text: (formData.useCaseName || "CASO DE USO").toUpperCase(),
+              text: `${formData.useCaseCode || ''} ${formData.useCaseName || "CASO DE USO"}`.toUpperCase(),
               bold: true,
-              size: 48,
+              size: 34, // 17pt in Word (17 * 2 = 34)
               color: "0070C0",
               font: "Segoe UI Semilight"
             })]
