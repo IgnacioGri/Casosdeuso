@@ -247,7 +247,11 @@ export class DocumentService {
           }),
           
           // Add remaining sections based on form data (includes test cases)
-          ...this.addFormDataSections(formData, aiGeneratedContent),
+          ...this.addFormDataSections(formData, aiGeneratedContent, {
+            multiLevel: multiLevelNumberingReference,
+            bullet: bulletNumberingReference,
+            simple: simpleNumberingReference
+          }),
           
           // History table
           ...this.createHistorySection()
@@ -419,8 +423,13 @@ export class DocumentService {
     return await Packer.toBuffer(doc);
   }
   
-  private static addFormDataSections(formData: any, aiGeneratedContent?: string): (Paragraph | Table)[] {
+  private static addFormDataSections(formData: any, aiGeneratedContent?: string, numberingRefs?: { multiLevel: string, bullet: string, simple: string }): (Paragraph | Table)[] {
     const sections: (Paragraph | Table)[] = [];
+    
+    // Get numbering references or use defaults
+    const multiLevelNumberingReference = numberingRefs?.multiLevel || "multilevel";
+    const bulletNumberingReference = numberingRefs?.bullet || "bullet";
+    const simpleNumberingReference = numberingRefs?.simple || "simple";
     
     // For API use cases, generate sections for API endpoints
     if (formData.useCaseType === 'api') {
