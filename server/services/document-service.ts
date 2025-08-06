@@ -2,6 +2,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, Ta
 import * as fs from 'fs';
 import * as path from 'path';
 // Removed image-size due to compatibility issues
+import { SpellChecker } from './spell-checker';
 
 interface TestCase {
   action: string;
@@ -118,7 +119,7 @@ export class DocumentService {
             spacing: { after: 120 },
             children: [
               new TextRun({ text: "• Nombre: ", bold: true, font: "Segoe UI Semilight" }),
-              new TextRun({ text: formData.useCaseName || '', font: "Segoe UI Semilight" })
+              new TextRun({ text: SpellChecker.correctAccents(formData.useCaseName || ''), font: "Segoe UI Semilight" })
             ]
           }),
           new Paragraph({
@@ -132,7 +133,7 @@ export class DocumentService {
             spacing: { after: 120 },
             children: [
               new TextRun({ text: "• Descripción: ", bold: true, font: "Segoe UI Semilight" }),
-              new TextRun({ text: formData.description || '', font: "Segoe UI Semilight" })
+              new TextRun({ text: SpellChecker.correctAccents(formData.description || ''), font: "Segoe UI Semilight" })
             ]
           }),
           
@@ -814,7 +815,7 @@ export class DocumentService {
             spacing: { after: 40 },
             indent: { left: 576 }, // 0.4 inch = 576 twips (additional 0.2)
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${filter}`,
+              text: `${this.toRomanNumeral(index + 1)}. ${SpellChecker.correctAccents(filter)}`,
               font: "Segoe UI Semilight"
             })]
           }));
@@ -837,7 +838,7 @@ export class DocumentService {
             spacing: { after: 40 },
             indent: { left: 576 },
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${column}`,
+              text: `${this.toRomanNumeral(index + 1)}. ${SpellChecker.correctAccents(column)}`,
               font: "Segoe UI Semilight"
             })]
           }));
@@ -870,7 +871,7 @@ export class DocumentService {
             spacing: { after: 40 },
             indent: { left: 576 },
             children: [new TextRun({
-              text: `${this.toRomanNumeral(index + 1)}. ${field.name} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})${field.description ? ` - ${field.description}` : ''}`,
+              text: `${this.toRomanNumeral(index + 1)}. ${SpellChecker.correctAccents(field.name)} (${field.type}${field.length ? `, ${field.length}` : ''}${field.mandatory ? ', obligatorio' : ', opcional'})${field.description ? ` - ${SpellChecker.correctAccents(field.description)}` : ''}`,
               font: "Segoe UI Semilight"
             })]
           }));
@@ -1196,7 +1197,7 @@ export class DocumentService {
         sections.push(new Paragraph({
           spacing: { after: 120 },
           children: [new TextRun({
-            text: String(formData.testCaseObjective || ''),
+            text: SpellChecker.correctAccents(String(formData.testCaseObjective || '')),
             font: "Segoe UI Semilight"
           })]
         }));
@@ -1248,7 +1249,7 @@ export class DocumentService {
               spacing: { after: 40 },
               indent: { left: indentLevel },
               children: [new TextRun({
-                text: formattedText,
+                text: SpellChecker.correctAccents(formattedText),
                 font: "Segoe UI Semilight"
               })]
             }));
@@ -1300,7 +1301,7 @@ export class DocumentService {
                 font: "Segoe UI Semilight"
               }),
               new TextRun({
-                text: testStep.action,
+                text: SpellChecker.correctAccents(testStep.action),
                 font: "Segoe UI Semilight"
               })
             ]
@@ -1318,7 +1319,7 @@ export class DocumentService {
                 font: "Segoe UI Semilight"
               }),
               new TextRun({
-                text: testStep.inputData,
+                text: SpellChecker.correctAccents(testStep.inputData),
                 font: "Segoe UI Semilight"
               })
             ]
@@ -1336,7 +1337,7 @@ export class DocumentService {
                 font: "Segoe UI Semilight"
               }),
               new TextRun({
-                text: testStep.expectedResult,
+                text: SpellChecker.correctAccents(testStep.expectedResult),
                 font: "Segoe UI Semilight"
               })
             ]
@@ -1412,7 +1413,7 @@ export class DocumentService {
           spacing: { after: 80 },
           indent: { left: trimmedLine.startsWith('•') ? 288 : 0 },
           children: [new TextRun({
-            text: trimmedLine,
+            text: SpellChecker.correctAccents(trimmedLine),
             font: "Segoe UI Semilight"
           })]
         }));
