@@ -1616,14 +1616,36 @@ export class DocumentService {
           if (line.trim()) {
             const trimmedLine = line.trim();
             
-            // Remove existing numbering if present
-            const cleanedLine = trimmedLine.replace(/^(\d+\.|[a-z]\.|[ivx]+\.|•|-)\s*/, '');
+            // Determine indentation level based on leading spaces or patterns
+            let level = 0;
+            let cleanedLine = trimmedLine;
             
-            // Always use bullet list for preconditions
+            // Count leading spaces for indentation (every 3 spaces = 1 level)
+            const leadingSpaces = line.length - line.trimStart().length;
+            if (leadingSpaces >= 3) {
+              level = Math.min(Math.floor(leadingSpaces / 3), 2); // Max level 2
+            }
+            
+            // Also check for patterns like "a.", "i.", etc.
+            if (/^[a-z]\./.test(trimmedLine)) {
+              level = 1;
+              cleanedLine = trimmedLine.replace(/^[a-z]\.\s*/, '');
+            } else if (/^[ivx]+\./.test(trimmedLine)) {
+              level = 2;
+              cleanedLine = trimmedLine.replace(/^[ivx]+\.\s*/, '');
+            } else if (/^\d+\./.test(trimmedLine)) {
+              level = 0;
+              cleanedLine = trimmedLine.replace(/^\d+\.\s*/, '');
+            } else if (/^[•-]/.test(trimmedLine)) {
+              // If it already has a bullet, remove it
+              cleanedLine = trimmedLine.replace(/^[•-]\s*/, '');
+            }
+            
+            // Use multilevel numbering for preconditions
             sections.push(new Paragraph({
               numbering: {
-                reference: bulletNumberingReference,
-                level: 0
+                reference: multiLevelNumberingReference,
+                level: level
               },
               spacing: { after: 40 },
               children: [new TextRun({
@@ -1653,12 +1675,12 @@ export class DocumentService {
         })]
       }));
       
-      // Test Cases Steps as numbered list
+      // Test Cases Steps as bulleted list
       formData.testSteps.forEach((testStep: any, index: number) => {
-        // Main number with step number
+        // Main bullet with step number
         sections.push(new Paragraph({
           numbering: {
-            reference: simpleNumberingReference,
+            reference: bulletNumberingReference,
             level: 0
           },
           spacing: { before: 120, after: 60 },
