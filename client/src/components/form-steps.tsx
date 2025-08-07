@@ -1300,9 +1300,7 @@ export default function FormSteps({
                 </div>
                 <div>
                   <h4 className="text-lg font-semibold text-blue-900 mb-2">¿Deseas incluir casos de prueba?</h4>
-                  <p className="text-sm text-blue-800 mb-4">
-                    Los casos de prueba te permiten validar el funcionamiento del caso de uso con objetivos, precondiciones y pasos estructurados según estándares ING.
-                  </p>
+                  
                 </div>
               </div>
               
