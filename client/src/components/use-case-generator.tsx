@@ -47,7 +47,21 @@ export default function UseCaseGenerator() {
 
   // Calculate total steps based on use case type and test case decision
   const getTotalSteps = () => {
-    const baseSteps = formData.useCaseType === 'entity' ? 10 : 7;
+    let baseSteps;
+    switch (formData.useCaseType) {
+      case 'entity':
+        baseSteps = 10; // All steps including entity fields
+        break;
+      case 'reports':
+        baseSteps = 9; // Similar to entity but without entity fields step, has export config instead
+        break;
+      case 'api':
+      case 'service':
+        baseSteps = 7; // Simplified flow for API/Service
+        break;
+      default:
+        baseSteps = 10;
+    }
     // Always show one more step for test case decision or final review
     return baseSteps + (formData.generateTestCase ? 1 : 0);
   };

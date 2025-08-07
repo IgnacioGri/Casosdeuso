@@ -64,7 +64,7 @@ export const testStepSchema = z.object({
 
 // Base schema para validación común
 const baseUseCaseFormSchema = z.object({
-  useCaseType: z.enum(['entity', 'api', 'service']),
+  useCaseType: z.enum(['entity', 'api', 'service', 'reports']),
   // Solo campos básicos obligatorios - Información Básica y Detalles del Caso de Uso
   clientName: z.string().min(1, "El nombre del cliente es requerido"),
   projectName: z.string().min(1, "El nombre del proyecto es requerido"),

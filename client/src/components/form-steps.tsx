@@ -1,4 +1,4 @@
-import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot, X, Plus } from "lucide-react";
+import { Brain, List, Info, Edit, Filter, Columns, Database, Settings, Globe, Clock, Sparkles, Cpu, Zap, Bot, X, Plus, FileSpreadsheet } from "lucide-react";
 import { TestCaseStep } from './steps/test-case-step';
 import { MinuteAnalysisStep } from './steps/minute-analysis-step';
 import { WireframesStep } from './steps/wireframes-step';
@@ -129,6 +129,15 @@ export default function FormSteps({
                         </div>
                       </div>
                     )}
+                    {formData.useCaseType === 'reports' && (
+                      <div className="flex items-center">
+                        <FileSpreadsheet className="mr-3 text-orange-500" size={20} />
+                        <div className="text-left">
+                          <div className="font-medium text-gray-900 dark:text-white">Reportes</div>
+                          <div className="text-xs text-gray-500">Solo lectura, exportación</div>
+                        </div>
+                      </div>
+                    )}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent className="w-full border-2 border-gray-200 rounded-lg bg-white dark:bg-gray-800 shadow-lg">
@@ -159,6 +168,15 @@ export default function FormSteps({
                       </div>
                     </div>
                   </SelectItem>
+                  <SelectItem value="reports" className="h-auto min-h-[3.5rem] px-4 py-3 hover:bg-orange-50 dark:hover:bg-orange-900/20 cursor-pointer">
+                    <div className="flex items-center w-full">
+                      <FileSpreadsheet className="mr-3 text-orange-500" size={20} />
+                      <div className="text-left">
+                        <div className="font-medium text-gray-900 dark:text-white">Reportes</div>
+                        <div className="text-xs text-gray-500">Solo lectura • Filtros • Exportación de datos</div>
+                      </div>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -174,7 +192,7 @@ export default function FormSteps({
                     El tipo de caso de uso determina qué campos aparecerán en el formulario y cómo la IA analizará las minutas en el siguiente paso. Cada tipo tiene un enfoque específico según los estándares ING.
                   </div>
                   <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
-                    💡 Consejo: <strong>Entidad</strong> es el más completo con wireframes, <strong>API</strong> para servicios web, <strong>Servicio</strong> para procesos automáticos.
+                    💡 Consejo: <strong>Entidad</strong> es el más completo con wireframes, <strong>API</strong> para servicios web, <strong>Servicio</strong> para procesos automáticos, <strong>Reportes</strong> para consultas de solo lectura.
                   </div>
                 </div>
               </div>
@@ -343,8 +361,8 @@ export default function FormSteps({
     );
   }
 
-  // Step 5: Search Filters (Entity only)
-  if (currentStep === 5 && formData.useCaseType === 'entity') {
+  // Step 5: Search Filters (Entity and Reports)
+  if (currentStep === 5 && (formData.useCaseType === 'entity' || formData.useCaseType === 'reports')) {
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
@@ -441,8 +459,8 @@ export default function FormSteps({
     );
   }
 
-  // Step 6: Result Columns (Entity only)
-  if (currentStep === 6 && formData.useCaseType === 'entity') {
+  // Step 6: Result Columns (Entity and Reports)
+  if (currentStep === 6 && (formData.useCaseType === 'entity' || formData.useCaseType === 'reports')) {
     return (
       <Card className="shadow-sm border border-ms-border">
         <CardContent className="p-6">
@@ -532,6 +550,117 @@ export default function FormSteps({
                   label="Agregar columna"
                 />
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Step 7: Export Configuration (Reports only)
+  if (currentStep === 7 && formData.useCaseType === 'reports') {
+    return (
+      <Card className="shadow-sm border border-ms-border">
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+              <FileSpreadsheet className="mr-2 text-ms-blue" size={20} />
+              Configuración de Exportación
+            </h3>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Formatos de exportación disponibles
+              </label>
+              <Input
+                value={formData.exportFormats || ''}
+                onChange={(e) => handleInputChange('exportFormats', e.target.value)}
+                placeholder="Ej: Excel, CSV, PDF"
+                className="mt-2"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Separa los formatos con comas
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Límite máximo de registros para exportación
+              </label>
+              <Input
+                value={formData.exportLimit || ''}
+                onChange={(e) => handleInputChange('exportLimit', e.target.value)}
+                placeholder="Ej: 10000 registros"
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Campos de agrupación (opcional)
+              </label>
+              <Input
+                value={formData.groupingFields || ''}
+                onChange={(e) => handleInputChange('groupingFields', e.target.value)}
+                placeholder="Ej: Categoría, Departamento, Mes"
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Funciones de agregación (opcional)
+              </label>
+              <Input
+                value={formData.aggregationFunctions || ''}
+                onChange={(e) => handleInputChange('aggregationFunctions', e.target.value)}
+                placeholder="Ej: Total ventas, Promedio saldo, Cantidad registros"
+                className="mt-2"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Totalizadores y cálculos que se mostrarán en el reporte
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Ordenamiento por defecto
+              </label>
+              <Input
+                value={formData.defaultSorting || ''}
+                onChange={(e) => handleInputChange('defaultSorting', e.target.value)}
+                placeholder="Ej: Fecha descendente, Nombre ascendente"
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Programación del reporte (opcional)
+              </label>
+              <Input
+                value={formData.reportSchedule || ''}
+                onChange={(e) => handleInputChange('reportSchedule', e.target.value)}
+                placeholder="Ej: Diario a las 9AM, Mensual el primer día, Bajo demanda"
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Destinatarios del reporte (opcional)
+              </label>
+              <Input
+                value={formData.reportRecipients || ''}
+                onChange={(e) => handleInputChange('reportRecipients', e.target.value)}
+                placeholder="Ej: gerencia@empresa.com, equipo-finanzas@empresa.com"
+                className="mt-2"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Correos electrónicos de quienes recibirán el reporte programado
+              </p>
             </div>
           </div>
         </CardContent>
@@ -884,18 +1013,132 @@ export default function FormSteps({
     );
   }
 
-  // Step 8: Wireframes (Entity only)
-  if (currentStep === 8 && formData.useCaseType === 'entity') {
-    return (
-      <WireframesStep
-        formData={formData}
-        onUpdateFormData={onUpdateFormData}
-      />
-    );
+  // Step 8: Business Rules (Reports only) or Wireframes (Entity only)
+  if (currentStep === 8) {
+    if (formData.useCaseType === 'entity') {
+      return (
+        <WireframesStep
+          formData={formData}
+          onUpdateFormData={onUpdateFormData}
+        />
+      );
+    } else if (formData.useCaseType === 'reports') {
+      // Business rules for reports
+      return (
+        <Card className="shadow-sm border border-ms-border">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <Settings className="mr-2 text-ms-blue" size={20} />
+                Reglas de Negocio y Requisitos
+              </h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reglas de negocio del reporte
+                </label>
+                <BulletTextarea
+                  value={formData.businessRules || ''}
+                  onChange={(value) => handleInputChange('businessRules', value)}
+                  rows={5}
+                  placeholder="Describe las reglas de negocio con bullet points. Ej:
+• Solo usuarios con rol Gerencia pueden exportar más de 1000 registros
+• Los datos sensibles deben estar enmascarados
+• El reporte debe incluir solo registros del último año fiscal..."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Requerimientos especiales
+                </label>
+                <BulletTextarea
+                  value={formData.specialRequirements || ''}
+                  onChange={(value) => handleInputChange('specialRequirements', value)}
+                  rows={5}
+                  placeholder="Describe los requerimientos especiales con bullet points. Ej:
+• El reporte debe generarse en menos de 30 segundos
+• Debe soportar exportación concurrente de múltiples usuarios
+• Los datos deben estar actualizados en tiempo real..."
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
   }
 
-  // Step 9: Additional Options (adjusted step number for non-entity types)
-  const isAdditionalOptionsStep = formData.useCaseType === 'entity' ? currentStep === 9 : currentStep === 6;
+  // Step 9: Wireframes (Reports only) or Additional Options (Entity)
+  if (currentStep === 9) {
+    if (formData.useCaseType === 'reports') {
+      return (
+        <WireframesStep
+          formData={formData}
+          onUpdateFormData={onUpdateFormData}
+          isReportsType={true}
+        />
+      );
+    } else if (formData.useCaseType === 'entity') {
+      // Additional options for entity - keep existing code
+      return (
+        <Card className="shadow-sm border border-ms-border">
+          <CardContent className="p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <Settings className="mr-2 text-ms-blue" size={20} />
+                Opciones Adicionales
+              </h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Una vez completado el caso de uso, podrás elegir si agregar casos de prueba en el siguiente paso.
+                </p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reglas de negocio adicionales
+                </label>
+                <BulletTextarea
+                  value={formData.businessRules || ''}
+                  onChange={(value) => handleInputChange('businessRules', value)}
+                  rows={5}
+                  placeholder="Describe las reglas de negocio con bullet points. Ej:
+• Los clientes no se pueden eliminar si tienen productos activos
+• El DNI debe ser único en el sistema
+• Solo supervisores pueden autorizar operaciones especiales..."
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Requerimientos especiales
+                </label>
+                <BulletTextarea
+                  value={formData.specialRequirements || ''}
+                  onChange={(value) => handleInputChange('specialRequirements', value)}
+                  rows={5}
+                  placeholder="Describe los requerimientos especiales con bullet points. Ej:
+• Debe integrarse con servicio externo de validación
+• Tiempos de respuesta menores a 3 segundos
+• Validaciones de seguridad HTTPS obligatorias
+• Auditoría completa de todas las operaciones..."
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+  }
+
+  // Step 6 or 9: Additional Options for API/Service types
+  const isAdditionalOptionsStep = currentStep === 6 && (formData.useCaseType === 'api' || formData.useCaseType === 'service');
   if (isAdditionalOptionsStep) {
     return (
       <Card className="shadow-sm border border-ms-border">
@@ -955,8 +1198,10 @@ export default function FormSteps({
   const testCaseStepNumber = () => {
     if (formData.useCaseType === 'entity') {
       return formData.generateTestCase ? 10 : null;
+    } else if (formData.useCaseType === 'reports') {
+      return formData.generateTestCase ? 10 : null; // Reports has 9 base steps + test case
     } else {
-      return formData.generateTestCase ? 7 : null;
+      return formData.generateTestCase ? 7 : null; // API/Service have 6 base steps + test case
     }
   };
 

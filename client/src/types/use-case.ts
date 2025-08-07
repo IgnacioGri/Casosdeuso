@@ -1,4 +1,4 @@
-export type UseCaseType = 'entity' | 'api' | 'service';
+export type UseCaseType = 'entity' | 'api' | 'service' | 'reports';
 
 export type AIModel = 'demo' | 'openai' | 'claude' | 'grok' | 'gemini' | 'copilot';
 
@@ -6,7 +6,7 @@ export type AIModel = 'demo' | 'openai' | 'claude' | 'grok' | 'gemini' | 'copilo
 
 export interface EntityField {
   name: string;
-  type: 'text' | 'number' | 'date' | 'datetime' | 'boolean' | 'email';
+  type: 'text' | 'number' | 'date' | 'datetime' | 'boolean' | 'email' | 'decimal';
   length?: number;
   mandatory: boolean;
   description?: string; // Documentar propósito del campo
@@ -66,6 +66,14 @@ export interface UseCaseFormData {
   executionTime?: string;
   configurationPaths?: string;
   webServiceCredentials?: string;
+  // Campos específicos para Reportes
+  exportFormats?: string; // Excel, CSV, PDF
+  exportLimit?: string; // Límite de registros a exportar
+  groupingFields?: string; // Campos para agrupación
+  aggregationFunctions?: string; // Funciones de agregación (suma, promedio, etc.)
+  defaultSorting?: string; // Ordenamiento por defecto
+  reportSchedule?: string; // Si es programado o no
+  reportRecipients?: string; // Destinatarios del reporte
 }
 
 export interface UseCase {
