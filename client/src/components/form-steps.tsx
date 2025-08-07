@@ -1320,11 +1320,7 @@ export default function FormSteps({
                 </Button>
               </div>
               
-              <div className="text-center mt-4">
-                <p className="text-sm text-gray-500 italic">
-                  Si prefieres no incluir casos de prueba, simplemente haz clic en "Generar y Descargar" abajo
-                </p>
-              </div>
+              
             </div>
 
             {/* Resumen de configuración - ahora menos prominente */}
