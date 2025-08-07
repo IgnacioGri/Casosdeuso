@@ -13,6 +13,7 @@ The application utilizes a modern full-stack JavaScript/TypeScript architecture 
 - **Performance Optimization**: Reduced verbose logging from 3,694 console statements to development-only logging
 - **Error Handling**: Improved error logging to show messages instead of full stack traces
 - **Code Cleanup**: Removed legacy document-service-old.ts file
+- **API Configuration Status**: Currently only Gemini API fully functional. Enterprise has Azure access for Azure OpenAI Service integration.
 - **Architecture Migration**: Migrated from Blazor/.NET to Node.js/React/Express stack
 - **Deployment Configuration**: Fixed deployment issues for Replit Autoscale
   - Server configured to use dynamic PORT environment variable allocation (respects platform-assigned ports)
@@ -51,10 +52,12 @@ The application utilizes a modern full-stack JavaScript/TypeScript architecture 
 ## External Dependencies
 
 ### AI Services
-- **OpenAI**: For GPT models.
-- **Anthropic Claude**: An alternative AI provider.
-- **X.AI Grok**: Another AI model option.
-- **Google Gemini**: Google's AI service.
+- **Google Gemini**: Currently active and functional AI service.
+- **Azure OpenAI Service**: Enterprise-grade access to GPT-4o, GPT-4 models (pending configuration).
+- **OpenAI**: Direct API access (configured but may be personal account).
+- **Anthropic Claude**: Alternative AI provider (pending configuration).
+- **X.AI Grok**: Additional AI model option (pending configuration).
+- **Microsoft Copilot**: Note: M365 Copilot is not an API service - cannot be used as text generation API.
 
 ### Document Processing
 - **Puppeteer**: Used for screenshotting HTML wireframes.
