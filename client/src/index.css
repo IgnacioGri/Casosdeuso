@@ -440,7 +440,7 @@ button[role="combobox"][data-state="closed"] {
 }
 
 .ai-button.variant-outline {
-  background-color: #f3f4f6 !important; /* Light background */
+  background-color: #f9f9f9 !important; /* Nearly white background */
   border-color: #7c3aed !important;
   color: #7c3aed !important;
 }

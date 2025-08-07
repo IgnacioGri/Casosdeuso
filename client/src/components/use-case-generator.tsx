@@ -313,7 +313,7 @@ export default function UseCaseGenerator() {
             variant="outline"
             className="ai-button variant-outline flex items-center"
             style={{ 
-              backgroundColor: '#ede9fe', 
+              backgroundColor: '#f9f9f9', 
               borderColor: '#7c3aed', 
               color: '#7c3aed' 
             }}

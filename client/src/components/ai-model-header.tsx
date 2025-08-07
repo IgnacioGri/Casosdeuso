@@ -61,7 +61,7 @@ export function AIModelHeader({ currentModel, onModelChange }: AIModelHeaderProp
           <SelectValue>
             <div className="flex items-center gap-2">
               {getModelIcon(currentModel)}
-              <Badge variant={getModelBadgeVariant(currentModel)} className="text-xs bg-violet-100 text-violet-700 border-violet-300">
+              <Badge variant={getModelBadgeVariant(currentModel)} className="text-xs bg-gray-50 text-violet-700 border-violet-300">
                 {currentModel.toUpperCase()}
               </Badge>
             </div>
