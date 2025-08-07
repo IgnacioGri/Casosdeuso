@@ -14,11 +14,13 @@ interface WireframeData {
     mandatory?: boolean;
     length?: number;
   }>;
+  useCaseType?: string; // Add use case type
 }
 
 function generateSearchWireframeHTML(data: WireframeData): string {
   const filters = data.filters || [];
   const columns = data.columns || [];
+  const isReports = data.useCaseType === 'reports';
 
   return `
 <!DOCTYPE html>
@@ -226,12 +228,27 @@ function generateSearchWireframeHTML(data: WireframeData): string {
             </svg>
             Limpiar
           </button>
+          ${isReports ? `
+          <button class="btn btn-success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,10V19L8,15.5L9.4,14.1L11,15.7V10H12M15,10V15.7L16.6,14.1L18,15.5L14,19V10H15Z"/>
+            </svg>
+            Excel
+          </button>
+          <button class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+              <path d="M14,2L20,8V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2H14M18,20V9H13V4H6V20H18M10,13H8V11H10V13M10,17H8V15H10V17M10,9H8V7H10V9M16,13H11V11H16V13M16,17H11V15H16V17M16,9H11V7H16V9Z"/>
+            </svg>
+            PDF
+          </button>
+          ` : `
           <button class="btn btn-white">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="#0078D4">
               <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
             </svg>
             Agregar
           </button>
+          `}
         </div>
       </div>
     </div>
@@ -250,6 +267,18 @@ function generateSearchWireframeHTML(data: WireframeData): string {
             <tr>
               <td>
                 <div class="actions">
+                  ${isReports ? `
+                  <button class="action-btn view" title="Ver">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#0078D4">
+                      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                  </button>
+                  <button class="action-btn download" title="Descargar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#107C10">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                  </button>
+                  ` : `
                   <button class="action-btn edit" title="Editar">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="#0078D4">
                       <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
@@ -270,6 +299,7 @@ function generateSearchWireframeHTML(data: WireframeData): string {
                       <path d="M18.3 5.71L12 12.01 5.7 5.71 4.29 7.12 10.59 13.42 4.29 19.72 5.7 21.13 12 14.83 18.3 21.13 19.71 19.72 13.41 13.42 19.71 7.12z"/>
                     </svg>
                   </button>
+                  `}
                 </div>
               </td>
               ${columns.map(() => `<td>Dato ${i}</td>`).join('')}
@@ -556,6 +586,7 @@ interface WireframeRequest {
     mandatory?: boolean;
     length?: number;
   }>;
+  useCaseType?: string; // Add use case type to request
 }
 
 router.post('/api/generate-wireframe', async (req, res) => {
@@ -563,10 +594,10 @@ router.post('/api/generate-wireframe', async (req, res) => {
     const data: WireframeRequest = req.body;
     const screenshotService = getScreenshotService();
 
-    // Generate HTML based on type
+    // Generate HTML based on type, pass the full data including useCaseType
     const html = data.type === 'search' 
-      ? generateSearchWireframeHTML(data)
-      : generateFormWireframeHTML(data);
+      ? generateSearchWireframeHTML(data as WireframeData)
+      : generateFormWireframeHTML(data as WireframeData);
 
     // Capture screenshot with smaller dimensions to reduce file size
     const imageBuffer = await screenshotService.captureHTMLAsImage({

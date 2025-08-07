@@ -9,7 +9,7 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 The application utilizes a modern full-stack JavaScript/TypeScript architecture with React frontend and Express backend.
 
-### Recent Changes (2025-01-06)
+### Recent Changes (2025-01-09)
 - **Architecture Migration**: Migrated from Blazor/.NET to Node.js/React/Express stack
 - **Deployment Configuration**: Fixed deployment issues for Replit Autoscale
   - Server configured to use dynamic PORT environment variable allocation (respects platform-assigned ports)
@@ -40,7 +40,7 @@ The application utilizes a modern full-stack JavaScript/TypeScript architecture 
 - **Intelligent Validation**: **UPDATED 2025-01-06**: Verb infinitive validation now uses regex pattern `/^[a-záéíóúñ]+(ar|er|ir)$/` plus irregular verbs (ver, ser, ir). System recognizes any Spanish infinitive verb automatically. Removed unused hardcoded verb list.
 - **Minute Analysis**: **UPDATED 2025-01-06**: Now extracts all fields specific to each use case type. Entity: filters/columns/fields. API: endpoint/method/request/response. Service: frequency/execution time/configuration paths/credentials. Reports: filters/columns/export formats/limits.
 - **Description Expansion**: Automatically expands descriptions < 50 words to 2 professional paragraphs using dedicated AI prompt.
-- **Wireframe Generation**: HTML generation → Puppeteer screenshot → Sharp compression → DOCX embedding pipeline. Professional Microsoft-style tables with actual form data. Reports type generates search-only interface with export button.
+- **Wireframe Generation**: HTML generation → Puppeteer screenshot → Sharp compression → DOCX embedding pipeline. Professional Microsoft-style tables with actual form data. Reports type generates search-only interface with specific actions: "Ver"/"Descargar" instead of CRUD operations, "Excel"/"PDF" export buttons instead of "Agregar". Form wireframe hidden for reports type.
 - **Test Case Generation**: AI creates intelligent test cases with objectives, preconditions, and professional step tables (Nº, Action, Input, Expected Result, Observations, Status). Incorporates user feedback through suggestions system.
 - **File Naming Protection**: Comprehensive prevention of file extensions (.json, .docx, .xml) through prompt rules, regex cleaning, and post-processing validation.
 - **API Section Enforcement**: Function `ensureApiSections` adds missing mandatory sections post-AI generation. **RESOLVED 2025-01-06**: Validation error fixed by adding service-oriented verbs (conciliar, ejecutar, monitorear, supervisar, automatizar) to validation logic.

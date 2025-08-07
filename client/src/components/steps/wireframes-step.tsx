@@ -77,7 +77,8 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
           type: f.type,
           mandatory: f.mandatory,
           length: f.length
-        })) || []
+        })) || [],
+        useCaseType: formData.useCaseType // Pass the use case type to backend
       };
       
       const result = await generateWireframeMutation.mutateAsync(requestData);
@@ -231,12 +232,13 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
               )}
             </div>
 
-            {/* Form Wireframe */}
-            <div className="border rounded-lg p-4 space-y-3">
-              <h3 className="font-medium">Wireframe del Formulario</h3>
-              <p className="text-sm text-gray-600">
-                Interfaz para agregar/editar entidad con todos los campos
-              </p>
+            {/* Form Wireframe - Only show for non-reports types */}
+            {formData.useCaseType !== 'reports' && (
+              <div className="border rounded-lg p-4 space-y-3">
+                <h3 className="font-medium">Wireframe del Formulario</h3>
+                <p className="text-sm text-gray-600">
+                  Interfaz para agregar/editar entidad con todos los campos
+                </p>
               
               {formData.generatedWireframes?.formWireframe ? (
                 <div className="space-y-2">
@@ -289,6 +291,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
                 </Button>
               )}
             </div>
+            )}
           </div>
         </>
       )}
