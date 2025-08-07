@@ -12,7 +12,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { toast, useToast } from '@/hooks/use-toast';
-import type { UseCaseFormData } from '@shared/schema';
+import type { UseCaseFormData } from '@/types/use-case';
 
 interface MinuteAnalysisStepProps {
   formData: UseCaseFormData;

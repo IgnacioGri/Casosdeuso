@@ -1306,30 +1306,24 @@ export default function FormSteps({
                 </div>
               </div>
               
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex justify-center">
                 <Button 
                   type="button" 
                   onClick={() => {
                     handleInputChange('generateTestCase', true);
                     if (onNextStep) onNextStep();
                   }}
-                  className="bg-green-600 hover:bg-green-700 text-white flex-1 py-3 text-base font-medium"
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-base font-medium"
                   size="lg"
                 >
                   ✓ Sí, agregar casos de prueba
                 </Button>
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={() => {
-                    handleInputChange('generateTestCase', false);
-                    if (onNextStep) onNextStep();
-                  }}
-                  className="border-gray-300 hover:bg-gray-50 text-gray-700 flex-1 py-3 text-base"
-                  size="lg"
-                >
-                  Continuar sin casos de prueba
-                </Button>
+              </div>
+              
+              <div className="text-center mt-4">
+                <p className="text-sm text-gray-500 italic">
+                  Si prefieres no incluir casos de prueba, simplemente haz clic en "Generar y Descargar" abajo
+                </p>
               </div>
             </div>
 
