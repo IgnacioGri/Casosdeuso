@@ -1293,32 +1293,27 @@ export default function FormSteps({
           
           <div className="space-y-6">
             {/* Decisión prominente sobre casos de prueba */}
-            <div className="bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200 rounded-lg p-6">
-              <div className="flex items-start mb-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-blue-600 font-bold text-lg">?</span>
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-blue-600 font-bold text-base">?</span>
+                  </div>
+                  <h4 className="text-base font-semibold text-blue-900">¿Deseas incluir casos de prueba?</h4>
                 </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-blue-900 mb-2">¿Deseas incluir casos de prueba?</h4>
-                  
-                </div>
-              </div>
-              
-              <div className="flex justify-center">
+                
                 <Button 
                   type="button" 
                   onClick={() => {
                     handleInputChange('generateTestCase', true);
                     if (onNextStep) onNextStep();
                   }}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-base font-medium"
-                  size="lg"
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 text-sm font-medium"
+                  size="sm"
                 >
                   ✓ Sí, agregar casos de prueba
                 </Button>
               </div>
-              
-              
             </div>
 
             {/* Resumen de configuración - ahora menos prominente */}
