@@ -1078,7 +1078,6 @@ export default function FormSteps({
         <WireframesStep
           formData={formData}
           onUpdateFormData={onUpdateFormData}
-          isReportsType={true}
         />
       );
     } else if (formData.useCaseType === 'entity') {
@@ -1240,9 +1239,19 @@ export default function FormSteps({
     );
   }
 
-  // Step 10/7: Pre-Final Step with Test Case Decision
+  // Step 9/10/7: Pre-Final Step with Test Case Decision
   const getPreFinalStepNumber = () => {
-    return formData.useCaseType === 'entity' ? 10 : 7;
+    switch (formData.useCaseType) {
+      case 'entity':
+        return 10;
+      case 'reports':
+        return 9;
+      case 'api':
+      case 'service':
+        return 7;
+      default:
+        return 7;
+    }
   };
 
   const isPreFinalStep = currentStep === getPreFinalStepNumber() && !formData.generateTestCase;
@@ -1282,33 +1291,58 @@ export default function FormSteps({
             </h3>
           </div>
           
-          <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-3">Resumen de la configuración:</h4>
-              <div className="space-y-2 text-sm">
-                {getSummaryData().map((item, index) => (
-                  <div key={index} className="text-gray-700">{item}</div>
-                ))}
+          <div className="space-y-6">
+            {/* Decisión prominente sobre casos de prueba */}
+            <div className="bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200 rounded-lg p-6">
+              <div className="flex items-start mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-blue-600 font-bold text-lg">?</span>
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold text-blue-900 mb-2">¿Deseas incluir casos de prueba?</h4>
+                  <p className="text-sm text-blue-800 mb-4">
+                    Los casos de prueba te permiten validar el funcionamiento del caso de uso con objetivos, precondiciones y pasos estructurados según estándares ING.
+                  </p>
+                </div>
               </div>
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <h4 className="font-medium text-blue-900 mb-2">¿Deseas incluir casos de prueba?</h4>
-              <p className="text-sm text-blue-700 mb-4">
-                Los casos de prueba te permiten validar el funcionamiento del caso de uso con objetivos, precondiciones y pasos estructurados según estándares ING.
-              </p>
-              <div className="flex space-x-4">
+              
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button 
                   type="button" 
                   onClick={() => {
                     handleInputChange('generateTestCase', true);
                     if (onNextStep) onNextStep();
                   }}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  className="bg-green-600 hover:bg-green-700 text-white flex-1 py-3 text-base font-medium"
+                  size="lg"
                 >
-                  Sí, agregar casos de prueba
+                  ✓ Sí, agregar casos de prueba
                 </Button>
-                
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => {
+                    handleInputChange('generateTestCase', false);
+                    if (onNextStep) onNextStep();
+                  }}
+                  className="border-gray-300 hover:bg-gray-50 text-gray-700 flex-1 py-3 text-base"
+                  size="lg"
+                >
+                  Continuar sin casos de prueba
+                </Button>
+              </div>
+            </div>
+
+            {/* Resumen de configuración - ahora menos prominente */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="font-medium text-gray-700 mb-3 text-sm uppercase tracking-wide">Resumen de la configuración:</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                {getSummaryData().map((item, index) => (
+                  <div key={index} className="text-gray-600 flex items-center">
+                    <span className="w-2 h-2 bg-gray-300 rounded-full mr-2 flex-shrink-0"></span>
+                    {item}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1319,7 +1353,21 @@ export default function FormSteps({
 
   // Final Review Step (after test cases or after decision)
   const getFinalReviewStepNumber = () => {
-    const baseStep = formData.useCaseType === 'entity' ? 10 : 7;
+    let baseStep: number;
+    switch (formData.useCaseType) {
+      case 'entity':
+        baseStep = 10;
+        break;
+      case 'reports':
+        baseStep = 9;
+        break;
+      case 'api':
+      case 'service':
+        baseStep = 7;
+        break;
+      default:
+        baseStep = 7;
+    }
     return formData.generateTestCase ? baseStep + 1 : baseStep;
   };
 

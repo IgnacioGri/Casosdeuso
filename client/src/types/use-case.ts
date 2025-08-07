@@ -28,6 +28,7 @@ export interface UseCaseFormData {
   uploadedMinute?: string;
   minuteFile?: File;
   aiGeneratedFields?: Record<string, boolean>; // Track which fields were AI-generated
+  isAIGenerated: boolean; // Track if form data came from AI analysis
   clientName: string;
   projectName: string;
   useCaseCode: string;
@@ -43,7 +44,7 @@ export interface UseCaseFormData {
   businessRules?: string;
   specialRequirements?: string;
   generateWireframes: boolean;
-  wireframeDescriptions?: string[];
+  wireframeDescriptions: string[];
   wireframesDescription?: string;
 
   generatedWireframes?: {
@@ -51,7 +52,7 @@ export interface UseCaseFormData {
     formWireframe?: string;
   };
   // Test case fields
-  generateTestCase?: boolean;
+  generateTestCase: boolean;
   testCaseObjective?: string;
   testCasePreconditions?: string;
   testSteps?: TestStep[];

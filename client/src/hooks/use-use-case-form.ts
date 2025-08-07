@@ -9,6 +9,7 @@ export function useUseCaseForm() {
     uploadedMinute: '',
     minuteFile: undefined,
     aiGeneratedFields: {},
+    isAIGenerated: false,
     clientName: '',
     projectName: '',
     useCaseCode: '',
@@ -30,7 +31,6 @@ export function useUseCaseForm() {
     specialRequirements: '',
     generateWireframes: false,
     wireframeDescriptions: [''],
-
     wireframesDescription: '',
     // Campos específicos para tipos de casos de uso
     apiEndpoint: '',
