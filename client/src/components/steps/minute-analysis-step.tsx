@@ -149,20 +149,28 @@ export function MinuteAnalysisStep({
           description: "Extrayendo texto del documento..."
         });
         
+        const formData = new FormData();
+        formData.append('file', file);
+        
         try {
-          const formData = new FormData();
-          formData.append('file', file);
-          
           const response = await fetch('/api/extract-text', {
             method: 'POST',
-            body: formData
+            body: formData,
+            credentials: 'include'
           });
           
           if (!response.ok) {
-            throw new Error('Error procesando el archivo');
+            const errorText = await response.text();
+            console.error('Error response:', response.status, errorText);
+            throw new Error(errorText || 'Error procesando el archivo');
           }
           
           const data = await response.json();
+          
+          if (data.error) {
+            throw new Error(data.error);
+          }
+          
           setMinuteText(data.text || '');
           
           toast({
