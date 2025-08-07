@@ -178,18 +178,21 @@ export class AIService {
   }
 
   private static async expandDescription(formData: any, aiModel: string): Promise<string | null> {
-    const expandPrompt = `Como experto en documentación bancaria/empresarial, expande la siguiente descripción de caso de uso a exactamente 2 párrafos profesionales:
+    const expandPrompt = `Expande esta descripción de caso de uso a exactamente 2 párrafos profesionales y concisos:
 
-Descripción original: "${formData.description}"
-Caso de uso: ${formData.useCaseName}
-Cliente: ${formData.clientName}
-Proyecto: ${formData.projectName}
+"${formData.description}"
 
-INSTRUCCIONES OBLIGATORIAS:
-1. Primer párrafo (75+ palabras): Explicar QUÉ hace el caso de uso, su propósito principal, qué procesos abarca, qué área del negocio atiende, cómo se integra en el sistema.
-2. Segundo párrafo (75+ palabras): Detallar los BENEFICIOS clave para el negocio, valor agregado, mejoras operativas, problemas que resuelve, impacto en eficiencia.
+Contexto: ${formData.useCaseName} para ${formData.clientName} - ${formData.projectName}
 
-IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato adicional. Usa contexto profesional relevante del sector ${formData.clientName?.includes('Banco') ? 'bancario' : 'empresarial'}.`;
+INSTRUCCIONES:
+1. Párrafo 1 (60-80 palabras): Explicar QUÉ hace y su propósito principal
+2. Párrafo 2 (60-80 palabras): Beneficios clave para el negocio
+
+IMPORTANTE: 
+- Texto directo y profesional, sin redundancias
+- NO usar frases como "fundamental para", "drásticamente", "sustanciales"
+- NO repetir el nombre del caso de uso múltiples veces
+- Genera SOLO los 2 párrafos sin títulos ni formato adicional`;
 
     try {
       const aiModels = ['copilot', 'gemini', 'openai', 'claude', 'grok'];
