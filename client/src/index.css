@@ -445,6 +445,15 @@ button[role="combobox"][data-state="closed"] {
   color: #7c3aed !important;
 }
 
+/* Force override for all AI assist buttons */
+button.ai-button.variant-outline,
+.ai-button.variant-outline,
+button[class*="ai-button"][class*="variant-outline"] {
+  background-color: #f9f9f9 !important; /* Nearly white background */
+  border-color: #7c3aed !important;
+  color: #7c3aed !important;
+}
+
 .ai-button.variant-outline:hover {
   background-color: #ede9fe !important; /* Violet-50 */
   border-color: #6d28d9 !important;
@@ -515,7 +524,7 @@ button.ai-button:hover {
 
 .ai-button.variant-outline,
 button.ai-button.variant-outline {
-  background-color: #ede9fe !important;
+  background-color: #f9f9f9 !important; /* Nearly white background */
   border-color: #7c3aed !important;
   color: #7c3aed !important;
 }
