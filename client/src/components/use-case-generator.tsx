@@ -292,27 +292,27 @@ export default function UseCaseGenerator() {
 
 
   const isReviewStep = () => {
-    // Final review step happens after test cases (if enabled) or after decision step
-    let baseStep: number;
+    // Final review step happens only after test case decision step
+    let testCaseDecisionStep: number;
     switch (formData.useCaseType) {
       case 'entity':
-        baseStep = 10;
+        testCaseDecisionStep = 10; // Test case decision is step 10
         break;
       case 'reports':
-        baseStep = 9;
+        testCaseDecisionStep = 9; // Test case decision is step 9
         break;
       case 'api':
       case 'service':
-        baseStep = 7;
+        testCaseDecisionStep = 7; // Test case decision is step 7
         break;
       default:
-        baseStep = 7;
+        testCaseDecisionStep = 7;
     }
     
     if (formData.generateTestCase) {
-      return currentStep === baseStep + 1; // Step after test cases
+      return currentStep === testCaseDecisionStep + 1; // Step after test cases (actual test case step)
     } else {
-      return currentStep === baseStep; // Decision step becomes review when user selects "finish without test cases"
+      return currentStep === testCaseDecisionStep; // Only on decision step when user selects "finish without test cases"
     }
   };
 
