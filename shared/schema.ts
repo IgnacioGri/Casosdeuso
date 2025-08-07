@@ -112,6 +112,14 @@ const baseUseCaseFormSchema = z.object({
   executionTime: z.string().optional(),
   configurationPaths: z.string().optional(),
   webServiceCredentials: z.string().optional(),
+  // Reports-specific export configuration fields
+  exportFormats: z.array(z.string()).optional(),
+  exportMaxRecords: z.number().optional(),
+  exportGroupBy: z.array(z.string()).optional(),
+  exportAggregation: z.array(z.string()).optional(),
+  exportDefaultSort: z.string().optional(),
+  exportSchedule: z.string().optional(),
+  exportRecipients: z.string().optional(),
   // Test case fields
   generateTestCase: z.boolean().default(false),
   testCaseObjective: z.string().optional(),

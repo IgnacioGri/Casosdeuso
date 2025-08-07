@@ -1,7 +1,7 @@
 import { AIService } from './ai-service.js';
 import { UseCaseFormData } from '../../shared/schema.js';
 
-type UseCaseType = 'entity' | 'api' | 'service';
+type UseCaseType = 'entity' | 'api' | 'service' | 'reports';
 
 export class MinuteAnalysisService {
   constructor(private aiService: AIService) {}
@@ -60,6 +60,11 @@ IMPORTANTE: Responde ÚNICAMENTE con un objeto JSON válido sin explicaciones ad
       case 'service':
         return {
           systemPrompt: baseSystemPrompt + this.getServiceAnalysisRules(),
+          context
+        };
+      case 'reports':
+        return {
+          systemPrompt: baseSystemPrompt + this.getReportsAnalysisRules(),
           context
         };
       default:
@@ -248,6 +253,61 @@ EJEMPLOS DE EXTRACCIÓN:
 `;
   }
 
+  private getReportsAnalysisRules(): string {
+    return `
+Para casos de uso tipo REPORTES, extrae y estructura la siguiente información:
+
+INSTRUCCIONES CRÍTICAS PARA REPORTES:
+- Los reportes son para CONSULTA y EXPORTACIÓN de datos, NO para gestión o modificación
+- Busca información sobre formatos de exportación, límites, agrupaciones, ordenamiento
+- NO incluyas campos de entidad (entityFields) ya que los reportes no gestionan entidades
+
+🚨 REGLA CRÍTICA DE fileName:
+- El fileName NUNCA debe incluir extensiones como .json, .docx, .xml, .txt, etc.
+- Formato correcto: solo código + descripción sin extensiones
+- Ejemplo correcto: "TR101MostrarCodigosPedidos" (NO "TR101MostrarCodigosPedidos.json")
+
+📊 CAMPOS ESPECÍFICOS DE CONFIGURACIÓN DE EXPORTACIÓN:
+{
+  "clientName": "Nombre del cliente/organización",
+  "projectName": "Nombre del proyecto o sistema",
+  "useCaseCode": "Código del caso de uso (ej: TR101, REP001)",
+  "useCaseName": "Nombre del reporte empezando con verbo infinitivo (Mostrar, Consultar, Generar)",
+  "fileName": "Nombre de archivo siguiendo patrón: código+descripción",
+  "description": "Descripción del propósito del reporte",
+  "actorName": "Usuario o rol que ejecuta el reporte",
+  "searchFilters": ["Filtros de búsqueda disponibles en el reporte"],
+  "filtersDescription": "Descripción de los filtros de búsqueda",
+  "resultColumns": ["Columnas que se mostrarán en el reporte"],
+  "columnsDescription": "Descripción de las columnas del reporte",
+  "exportFormats": ["Excel", "CSV", "PDF"],
+  "exportMaxRecords": 10000,
+  "exportGroupBy": ["Categoría", "Departamento", "Mes"],
+  "exportAggregation": ["Total ventas", "Promedio saldo", "Cantidad registros"],
+  "exportDefaultSort": "Fecha descendente, Nombre ascendente",
+  "exportSchedule": "Diario a las 9AM, Mensual el primer día",
+  "exportRecipients": "gerencia@empresa.com, equipo-finanzas@empresa.com",
+  "businessRules": "• Solo usuarios autorizados pueden exportar • Límite de 10000 registros por exportación",
+  "specialRequirements": "• Formato Excel con múltiples hojas • Gráficos incluidos en PDF",
+  "isAIGenerated": true
+}
+
+EXTRACCIÓN DE INFORMACIÓN DE EXPORTACIÓN:
+- Si menciona "Excel, CSV, PDF", extrae en exportFormats
+- Si dice "máximo 10000 registros", extrae en exportMaxRecords  
+- Si menciona "agrupar por departamento", extrae en exportGroupBy
+- Si dice "suma total, promedio", extrae en exportAggregation
+- Si menciona "ordenado por fecha", extrae en exportDefaultSort
+- Si dice "enviar diariamente", extrae en exportSchedule
+- Si menciona destinatarios de email, extrae en exportRecipients
+
+IMPORTANTE:
+- NO incluyas entityFields para reportes (solo son para gestión de entidades)
+- searchFilters y resultColumns son los campos principales para reportes
+- Si no encuentras información de exportación específica, usa valores por defecto razonables
+`;
+  }
+
   private parseAnalysisResult(result: string, useCaseType: UseCaseType): Partial<UseCaseFormData> {
     try {
       console.log('Raw AI analysis result:', result.substring(0, 200) + '...');
@@ -425,6 +485,27 @@ EJEMPLOS DE EXTRACCIÓN:
           webServiceCredentials: "Usuario: srv_batch, URL: https://api.banco.com/v1/cierre, Método: OAuth 2.0",
           businessRules: "1. Ejecutar solo en días hábiles\n2. Generar backup antes del proceso\n3. Validar integridad de datos antes de procesar",
           specialRequirements: "1. Logging detallado\n2. Alertas por email\n3. Mecanismo de rollback\n4. Integración con sistema de monitoreo"
+        };
+
+      case 'reports':
+        return {
+          ...baseData,
+          useCaseName: "Mostrar movimientos de cuenta",
+          fileName: "BP001MostrarMovimientosCuenta",
+          description: "Permite consultar y exportar los movimientos de cuentas bancarias con diferentes filtros y formatos de exportación.",
+          searchFilters: ["Fecha Desde", "Fecha Hasta", "Número de Cuenta", "Tipo de Movimiento"],
+          filtersDescription: "Filtros para búsqueda de movimientos por período, cuenta y tipo",
+          resultColumns: ["Fecha", "Descripción", "Débito", "Crédito", "Saldo"],
+          columnsDescription: "Columnas del reporte mostrando detalle de cada movimiento",
+          exportFormats: ["Excel", "CSV", "PDF"],
+          exportMaxRecords: 10000,
+          exportGroupBy: ["Categoría", "Departamento", "Mes"],
+          exportAggregation: ["Total ventas", "Promedio saldo", "Cantidad registros"],
+          exportDefaultSort: "Fecha descendente, Nombre ascendente",
+          exportSchedule: "Diario a las 9AM, Mensual el primer día",
+          exportRecipients: "gerencia@empresa.com, equipo-finanzas@empresa.com",
+          businessRules: "• Solo usuarios autorizados pueden exportar\n• Límite de 10000 registros por exportación\n• Los reportes deben cumplir con normativas del BCRA",
+          specialRequirements: "• Formato Excel con múltiples hojas\n• Gráficos incluidos en PDF\n• Firma digital en reportes oficiales"
         };
 
       default:
