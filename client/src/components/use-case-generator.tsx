@@ -269,7 +269,22 @@ export default function UseCaseGenerator() {
 
   const isReviewStep = () => {
     // Final review step happens after test cases (if enabled) or after decision step
-    const baseStep = formData.useCaseType === 'entity' ? 10 : 7;
+    let baseStep: number;
+    switch (formData.useCaseType) {
+      case 'entity':
+        baseStep = 10;
+        break;
+      case 'reports':
+        baseStep = 9;
+        break;
+      case 'api':
+      case 'service':
+        baseStep = 7;
+        break;
+      default:
+        baseStep = 7;
+    }
+    
     if (formData.generateTestCase) {
       return currentStep === baseStep + 1; // Step after test cases
     } else {
