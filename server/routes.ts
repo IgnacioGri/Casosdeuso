@@ -463,8 +463,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const specificRules = getSpecificRules(validatedData.useCaseType, validatedData);
       
       // DEBUG: Log use case type and rules for API cases
-      console.log(`🔍 Generating use case with type: ${validatedData.useCaseType}`);
-      if (validatedData.useCaseType === 'api') {
+      // Only log in development mode
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔍 Generating use case with type: ${validatedData.useCaseType}`);
+      }
+      if (validatedData.useCaseType === 'api' && process.env.NODE_ENV === 'development') {
         console.log('🚨 API rules should include FLUJO PRINCIPAL DE EVENTOS and FLUJOS ALTERNATIVOS');
         console.log(`📝 Rules length: ${(USE_CASE_RULES + "\n\n" + specificRules).length} characters`);
       }
@@ -566,9 +569,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expandedDescription: response.expandedDescription
       });
     } catch (error) {
-      console.error("Error generating use case:", error);
+      const errorMessage = error instanceof Error ? error.message : "Error de validación";
+      console.error("Error generating use case:", errorMessage);
       res.status(400).json({
-        message: error instanceof Error ? error.message : "Error de validación"
+        message: errorMessage
       });
     }
   });

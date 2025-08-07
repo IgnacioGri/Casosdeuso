@@ -222,19 +222,22 @@ IMPORTANTE: Genera SOLO los 2 párrafos de texto sin títulos, HTML o formato ad
             return expandedText.replace(/<[^>]*>/g, '').trim();
           }
         } catch (error) {
-          console.error(`Failed to expand description with ${model}:`, error);
+          console.error(`Failed to expand description with ${model}:`, error instanceof Error ? error.message : error);
         }
       }
     } catch (error) {
-      console.error('Error expanding description:', error);
+      console.error('Error expanding description:', error instanceof Error ? error.message : error);
     }
     
     return null;
   }
 
   private static buildPrompt(formData: any, rules: string): string {
-    console.log(`Building prompt with description: "${formData.description?.substring(0, 100)}..."`);
-    console.log(`Description length: ${formData.description?.length} characters`);
+    // Only log in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Building prompt with description: "${formData.description?.substring(0, 100)}..."`);
+      console.log(`Description length: ${formData.description?.length} characters`);
+    }
     
     return `Eres un experto en documentación de casos de uso bancarios/empresariales. Tu tarea es generar un documento profesional estructurado que será convertido a DOCX.
 
