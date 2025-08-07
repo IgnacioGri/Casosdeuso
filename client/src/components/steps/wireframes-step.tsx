@@ -45,6 +45,7 @@ export function WireframesStep({ formData, onUpdateFormData }: WireframesStepPro
         mandatory?: boolean;
         length?: number;
       }>;
+      useCaseType?: string; // Add use case type to request interface
     }) => {
       const response = await apiRequest('POST', '/api/generate-wireframe', request);
       return response.json();

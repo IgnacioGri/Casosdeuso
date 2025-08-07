@@ -594,6 +594,15 @@ router.post('/api/generate-wireframe', async (req, res) => {
     const data: WireframeRequest = req.body;
     const screenshotService = getScreenshotService();
 
+    // Debug log to see what we're receiving
+    console.log('🔍 Wireframe request:', {
+      type: data.type,
+      useCaseType: data.useCaseType,
+      title: data.title,
+      hasFilters: !!data.filters,
+      hasColumns: !!data.columns
+    });
+
     // Generate HTML based on type, pass the full data including useCaseType
     const html = data.type === 'search' 
       ? generateSearchWireframeHTML(data as WireframeData)
