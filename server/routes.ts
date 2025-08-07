@@ -432,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         webServiceCredentials: req.body.webServiceCredentials || '',
         testCaseObjective: req.body.testCaseObjective || '',
         testCasePreconditions: req.body.testCasePreconditions || '',
-        // Clean up entity fields - convert null values to empty strings
+        // Clean up entity fields - convert null values to empty strings or undefined
         entityFields: req.body.entityFields?.map((field: any) => ({
           ...field,
           name: field.name || '',
@@ -440,7 +440,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: field.description || '',
           validationRules: field.validationRules || '',
           message: field.message || '',
-          length: field.length || null,
+          length: field.length || undefined, // Use undefined instead of null for optional fields
           mandatory: Boolean(field.mandatory)
         })) || [],
         // Clean up arrays
