@@ -152,25 +152,41 @@ export function MinuteAnalysisStep({
         const formData = new FormData();
         formData.append('file', file);
         
+        console.log(`Uploading file: ${file.name}, size: ${file.size} bytes`);
+        
         try {
           const response = await fetch('/api/extract-text', {
             method: 'POST',
-            body: formData,
-            credentials: 'include'
+            body: formData
           });
           
+          console.log('Response status:', response.status);
+          
           if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', response.status, errorText);
-            throw new Error(errorText || 'Error procesando el archivo');
+            let errorMessage = 'Error procesando el archivo';
+            try {
+              const errorData = await response.json();
+              errorMessage = errorData.error || errorMessage;
+            } catch {
+              try {
+                const errorText = await response.text();
+                errorMessage = errorText || errorMessage;
+              } catch {
+                errorMessage = `Error ${response.status}: ${response.statusText}`;
+              }
+            }
+            console.error('Server error:', response.status, errorMessage);
+            throw new Error(errorMessage);
           }
           
           const data = await response.json();
+          console.log('Response data:', data);
           
           if (data.error) {
             throw new Error(data.error);
           }
           
+          console.log(`Text extracted: ${data.text?.length || 0} characters`);
           setMinuteText(data.text || '');
           
           toast({

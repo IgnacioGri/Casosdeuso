@@ -697,11 +697,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   app.post("/api/extract-text", upload.single('file'), async (req, res) => {
     try {
+      console.log('Received file upload request');
+      
       if (!req.file) {
+        console.error('No file in request');
         return res.status(400).json({ error: 'No file uploaded' });
       }
       
       const { originalname, buffer, mimetype } = req.file;
+      console.log(`Processing file: ${originalname}, size: ${buffer.length} bytes, mimetype: ${mimetype}`);
+      
       const extension = originalname.substring(originalname.lastIndexOf('.')).toLowerCase();
       
       let extractedText = '';
@@ -709,11 +714,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle DOCX files
       if (extension === '.docx' || mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
         try {
+          console.log('Extracting text from DOCX file...');
           const result = await mammoth.extractRawText({ buffer });
           extractedText = result.value;
-        } catch (error) {
+          console.log(`Extracted ${extractedText.length} characters from DOCX`);
+        } catch (error: any) {
           console.error('Error extracting text from DOCX:', error);
-          return res.status(500).json({ error: 'Error procesando el archivo DOCX' });
+          return res.status(500).json({ error: `Error procesando el archivo DOCX: ${error?.message || error}` });
         }
       }
       // Handle XLSX/XLS files
