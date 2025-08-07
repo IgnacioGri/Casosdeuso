@@ -217,6 +217,7 @@ export function MinuteAnalysisStep({
               {formData.useCaseType === 'entity' && 'Gestión de Entidad'}
               {formData.useCaseType === 'api' && 'API'}
               {formData.useCaseType === 'service' && 'Servicio/Proceso Automático'}
+              {formData.useCaseType === 'reports' && 'Reportes'}
             </span>
           </div>
         </div>
