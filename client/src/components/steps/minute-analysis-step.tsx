@@ -18,12 +18,14 @@ interface MinuteAnalysisStepProps {
   formData: UseCaseFormData;
   onDataExtracted: (extractedData: Partial<UseCaseFormData>) => void;
   readOnly?: boolean;
+  onMinuteTextChange?: (text: string) => void;
 }
 
 export function MinuteAnalysisStep({ 
   formData, 
   onDataExtracted,
-  readOnly = false 
+  readOnly = false,
+  onMinuteTextChange
 }: MinuteAnalysisStepProps) {
   const [minuteText, setMinuteText] = useState('');
   const [dragActive, setDragActive] = useState(false);
@@ -287,7 +289,11 @@ export function MinuteAnalysisStep({
           </div>
           <Textarea
             value={minuteText}
-            onChange={(e) => setMinuteText(e.target.value)}
+            onChange={(e) => {
+              const newText = e.target.value;
+              setMinuteText(newText);
+              onMinuteTextChange?.(newText);
+            }}
             placeholder="Pega aquí el contenido de la minuta de reunión, documento de requisitos, o descripción del caso de uso..."
             className="min-h-[200px] resize-y"
           />

@@ -42,6 +42,7 @@ interface FormStepsProps {
 
   onNextStep?: () => void;
   onPreviousStep?: () => void;
+  onMinuteTextChange?: (text: string) => void;
 
 }
 
@@ -65,7 +66,8 @@ export default function FormSteps({
   onRemoveTestStep,
   onUpdateTestStep,
   onNextStep,
-  onPreviousStep
+  onPreviousStep,
+  onMinuteTextChange
 }: FormStepsProps) {
 
   const handleInputChange = (field: keyof UseCaseFormData, value: any) => {
@@ -209,6 +211,7 @@ export default function FormSteps({
       <MinuteAnalysisStep
         formData={formData}
         onDataExtracted={onUpdateFormData}
+        onMinuteTextChange={onMinuteTextChange}
       />
     );
   }

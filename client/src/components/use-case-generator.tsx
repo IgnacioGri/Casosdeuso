@@ -18,6 +18,7 @@ export default function UseCaseGenerator() {
   const [generatedUseCase, setGeneratedUseCase] = useState<UseCase | null>(null);
   const [generationProgress, setGenerationProgress] = useState<string>("");
   const [progressPercentage, setProgressPercentage] = useState(0);
+  const [minuteText, setMinuteText] = useState<string>("");
 
   const { toast } = useToast();
 
@@ -190,6 +191,29 @@ export default function UseCaseGenerator() {
   });
 
   const handleNextStep = () => {
+    // Special validation for step 2 (Minute Analysis) - check if minute text is empty
+    if (currentStep === 2) {
+      // Check if minuteText is empty (this would be tracked in the MinuteAnalysisStep component)
+      // Since we don't have direct access to minuteText here, we'll check if basic fields are filled
+      // after minute analysis, or if the user wants to proceed without minute analysis
+      const hasBasicInfo = formData.clientName || formData.projectName || formData.useCaseName || formData.description;
+      
+      if (!minuteText.trim() && !hasBasicInfo) {
+        const confirmed = window.confirm(
+          "⚠️ Sin Análisis de Minuta\n\n" +
+          "No se ha ingresado texto de minuta para analizar automáticamente.\n\n" +
+          "Opciones:\n" +
+          "• Volver atrás y agregar el texto de la minuta\n" +
+          "• Continuar y llenar el formulario manualmente\n\n" +
+          "¿Deseas continuar sin análisis de minuta y llenar el formulario manualmente?"
+        );
+        
+        if (!confirmed) {
+          return; // User cancelled, stay on current step
+        }
+      }
+    }
+
     // Check if we're on the test case step
     const isTestCaseStep = () => {
       if (!formData.generateTestCase) return false;
@@ -437,6 +461,7 @@ export default function UseCaseGenerator() {
 
             onNextStep={handleNextStep}
             onPreviousStep={handlePreviousStep}
+            onMinuteTextChange={setMinuteText}
           />
 
           {/* Navigation Buttons - Bottom */}
